@@ -4,6 +4,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Android HERMIT</string>
+    <string name="title_preference_screen">Android HERMIT preferences</string>
     <string name="open_file">Open file</string>
+    <string name="open_file_message">From where do you want to open a Haskell source file?</string>
 
 </resources>
