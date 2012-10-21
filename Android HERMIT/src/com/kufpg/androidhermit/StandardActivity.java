@@ -43,15 +43,20 @@ public class StandardActivity extends Activity {
 		case R.id.open_file:
 			openFile();
 			return true;
+		case R.id.menu_settings:
+			Intent settingsActivity = new Intent(getBaseContext(),
+					Preferences.class);
+			startActivity(settingsActivity);
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	public void makeToast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
-	
+
 	public void openCode(String code) {
 		//Empty stub; override where necessary
 	}
@@ -94,10 +99,10 @@ public class StandardActivity extends Activity {
 		});
 		openFileAlert.setNegativeButton("URL", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				// Canceled.
+				//TODO: Add URL extraction method.
 			}
 		});
-		
+
 		openFileAlert.show();
 	}
 
