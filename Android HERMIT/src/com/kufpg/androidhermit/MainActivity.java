@@ -1,11 +1,10 @@
 package com.kufpg.androidhermit;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.view.Menu;
 
-public class MainActivity extends Activity {
-
+public class MainActivity extends StandardActivity {
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -14,7 +13,7 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 }

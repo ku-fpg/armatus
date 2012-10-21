@@ -4,5 +4,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Android HERMIT</string>
+    <string name="open_file">Open file</string>
 
 </resources>
