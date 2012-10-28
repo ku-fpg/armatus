@@ -1,14 +1,13 @@
 package com.kufpg.androidhermit;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 import com.kufpg.androidhermit.util.FileIOManager;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,7 +40,11 @@ public class StandardActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()) {
 		case R.id.open_file:
-			openFile();
+			Intent filesIntent = new Intent();
+			filesIntent.setType("text/plain");
+			filesIntent.setAction(Intent.ACTION_GET_CONTENT);								
+			startActivityForResult(Intent.createChooser(filesIntent,
+					"Select app"), FILE_FROM_DISK);
 			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
@@ -69,41 +72,18 @@ public class StandardActivity extends Activity {
 		case FILE_FROM_DISK:
 			if(resultCode == RESULT_OK) {
 				Uri diskTextFile = intent.getData();
-				String code = null;
+				ArrayList<String> code = null;
 				try {
-					code = FileIOManager.readText(getContentResolver().openInputStream(diskTextFile));
+					code = FileIOManager.getTextArray(getContentResolver().openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				openCode(code);
+				Intent codeIntent = new Intent(this, WarpDSLV.class);
+				codeIntent.putExtra("CODE_ARRAY", code);
+				startActivity(codeIntent);
 			}
 		}
-	}
-
-	protected void openFile() {
-		//TODO: If file is unsaved, show save dialog
-
-		AlertDialog.Builder openFileAlert = new AlertDialog.Builder(mContext);
-		openFileAlert.setMessage(R.string.open_file_message);
-		openFileAlert.setCancelable(true);
-
-		openFileAlert.setPositiveButton("File", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				Intent filesIntent = new Intent();
-				filesIntent.setType("text/plain");
-				filesIntent.setAction(Intent.ACTION_GET_CONTENT);								
-				startActivityForResult(Intent.createChooser(filesIntent,
-						"Select app"), FILE_FROM_DISK);
-			}
-		});
-		openFileAlert.setNegativeButton("URL", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				//TODO: Add URL extraction method.
-			}
-		});
-
-		openFileAlert.show();
 	}
 
 }
