@@ -6,6 +6,7 @@
     <string name="title_activity_main">Android HERMIT</string>
     <string name="title_preference_screen">Android HERMIT preferences</string>
     <string name="open_file">Open file</string>
-    <string name="open_file_message">From where do you want to open a Haskell source file?</string>
+    <string name="save_file">Save file</string>
+    <string name="default_pref_message">Are you sure you want to restore the default settings?</string>
 
 </resources>

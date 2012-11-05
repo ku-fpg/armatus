@@ -9,8 +9,10 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,20 +21,37 @@ import android.widget.Toast;
 public class StandardActivity extends Activity {
 
 	public final static int FILE_FROM_DISK = 1;
-	protected Context mContext = this;
+	protected static Context mContext;
+	protected static String mSaveDir;
+	protected static String mDefaultSaveDir;
+	protected static String mEditModeValue;
+	protected static SharedPreferences prefs;
+	protected static SharedPreferences.Editor prefsEditor;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
+
+		mContext = getApplicationContext();
+		mSaveDir = getCacheDir().toString();
+		mDefaultSaveDir = mSaveDir;
+		mEditModeValue = "0";
+		prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		prefsEditor = prefs.edit();
+		if(getSaveDir() == null) {
+			loadPrefs();
+		}
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.actionbar, menu);
+
+		MenuItem item = menu.findItem(R.id.save_file);
+		item.setVisible(false);
 		return true;
 	}
 
@@ -68,7 +87,7 @@ public class StandardActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) { 
 		super.onActivityResult(requestCode, resultCode, intent);
 
-		switch(requestCode) { 
+		switch(requestCode) {
 		case FILE_FROM_DISK:
 			if(resultCode == RESULT_OK) {
 				Uri diskTextFile = intent.getData();
@@ -76,14 +95,51 @@ public class StandardActivity extends Activity {
 				try {
 					code = FileIOManager.getTextArray(getContentResolver().openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				Intent codeIntent = new Intent(this, WarpDSLV.class);
 				codeIntent.putExtra("CODE_ARRAY", code);
+				String[] uriBits = intent.getDataString().replace("file:///", "").split("/"); //The replace method is due to the Nexus 7's filesystem, so this may need to be improved later
+				String codePath = "";
+				for(int i = 0; i < uriBits.length - 1; i++)
+					codePath += "/" + uriBits[i];
+				codeIntent.putExtra("CODE_PATH", codePath);
+				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
 				startActivity(codeIntent);
 			}
 		}
+	}
+
+	public static String getSaveDir() {
+		return mSaveDir;
+	}
+
+	public static void setSaveDir(String saveDir) {
+		mSaveDir = saveDir;
+	}
+
+	public static String getDefaultSaveDir() {
+		return mDefaultSaveDir;
+	}
+
+	public static String getEditModeValue() {
+		return mEditModeValue;
+	}
+
+	public static void setEditModeValue(String editModeValue) {
+		mEditModeValue = editModeValue;
+	}
+
+	public static void setDefaultPrefs() {
+		prefsEditor.clear();
+		PreferenceManager.setDefaultValues(mContext, R.xml.preferences, true);
+		prefsEditor.commit();
+	}
+
+	public static void loadPrefs() {
+		prefsEditor.putString("savedir_pref", mSaveDir);
+		prefsEditor.putString("editmode_pref", mEditModeValue);
+		prefsEditor.commit();
 	}
 
 }

@@ -22,12 +22,14 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class WarpDSLV extends ListActivity {
 
 	public final static int FILE_FROM_DISK = 1;
 	private CodeAdapter mAdapter;
 	private ArrayList<String> mList;
+	private String mFileName;
 
 	private DragSortListView.DropListener onDrop =
 			new DragSortListView.DropListener() {
@@ -77,8 +79,9 @@ public class WarpDSLV extends ListActivity {
 		lv.setRemoveListener(onRemove);
 		lv.setDragScrollProfile(ssProfile);
 
+		mFileName = getIntent().getStringExtra("CODE_FILENAME");
+		StandardActivity.setSaveDir(getIntent().getStringExtra("CODE_PATH"));
 		mList = (ArrayList<String>) getIntent().getSerializableExtra("CODE_ARRAY");
-
 		mAdapter = new CodeAdapter(mList);
 		setListAdapter(mAdapter);
 	}
@@ -100,6 +103,13 @@ public class WarpDSLV extends ListActivity {
 			startActivityForResult(Intent.createChooser(filesIntent,
 					"Select app"), FILE_FROM_DISK);
 			return true;
+		case R.id.save_file:
+			if(FileIOManager.saveTextArray(mList, StandardActivity.getSaveDir(), mFileName, this)) {
+				makeToast(mFileName + " saved successfully!");
+			} else {
+				makeToast("There was an error saving " + mFileName);
+			}
+			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
 					Preferences.class);
@@ -108,6 +118,10 @@ public class WarpDSLV extends ListActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	public void makeToast(String message) {
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -127,6 +141,12 @@ public class WarpDSLV extends ListActivity {
 				}
 				Intent codeIntent = new Intent(this, WarpDSLV.class);
 				codeIntent.putExtra("CODE_ARRAY", code);
+				String[] uriBits = intent.getDataString().split("/");
+				String codePath = "";
+				for(int i = 0; i < uriBits.length - 1; i++)
+					codePath += "/" + uriBits[i];
+				codeIntent.putExtra("CODE_PATH", codePath);
+				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
 				finish();
 				startActivity(codeIntent);
 			}
@@ -143,21 +163,21 @@ public class WarpDSLV extends ListActivity {
 
 	private class CodeAdapter extends ArrayAdapter<String> {
 		private LayoutInflater mInflater;
-		private ArrayList<String> backupItems = new ArrayList<String>();
+		private ArrayList<String> backupList = new ArrayList<String>();
 
 		public CodeAdapter(List<String> codeLines) {
 			super(WarpDSLV.this, R.layout.list_item_handle_right,
 					R.id.text, codeLines);
 			mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			backupItems = mList;
+			backupList = mList;
 			notifyDataSetChanged();
 		}
 
 		public int getCount() {
-			return backupItems.size();
+			return backupList.size();
 		}
 
-		
+
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder;
 
@@ -169,9 +189,9 @@ public class WarpDSLV extends ListActivity {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			
+
 			//Fill EditText with the value you have in data source
-			holder.codeView.setText(backupItems.get(position));
+			holder.codeView.setText(backupList.get(position));
 			holder.codeView.setId(position);
 
 			//we need to update adapter once we finish with editing
@@ -180,7 +200,7 @@ public class WarpDSLV extends ListActivity {
 					if (!hasFocus){
 						final int position = v.getId();
 						final EditText Caption = (EditText) v;
-						backupItems.set(position, Caption.getText().toString());
+						backupList.set(position, Caption.getText().toString());
 					}
 				}
 			});
