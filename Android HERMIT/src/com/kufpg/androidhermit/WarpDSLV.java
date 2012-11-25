@@ -142,7 +142,7 @@ public class WarpDSLV extends ListActivity {
 			alert.show();
 			return true;
 		case R.id.save_file:
-			if(FileIOManager.saveTextArray(mList, StandardActivity.getSaveDir(), mFileName, this)) {
+			if(FileIOManager.saveTextArray(mList, StandardActivity.getSaveDir(), mFileName)) {
 				makeToast(mFileName + " saved successfully!");
 			} else {
 				makeToast("There was an error saving " + mFileName);
