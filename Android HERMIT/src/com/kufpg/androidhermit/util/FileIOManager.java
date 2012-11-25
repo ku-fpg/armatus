@@ -12,51 +12,51 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.Context;
 import android.util.Base64OutputStream;
+import android.widget.Toast;
 
 public class FileIOManager {
-
-	public static String readText(InputStream textStream) {
-		InputStream inputStream = textStream;
-		//InputStream inputStream = getResources().openRawResource(R.raw.internals);
-		System.out.println(inputStream);
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		int i;
-
-		try {
-			i = inputStream.read();
-			while (i != -1)
-			{
-				byteArrayOutputStream.write(i);
-				i = inputStream.read();
-			}
-			inputStream.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return byteArrayOutputStream.toString();
-	}
 
 	public static ArrayList<String> getTextArray(InputStream textStream) {
 		ArrayList<String> textArray = new ArrayList<String>();
 		try {                        
 			FileInputStream fileIS = (FileInputStream) textStream;          
 			BufferedReader buf = new BufferedReader(new InputStreamReader(fileIS));           
-			String readString;         
-
+			String readString;
 			while ((readString = buf.readLine()) != null) {   
 				textArray.add(readString);
 			}
+			buf.close();
 		} catch (FileNotFoundException e) {          
 			e.printStackTrace();          
 		} catch (IOException e){             
 			e.printStackTrace();          
 		}    
+		return textArray;
+	}
+
+	public static ArrayList<String> getTextArrayFromUrl(String textUrlLoc) {
+		ArrayList<String> textArray = new ArrayList<String>();
+		try {
+			URL textUrl = new URL(textUrlLoc);
+			BufferedReader buf = new BufferedReader(new InputStreamReader(textUrl.openStream()));
+			String readString;
+			while ((readString = buf.readLine()) != null) {
+				textArray.add(readString);
+			}
+			buf.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return textArray;
 	}
 
@@ -99,6 +99,34 @@ public class FileIOManager {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static boolean isTextFile(String urlLoc) {
+		URL url = null;
+		try {
+			url = new URL(urlLoc);
+			HttpURLConnection urlc = (HttpURLConnection)url.openConnection();
+			urlc.setAllowUserInteraction(false);
+			urlc.setDoInput(true);
+			urlc.setDoOutput(false);
+			urlc.setUseCaches(true);
+			urlc.setRequestMethod("HEAD");
+			urlc.connect();
+			String mime = urlc.getContentType();
+			if(mime != null) {
+				mime = mime.replaceAll(";[^;]*$", ""); //Get rid of some extra stuff after the MIME type
+				if(mime.equals("text/plain")) {
+					return true;
+				}
+			}
+		} catch(MalformedURLException e) {
+			e.printStackTrace();
+		} catch (ProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

@@ -8,8 +8,10 @@ import com.kufpg.androidhermit.dragsort.DragSortListView;
 import com.kufpg.androidhermit.util.FileIOManager;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 public class WarpDSLV extends ListActivity {
 
 	public final static int FILE_FROM_DISK = 1;
+	private Context mContext;
 	private CodeAdapter mAdapter;
 	private ArrayList<String> mList;
 	private String mFileName;
@@ -74,16 +77,17 @@ public class WarpDSLV extends ListActivity {
 		actionBar.show();
 
 		DragSortListView lv = (DragSortListView) getListView(); 
-
 		lv.setDropListener(onDrop);
 		lv.setRemoveListener(onRemove);
 		lv.setDragScrollProfile(ssProfile);
 
 		mFileName = getIntent().getStringExtra("CODE_FILENAME");
-		StandardActivity.setSaveDir(getIntent().getStringExtra("CODE_PATH"));
+		if(getIntent().getStringExtra("CODE_PATH") != null)
+			StandardActivity.setSaveDir(getIntent().getStringExtra("CODE_PATH"));
 		mList = (ArrayList<String>) getIntent().getSerializableExtra("CODE_ARRAY");
 		mAdapter = new CodeAdapter(mList);
 		setListAdapter(mAdapter);
+		mContext = getApplicationContext();
 	}
 
 	@Override
@@ -96,12 +100,46 @@ public class WarpDSLV extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()) {
-		case R.id.open_file:
+		case R.id.open_from_disk:
 			Intent filesIntent = new Intent();
 			filesIntent.setType("text/plain");
 			filesIntent.setAction(Intent.ACTION_GET_CONTENT);								
 			startActivityForResult(Intent.createChooser(filesIntent,
 					"Select app"), FILE_FROM_DISK);
+			return true;
+		case R.id.open_from_url:
+			final Context c = this;
+			AlertDialog.Builder alert = new AlertDialog.Builder(c);
+			alert.setMessage(R.string.open_from_url_message);
+
+			// Set an EditText view to get user input 
+			final EditText inputBox = new EditText(c);
+			alert.setView(inputBox);
+
+			alert.setPositiveButton("Open", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String textInput = inputBox.getText().toString();
+					if(FileIOManager.isTextFile(textInput)) {
+						ArrayList<String> code = FileIOManager.getTextArrayFromUrl(textInput);
+						Intent codeIntent = new Intent(mContext, WarpDSLV.class);
+						codeIntent.putExtra("CODE_ARRAY", code);
+						String[] uriBits = textInput.split("/");
+						codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
+						finish();
+						startActivity(codeIntent);
+					} else {
+						makeToast("The entered URL is not a plaintext file.");
+					}
+				}
+			});
+
+			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Cancelled.
+				}
+			});
+
+			alert.show();
 			return true;
 		case R.id.save_file:
 			if(FileIOManager.saveTextArray(mList, StandardActivity.getSaveDir(), mFileName, this)) {

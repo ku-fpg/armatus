@@ -6,15 +6,23 @@
         android:showAsAction="never"
         android:title="@string/menu_settings"/>
     <item
-        android:id="@+id/open_file"
+        android:id="@+id/open_from_disk"
+        android:icon="@drawable/open_from_disk"
         android:orderInCategory="1"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/open_file">
+        android:showAsAction="ifRoom"
+        android:title="@string/open_from_disk">
+    </item>
+    <item
+        android:id="@+id/open_from_url"
+        android:orderInCategory="2"
+        android:showAsAction="ifRoom"
+        android:title="@string/open_from_url" android:icon="@drawable/open_from_url">
     </item>
     <item
         android:id="@+id/save_file"
-        android:orderInCategory="2"
-        android:showAsAction="ifRoom|withText"
+        android:icon="@drawable/save_file"
+        android:orderInCategory="3"
+        android:showAsAction="ifRoom"
         android:title="@string/save_file">
     </item>
 

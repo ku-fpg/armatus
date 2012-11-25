@@ -7,15 +7,19 @@ import com.kufpg.androidhermit.util.FileIOManager;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class StandardActivity extends Activity {
@@ -43,6 +47,10 @@ public class StandardActivity extends Activity {
 		if(getSaveDir() == null) {
 			loadPrefs();
 		}
+		
+		//This prevents some exceptions from being thrown when the Internet is accessed
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	    StrictMode.setThreadPolicy(policy);
 	}
 
 	@Override
@@ -58,12 +66,45 @@ public class StandardActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()) {
-		case R.id.open_file:
+		case R.id.open_from_disk:
 			Intent filesIntent = new Intent();
 			filesIntent.setType("text/plain");
 			filesIntent.setAction(Intent.ACTION_GET_CONTENT);								
 			startActivityForResult(Intent.createChooser(filesIntent,
 					"Select app"), FILE_FROM_DISK);
+			return true;
+		case R.id.open_from_url:
+			final Context c = this;
+			AlertDialog.Builder alert = new AlertDialog.Builder(c);
+			alert.setMessage(R.string.open_from_url_message);
+
+			// Set an EditText view to get user input 
+			final EditText inputBox = new EditText(c);
+			alert.setView(inputBox);
+
+			alert.setPositiveButton("Open", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String textInput = inputBox.getText().toString();
+					if(FileIOManager.isTextFile(textInput)) {
+						ArrayList<String> code = FileIOManager.getTextArrayFromUrl(textInput);
+						Intent codeIntent = new Intent(mContext, WarpDSLV.class);
+						codeIntent.putExtra("CODE_ARRAY", code);
+						String[] uriBits = textInput.split("/");
+						codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
+						startActivity(codeIntent);
+					} else {
+						makeToast("The entered URL is not a plaintext file.");
+					}
+				}
+			});
+
+			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Cancelled.
+				}
+			});
+
+			alert.show();
 			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
