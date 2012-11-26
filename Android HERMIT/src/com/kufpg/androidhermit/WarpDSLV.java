@@ -4,8 +4,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+
 import com.kufpg.androidhermit.dragsort.DragSortListView;
 import com.kufpg.androidhermit.util.FileIOManager;
+import com.kufpg.androidhermit.util.HermitJsonObject;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
@@ -172,9 +175,8 @@ public class WarpDSLV extends ListActivity {
 				Uri diskTextFile = intent.getData();
 				ArrayList<String> code = null;
 				try {
-					code = FileIOManager.getTextArray(getContentResolver().openInputStream(diskTextFile));
+					code = FileIOManager.getTextArrayFromDisk(getContentResolver().openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				Intent codeIntent = new Intent(this, WarpDSLV.class);
@@ -185,6 +187,26 @@ public class WarpDSLV extends ListActivity {
 					codePath += "/" + uriBits[i];
 				codeIntent.putExtra("CODE_PATH", codePath);
 				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
+				
+				/* Code for opening a file with HermitJsonObject */
+//				Uri diskTextFile = intent.getData();
+//				HermitJsonObject hjo = null;
+//				try {
+//					hjo = new HermitJsonObject(getContentResolver().openInputStream(diskTextFile));
+//				} catch (FileNotFoundException e) {
+//					e.printStackTrace();
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//				Intent codeIntent = new Intent(this, WarpDSLV.class);
+//				codeIntent.putExtra("CODE_ARRAY", hjo.getJSONContents());
+//				String[] uriBits = intent.getDataString().replace("file:///", "").split("/"); //The replace method is due to the Nexus 7's filesystem, so this may need to be improved later
+//				String codePath = "";
+//				for(int i = 0; i < uriBits.length - 1; i++)
+//					codePath += "/" + uriBits[i];
+//				codeIntent.putExtra("CODE_PATH", codePath);
+//				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
+				
 				finish();
 				startActivity(codeIntent);
 			}

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class FileIOManager {
 
-	public static ArrayList<String> getTextArray(InputStream textStream) {
+	public static ArrayList<String> getTextArrayFromDisk(InputStream textStream) {
 		ArrayList<String> textArray = new ArrayList<String>();
 		try {                        
 			FileInputStream fileIS = (FileInputStream) textStream;          
@@ -31,6 +31,24 @@ public class FileIOManager {
 			e.printStackTrace();          
 		}    
 		return textArray;
+	}
+	
+	public static String getTextFromDisk(InputStream textStream) {
+		String text = "";
+		try {                        
+			FileInputStream fileIS = (FileInputStream) textStream;          
+			BufferedReader buf = new BufferedReader(new InputStreamReader(fileIS));           
+			String readString;
+			while ((readString = buf.readLine()) != null) {   
+				text += readString + "\n";
+			}
+			buf.close();
+		} catch (FileNotFoundException e) {          
+			e.printStackTrace();          
+		} catch (IOException e){             
+			e.printStackTrace();          
+		}    
+		return text;
 	}
 
 	public static ArrayList<String> getTextArrayFromUrl(String textUrlLoc) {
