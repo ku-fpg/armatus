@@ -26,4 +26,20 @@
             tools:context=".MainActivity" />
     </ScrollView>
 
+    <Button
+        android:id="@+id/lock_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/code_scroll_view"
+        android:text="Do something important (and lock)" />
+    
+    <Button
+        android:id="@+id/unlock_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/lock_button"
+        android:text="Unlock important button" />
+
 </RelativeLayout>

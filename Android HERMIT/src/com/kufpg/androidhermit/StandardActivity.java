@@ -123,10 +123,6 @@ public class StandardActivity extends Activity {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
-	public void openCode(String code) {
-		//Empty stub; override where necessary
-	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) { 
 		super.onActivityResult(requestCode, resultCode, intent);

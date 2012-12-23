@@ -29,10 +29,10 @@ public class FileIOManager {
 			e.printStackTrace();          
 		} catch (IOException e){             
 			e.printStackTrace();          
-		}    
+		}
 		return textArray;
 	}
-	
+
 	public static String getTextFromDisk(InputStream textStream) {
 		String text = "";
 		try {                        

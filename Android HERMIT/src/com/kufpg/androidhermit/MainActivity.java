@@ -1,22 +1,72 @@
 package com.kufpg.androidhermit;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import android.os.Bundle;
 import android.view.Menu;
-import android.widget.ScrollView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends StandardActivity {
 
-	private ScrollView scrollView;
 	private TextView codeView;
+	private Button lockButton, unlockButton;
+	private int mNumTextChanges = 0;
+	private boolean mIsLocked = false;
+	private final ReentrantLock mLock = new ReentrantLock(true);
+	private final Condition lockInEffect = mLock.newCondition();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		scrollView = (ScrollView) findViewById(R.id.code_scroll_view);
 		codeView = (TextView) findViewById(R.id.code_text_view);
+		setCodeText(mNumTextChanges, mIsLocked);
+		lockButton = (Button) findViewById(R.id.lock_button);
+		unlockButton = (Button) findViewById(R.id.unlock_button);
+
+		lockButton.setOnClickListener(new OnClickListener() {	
+			@Override
+			public void onClick(View v) {
+				mLock.lock();
+				try {
+					while(mIsLocked) {
+						try {
+							lockInEffect.await();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					mIsLocked = true;
+					lockButton.setEnabled(false);
+					mNumTextChanges++;
+					setCodeText(mNumTextChanges, mIsLocked);
+				} finally {
+					mLock.unlock();
+				}
+			}
+		});
+
+		unlockButton.setOnClickListener(new OnClickListener() {	
+			@Override
+			public void onClick(View v) {
+				mLock.lock();
+				try {
+					if(mIsLocked) {
+						lockInEffect.signal();
+						mIsLocked = false;
+						lockButton.setEnabled(true);
+						setCodeText(mNumTextChanges, mIsLocked);
+					}
+				} finally {
+					mLock.unlock();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -25,28 +75,8 @@ public class MainActivity extends StandardActivity {
 		return true;
 	}
 
-	@Override
-	public void openCode(String code) {
-		codeView.setText(code);
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putIntArray("ARTICLE_SCROLL_POSITION",
-				new int[]{ scrollView.getScrollX(), scrollView.getScrollY()});
-	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		final int[] position = savedInstanceState.getIntArray("ARTICLE_SCROLL_POSITION");
-		if(position != null)
-			scrollView.post(new Runnable() {
-				public void run() {
-					scrollView.scrollTo(position[0], position[1]);
-				}
-			});
+	private void setCodeText(int numTextChanges, boolean isLocked) {
+		codeView.setText("Button pushed " + numTextChanges + " times. (Status: " + (isLocked ? "locked" : "unlocked") + ".)");
 	}
 
 }
