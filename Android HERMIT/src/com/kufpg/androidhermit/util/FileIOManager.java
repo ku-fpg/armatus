@@ -7,11 +7,28 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.http.AndroidHttpClient;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.ImageView;
 
 public class FileIOManager {
 
@@ -116,6 +133,97 @@ public class FileIOManager {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public static void downloadImage(String url, ImageView imageView, boolean showProgress, Context context) {
+        BitmapDownloaderTask task = new BitmapDownloaderTask(imageView, showProgress, context);
+        task.execute(url);
+    }
+	
+	public static class BitmapDownloaderTask extends AsyncTask<String, Long, Bitmap> {
+	    private final WeakReference<ImageView> imageViewReference;
+	    private final boolean mShowProgress;
+	    private ProgressDialog mDialog;
+
+	    public BitmapDownloaderTask(ImageView imageView, boolean showProgress, Context context) {
+	        imageViewReference = new WeakReference<ImageView>(imageView);
+	        mShowProgress = showProgress;
+	        
+	        if(mShowProgress) {
+	        	mDialog = new ProgressDialog(context);
+		        mDialog.setTitle("Downloading image");
+				mDialog.setMessage("Please wait...");
+				mDialog.setCancelable(false);
+				mDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, "Cancel", new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						BitmapDownloaderTask.this.cancel(true);
+					}
+				});
+				mDialog.show();
+	        }
+	    }
+
+	    @Override
+	    // Actual download method, run in the task thread
+	    protected Bitmap doInBackground(String... params) {
+	         // params comes from the execute() call: params[0] is the url.
+	         return downloadBitmap(params[0]);
+	    }
+
+	    @Override
+	    // Once the image is downloaded, associates it to the imageView
+	    protected void onPostExecute(Bitmap bitmap) {
+	        if (isCancelled()) {
+	            bitmap = null;
+	        }
+	        if (imageViewReference != null) {
+	            ImageView imageView = imageViewReference.get();
+	            if (imageView != null) {
+	                imageView.setImageBitmap(bitmap);
+	            }
+	        }
+	        if(mShowProgress) {
+		        mDialog.dismiss();
+	        }
+	    }
+	    
+	    public Bitmap downloadBitmap(String url) {
+		    final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+		    final HttpGet getRequest = new HttpGet(url);
+
+		    try {
+		        HttpResponse response = client.execute(getRequest);
+		        final int statusCode = response.getStatusLine().getStatusCode();
+		        if (statusCode != HttpStatus.SC_OK) { 
+		            Log.w("ImageDownloader", "Error " + statusCode + " while retrieving bitmap from " + url); 
+		            return null;
+		        }
+		        
+		        final HttpEntity entity = response.getEntity();
+		        if (entity != null) {
+		            InputStream inputStream = null;
+		            try {
+		                inputStream = entity.getContent(); 
+		                final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+		                return bitmap;
+		            } finally {
+		                if (inputStream != null) {
+		                    inputStream.close();  
+		                }
+		                entity.consumeContent();
+		            }
+		        }
+		    } catch (Exception e) {
+		        // Could provide a more explicit error message for IOException or IllegalStateException
+		        getRequest.abort();
+		        Log.w("ImageDownloader", "Error " + e.toString() + " while retrieving bitmap from " + url);
+		    } finally {
+		        if (client != null) {
+		            client.close();
+		        }
+		    }
+		    return null;
+		}
 	}
 
 }
