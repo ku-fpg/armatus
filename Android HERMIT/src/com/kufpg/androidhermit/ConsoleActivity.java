@@ -42,14 +42,14 @@ import android.view.MenuItem;
 import android.view.Display;
 import android.util.DisplayMetrics;
 
-public class ConsoleActivity extends Activity implements IStdOut {
+public class ConsoleActivity extends StandardActivity implements IStdOut {
 	private ConsoleScrollView scrollView;
 	private ConsoleOutputTextView outputTextView;
 	private CommandDispatcher cmdDispatcher;
 
 	/** Called when the activity is first created. */
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console);
 		CFunc.setAppInst(this.getApplication());

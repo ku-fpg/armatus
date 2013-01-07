@@ -117,7 +117,7 @@ public class MainActivity extends StandardActivity {
 			@Override
 			public void onClick(View arg0) {
 				Intent consoleIntent = new Intent(mContext,
-						ConsoleActivity.class);
+						TestConsoleActivity.class);
 				startActivity(consoleIntent);
 			}
 		});
