@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class TestConsoleActivity extends StandardActivity {
@@ -14,11 +15,13 @@ public class TestConsoleActivity extends StandardActivity {
 	private TextView tv1;
 	private View recent;
 	private LayoutParams lp;
+	private ScrollView sv; 
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_console);
 
+		sv = (ScrollView) findViewById(R.id.scroll);
 		rr = (RelativeLayout) findViewById(R.id.whatever);
 		b1 = (Button) findViewById(R.id.add_text_button);
 		recent = b1;

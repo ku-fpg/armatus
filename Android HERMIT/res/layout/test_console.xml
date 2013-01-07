@@ -1,15 +1,22 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/whatever"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:fillViewport="true" >
 
-    <Button
-        android:id="@+id/add_text_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add text"
-        android:textColor="@android:color/black" >
-    </Button>
+    <RelativeLayout
+        android:id="@+id/whatever"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/add_text_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add text"
+            android:textColor="@android:color/black" >
+        </Button>
+    </RelativeLayout>
+
+</ScrollView>
