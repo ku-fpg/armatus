@@ -1,21 +1,48 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <RelativeLayout
+            android:id="@+id/whatever"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/add_text_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add text"
+                android:textColor="@android:color/black" >
+            </Button>
+        </RelativeLayout>
+    </ScrollView>
 
     <RelativeLayout
-        android:id="@+id/whatever"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/lowerLayout"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/add_text_button"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/inputBox"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Add text"
-            android:textColor="@android:color/black" >
-        </Button>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="center_vertical"
+            android:background="@android:drawable/editbox_background_normal"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textCursorDrawable="@null" />
     </RelativeLayout>
 
-</ScrollView>
+</RelativeLayout>
