@@ -4,12 +4,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-
 import com.kufpg.androidhermit.dragsort.DragSortListView;
 import com.kufpg.androidhermit.util.FileIOManager;
-import com.kufpg.androidhermit.util.HermitJsonObject;
-
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -37,11 +33,10 @@ public class WarpDSLV extends ListActivity {
 	private ArrayList<String> mList;
 	private String mFileName;
 
-	private DragSortListView.DropListener onDrop =
-			new DragSortListView.DropListener() {
+	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
-			String item=mAdapter.getItem(from);
+			String item = mAdapter.getItem(from);
 
 			mAdapter.notifyDataSetChanged();
 			mAdapter.remove(item);
@@ -49,21 +44,19 @@ public class WarpDSLV extends ListActivity {
 		}
 	};
 
-	private DragSortListView.RemoveListener onRemove = 
-			new DragSortListView.RemoveListener() {
+	private DragSortListView.RemoveListener onRemove = new DragSortListView.RemoveListener() {
 		@Override
 		public void remove(int which) {
 			mAdapter.remove(mAdapter.getItem(which));
 		}
 	};
 
-	private DragSortListView.DragScrollProfile ssProfile =
-			new DragSortListView.DragScrollProfile() {
+	private DragSortListView.DragScrollProfile ssProfile = new DragSortListView.DragScrollProfile() {
 		@Override
 		public float getSpeed(float w, long t) {
 			if (w > 0.8f) {
 				// Traverse all views in a millisecond
-				return ((float) mAdapter.getCount()) / 0.001f;
+				return (mAdapter.getCount()) / 0.001f;
 			} else {
 				return 10.0f * w;
 			}
@@ -79,15 +72,17 @@ public class WarpDSLV extends ListActivity {
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
 
-		DragSortListView lv = (DragSortListView) getListView(); 
+		DragSortListView lv = (DragSortListView) getListView();
 		lv.setDropListener(onDrop);
 		lv.setRemoveListener(onRemove);
 		lv.setDragScrollProfile(ssProfile);
 
 		mFileName = getIntent().getStringExtra("CODE_FILENAME");
-		if(getIntent().getStringExtra("CODE_PATH") != null)
-			StandardActivity.setSaveDir(getIntent().getStringExtra("CODE_PATH"));
-		mList = (ArrayList<String>) getIntent().getSerializableExtra("CODE_ARRAY");
+		if (getIntent().getStringExtra("CODE_PATH") != null)
+			StandardActivity
+					.setSaveDir(getIntent().getStringExtra("CODE_PATH"));
+		mList = (ArrayList<String>) getIntent().getSerializableExtra(
+				"CODE_ARRAY");
 		mAdapter = new CodeAdapter(mList);
 		setListAdapter(mAdapter);
 		mContext = getApplicationContext();
@@ -101,51 +96,62 @@ public class WarpDSLV extends ListActivity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()) {
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 		case R.id.open_from_disk:
 			Intent filesIntent = new Intent();
 			filesIntent.setType("text/plain");
-			filesIntent.setAction(Intent.ACTION_GET_CONTENT);								
-			startActivityForResult(Intent.createChooser(filesIntent,
-					"Select app"), FILE_FROM_DISK);
+			filesIntent.setAction(Intent.ACTION_GET_CONTENT);
+			startActivityForResult(
+					Intent.createChooser(filesIntent, "Select app"),
+					FILE_FROM_DISK);
 			return true;
 		case R.id.open_from_url:
 			final Context c = this;
 			AlertDialog.Builder alert = new AlertDialog.Builder(c);
 			alert.setMessage(R.string.open_from_url_message);
 
-			// Set an EditText view to get user input 
+			// Set an EditText view to get user input
 			final EditText inputBox = new EditText(c);
 			alert.setView(inputBox);
 
-			alert.setPositiveButton("Open", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					String textInput = inputBox.getText().toString();
-					if(FileIOManager.isTextFile(textInput)) {
-						ArrayList<String> code = FileIOManager.getTextArrayFromUrl(textInput);
-						Intent codeIntent = new Intent(mContext, WarpDSLV.class);
-						codeIntent.putExtra("CODE_ARRAY", code);
-						String[] uriBits = textInput.split("/");
-						codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
-						finish();
-						startActivity(codeIntent);
-					} else {
-						makeToast("The entered URL is not a plaintext file.");
-					}
-				}
-			});
+			alert.setPositiveButton("Open",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String textInput = inputBox.getText().toString();
+							if (FileIOManager.isTextFile(textInput)) {
+								ArrayList<String> code = FileIOManager
+										.getTextArrayFromUrl(textInput);
+								Intent codeIntent = new Intent(mContext,
+										WarpDSLV.class);
+								codeIntent.putExtra("CODE_ARRAY", code);
+								String[] uriBits = textInput.split("/");
+								codeIntent.putExtra("CODE_FILENAME",
+										uriBits[uriBits.length - 1]);
+								finish();
+								startActivity(codeIntent);
+							} else {
+								makeToast("The entered URL is not a plaintext file.");
+							}
+						}
+					});
 
-			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Cancelled.
-				}
-			});
+			alert.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							// Cancelled.
+						}
+					});
 
 			alert.show();
 			return true;
 		case R.id.save_file:
-			if(FileIOManager.saveTextArray(mList, StandardActivity.getSaveDir(), mFileName)) {
+			if (FileIOManager.saveTextArray(mList,
+					StandardActivity.getSaveDir(), mFileName)) {
 				makeToast(mFileName + " saved successfully!");
 			} else {
 				makeToast("There was an error saving " + mFileName);
@@ -166,16 +172,19 @@ public class WarpDSLV extends ListActivity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) { 
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 
-		switch(requestCode) { 
+		switch (requestCode) {
 		case FILE_FROM_DISK:
-			if(resultCode == RESULT_OK) {
+			if (resultCode == RESULT_OK) {
 				Uri diskTextFile = intent.getData();
 				ArrayList<String> code = null;
 				try {
-					code = FileIOManager.getTextArrayFromDisk(getContentResolver().openInputStream(diskTextFile));
+					code = FileIOManager
+							.getTextArrayFromDisk(getContentResolver()
+									.openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -183,30 +192,35 @@ public class WarpDSLV extends ListActivity {
 				codeIntent.putExtra("CODE_ARRAY", code);
 				String[] uriBits = intent.getDataString().split("/");
 				String codePath = "";
-				for(int i = 0; i < uriBits.length - 1; i++)
+				for (int i = 0; i < uriBits.length - 1; i++)
 					codePath += "/" + uriBits[i];
 				codeIntent.putExtra("CODE_PATH", codePath);
-				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
-				
+				codeIntent.putExtra("CODE_FILENAME",
+						uriBits[uriBits.length - 1]);
+
 				/* Code for opening a file with HermitJsonObject */
-//				Uri diskTextFile = intent.getData();
-//				HermitJsonObject hjo = null;
-//				try {
-//					hjo = new HermitJsonObject(getContentResolver().openInputStream(diskTextFile));
-//				} catch (FileNotFoundException e) {
-//					e.printStackTrace();
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				Intent codeIntent = new Intent(this, WarpDSLV.class);
-//				codeIntent.putExtra("CODE_ARRAY", hjo.getJSONContents());
-//				String[] uriBits = intent.getDataString().replace("file:///", "").split("/"); //The replace method is due to the Nexus 7's filesystem, so this may need to be improved later
-//				String codePath = "";
-//				for(int i = 0; i < uriBits.length - 1; i++)
-//					codePath += "/" + uriBits[i];
-//				codeIntent.putExtra("CODE_PATH", codePath);
-//				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
-				
+				// Uri diskTextFile = intent.getData();
+				// HermitJsonObject hjo = null;
+				// try {
+				// hjo = new
+				// HermitJsonObject(getContentResolver().openInputStream(diskTextFile));
+				// } catch (FileNotFoundException e) {
+				// e.printStackTrace();
+				// } catch (JSONException e) {
+				// e.printStackTrace();
+				// }
+				// Intent codeIntent = new Intent(this, WarpDSLV.class);
+				// codeIntent.putExtra("CODE_ARRAY", hjo.getJSONContents());
+				// String[] uriBits = intent.getDataString().replace("file:///",
+				// "").split("/"); //The replace method is due to the Nexus 7's
+				// filesystem, so this may need to be improved later
+				// String codePath = "";
+				// for(int i = 0; i < uriBits.length - 1; i++)
+				// codePath += "/" + uriBits[i];
+				// codeIntent.putExtra("CODE_PATH", codePath);
+				// codeIntent.putExtra("CODE_FILENAME",
+				// uriBits[uriBits.length-1]);
+
 				finish();
 				startActivity(codeIntent);
 			}
@@ -226,44 +240,50 @@ public class WarpDSLV extends ListActivity {
 		private ArrayList<String> backupList = new ArrayList<String>();
 
 		public CodeAdapter(List<String> codeLines) {
-			super(WarpDSLV.this, R.layout.list_item_handle_right,
-					R.id.text, codeLines);
+			super(WarpDSLV.this, R.layout.list_item_handle_right, R.id.text,
+					codeLines);
 			mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			backupList = mList;
 			notifyDataSetChanged();
 		}
 
+		@Override
 		public int getCount() {
 			return backupList.size();
 		}
 
-
+		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder;
 
 			if (convertView == null) {
 				holder = new ViewHolder();
-				convertView = mInflater.inflate(R.layout.list_item_handle_right, null);
-				holder.codeView = (EditText) convertView.findViewById(R.id.text);
+				convertView = mInflater.inflate(
+						R.layout.list_item_handle_right, null);
+				holder.codeView = (EditText) convertView
+						.findViewById(R.id.text);
 				convertView.setTag(holder);
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
 
-			//Fill EditText with the value you have in data source
+			// Fill EditText with the value you have in data source
 			holder.codeView.setText(backupList.get(position));
 			holder.codeView.setId(position);
 
-			//we need to update adapter once we finish with editing
-			holder.codeView.setOnFocusChangeListener(new OnFocusChangeListener() {
-				public void onFocusChange(View v, boolean hasFocus) {
-					if (!hasFocus){
-						final int position = v.getId();
-						final EditText Caption = (EditText) v;
-						backupList.set(position, Caption.getText().toString());
-					}
-				}
-			});
+			// we need to update adapter once we finish with editing
+			holder.codeView
+					.setOnFocusChangeListener(new OnFocusChangeListener() {
+						@Override
+						public void onFocusChange(View v, boolean hasFocus) {
+							if (!hasFocus) {
+								final int position = v.getId();
+								final EditText Caption = (EditText) v;
+								backupList.set(position, Caption.getText()
+										.toString());
+							}
+						}
+					});
 
 			return convertView;
 		}

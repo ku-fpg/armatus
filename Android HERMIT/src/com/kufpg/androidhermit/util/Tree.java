@@ -17,15 +17,14 @@ public class Tree<T> {
 	public Tree() {
 		super();
 	}
-	
+
 	public Tree(T data) {
 		super();
 		setRoot(new TreeNode<T>(data));
 	}
 
 	public enum TreeTraversalOrder {
-		PRE_ORDER,
-		POST_ORDER
+		PRE_ORDER, POST_ORDER
 	}
 
 	public TreeNode<T> getRoot() {
@@ -39,8 +38,9 @@ public class Tree<T> {
 	public int getNumberOfNodes() {
 		int numberOfNodes = 0;
 
-		if(root != null) {
-			numberOfNodes = auxiliaryGetNumberOfNodes(root) + 1; //1 for the root!
+		if (root != null) {
+			numberOfNodes = auxiliaryGetNumberOfNodes(root) + 1; // 1 for the
+																	// root!
 		}
 
 		return numberOfNodes;
@@ -49,7 +49,7 @@ public class Tree<T> {
 	private int auxiliaryGetNumberOfNodes(TreeNode<T> node) {
 		int numberOfNodes = node.getNumberOfChildren();
 
-		for(TreeNode<T> child : node.getChildren()) {
+		for (TreeNode<T> child : node.getChildren()) {
 			numberOfNodes += auxiliaryGetNumberOfNodes(child);
 		}
 
@@ -63,7 +63,7 @@ public class Tree<T> {
 	public TreeNode<T> find(T dataToFind) {
 		TreeNode<T> returnNode = null;
 
-		if(root != null) {
+		if (root != null) {
 			returnNode = auxiliaryFind(root, dataToFind);
 		}
 
@@ -78,10 +78,11 @@ public class Tree<T> {
 			returnNode = currentNode;
 		}
 
-		else if(currentNode.hasChildren()) {
+		else if (currentNode.hasChildren()) {
 			i = 0;
-			while(returnNode == null && i < currentNode.getNumberOfChildren()) {
-				returnNode = auxiliaryFind(currentNode.getChildAt(i), dataToFind);
+			while (returnNode == null && i < currentNode.getNumberOfChildren()) {
+				returnNode = auxiliaryFind(currentNode.getChildAt(i),
+						dataToFind);
 				i++;
 			}
 		}
@@ -96,77 +97,84 @@ public class Tree<T> {
 	public List<TreeNode<T>> build(TreeTraversalOrder traversalOrder) {
 		List<TreeNode<T>> returnList = null;
 
-		if(root != null) {
+		if (root != null) {
 			returnList = build(root, traversalOrder);
 		}
 
 		return returnList;
 	}
 
-	public List<TreeNode<T>> build(TreeNode<T> node, TreeTraversalOrder traversalOrder) {
+	public List<TreeNode<T>> build(TreeNode<T> node,
+			TreeTraversalOrder traversalOrder) {
 		List<TreeNode<T>> traversalResult = new ArrayList<TreeNode<T>>();
 
-		if(traversalOrder == TreeTraversalOrder.PRE_ORDER) {
+		if (traversalOrder == TreeTraversalOrder.PRE_ORDER) {
 			buildPreOrder(node, traversalResult);
 		}
 
-		else if(traversalOrder == TreeTraversalOrder.POST_ORDER) {
+		else if (traversalOrder == TreeTraversalOrder.POST_ORDER) {
 			buildPostOrder(node, traversalResult);
 		}
 
 		return traversalResult;
 	}
 
-	private void buildPreOrder(TreeNode<T> node, List<TreeNode<T>> traversalResult) {
+	private void buildPreOrder(TreeNode<T> node,
+			List<TreeNode<T>> traversalResult) {
 		traversalResult.add(node);
 
-		for(TreeNode<T> child : node.getChildren()) {
+		for (TreeNode<T> child : node.getChildren()) {
 			buildPreOrder(child, traversalResult);
 		}
 	}
 
-	private void buildPostOrder(TreeNode<T> node, List<TreeNode<T>> traversalResult) {
-		for(TreeNode<T> child : node.getChildren()) {
+	private void buildPostOrder(TreeNode<T> node,
+			List<TreeNode<T>> traversalResult) {
+		for (TreeNode<T> child : node.getChildren()) {
 			buildPostOrder(child, traversalResult);
 		}
 
 		traversalResult.add(node);
 	}
 
-	public Map<TreeNode<T>, Integer> buildWithDepth(TreeTraversalOrder traversalOrder) {
+	public Map<TreeNode<T>, Integer> buildWithDepth(
+			TreeTraversalOrder traversalOrder) {
 		Map<TreeNode<T>, Integer> returnMap = null;
 
-		if(root != null) {
+		if (root != null) {
 			returnMap = buildWithDepth(root, traversalOrder);
 		}
 
 		return returnMap;
 	}
 
-	public Map<TreeNode<T>, Integer> buildWithDepth(TreeNode<T> node, TreeTraversalOrder traversalOrder) {
+	public Map<TreeNode<T>, Integer> buildWithDepth(TreeNode<T> node,
+			TreeTraversalOrder traversalOrder) {
 		Map<TreeNode<T>, Integer> traversalResult = new LinkedHashMap<TreeNode<T>, Integer>();
 
-		if(traversalOrder == TreeTraversalOrder.PRE_ORDER) {
+		if (traversalOrder == TreeTraversalOrder.PRE_ORDER) {
 			buildPreOrderWithDepth(node, traversalResult, 0);
 		}
 
-		else if(traversalOrder == TreeTraversalOrder.POST_ORDER) {
+		else if (traversalOrder == TreeTraversalOrder.POST_ORDER) {
 			buildPostOrderWithDepth(node, traversalResult, 0);
 		}
 
 		return traversalResult;
 	}
 
-	private void buildPreOrderWithDepth(TreeNode<T> node, Map<TreeNode<T>, Integer> traversalResult, int depth) {
+	private void buildPreOrderWithDepth(TreeNode<T> node,
+			Map<TreeNode<T>, Integer> traversalResult, int depth) {
 		traversalResult.put(node, depth);
 
-		for(TreeNode<T> child : node.getChildren()) {
+		for (TreeNode<T> child : node.getChildren()) {
 			buildPreOrderWithDepth(child, traversalResult, depth + 1);
 		}
 	}
 
-	private void buildPostOrderWithDepth(TreeNode<T> node, Map<TreeNode<T>, Integer> traversalResult, int depth) {
-		for(TreeNode<T> child : node.getChildren()) {
+	private void buildPostOrderWithDepth(TreeNode<T> node,
+			Map<TreeNode<T>, Integer> traversalResult, int depth) {
+		for (TreeNode<T> child : node.getChildren()) {
 			buildPostOrderWithDepth(child, traversalResult, depth + 1);
 		}
 
@@ -176,7 +184,7 @@ public class Tree<T> {
 	public String toString(TreeTraversalOrder traversalOrder) {
 		String stringRepresentation = "";
 
-		if(root != null) {
+		if (root != null) {
 			stringRepresentation = build(traversalOrder).toString();
 		}
 
@@ -187,7 +195,7 @@ public class Tree<T> {
 
 		String stringRepresentation = "";
 
-		if(root != null) {
+		if (root != null) {
 			stringRepresentation = buildWithDepth(traversalOrder).toString();
 		}
 

@@ -8,6 +8,7 @@ import com.kufpg.androidhermit.util.Tree;
 import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 import com.kufpg.androidhermit.util.TreeNode;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -21,7 +22,8 @@ import android.widget.Toast;
 public class MainActivity extends StandardActivity {
 
 	private TextView codeView;
-	private Button lockButton, unlockButton, asyncButton, treeButton;
+	private Button lockButton, unlockButton, asyncButton, treeButton,
+			consoleButton;
 	private CheckBox progressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
@@ -39,14 +41,15 @@ public class MainActivity extends StandardActivity {
 		unlockButton = (Button) findViewById(R.id.unlock_button);
 		asyncButton = (Button) findViewById(R.id.async_button);
 		treeButton = (Button) findViewById(R.id.tree_button);
+		consoleButton = (Button) findViewById(R.id.console_button);
 		progressCheckBox = (CheckBox) findViewById(R.id.progress_checkbox);
 
-		lockButton.setOnClickListener(new OnClickListener() {	
+		lockButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLock.lock();
 				try {
-					while(mIsLocked) {
+					while (mIsLocked) {
 						try {
 							lockInEffect.await();
 						} catch (InterruptedException e) {
@@ -63,12 +66,12 @@ public class MainActivity extends StandardActivity {
 			}
 		});
 
-		unlockButton.setOnClickListener(new OnClickListener() {	
+		unlockButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLock.lock();
 				try {
-					if(mIsLocked) {
+					if (mIsLocked) {
 						lockInEffect.signal();
 						mIsLocked = false;
 						lockButton.setEnabled(true);
@@ -79,20 +82,23 @@ public class MainActivity extends StandardActivity {
 				}
 			}
 		});
-		
+
 		asyncButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Toast imgToast = new Toast(MainActivity.this);
-	            ImageView imgView = new ImageView(MainActivity.this);     
-	            imgToast.setView(imgView);
-	            imgToast.setDuration(Toast.LENGTH_LONG);
-	            FileIOManager.downloadImage("http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
-	            		imgView, progressCheckBox.isChecked(), MainActivity.this);
-	            imgToast.show();
+				ImageView imgView = new ImageView(MainActivity.this);
+				imgToast.setView(imgView);
+				imgToast.setDuration(Toast.LENGTH_LONG);
+				FileIOManager
+						.downloadImage(
+								"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
+								imgView, progressCheckBox.isChecked(),
+								MainActivity.this);
+				imgToast.show();
 			}
 		});
-		
+
 		treeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -106,6 +112,15 @@ public class MainActivity extends StandardActivity {
 				makeToast(testTree.toString(TreeTraversalOrder.PRE_ORDER));
 			}
 		});
+
+		consoleButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				Intent consoleIntent = new Intent(mContext,
+						ConsoleActivity.class);
+				startActivity(consoleIntent);
+			}
+		});
 	}
 
 	@Override
@@ -115,7 +130,9 @@ public class MainActivity extends StandardActivity {
 	}
 
 	private void setCodeText(int numTextChanges, boolean isLocked) {
-		codeView.setText("Button pushed " + numTextChanges + " times. (Status: " + (isLocked ? "locked" : "unlocked") + ".)");
+		codeView.setText("Button pushed " + numTextChanges
+				+ " times. (Status: " + (isLocked ? "locked" : "unlocked")
+				+ ".)");
 	}
-	
+
 }

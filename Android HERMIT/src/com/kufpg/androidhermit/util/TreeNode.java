@@ -43,7 +43,7 @@ public class TreeNode<T> {
 	}
 
 	public void setChildren(List<TreeNode<T>> children) {
-		for(TreeNode<T> child : children) {
+		for (TreeNode<T> child : children) {
 			child.parent = this;
 		}
 
@@ -54,44 +54,46 @@ public class TreeNode<T> {
 		child.parent = this;
 		children.add(child);
 	}
-	
+
 	public void addChild(T data) {
 		TreeNode<T> child = new TreeNode<T>(data);
 		child.parent = this;
 		children.add(child);
 	}
-	
+
 	public void addChildren(TreeNode<T>... children) {
-		for(TreeNode<T> child : children) {
+		for (TreeNode<T> child : children) {
 			addChild(child);
 		}
 	}
-	
+
 	public void addChildren(T... data) {
-		for(T datum : data) {
+		for (T datum : data) {
 			addChild(datum);
 		}
 	}
 
-	public void addChildAt(int index, TreeNode<T> child) throws IndexOutOfBoundsException {
+	public void addChildAt(int index, TreeNode<T> child)
+			throws IndexOutOfBoundsException {
 		child.parent = this;
 		children.add(index, child);
 	}
-	
+
 	public void addChildAt(int index, T data) throws IndexOutOfBoundsException {
 		TreeNode<T> child = new TreeNode<T>(data);
 		child.parent = this;
 		children.add(index, child);
 	}
-	
-	public void addChildrenAt(int index, TreeNode<T>... children) throws IndexOutOfBoundsException {
-		for(TreeNode<T> child : children) {
+
+	public void addChildrenAt(int index, TreeNode<T>... children)
+			throws IndexOutOfBoundsException {
+		for (TreeNode<T> child : children) {
 			addChildAt(index, child);
 		}
 	}
-	
+
 	public void addChildrenAt(int index, T... data) {
-		for(T datum : data) {
+		for (T datum : data) {
 			addChildAt(index, datum);
 		}
 	}
@@ -116,6 +118,7 @@ public class TreeNode<T> {
 		this.data = data;
 	}
 
+	@Override
 	public String toString() {
 		return getData().toString();
 	}
@@ -142,11 +145,13 @@ public class TreeNode<T> {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
-	 @Override
-	 public int hashCode() {
+	@Override
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((data == null) ? 0 : data.hashCode());
@@ -169,5 +174,3 @@ public class TreeNode<T> {
 		return stringRepresentation;
 	}
 }
-
-

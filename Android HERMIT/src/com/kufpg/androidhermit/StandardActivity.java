@@ -3,11 +3,7 @@ package com.kufpg.androidhermit;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import org.json.JSONException;
-
 import com.kufpg.androidhermit.util.FileIOManager;
-import com.kufpg.androidhermit.util.HermitJsonObject;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -47,13 +43,15 @@ public class StandardActivity extends Activity {
 		mEditModeValue = "0";
 		prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		prefsEditor = prefs.edit();
-		if(getSaveDir() == null) {
+		if (getSaveDir() == null) {
 			loadPrefs();
 		}
-		
-		//This prevents some exceptions from being thrown when the Internet is accessed
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-	    StrictMode.setThreadPolicy(policy);
+
+		// This prevents some exceptions from being thrown when the Internet is
+		// accessed
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 	}
 
 	@Override
@@ -67,45 +65,55 @@ public class StandardActivity extends Activity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()) {
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 		case R.id.open_from_disk:
 			Intent filesIntent = new Intent();
 			filesIntent.setType("text/plain");
-			filesIntent.setAction(Intent.ACTION_GET_CONTENT);								
-			startActivityForResult(Intent.createChooser(filesIntent,
-					"Select app"), FILE_FROM_DISK);
+			filesIntent.setAction(Intent.ACTION_GET_CONTENT);
+			startActivityForResult(
+					Intent.createChooser(filesIntent, "Select app"),
+					FILE_FROM_DISK);
 			return true;
 		case R.id.open_from_url:
 			final Context c = this;
 			AlertDialog.Builder alert = new AlertDialog.Builder(c);
 			alert.setMessage(R.string.open_from_url_message);
 
-			// Set an EditText view to get user input 
+			// Set an EditText view to get user input
 			final EditText inputBox = new EditText(c);
 			alert.setView(inputBox);
 
-			alert.setPositiveButton("Open", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					String textInput = inputBox.getText().toString();
-					if(FileIOManager.isTextFile(textInput)) {
-						ArrayList<String> code = FileIOManager.getTextArrayFromUrl(textInput);
-						Intent codeIntent = new Intent(mContext, WarpDSLV.class);
-						codeIntent.putExtra("CODE_ARRAY", code);
-						String[] uriBits = textInput.split("/");
-						codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
-						startActivity(codeIntent);
-					} else {
-						makeToast("The entered URL is not a plaintext file.");
-					}
-				}
-			});
+			alert.setPositiveButton("Open",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String textInput = inputBox.getText().toString();
+							if (FileIOManager.isTextFile(textInput)) {
+								ArrayList<String> code = FileIOManager
+										.getTextArrayFromUrl(textInput);
+								Intent codeIntent = new Intent(mContext,
+										WarpDSLV.class);
+								codeIntent.putExtra("CODE_ARRAY", code);
+								String[] uriBits = textInput.split("/");
+								codeIntent.putExtra("CODE_FILENAME",
+										uriBits[uriBits.length - 1]);
+								startActivity(codeIntent);
+							} else {
+								makeToast("The entered URL is not a plaintext file.");
+							}
+						}
+					});
 
-			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Cancelled.
-				}
-			});
+			alert.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							// Cancelled.
+						}
+					});
 
 			alert.show();
 			return true;
@@ -124,47 +132,64 @@ public class StandardActivity extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) { 
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 
-		switch(requestCode) {
+		switch (requestCode) {
 		case FILE_FROM_DISK:
-			if(resultCode == RESULT_OK) {
+			if (resultCode == RESULT_OK) {
 				Uri diskTextFile = intent.getData();
 				ArrayList<String> code = null;
 				try {
-					code = FileIOManager.getTextArrayFromDisk(getContentResolver().openInputStream(diskTextFile));
+					code = FileIOManager
+							.getTextArrayFromDisk(getContentResolver()
+									.openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
 				Intent codeIntent = new Intent(this, WarpDSLV.class);
 				codeIntent.putExtra("CODE_ARRAY", code);
-				String[] uriBits = intent.getDataString().replace("file:///", "").split("/"); //The replace method is due to the Nexus 7's filesystem, so this may need to be improved later
+				String[] uriBits = intent.getDataString()
+						.replace("file:///", "").split("/"); // The replace
+																// method is due
+																// to the Nexus
+																// 7's
+																// filesystem,
+																// so this may
+																// need to be
+																// improved
+																// later
 				String codePath = "";
-				for(int i = 0; i < uriBits.length - 1; i++)
+				for (int i = 0; i < uriBits.length - 1; i++)
 					codePath += "/" + uriBits[i];
 				codeIntent.putExtra("CODE_PATH", codePath);
-				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
-				
+				codeIntent.putExtra("CODE_FILENAME",
+						uriBits[uriBits.length - 1]);
+
 				/* Code for opening a file with HermitJsonObject */
-//				Uri diskTextFile = intent.getData();
-//				HermitJsonObject hjo = null;
-//				try {
-//					hjo = new HermitJsonObject(getContentResolver().openInputStream(diskTextFile));
-//				} catch (FileNotFoundException e) {
-//					e.printStackTrace();
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				Intent codeIntent = new Intent(this, WarpDSLV.class);
-//				codeIntent.putExtra("CODE_ARRAY", hjo.getJSONContents());
-//				String[] uriBits = intent.getDataString().replace("file:///", "").split("/"); //The replace method is due to the Nexus 7's filesystem, so this may need to be improved later
-//				String codePath = "";
-//				for(int i = 0; i < uriBits.length - 1; i++)
-//					codePath += "/" + uriBits[i];
-//				codeIntent.putExtra("CODE_PATH", codePath);
-//				codeIntent.putExtra("CODE_FILENAME", uriBits[uriBits.length-1]);
-				
+				// Uri diskTextFile = intent.getData();
+				// HermitJsonObject hjo = null;
+				// try {
+				// hjo = new
+				// HermitJsonObject(getContentResolver().openInputStream(diskTextFile));
+				// } catch (FileNotFoundException e) {
+				// e.printStackTrace();
+				// } catch (JSONException e) {
+				// e.printStackTrace();
+				// }
+				// Intent codeIntent = new Intent(this, WarpDSLV.class);
+				// codeIntent.putExtra("CODE_ARRAY", hjo.getJSONContents());
+				// String[] uriBits = intent.getDataString().replace("file:///",
+				// "").split("/"); //The replace method is due to the Nexus 7's
+				// filesystem, so this may need to be improved later
+				// String codePath = "";
+				// for(int i = 0; i < uriBits.length - 1; i++)
+				// codePath += "/" + uriBits[i];
+				// codeIntent.putExtra("CODE_PATH", codePath);
+				// codeIntent.putExtra("CODE_FILENAME",
+				// uriBits[uriBits.length-1]);
+
 				startActivity(codeIntent);
 			}
 		}

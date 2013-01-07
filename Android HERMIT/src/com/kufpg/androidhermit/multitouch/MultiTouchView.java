@@ -38,11 +38,13 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class MultiTouchView extends View implements MultiTouchObjectCanvas<Object> {
+public class MultiTouchView extends View implements
+		MultiTouchObjectCanvas<Object> {
 
 	private MultiTouchController<Object> multiTouchController;
 	private PointInfo mCurrTouchPoint;
-	private Paint mLinePaintCoords = new Paint(), mRectPaintCoords = new Paint();
+	private Paint mLinePaintCoords = new Paint(),
+			mRectPaintCoords = new Paint();
 
 	public MultiTouchView(Context context) {
 		this(context, null);
@@ -66,26 +68,32 @@ public class MultiTouchView extends View implements MultiTouchObjectCanvas<Objec
 
 	@Override
 	public void selectObject(Object obj, PointInfo touchPoint) {
-		// We aren't dragging any objects in this particular app, but this is called when the point goes up (obj == null) or down (obj != null),
+		// We aren't dragging any objects in this particular app, but this is
+		// called when the point goes up (obj == null) or down (obj != null),
 		// save the touch point info
 		touchPointChanged(touchPoint);
 	}
 
 	@Override
-	public boolean setPositionAndScale(Object obj, PositionAndScale newImgPosAndScale, PointInfo touchPoint) {
-		// Called during a drag or stretch operation, update the touch point info
+	public boolean setPositionAndScale(Object obj,
+			PositionAndScale newImgPosAndScale, PointInfo touchPoint) {
+		// Called during a drag or stretch operation, update the touch point
+		// info
 		touchPointChanged(touchPoint);
 		return true;
 	}
 
 	@Override
-	public void getPositionAndScale(Object obj, PositionAndScale objPosAndScaleOut) {
-		// We aren't dragging any objects, so this doesn't do anything in this app
+	public void getPositionAndScale(Object obj,
+			PositionAndScale objPosAndScaleOut) {
+		// We aren't dragging any objects, so this doesn't do anything in this
+		// app
 	}
 
 	@Override
 	public Object getDraggableObjectAtPoint(PointInfo pt) {
-		// IMPORTANT: to start a multitouch drag operation, this routine must return non-null
+		// IMPORTANT: to start a multitouch drag operation, this routine must
+		// return non-null
 		return this;
 	}
 
@@ -106,20 +114,26 @@ public class MultiTouchView extends View implements MultiTouchObjectCanvas<Objec
 			float x = mCurrTouchPoint.getX(), y = mCurrTouchPoint.getY();
 
 			if (numPoints == 2) {
-				//dx2 and dy2 can be thought of as the "deviation" from the selection box's center in the x- and y- direction
+				// dx2 and dy2 can be thought of as the "deviation" from the
+				// selection box's center in the x- and y- direction
 				float dx2 = mCurrTouchPoint.getMultiTouchWidth() / 2;
 				float dy2 = mCurrTouchPoint.getMultiTouchHeight() / 2;
 
-				//Right side of box
-				canvas.drawLine(x + dx2, y - dy2, x + dx2, y + dy2, mLinePaintCoords);
-				//Left side of box
-				canvas.drawLine(x - dx2, y - dy2, x - dx2, y + dy2, mLinePaintCoords);
-				//Bottom side of box
-				canvas.drawLine(x - dx2, y + dy2, x + dx2, y + dy2, mLinePaintCoords);
-				//Top side of box
-				canvas.drawLine(x - dx2, y - dy2, x + dx2, y - dy2, mLinePaintCoords);
-				//Draws in transparent shading inside box
-				canvas.drawRect(x - dx2, y - dy2, x + dx2, y + dy2, mRectPaintCoords);
+				// Right side of box
+				canvas.drawLine(x + dx2, y - dy2, x + dx2, y + dy2,
+						mLinePaintCoords);
+				// Left side of box
+				canvas.drawLine(x - dx2, y - dy2, x - dx2, y + dy2,
+						mLinePaintCoords);
+				// Bottom side of box
+				canvas.drawLine(x - dx2, y + dy2, x + dx2, y + dy2,
+						mLinePaintCoords);
+				// Top side of box
+				canvas.drawLine(x - dx2, y - dy2, x + dx2, y - dy2,
+						mLinePaintCoords);
+				// Draws in transparent shading inside box
+				canvas.drawRect(x - dx2, y - dy2, x + dx2, y + dy2,
+						mRectPaintCoords);
 			}
 		}
 	}
