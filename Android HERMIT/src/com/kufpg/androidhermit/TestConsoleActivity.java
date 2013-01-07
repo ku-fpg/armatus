@@ -1,6 +1,7 @@
 package com.kufpg.androidhermit;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -15,7 +16,7 @@ public class TestConsoleActivity extends StandardActivity {
 	private TextView tv1;
 	private View recent;
 	private LayoutParams lp;
-	private ScrollView sv; 
+	private ScrollView sv;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -31,13 +32,24 @@ public class TestConsoleActivity extends StandardActivity {
 			@Override
 			public void onClick(View v) {
 				tv1 = new TextView(TestConsoleActivity.this);
+				tv1.setGravity(Gravity.BOTTOM);
 				tv1.setId((int) System.currentTimeMillis());
 				lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 						LayoutParams.WRAP_CONTENT);
 				lp.addRule(RelativeLayout.BELOW, recent.getId());
-				tv1.setText("Time: " + System.currentTimeMillis());
-				rr.addView(tv1, lp);
+				addMessage(tv1, "Time: " + System.currentTimeMillis());
 				recent = tv1;
+			}
+		});
+	}
+
+	private void addMessage(final TextView tv, String msg) {
+		// append the new string
+		tv.setText(msg);
+		rr.addView(tv, lp);
+		sv.post(new Runnable() {
+			public void run() {
+				sv.smoothScrollTo(0, tv.getBottom());
 			}
 		});
 	}
