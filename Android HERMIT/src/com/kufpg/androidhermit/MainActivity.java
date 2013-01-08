@@ -23,7 +23,7 @@ public class MainActivity extends StandardActivity {
 
 	private TextView codeView;
 	private Button lockButton, unlockButton, asyncButton, treeButton,
-			consoleButton;
+			consoleButton, testConsoleButton;
 	private CheckBox progressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
@@ -42,6 +42,7 @@ public class MainActivity extends StandardActivity {
 		asyncButton = (Button) findViewById(R.id.async_button);
 		treeButton = (Button) findViewById(R.id.tree_button);
 		consoleButton = (Button) findViewById(R.id.console_button);
+		testConsoleButton = (Button) findViewById(R.id.test_console_button);
 		progressCheckBox = (CheckBox) findViewById(R.id.progress_checkbox);
 
 		lockButton.setOnClickListener(new OnClickListener() {
@@ -101,7 +102,7 @@ public class MainActivity extends StandardActivity {
 
 		treeButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(View v) {
 				Tree<Integer> testTree = new Tree<Integer>();
 				TreeNode<Integer> rootNode = new TreeNode<Integer>(1);
 				testTree.setRoot(rootNode);
@@ -115,10 +116,19 @@ public class MainActivity extends StandardActivity {
 
 		consoleButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(View v) {
 				Intent consoleIntent = new Intent(mContext,
-						TestConsoleActivity.class);
+						ConsoleActivity.class);
 				startActivity(consoleIntent);
+			}
+		});
+
+		testConsoleButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent testConsoleIntent = new Intent(mContext,
+						TestConsoleActivity.class);
+				startActivity(testConsoleIntent);
 			}
 		});
 	}

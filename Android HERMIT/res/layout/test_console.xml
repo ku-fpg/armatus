@@ -18,6 +18,7 @@
                 android:id="@+id/add_text_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:drawable/btn_default"
                 android:text="Add text"
                 android:textColor="@android:color/black" >
             </Button>
