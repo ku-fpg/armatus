@@ -37,7 +37,7 @@ public class TestConsoleActivity extends StandardActivity {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP) {
-					addMessage("Time: " + System.currentTimeMillis());
+					addMessage(mEt.getText().toString());
 					return true;
 				}
 				return false;
