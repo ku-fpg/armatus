@@ -33,7 +33,7 @@ public class TestConsoleActivity extends StandardActivity {
 
 		sv = (ScrollView) findViewById(R.id.code_scroll_view);
 		rr = (RelativeLayout) findViewById(R.id.code_scroll_layout);
-		et = (EditText) findViewById(R.id.inputBox);
+		et = (EditText) findViewById(R.id.code_input_box);
 		et.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
