@@ -39,6 +39,7 @@ public class TestConsoleActivity extends StandardActivity {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP) {
 					addMessage(mEt.getText().toString());
+					mEt.setText(""); 
 					return true;
 				}
 				return false;
