@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import android.os.Bundle;
-import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -19,8 +18,8 @@ import android.widget.TextView;
 public class TestConsoleActivity extends StandardActivity {
 
 	private RelativeLayout rr;
-	private Button b1;
-	private View recent;
+//	private Button b1;
+	private View recent = null;
 	private LayoutParams lp;
 	private ScrollView sv;
 	private EditText et;
@@ -32,8 +31,8 @@ public class TestConsoleActivity extends StandardActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_console);
 
-		sv = (ScrollView) findViewById(R.id.scroll);
-		rr = (RelativeLayout) findViewById(R.id.whatever);
+		sv = (ScrollView) findViewById(R.id.code_scroll_view);
+		rr = (RelativeLayout) findViewById(R.id.code_scroll_layout);
 		et = (EditText) findViewById(R.id.inputBox);
 		et.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
@@ -48,15 +47,15 @@ public class TestConsoleActivity extends StandardActivity {
 
 		});
 
-		b1 = (Button) findViewById(R.id.add_text_button);
-		recent = b1;
-		b1.setText("Click me");
-		b1.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				addMessage("Time: " + System.currentTimeMillis());
-			}
-		});
+//		b1 = (Button) findViewById(R.id.add_text_button);
+//		recent = b1;
+//		b1.setText("Click me");
+//		b1.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				addMessage("Time: " + System.currentTimeMillis());
+//			}
+//		});
 	}
 
 	@Override
@@ -88,6 +87,7 @@ public class TestConsoleActivity extends StandardActivity {
 
 	/**
 	 * Adds a new "line" to the console with msg as its contents.
+	 * @param msg
 	 */
 	private void addMessage(String msg) {
 		tv = new TextView(TestConsoleActivity.this);
@@ -99,7 +99,8 @@ public class TestConsoleActivity extends StandardActivity {
 
 		lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.BELOW, recent.getId());
+		if (recent != null)
+			lp.addRule(RelativeLayout.BELOW, recent.getId());
 		rr.addView(tv, lp);
 
 		sv.post(new Runnable() {
@@ -110,6 +111,11 @@ public class TestConsoleActivity extends StandardActivity {
 		recent = tv;
 	}
 
+	/**
+	 * Similar to addMessage(String), but you can add an already built TextView as an argument.
+	 * Useful for when you have to rotate the screen and re-add TextViews.
+	 * @param textView
+	 */
 	private void addTextView(final TextView textView) {
 		if (!cmdHistory.containsKey(textView.getId())) {
 			cmdHistory.put(textView.getId(), textView);
@@ -117,7 +123,8 @@ public class TestConsoleActivity extends StandardActivity {
 
 		lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.BELOW, recent.getId());
+		if (recent != null)
+			lp.addRule(RelativeLayout.BELOW, recent.getId());
 		rr.addView(textView, lp);
 
 		sv.post(new Runnable() {
