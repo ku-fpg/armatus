@@ -1,10 +1,8 @@
 package com.kufpg.androidhermit.util;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.provider.CalendarContract.Colors;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.TextView;
@@ -13,6 +11,21 @@ public class ConsoleTextView extends TextView {
 
 	private final float TEXT_SIZE = 15;
 
+	public ConsoleTextView(Context context) {
+		super(context);
+		setupView(null);
+	}
+	
+	public ConsoleTextView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		setupView(null);
+	}
+	
+	public ConsoleTextView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		setupView(null);
+	}
+	
 	public ConsoleTextView(Context context, String msg) {
 		super(context);
 		setupView(msg);

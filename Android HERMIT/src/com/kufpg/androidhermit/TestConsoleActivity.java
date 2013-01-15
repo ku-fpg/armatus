@@ -16,23 +16,23 @@ import android.widget.ScrollView;
 
 public class TestConsoleActivity extends StandardActivity {
 
-	private RelativeLayout rr;
+	private RelativeLayout mRr;
 	private View recent = null;
-	private LayoutParams lp;
-	private ScrollView sv;
-	private EditText et;
+	private LayoutParams mLp;
+	private ScrollView mSv;
+	private EditText mEt;
 
 	private HashMap<Integer, ConsoleTextView> cmdHistory = new HashMap<Integer, ConsoleTextView>();
-	private ConsoleTextView tv;
+	private ConsoleTextView mCtv;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_console);
 
-		sv = (ScrollView) findViewById(R.id.code_scroll_view);
-		rr = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
-		et = (EditText) findViewById(R.id.code_input_box);
-		et.setOnKeyListener(new EditText.OnKeyListener() {
+		mSv = (ScrollView) findViewById(R.id.code_scroll_view);
+		mRr = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
+		mEt = (EditText) findViewById(R.id.code_input_box);
+		mEt.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
@@ -52,7 +52,7 @@ public class TestConsoleActivity extends StandardActivity {
 		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = cmdHistory.entrySet().iterator();
 		while (cmdIter.hasNext()) {
 			Entry<Integer, ConsoleTextView> curEntry =(Entry<Integer, ConsoleTextView>) cmdIter.next();
-			rr.removeView(curEntry.getValue());
+			mRr.removeView(curEntry.getValue());
 		}
 	}
 
@@ -72,21 +72,21 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param msg
 	 */
 	private void addMessage(String msg) {
-		tv = new ConsoleTextView(TestConsoleActivity.this, msg);
-		cmdHistory.put(tv.getId(), tv);
+		mCtv = new ConsoleTextView(TestConsoleActivity.this, msg);
+		cmdHistory.put(mCtv.getId(), mCtv);
 
-		lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+		mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		if (recent != null)
-			lp.addRule(RelativeLayout.BELOW, recent.getId());
-		rr.addView(tv, lp);
+			mLp.addRule(RelativeLayout.BELOW, recent.getId());
+		mRr.addView(mCtv, mLp);
 
-		sv.post(new Runnable() {
+		mSv.post(new Runnable() {
 			public void run() {
-				sv.smoothScrollTo(0, tv.getBottom());
+				mSv.smoothScrollTo(0, mCtv.getBottom());
 			}
 		});
-		recent = tv;
+		recent = mCtv;
 	}
 
 	/**
@@ -99,15 +99,15 @@ public class TestConsoleActivity extends StandardActivity {
 			cmdHistory.put(ctv.getId(), ctv);
 		}
 
-		lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+		mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		if (recent != null)
-			lp.addRule(RelativeLayout.BELOW, recent.getId());
-		rr.addView(ctv, lp);
+			mLp.addRule(RelativeLayout.BELOW, recent.getId());
+		mRr.addView(ctv, mLp);
 
-		sv.post(new Runnable() {
+		mSv.post(new Runnable() {
 			public void run() {
-				sv.smoothScrollTo(0, ctv.getBottom());
+				mSv.smoothScrollTo(0, ctv.getBottom());
 			}
 		});
 		recent = ctv;
