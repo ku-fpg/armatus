@@ -24,7 +24,7 @@ public class CmdInfo {
 	// ! these are built-in commands
 	public enum BuiltInCmd {
 		_unknown_, // hidden command starts and ends with "_"
-		_ui_exit_, _history_cmd_, help, ls, pwd, cd, clear, run, history, del, mkdir, ren, cp, cleardex, ver, sres, netinfo, fontsize, exit,
+		_ui_exit_, _history_cmd_, help, ls, pwd, cd, clear, consider, run, history, del, mkdir, ren, resume, cp, cleardex, ver, sres, netinfo, fontsize, exit,
 	};
 
 	public static final String HISTORYCMD_PREFIX = "!";

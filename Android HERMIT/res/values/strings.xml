@@ -14,6 +14,8 @@
     <string name="help_commands">Available commands:</string>
     <string name="ls_fullmode_on">ls full mode is on</string>
     <string name="ls_fullmode_off">ls full mode is off</string>
+    <string name="error_args_1">This command takes exactly one argument.</string>
+    <string name="error_args_quote">Arguments must be preceded with single quotes.</string>
     <string name="error_prefix">Error:\u0020</string>
     <string name="error_not_dir">\u0020is not a directory</string>
     <string name="error_cant_del">Cannot delete\u0020</string>

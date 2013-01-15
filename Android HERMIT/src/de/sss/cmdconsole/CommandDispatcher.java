@@ -341,6 +341,18 @@ public class CommandDispatcher implements Runnable, IStdOut {
 				if (!CFunc.isNullOrEmpty(cmdInfo.getOrgCmd()))
 					printError(CFunc.getString(R.string.error_unknown_cmd)
 							+ cmdInfo.getOrgCmd());
+			} else if (builtInCmd == CmdInfo.BuiltInCmd.resume) {
+				writeln("TODO: Figure out what resume does.");
+			} else if (builtInCmd == CmdInfo.BuiltInCmd.consider) {
+				if (args.length != 2) {
+					printError(CFunc.getString(R.string.error_args_1));
+				} else {
+					if (!args[1].startsWith("'")) {
+						printError(CFunc.getString(R.string.error_args_quote));
+					} else {
+						writeln("TODO: Figure out what consider '<arg> does.");
+					}
+				}
 			}
 
 			// save command history
