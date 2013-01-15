@@ -4,29 +4,26 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import android.graphics.Typeface;
+import com.kufpg.androidhermit.util.ConsoleTextView;
+
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 public class TestConsoleActivity extends StandardActivity {
 
 	private RelativeLayout rr;
-//	private Button b1;
 	private View recent = null;
 	private LayoutParams lp;
 	private ScrollView sv;
 	private EditText et;
 
-	private HashMap<Integer, TextView> cmdHistory = new HashMap<Integer, TextView>();
-	private TextView tv;
+	private HashMap<Integer, ConsoleTextView> cmdHistory = new HashMap<Integer, ConsoleTextView>();
+	private ConsoleTextView tv;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,29 +42,16 @@ public class TestConsoleActivity extends StandardActivity {
 				}
 				return false;
 			}
-
 		});
-
-//		b1 = (Button) findViewById(R.id.add_text_button);
-//		recent = b1;
-//		b1.setText("Click me");
-//		b1.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				addMessage("Time: " + System.currentTimeMillis());
-//			}
-//		});
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putSerializable("cmdHistory", cmdHistory);
-		Iterator<Entry<Integer, TextView>> cmdIter = cmdHistory.entrySet()
-				.iterator();
+		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = cmdHistory.entrySet().iterator();
 		while (cmdIter.hasNext()) {
-			Entry<Integer, TextView> curEntry = (Entry<Integer, TextView>) cmdIter
-					.next();
+			Entry<Integer, ConsoleTextView> curEntry =(Entry<Integer, ConsoleTextView>) cmdIter.next();
 			rr.removeView(curEntry.getValue());
 		}
 	}
@@ -75,13 +59,10 @@ public class TestConsoleActivity extends StandardActivity {
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		cmdHistory = (HashMap<Integer, TextView>) savedInstanceState
-				.getSerializable("cmdHistory");
-		Iterator<Entry<Integer, TextView>> cmdIter = cmdHistory.entrySet()
-				.iterator();
+		cmdHistory = (HashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("cmdHistory");
+		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = cmdHistory.entrySet().iterator();
 		while (cmdIter.hasNext()) {
-			Entry<Integer, TextView> curEntry = (Entry<Integer, TextView>) cmdIter
-					.next();
+			Entry<Integer, ConsoleTextView> curEntry = (Entry<Integer, ConsoleTextView>) cmdIter.next();
 			addTextView(curEntry.getValue());
 		}
 	}
@@ -91,12 +72,7 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param msg
 	 */
 	private void addMessage(String msg) {
-		tv = new TextView(TestConsoleActivity.this);
-		tv.setTypeface(Typeface.MONOSPACE);
-		tv.setGravity(Gravity.BOTTOM);
-		// TODO: Make a better ID system
-		tv.setId((int) System.currentTimeMillis());
-		tv.setText(msg);
+		tv = new ConsoleTextView(TestConsoleActivity.this, msg);
 		cmdHistory.put(tv.getId(), tv);
 
 		lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -114,27 +90,27 @@ public class TestConsoleActivity extends StandardActivity {
 	}
 
 	/**
-	 * Similar to addMessage(String), but you can add an already built TextView as an argument.
-	 * Useful for when you have to rotate the screen and re-add TextViews.
-	 * @param textView
+	 * Similar to addMessage(String), but you can add an already built ConsoleTextView as an argument.
+	 * Useful for when you have to rotate the screen and reconstruct the console buffer.
+	 * @param ctv
 	 */
-	private void addTextView(final TextView textView) {
-		if (!cmdHistory.containsKey(textView.getId())) {
-			cmdHistory.put(textView.getId(), textView);
+	private void addTextView(final ConsoleTextView ctv) {
+		if (!cmdHistory.containsKey(ctv.getId())) {
+			cmdHistory.put(ctv.getId(), ctv);
 		}
 
 		lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
 		if (recent != null)
 			lp.addRule(RelativeLayout.BELOW, recent.getId());
-		rr.addView(textView, lp);
+		rr.addView(ctv, lp);
 
 		sv.post(new Runnable() {
 			public void run() {
-				sv.smoothScrollTo(0, textView.getBottom());
+				sv.smoothScrollTo(0, ctv.getBottom());
 			}
 		});
-		recent = textView;
+		recent = ctv;
 	}
 
 }

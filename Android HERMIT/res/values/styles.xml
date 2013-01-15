@@ -1,8 +1,5 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Light" />
-	<style name="code_font_style" parent="@android:style/Widget.TextView">
-	    
-	</style>
     
 </resources>
