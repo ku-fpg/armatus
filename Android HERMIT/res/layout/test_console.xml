@@ -38,8 +38,8 @@
                 android:background="@null"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
-                android:textCursorDrawable="@null" />
-
+                android:textCursorDrawable="@null" 
+                android:typeface="monospace"/>
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
