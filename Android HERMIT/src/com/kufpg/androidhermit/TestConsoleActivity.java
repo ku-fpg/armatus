@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.ConsoleTextView;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,7 +16,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 
 public class TestConsoleActivity extends StandardActivity {
-
+	
 	private RelativeLayout mRr;
 	private View recent = null;
 	private LayoutParams mLp;
@@ -43,6 +44,8 @@ public class TestConsoleActivity extends StandardActivity {
 				return false;
 			}
 		});
+		Typeface mTypeface = Typeface.createFromAsset(getAssets(), ConsoleTextView.TYPEFACE);
+		mEt.setTypeface(mTypeface);
 	}
 
 	@Override
@@ -72,18 +75,18 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param msg
 	 */
 	private void addMessage(String msg) {
-		if(msg.equals("<clear>")){
+		if (msg.equals("<clear>")){
 			mRr.removeAllViews();
-		}	
-		else{mCtv = new ConsoleTextView(TestConsoleActivity.this, msg);
+		} else {
+			mCtv = new ConsoleTextView(TestConsoleActivity.this, msg);
 			cmdHistory.put(mCtv.getId(), mCtv);
-	
+
 			mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 					LayoutParams.WRAP_CONTENT);
 			if (recent != null)
 				mLp.addRule(RelativeLayout.BELOW, recent.getId());
 			mRr.addView(mCtv, mLp);
-	
+
 			mSv.post(new Runnable() {
 				public void run() {
 					mSv.smoothScrollTo(0, mCtv.getBottom());
