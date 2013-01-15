@@ -36,10 +36,13 @@
                 android:layout_alignParentLeft="true"
                 android:layout_gravity="center_vertical"
                 android:background="@null"
+                android:inputType="textNoSuggestions"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
-                android:textCursorDrawable="@null" 
-                android:typeface="monospace"/>
+                android:textCursorDrawable="@null"
+                android:textSize="15sp"
+                android:typeface="monospace" />
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
