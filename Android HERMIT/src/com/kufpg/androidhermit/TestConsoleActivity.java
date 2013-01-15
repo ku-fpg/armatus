@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -32,7 +33,7 @@ public class TestConsoleActivity extends StandardActivity {
 		setContentView(R.layout.test_console);
 
 		sv = (ScrollView) findViewById(R.id.code_scroll_view);
-		rr = (RelativeLayout) findViewById(R.id.code_scroll_layout);
+		rr = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
 		et = (EditText) findViewById(R.id.code_input_box);
 		et.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
@@ -91,6 +92,7 @@ public class TestConsoleActivity extends StandardActivity {
 	 */
 	private void addMessage(String msg) {
 		tv = new TextView(TestConsoleActivity.this);
+		tv.setTypeface(Typeface.MONOSPACE);
 		tv.setGravity(Gravity.BOTTOM);
 		// TODO: Make a better ID system
 		tv.setId((int) System.currentTimeMillis());
