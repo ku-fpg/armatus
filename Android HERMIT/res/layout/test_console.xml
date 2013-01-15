@@ -35,11 +35,11 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_gravity="center_vertical"
-                android:background="@android:drawable/editbox_background_normal"
+                android:background="@null"
                 android:singleLine="true"
-                android:textColor="@android:color/black"
-                android:textCursorDrawable="@null" />
-
+                android:textColor="@android:color/white"
+                android:textCursorDrawable="@null" 
+                android:typeface="monospace"/>
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
