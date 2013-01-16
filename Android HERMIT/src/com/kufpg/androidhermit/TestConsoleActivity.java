@@ -1,7 +1,7 @@
 package com.kufpg.androidhermit;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.ConsoleTextView;
@@ -14,17 +14,20 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 public class TestConsoleActivity extends StandardActivity {
 	
 	private RelativeLayout mRr;
-	private View recent = null;
 	private LayoutParams mLp;
 	private ScrollView mSv;
 	private EditText mEt;
-
-	private HashMap<Integer, ConsoleTextView> cmdHistory = new HashMap<Integer, ConsoleTextView>();
+	private TextView mTv;
 	private ConsoleTextView mCtv;
+	private View recent = null;
+
+	private LinkedHashMap<Integer, ConsoleTextView> mCmdHistory = new LinkedHashMap<Integer, ConsoleTextView>();
+	private int mCmdCount = 0;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,6 +35,8 @@ public class TestConsoleActivity extends StandardActivity {
 
 		mSv = (ScrollView) findViewById(R.id.code_scroll_view);
 		mRr = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
+		mTv = (TextView) findViewById(R.id.code_command_num);
+		mTv.setText("hermit<" + mCmdCount + "> ");
 		mEt = (EditText) findViewById(R.id.code_input_box);
 		mEt.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
@@ -45,15 +50,18 @@ public class TestConsoleActivity extends StandardActivity {
 				return false;
 			}
 		});
+		
 		Typeface mTypeface = Typeface.createFromAsset(getAssets(), ConsoleTextView.TYPEFACE);
 		mEt.setTypeface(mTypeface);
+		mTv.setTypeface(mTypeface);
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("cmdHistory", cmdHistory);
-		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = cmdHistory.entrySet().iterator();
+		savedInstanceState.putInt("CmdCount", mCmdCount);
+		savedInstanceState.putSerializable("CmdHistory", mCmdHistory);
+		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = mCmdHistory.entrySet().iterator();
 		while (cmdIter.hasNext()) {
 			Entry<Integer, ConsoleTextView> curEntry =(Entry<Integer, ConsoleTextView>) cmdIter.next();
 			mRr.removeView(curEntry.getValue());
@@ -63,8 +71,9 @@ public class TestConsoleActivity extends StandardActivity {
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		cmdHistory = (HashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("cmdHistory");
-		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = cmdHistory.entrySet().iterator();
+		mCmdCount = savedInstanceState.getInt("CmdCount");
+		mCmdHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
+		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = mCmdHistory.entrySet().iterator();
 		while (cmdIter.hasNext()) {
 			Entry<Integer, ConsoleTextView> curEntry = (Entry<Integer, ConsoleTextView>) cmdIter.next();
 			addTextView(curEntry.getValue());
@@ -76,11 +85,15 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param msg
 	 */
 	private void addMessage(String msg) {
-		if (msg.equals("<clear>")){
+		if (msg.equals("clear")){
 			mRr.removeAllViews();
+			mCmdCount = 0;
+			mCmdHistory.clear();
+			recent = null;
 		} else {
-			mCtv = new ConsoleTextView(TestConsoleActivity.this, msg);
-			cmdHistory.put(mCtv.getId(), mCtv);
+			mCtv = new ConsoleTextView(TestConsoleActivity.this, msg, mCmdCount);
+			mCmdHistory.put(mCtv.getId(), mCtv);
+			mCmdCount++;
 
 			mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 					LayoutParams.WRAP_CONTENT);
@@ -95,6 +108,7 @@ public class TestConsoleActivity extends StandardActivity {
 			});
 			recent = mCtv;
 		}
+		mTv.setText("hermit<" + mCmdCount + "> ");
 	}
 
 	/**
@@ -103,8 +117,9 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param ctv
 	 */
 	private void addTextView(final ConsoleTextView ctv) {
-		if (!cmdHistory.containsKey(ctv.getId())) {
-			cmdHistory.put(ctv.getId(), ctv);
+		if (!mCmdHistory.containsKey(ctv.getId())) {
+			mCmdHistory.put(ctv.getId(), ctv);
+			mCmdCount++;
 		}
 
 		mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -119,6 +134,7 @@ public class TestConsoleActivity extends StandardActivity {
 			}
 		});
 		recent = ctv;
+		mTv.setText("hermit<" + mCmdCount + "> ");
 	}
 
 }
