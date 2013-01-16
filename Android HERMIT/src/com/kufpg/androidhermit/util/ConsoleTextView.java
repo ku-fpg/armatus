@@ -66,10 +66,9 @@ public class ConsoleTextView extends TextView {
 				lastText = s.toString();
 
 				String res = "";
-				String[] sentence = s.toString().split(" ");
-				//Avoid HTML-ification of these triangle brackets
-				sentence[0] = sentence[0].replace("<", "&lt;")
-						.replace(">", "&gt;");
+				//Make sure to sanitize string for HTML parsing
+				String[] sentence = s.toString().replace("<", "&lt;")
+						.replace(">", "&gt;").split(" ");
 				for (String word : sentence) {
 					String color = null;
 					if (word.equals("red")) {
@@ -87,6 +86,7 @@ public class ConsoleTextView extends TextView {
 					}
 				}
 
+//				res = res.trim(); //Remove trailing whitespace
 				ConsoleTextView.this.setText(Html.fromHtml(res));
 			}
 		}

@@ -1,6 +1,5 @@
 package com.kufpg.androidhermit;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -61,10 +60,8 @@ public class TestConsoleActivity extends StandardActivity {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putInt("CmdCount", mCmdCount);
 		savedInstanceState.putSerializable("CmdHistory", mCmdHistory);
-		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = mCmdHistory.entrySet().iterator();
-		while (cmdIter.hasNext()) {
-			Entry<Integer, ConsoleTextView> curEntry =(Entry<Integer, ConsoleTextView>) cmdIter.next();
-			mRr.removeView(curEntry.getValue());
+		for (Entry<Integer, ConsoleTextView> entry : mCmdHistory.entrySet()) {
+			mRr.removeView(entry.getValue());
 		}
 	}
 
@@ -73,10 +70,8 @@ public class TestConsoleActivity extends StandardActivity {
 		super.onRestoreInstanceState(savedInstanceState);
 		mCmdCount = savedInstanceState.getInt("CmdCount");
 		mCmdHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
-		Iterator<Entry<Integer, ConsoleTextView>> cmdIter = mCmdHistory.entrySet().iterator();
-		while (cmdIter.hasNext()) {
-			Entry<Integer, ConsoleTextView> curEntry = (Entry<Integer, ConsoleTextView>) cmdIter.next();
-			addTextView(curEntry.getValue());
+		for (Entry<Integer, ConsoleTextView> entry : mCmdHistory.entrySet()) {
+			addTextView(entry.getValue());
 		}
 	}
 
