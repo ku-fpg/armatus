@@ -65,6 +65,7 @@ public class TestConsoleActivity extends StandardActivity {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
