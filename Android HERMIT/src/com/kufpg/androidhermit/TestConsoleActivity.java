@@ -5,8 +5,10 @@ import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.ConsoleTextView;
 
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -16,7 +18,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class TestConsoleActivity extends StandardActivity {
-	
+
 	private RelativeLayout mRr;
 	private LayoutParams mLp;
 	private ScrollView mSv;
@@ -54,26 +56,35 @@ public class TestConsoleActivity extends StandardActivity {
 		mEt.setTypeface(mTypeface);
 		mTv.setTypeface(mTypeface);
 	}
+	
+	@Override
+	public void onRestart() {
+		super.onRestart();
+		//Since onRestoreInstanceState() isn't called when
+		//app sleeps or loses focus
+		refreshConsole(mCmdHistory);
+	}
+	
+//	@Override
+//	public void onConfigurationChanged(Configuration newConfig) {
+//		super.onConfigurationChanged(newConfig);
+//	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putInt("CmdCount", mCmdCount);
 		savedInstanceState.putSerializable("CmdHistory", mCmdHistory);
-		for (Entry<Integer, ConsoleTextView> entry : mCmdHistory.entrySet()) {
-			mRr.removeView(entry.getValue());
-		}
+		mRr.removeAllViews();
+		recent = null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		mCmdCount = savedInstanceState.getInt("CmdCount");
 		mCmdHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
-		for (Entry<Integer, ConsoleTextView> entry : mCmdHistory.entrySet()) {
-			addTextView(entry.getValue());
-		}
+		refreshConsole(mCmdHistory);
 	}
 
 	/**
@@ -131,6 +142,18 @@ public class TestConsoleActivity extends StandardActivity {
 		});
 		recent = ctv;
 		mTv.setText("hermit<" + mCmdCount + "> ");
+	}
+	
+	/**
+	 * Re-adds all of the ConsoleTextViews in conjunction with onRestart() and
+	 * onRestoreInstanceState(Bundle).
+	 * @param cmdHistory Pass as argument, since mCmdHistory could have been
+	 * destroyed.
+	 */
+	private void refreshConsole(LinkedHashMap<Integer,ConsoleTextView> cmdHistory) {
+		for (Entry<Integer, ConsoleTextView> entry : cmdHistory.entrySet()) {
+			addTextView(entry.getValue());
+		}
 	}
 
 }

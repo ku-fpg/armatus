@@ -1,20 +1,20 @@
 package com.kufpg.androidhermit.util;
 
+import java.io.Serializable;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
 
-public class ConsoleTextView extends TextView {
+public class ConsoleTextView extends TextView implements Serializable {
 
+	private static final long serialVersionUID = 492620301229198361L;
 	public final static float TEXT_SIZE = 15;
 	public final static String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 	
@@ -67,7 +67,8 @@ public class ConsoleTextView extends TextView {
 
 				String res = "";
 				//Make sure to sanitize string for HTML parsing
-				String[] sentence = s.toString().replace("<", "&lt;")
+				String[] sentence = s.toString().replace("&", "&amp;")
+						.replace("<", "&lt;")
 						.replace(">", "&gt;").split(" ");
 				for (String word : sentence) {
 					String color = null;
@@ -86,7 +87,6 @@ public class ConsoleTextView extends TextView {
 					}
 				}
 
-//				res = res.trim(); //Remove trailing whitespace
 				ConsoleTextView.this.setText(Html.fromHtml(res));
 			}
 		}
