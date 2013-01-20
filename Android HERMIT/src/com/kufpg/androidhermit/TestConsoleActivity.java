@@ -1,14 +1,15 @@
 package com.kufpg.androidhermit;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.ConsoleTextView;
 
-import android.content.res.Configuration;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -29,11 +30,13 @@ public class TestConsoleActivity extends StandardActivity {
 
 	private LinkedHashMap<Integer, ConsoleTextView> mCmdHistory = new LinkedHashMap<Integer, ConsoleTextView>();
 	private int mCmdCount = 0;
+	private CommandDispatcher mDispatcher;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_console);
 
+		mDispatcher = new CommandDispatcher(this);
 		mSv = (ScrollView) findViewById(R.id.code_scroll_view);
 		mRr = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
 		mTv = (TextView) findViewById(R.id.code_command_num);
@@ -44,19 +47,29 @@ public class TestConsoleActivity extends StandardActivity {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP) {
-					addMessage(mEt.getText().toString());
+					String[] inputs = mEt.getText().toString().split(" ");
+					if(mDispatcher.isCommand(inputs[0])) {
+						if(inputs.length == 1) {
+							mDispatcher.execute(inputs[0]);
+						} else {
+							mDispatcher.execute(inputs[0], Arrays.copyOfRange
+									(inputs, 1, inputs.length));
+						}
+					} else {
+						addMessage(mEt.getText().toString());
+					}
 					mEt.setText(""); 
 					return true;
 				}
 				return false;
 			}
 		});
-		
+
 		Typeface mTypeface = Typeface.createFromAsset(getAssets(), ConsoleTextView.TYPEFACE);
 		mEt.setTypeface(mTypeface);
 		mTv.setTypeface(mTypeface);
 	}
-	
+
 	@Override
 	public void onRestart() {
 		super.onRestart();
@@ -64,11 +77,6 @@ public class TestConsoleActivity extends StandardActivity {
 		//app sleeps or loses focus
 		refreshConsole(mCmdHistory);
 	}
-	
-//	@Override
-//	public void onConfigurationChanged(Configuration newConfig) {
-//		super.onConfigurationChanged(newConfig);
-//	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -79,6 +87,7 @@ public class TestConsoleActivity extends StandardActivity {
 		recent = null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
@@ -87,34 +96,40 @@ public class TestConsoleActivity extends StandardActivity {
 		refreshConsole(mCmdHistory);
 	}
 
+	public void clear() {
+		mRr.removeAllViews();
+		mCmdCount = 0;
+		mCmdHistory.clear();
+		recent = null;
+		mTv.setText("hermit<" + mCmdCount + "> ");
+	}
+	
+	public void exit() {
+		this.finish();
+		startActivity(new Intent(this, MainActivity.class));
+	}
+
 	/**
 	 * Adds a new "line" to the console with msg as its contents.
 	 * @param msg
 	 */
-	private void addMessage(String msg) {
-		if (msg.equals("clear")){
-			mRr.removeAllViews();
-			mCmdCount = 0;
-			mCmdHistory.clear();
-			recent = null;
-		} else {
-			mCtv = new ConsoleTextView(TestConsoleActivity.this, msg, mCmdCount);
-			mCmdHistory.put(mCtv.getId(), mCtv);
-			mCmdCount++;
+	public void addMessage(String msg) {
+		mCtv = new ConsoleTextView(TestConsoleActivity.this, msg, mCmdCount);
+		mCmdHistory.put(mCtv.getId(), mCtv);
+		mCmdCount++;
 
-			mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT);
-			if (recent != null)
-				mLp.addRule(RelativeLayout.BELOW, recent.getId());
-			mRr.addView(mCtv, mLp);
+		mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
+		if (recent != null)
+			mLp.addRule(RelativeLayout.BELOW, recent.getId());
+		mRr.addView(mCtv, mLp);
 
-			mSv.post(new Runnable() {
-				public void run() {
-					mSv.smoothScrollTo(0, mCtv.getBottom());
-				}
-			});
-			recent = mCtv;
-		}
+		mSv.post(new Runnable() {
+			public void run() {
+				mSv.smoothScrollTo(0, mCtv.getBottom());
+			}
+		});
+		recent = mCtv;
 		mTv.setText("hermit<" + mCmdCount + "> ");
 	}
 
@@ -123,7 +138,7 @@ public class TestConsoleActivity extends StandardActivity {
 	 * Useful for when you have to rotate the screen and reconstruct the console buffer.
 	 * @param ctv
 	 */
-	private void addTextView(final ConsoleTextView ctv) {
+	public void addTextView(final ConsoleTextView ctv) {
 		if (!mCmdHistory.containsKey(ctv.getId())) {
 			mCmdHistory.put(ctv.getId(), ctv);
 			mCmdCount++;
@@ -143,7 +158,7 @@ public class TestConsoleActivity extends StandardActivity {
 		recent = ctv;
 		mTv.setText("hermit<" + mCmdCount + "> ");
 	}
-	
+
 	/**
 	 * Re-adds all of the ConsoleTextViews in conjunction with onRestart() and
 	 * onRestoreInstanceState(Bundle).
@@ -151,6 +166,8 @@ public class TestConsoleActivity extends StandardActivity {
 	 * destroyed.
 	 */
 	private void refreshConsole(LinkedHashMap<Integer,ConsoleTextView> cmdHistory) {
+		mRr.removeAllViews();
+		recent = null;
 		for (Entry<Integer, ConsoleTextView> entry : cmdHistory.entrySet()) {
 			addTextView(entry.getValue());
 		}
