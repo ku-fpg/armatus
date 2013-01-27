@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.kufpg.androidhermit.TestConsoleActivity;
 
+@SuppressWarnings("unused")
 public class CommandDispatcher {
 
 	private static Command clear = new Command("clear", 0, false) {

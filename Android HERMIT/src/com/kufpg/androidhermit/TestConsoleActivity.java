@@ -20,16 +20,16 @@ import android.widget.TextView;
 
 public class TestConsoleActivity extends StandardActivity {
 
-	private RelativeLayout mRr;
-	private LayoutParams mLp;
-	private ScrollView mSv;
-	private EditText mEt;
-	private TextView mTv;
-	private ConsoleTextView mCtv;
-	private View recent = null;
+	private RelativeLayout mCodeLayout;
+	private LayoutParams mCodeLayoutParams;
+	private ScrollView mScrollView;
+	private EditText mInputEditText;
+	private TextView mInputHeader;
+	private ConsoleTextView mCurConsoleTextView;
+	private ConsoleTextView mPrevConsoleTextView = null;
 
-	private LinkedHashMap<Integer, ConsoleTextView> mCmdHistory = new LinkedHashMap<Integer, ConsoleTextView>();
-	private int mCmdCount = 0;
+	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
+	private int mCommandCount = 0;
 	private CommandDispatcher mDispatcher;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,17 +37,17 @@ public class TestConsoleActivity extends StandardActivity {
 		setContentView(R.layout.test_console);
 
 		mDispatcher = new CommandDispatcher(this);
-		mSv = (ScrollView) findViewById(R.id.code_scroll_view);
-		mRr = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
-		mTv = (TextView) findViewById(R.id.code_command_num);
-		mTv.setText("hermit<" + mCmdCount + "> ");
-		mEt = (EditText) findViewById(R.id.code_input_box);
-		mEt.setOnKeyListener(new EditText.OnKeyListener() {
+		mScrollView = (ScrollView) findViewById(R.id.code_scroll_view);
+		mCodeLayout = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
+		mInputHeader = (TextView) findViewById(R.id.code_command_num);
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
+		mInputEditText = (EditText) findViewById(R.id.code_input_box);
+		mInputEditText.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP) {
-					String[] inputs = mEt.getText().toString().split(" ");
+					String[] inputs = mInputEditText.getText().toString().split(" ");
 					if(mDispatcher.isCommand(inputs[0])) {
 						if(inputs.length == 1) {
 							mDispatcher.execute(inputs[0]);
@@ -56,9 +56,9 @@ public class TestConsoleActivity extends StandardActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						addMessage(mEt.getText().toString());
+						addMessage(mInputEditText.getText().toString());
 					}
-					mEt.setText(""); 
+					mInputEditText.setText(""); 
 					return true;
 				}
 				return false;
@@ -66,8 +66,8 @@ public class TestConsoleActivity extends StandardActivity {
 		});
 
 		Typeface mTypeface = Typeface.createFromAsset(getAssets(), ConsoleTextView.TYPEFACE);
-		mEt.setTypeface(mTypeface);
-		mTv.setTypeface(mTypeface);
+		mInputEditText.setTypeface(mTypeface);
+		mInputHeader.setTypeface(mTypeface);
 	}
 
 	@Override
@@ -75,33 +75,33 @@ public class TestConsoleActivity extends StandardActivity {
 		super.onRestart();
 		//Since onRestoreInstanceState() isn't called when
 		//app sleeps or loses focus
-		refreshConsole(mCmdHistory);
+		refreshConsole(mCommandHistory);
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putInt("CmdCount", mCmdCount);
-		savedInstanceState.putSerializable("CmdHistory", mCmdHistory);
-		mRr.removeAllViews();
-		recent = null;
+		savedInstanceState.putInt("CmdCount", mCommandCount);
+		savedInstanceState.putSerializable("CmdHistory", mCommandHistory);
+		mCodeLayout.removeAllViews();
+		mPrevConsoleTextView = null;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		mCmdCount = savedInstanceState.getInt("CmdCount");
-		mCmdHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
-		refreshConsole(mCmdHistory);
+		mCommandCount = savedInstanceState.getInt("CmdCount");
+		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
+		refreshConsole(mCommandHistory);
 	}
 
 	public void clear() {
-		mRr.removeAllViews();
-		mCmdCount = 0;
-		mCmdHistory.clear();
-		recent = null;
-		mTv.setText("hermit<" + mCmdCount + "> ");
+		mCodeLayout.removeAllViews();
+		mCommandCount = 0;
+		mCommandHistory.clear();
+		mPrevConsoleTextView = null;
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 	}
 	
 	public void exit() {
@@ -114,23 +114,23 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param msg
 	 */
 	public void addMessage(String msg) {
-		mCtv = new ConsoleTextView(TestConsoleActivity.this, msg, mCmdCount);
-		mCmdHistory.put(mCtv.getId(), mCtv);
-		mCmdCount++;
+		mCurConsoleTextView = new ConsoleTextView(TestConsoleActivity.this, msg, mCommandCount);
+		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);
+		mCommandCount++;
 
-		mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+		mCodeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
-		if (recent != null)
-			mLp.addRule(RelativeLayout.BELOW, recent.getId());
-		mRr.addView(mCtv, mLp);
+		if (mPrevConsoleTextView != null)
+			mCodeLayoutParams.addRule(RelativeLayout.BELOW, mPrevConsoleTextView.getId());
+		mCodeLayout.addView(mCurConsoleTextView, mCodeLayoutParams);
 
-		mSv.post(new Runnable() {
+		mScrollView.post(new Runnable() {
 			public void run() {
-				mSv.smoothScrollTo(0, mCtv.getBottom());
+				mScrollView.smoothScrollTo(0, mCurConsoleTextView.getBottom());
 			}
 		});
-		recent = mCtv;
-		mTv.setText("hermit<" + mCmdCount + "> ");
+		mPrevConsoleTextView = mCurConsoleTextView;
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 	}
 
 	/**
@@ -139,24 +139,24 @@ public class TestConsoleActivity extends StandardActivity {
 	 * @param ctv
 	 */
 	public void addTextView(final ConsoleTextView ctv) {
-		if (!mCmdHistory.containsKey(ctv.getId())) {
-			mCmdHistory.put(ctv.getId(), ctv);
-			mCmdCount++;
+		if (!mCommandHistory.containsKey(ctv.getId())) {
+			mCommandHistory.put(ctv.getId(), ctv);
+			mCommandCount++;
 		}
 
-		mLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+		mCodeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT);
-		if (recent != null)
-			mLp.addRule(RelativeLayout.BELOW, recent.getId());
-		mRr.addView(ctv, mLp);
+		if (mPrevConsoleTextView != null)
+			mCodeLayoutParams.addRule(RelativeLayout.BELOW, mPrevConsoleTextView.getId());
+		mCodeLayout.addView(ctv, mCodeLayoutParams);
 
-		mSv.post(new Runnable() {
+		mScrollView.post(new Runnable() {
 			public void run() {
-				mSv.smoothScrollTo(0, ctv.getBottom());
+				mScrollView.smoothScrollTo(0, ctv.getBottom());
 			}
 		});
-		recent = ctv;
-		mTv.setText("hermit<" + mCmdCount + "> ");
+		mPrevConsoleTextView = ctv;
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 	}
 
 	/**
@@ -166,8 +166,8 @@ public class TestConsoleActivity extends StandardActivity {
 	 * destroyed.
 	 */
 	private void refreshConsole(LinkedHashMap<Integer,ConsoleTextView> cmdHistory) {
-		mRr.removeAllViews();
-		recent = null;
+		mCodeLayout.removeAllViews();
+		mPrevConsoleTextView = null;
 		for (Entry<Integer, ConsoleTextView> entry : cmdHistory.entrySet()) {
 			addTextView(entry.getValue());
 		}
