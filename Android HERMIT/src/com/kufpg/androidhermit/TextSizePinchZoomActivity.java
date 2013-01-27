@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -14,7 +13,10 @@ import android.widget.TextView;
 public class TextSizePinchZoomActivity extends Activity implements OnTouchListener {
 
 	private final static float STEP = 200;
-	private TextView mTextRatio1, mTextRatio2, mTextRatio3, mTextRatio4;
+	private final static int MAX_FONT_SIZE = 75;
+	private final static int MIN_FONT_SIZE = 10;
+	
+	private TextView mTextRatio1, mTextRatio2;
 	private ArrayList<TextView> mTextViews = new ArrayList<TextView>();
 	private float mRatio = 1.0f;
 	private int mBaseDist;
@@ -45,6 +47,8 @@ public class TextSizePinchZoomActivity extends Activity implements OnTouchListen
 				float delta = (getDistance(event) - mBaseDist) / STEP;
 				float multi = (float)Math.pow(2, delta);
 				mRatio = Math.min(1024.0f, Math.max(0.1f, mBaseRatio * multi));
+				if (mRatio + mDefaultFontSize <= MAX_FONT_SIZE
+						&& mRatio + mDefaultFontSize >= MIN_FONT_SIZE)
 				for (TextView tv : mTextViews)
 					tv.setTextSize(mRatio + mDefaultFontSize);
 			}

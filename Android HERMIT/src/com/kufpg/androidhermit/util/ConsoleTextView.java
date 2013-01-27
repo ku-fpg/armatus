@@ -2,6 +2,8 @@ package com.kufpg.androidhermit.util;
 
 import java.io.Serializable;
 
+import com.kufpg.androidhermit.R;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -11,6 +13,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 public class ConsoleTextView extends TextView implements Serializable {
@@ -104,6 +107,12 @@ public class ConsoleTextView extends TextView implements Serializable {
 		@Override
 		public void afterTextChanged(Editable s) {}
 
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		setBackground(getResources().getDrawable(R.drawable.console_text_border));
+		return super.onTouchEvent(event);
 	}
 
 }
