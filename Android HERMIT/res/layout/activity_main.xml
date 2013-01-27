@@ -85,7 +85,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/onsole_button"
+        android:layout_below="@+id/console_button"
         android:text="Launch pinch-zoom test"
         android:textColor="@android:color/black" />
 
