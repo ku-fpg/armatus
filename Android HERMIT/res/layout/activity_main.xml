@@ -52,6 +52,15 @@
         android:layout_below="@+id/unlock_button"
         android:text="AsyncTask test"
         android:textColor="@android:color/black" />
+    
+    <CheckBox
+        android:id="@+id/progress_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tree_button"
+        android:layout_toRightOf="@+id/async_button"
+        android:text="Show progress spinner"
+        android:textColor="@android:color/black" />
 
     <Button
         android:id="@+id/tree_button"
@@ -68,25 +77,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/tree_button"
-        android:text="Launch console (stolen from the Internet)"
+        android:text="Launch console"
         android:textColor="@android:color/black" />
-
+    
     <Button
-        android:id="@+id/test_console_button"
+        android:id="@+id/pinchzoom_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/console_button"
-        android:text="Launch test console"
-        android:textColor="@android:color/black" />
-
-    <CheckBox
-        android:id="@+id/progress_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tree_button"
-        android:layout_toRightOf="@+id/async_button"
-        android:text="Show progress spinner"
+        android:layout_below="@+id/onsole_button"
+        android:text="Launch pinch-zoom test"
         android:textColor="@android:color/black" />
 
 </RelativeLayout>

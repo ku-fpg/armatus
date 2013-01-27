@@ -21,44 +21,44 @@ import android.widget.Toast;
 
 public class MainActivity extends StandardActivity {
 
-	private TextView codeView;
-	private Button lockButton, unlockButton, asyncButton, treeButton,
-			consoleButton, testConsoleButton;
-	private CheckBox progressCheckBox;
+	private TextView mButtonsView;
+	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton,
+			mConsoleButton, mPinchZoomButton;
+	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
-	private final Condition lockInEffect = mLock.newCondition();
+	private final Condition mLockInEffect = mLock.newCondition();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		codeView = (TextView) findViewById(R.id.code_text_view);
+		mButtonsView = (TextView) findViewById(R.id.code_text_view);
 		setCodeText(mNumTextChanges, mIsLocked);
-		lockButton = (Button) findViewById(R.id.lock_button);
-		unlockButton = (Button) findViewById(R.id.unlock_button);
-		asyncButton = (Button) findViewById(R.id.async_button);
-		treeButton = (Button) findViewById(R.id.tree_button);
-		consoleButton = (Button) findViewById(R.id.console_button);
-		testConsoleButton = (Button) findViewById(R.id.test_console_button);
-		progressCheckBox = (CheckBox) findViewById(R.id.progress_checkbox);
+		mLockButton = (Button) findViewById(R.id.lock_button);
+		mUnlockButton = (Button) findViewById(R.id.unlock_button);
+		mAsyncButton = (Button) findViewById(R.id.async_button);
+		mProgressCheckBox = (CheckBox) findViewById(R.id.progress_checkbox);
+		mTreeButton = (Button) findViewById(R.id.tree_button);
+		mConsoleButton = (Button) findViewById(R.id.console_button);
+		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
 
-		lockButton.setOnClickListener(new OnClickListener() {
+		mLockButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLock.lock();
 				try {
 					while (mIsLocked) {
 						try {
-							lockInEffect.await();
+							mLockInEffect.await();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
 					mIsLocked = true;
-					lockButton.setEnabled(false);
+					mLockButton.setEnabled(false);
 					mNumTextChanges++;
 					setCodeText(mNumTextChanges, mIsLocked);
 				} finally {
@@ -67,15 +67,15 @@ public class MainActivity extends StandardActivity {
 			}
 		});
 
-		unlockButton.setOnClickListener(new OnClickListener() {
+		mUnlockButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mLock.lock();
 				try {
 					if (mIsLocked) {
-						lockInEffect.signal();
+						mLockInEffect.signal();
 						mIsLocked = false;
-						lockButton.setEnabled(true);
+						mLockButton.setEnabled(true);
 						setCodeText(mNumTextChanges, mIsLocked);
 					}
 				} finally {
@@ -84,7 +84,7 @@ public class MainActivity extends StandardActivity {
 			}
 		});
 
-		asyncButton.setOnClickListener(new OnClickListener() {
+		mAsyncButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Toast imgToast = new Toast(MainActivity.this);
@@ -94,13 +94,13 @@ public class MainActivity extends StandardActivity {
 				FileIOManager
 						.downloadImage(
 								"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
-								imgView, progressCheckBox.isChecked(),
+								imgView, mProgressCheckBox.isChecked(),
 								MainActivity.this);
 				imgToast.show();
 			}
 		});
 
-		treeButton.setOnClickListener(new OnClickListener() {
+		mTreeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Tree<Integer> testTree = new Tree<Integer>();
@@ -114,7 +114,7 @@ public class MainActivity extends StandardActivity {
 			}
 		});
 
-		consoleButton.setOnClickListener(new OnClickListener() {
+		mConsoleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent consoleIntent = new Intent(mContext,
@@ -122,13 +122,13 @@ public class MainActivity extends StandardActivity {
 				startActivity(consoleIntent);
 			}
 		});
-
-		testConsoleButton.setOnClickListener(new OnClickListener() {
+		
+		mPinchZoomButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent testConsoleIntent = new Intent(mContext,
-						TestConsoleActivity.class);
-				startActivity(testConsoleIntent);
+				Intent pinchZoomIntent = new Intent(mContext,
+						TextSizePinchZoomActivity.class);
+				startActivity(pinchZoomIntent);
 			}
 		});
 	}
@@ -140,7 +140,7 @@ public class MainActivity extends StandardActivity {
 	}
 
 	private void setCodeText(int numTextChanges, boolean isLocked) {
-		codeView.setText("Button pushed " + numTextChanges
+		mButtonsView.setText("Button pushed " + numTextChanges
 				+ " times. (Status: " + (isLocked ? "locked" : "unlocked")
 				+ ".)");
 	}

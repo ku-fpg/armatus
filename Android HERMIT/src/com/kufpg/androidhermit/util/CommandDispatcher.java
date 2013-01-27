@@ -3,7 +3,7 @@ package com.kufpg.androidhermit.util;
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.kufpg.androidhermit.TestConsoleActivity;
+import com.kufpg.androidhermit.ConsoleActivity;
 
 @SuppressWarnings("unused")
 public class CommandDispatcher {
@@ -33,10 +33,10 @@ public class CommandDispatcher {
 		}
 	};
 
-	private static TestConsoleActivity mConsole;
+	private static ConsoleActivity mConsole;
 	private static ConcurrentHashMap<String, Command> commandMap = new ConcurrentHashMap<String, Command>();
 
-	public CommandDispatcher(TestConsoleActivity console) {
+	public CommandDispatcher(ConsoleActivity console) {
 		mConsole = console;
 
 		//This gets all of this class's instance variables and puts the variables

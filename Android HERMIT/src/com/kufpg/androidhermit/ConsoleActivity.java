@@ -1,270 +1,176 @@
-/*
- *  Copyright 2011 Seto Chi Lap (setosoft@gmail.com)
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 package com.kufpg.androidhermit;
 
-import de.sss.cmdconsole.CommandDispatcher;
-import de.sss.cmdconsole.builtincmd.CmdInfo;
-import de.sss.cmdconsole.builtincmd.FileSys;
-import de.sss.cmdconsole.builtincmd.UiCmd;
-import de.sss.cmdconsole.common.*;
-import de.sss.cmdconsole.gui.ConsoleOutputTextView;
-import de.sss.cmdconsole.gui.ConsoleScrollView;
-import de.sss.cmdconsole.gui.UiConst;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
-import android.app.Activity;
+import com.kufpg.androidhermit.util.CommandDispatcher;
+import com.kufpg.androidhermit.util.ConsoleTextView;
+
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.view.View;
-import android.widget.Toast;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Process;
 import android.view.KeyEvent;
-import android.widget.ImageButton;
-import android.content.pm.ApplicationInfo;
-import android.content.res.Configuration;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.Display;
-import android.util.DisplayMetrics;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
-public class ConsoleActivity extends StandardActivity implements IStdOut {
-	private ConsoleScrollView scrollView;
-	private ConsoleOutputTextView outputTextView;
-	private CommandDispatcher cmdDispatcher;
+public class ConsoleActivity extends StandardActivity {
 
-	/** Called when the activity is first created. */
-	@Override
+	private RelativeLayout mCodeLayout;
+	private LayoutParams mCodeLayoutParams;
+	private ScrollView mScrollView;
+	private EditText mInputEditText;
+	private TextView mInputHeader;
+	private ConsoleTextView mCurConsoleTextView;
+	private ConsoleTextView mPrevConsoleTextView = null;
+
+	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
+	private int mCommandCount = 0;
+	private CommandDispatcher mDispatcher;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console);
-		CFunc.setAppInst(this.getApplication());
-		init();
+
+		mDispatcher = new CommandDispatcher(this);
+		mScrollView = (ScrollView) findViewById(R.id.code_scroll_view);
+		mCodeLayout = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
+		mInputHeader = (TextView) findViewById(R.id.code_command_num);
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
+		mInputEditText = (EditText) findViewById(R.id.code_input_box);
+		mInputEditText.setOnKeyListener(new EditText.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER
+						&& event.getAction() == KeyEvent.ACTION_UP) {
+					String[] inputs = mInputEditText.getText().toString().split(" ");
+					if(mDispatcher.isCommand(inputs[0])) {
+						if(inputs.length == 1) {
+							mDispatcher.execute(inputs[0]);
+						} else {
+							mDispatcher.execute(inputs[0], Arrays.copyOfRange
+									(inputs, 1, inputs.length));
+						}
+					} else {
+						addMessage(mInputEditText.getText().toString());
+					}
+					mInputEditText.setText(""); 
+					return true;
+				}
+				return false;
+			}
+		});
+
+		Typeface mTypeface = Typeface.createFromAsset(getAssets(), ConsoleTextView.TYPEFACE);
+		mInputEditText.setTypeface(mTypeface);
+		mInputHeader.setTypeface(mTypeface);
+	}
+
+	@Override
+	public void onRestart() {
+		super.onRestart();
+		//Since onRestoreInstanceState() isn't called when
+		//app sleeps or loses focus
+		refreshConsole(mCommandHistory);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putInt("CmdCount", mCommandCount);
+		savedInstanceState.putSerializable("CmdHistory", mCommandHistory);
+		mCodeLayout.removeAllViews();
+		mPrevConsoleTextView = null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		mCommandCount = savedInstanceState.getInt("CmdCount");
+		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
+		refreshConsole(mCommandHistory);
+	}
+
+	public void clear() {
+		mCodeLayout.removeAllViews();
+		mCommandCount = 0;
+		mCommandHistory.clear();
+		mPrevConsoleTextView = null;
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
+	}
+	
+	public void exit() {
+		this.finish();
+		startActivity(new Intent(this, MainActivity.class));
 	}
 
 	/**
-	 * To prevent system from calling onCreate once screen orientation/locale is
-	 * changed.
+	 * Adds a new "line" to the console with msg as its contents.
+	 * @param msg
 	 */
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-	}
+	public void addMessage(String msg) {
+		mCurConsoleTextView = new ConsoleTextView(ConsoleActivity.this, msg, mCommandCount);
+		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);
+		mCommandCount++;
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		cmdDispatcher.executeCommand(CmdInfo
-				.getCmdInfo(CmdInfo.BuiltInCmd._ui_exit_.name()));
-	}
+		mCodeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
+		if (mPrevConsoleTextView != null)
+			mCodeLayoutParams.addRule(RelativeLayout.BELOW, mPrevConsoleTextView.getId());
+		mCodeLayout.addView(mCurConsoleTextView, mCodeLayoutParams);
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (cmdDispatcher.isApkRunning()) {
-				Toast.makeText(this,
-						CFunc.getString(R.string.external_program_running),
-						Toast.LENGTH_SHORT).show();
-				return true; // prevent console from exiting if a program is
-								// still running
+		mScrollView.post(new Runnable() {
+			public void run() {
+				mScrollView.smoothScrollTo(0, mCurConsoleTextView.getBottom());
 			}
-		}
-
-		return super.onKeyDown(keyCode, event);
+		});
+		mPrevConsoleTextView = mCurConsoleTextView;
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 	}
 
-	private void issueCommand() {
-		EditText inputView = (EditText) findViewById(R.id.inputBox);
-		String s = inputView.getText().toString().trim();
+	/**
+	 * Similar to addMessage(String), but you can add an already built ConsoleTextView as an argument.
+	 * Useful for when you have to rotate the screen and reconstruct the console buffer.
+	 * @param ctv
+	 */
+	public void addTextView(final ConsoleTextView ctv) {
+		if (!mCommandHistory.containsKey(ctv.getId())) {
+			mCommandHistory.put(ctv.getId(), ctv);
+			mCommandCount++;
+		}
 
-		if (cmdDispatcher.isApkRunning()) {
-			cmdDispatcher.write2ConStdIn(s);
-		} else {
+		mCodeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
+		if (mPrevConsoleTextView != null)
+			mCodeLayoutParams.addRule(RelativeLayout.BELOW, mPrevConsoleTextView.getId());
+		mCodeLayout.addView(ctv, mCodeLayoutParams);
 
-			CmdInfo cmdInfo = CmdInfo.getCmdInfo(s);
-			if (cmdInfo != null) {
-				cmdDispatcher.executeCommand(cmdInfo);
-			} else {
-				boolean isOK = false;
-				if (s.startsWith(CmdInfo.HISTORYCMD_PREFIX)) {
-					isOK = cmdDispatcher.executeCommand(CFunc.parseInt(s
-							.substring(1)));
-				}
-
-				if (!isOK) {
-					cmdDispatcher.executeCommand(new CmdInfo(
-							CmdInfo.BuiltInCmd._unknown_, s, null));
-				}
+		mScrollView.post(new Runnable() {
+			public void run() {
+				mScrollView.smoothScrollTo(0, ctv.getBottom());
 			}
+		});
+		mPrevConsoleTextView = ctv;
+		mInputHeader.setText("hermit<" + mCommandCount + "> ");
+	}
+
+	/**
+	 * Re-adds all of the ConsoleTextViews in conjunction with onRestart() and
+	 * onRestoreInstanceState(Bundle).
+	 * @param cmdHistory Pass as argument, since mCmdHistory could have been
+	 * destroyed.
+	 */
+	private void refreshConsole(LinkedHashMap<Integer,ConsoleTextView> cmdHistory) {
+		mCodeLayout.removeAllViews();
+		mPrevConsoleTextView = null;
+		for (Entry<Integer, ConsoleTextView> entry : cmdHistory.entrySet()) {
+			addTextView(entry.getValue());
 		}
-
-		inputView.setText(""); // clear
-
 	}
 
-	private View.OnClickListener butClickListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			issueCommand();
-		}
-
-	};
-
-	private EditText.OnKeyListener inputTextViewKeyListener = new EditText.OnKeyListener() {
-		@Override
-		public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (keyCode == KeyEvent.KEYCODE_ENTER
-					&& event.getAction() == KeyEvent.ACTION_UP) {
-
-				issueCommand();
-				return true;
-			}
-			return false;
-		}
-
-	};
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.clear();
-		if (cmdDispatcher.isApkRunning()) {
-			menu.add(0, UiConst.MENU_KILL_CONSOLE, 0,
-					CFunc.getString(R.string.menu_kill_console)).setIcon(
-					android.R.drawable.ic_delete);
-			menu.add(0, UiConst.MENU_KILL_APP, 0,
-					CFunc.getString(R.string.menu_kill_running_app)).setIcon(
-					android.R.drawable.ic_menu_delete);
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case UiConst.MENU_KILL_APP:
-			cmdDispatcher.killRunningApk();
-			break;
-		case UiConst.MENU_KILL_CONSOLE:
-			cmdDispatcher.killRunningApk();
-			CFunc.sleep(1000);
-			Process.killProcess(Process.myPid());
-			break;
-		}
-
-		return true;
-	}
-
-	private void init() {
-		// init private data dir
-		ApplicationInfo appInfo = this.getApplicationInfo();
-		FileSys.setPrivateDataRoot(appInfo.dataDir);
-
-		// init display text views
-		Display display = this.getWindowManager().getDefaultDisplay();
-		DisplayMetrics metrics = new DisplayMetrics();
-		display.getMetrics(metrics);
-
-		LinearLayout ll = (LinearLayout) findViewById(R.id.verticalLayout);
-		outputTextView = new ConsoleOutputTextView(this, metrics.heightPixels);
-		ll.addView(outputTextView);
-
-		scrollView = (ConsoleScrollView) findViewById(R.id.consoleScrollView);
-		scrollView.setScrollViewListener(outputTextView);
-
-		// init input button
-		ImageButton inputOK = (ImageButton) findViewById(R.id.inputOKButton);
-		inputOK.setOnClickListener(butClickListener);
-
-		// init input text view
-		EditText inputView = (EditText) findViewById(R.id.inputBox);
-		inputView.setOnKeyListener(inputTextViewKeyListener);
-
-		cmdDispatcher = new CommandDispatcher(uiHandler);
-	}
-
-	@Override
-	public void write(String msg) {
-		outputTextView.appendText(msg);
-		scrollView.post(scrollToBottomAction); // add scroll action to message
-												// queue
-	}
-
-	@Override
-	public void writeln(String msg) {
-		outputTextView.appendText(msg);
-		outputTextView.appendText(ConstantData.NEWLINE);
-		scrollView.post(scrollToBottomAction); // add scroll action to message
-												// queue
-	}
-
-	@Override
-	public void printError(String s) {
-		writeln(CFunc.getString(R.string.error_prefix) + s);
-	}
-
-	private void clearScreen() {
-		outputTextView.clearAllText();
-		scrollView.post(scrollToTopAction); // add scroll action to message
-											// queue
-	}
-
-	private void setConsoleFontSize(int fontSize) {
-		clearScreen();
-		outputTextView.setFontSize(fontSize);
-	}
-
-	private Runnable scrollToBottomAction = new Runnable() {
-		@Override
-		public void run() {
-			if (outputTextView.getViewableHeight() > scrollView.getHeight()) {
-				scrollView.scrollTo(0, outputTextView.getHeight());
-			}
-		}
-	};
-
-	private Runnable scrollToTopAction = new Runnable() {
-		@Override
-		public void run() {
-			scrollView.scrollTo(0, 0);
-		}
-	};
-
-	private Handler uiHandler = new Handler() {
-		@Override
-		public void handleMessage(Message m) {
-			if (m.what == ConstantData.MsgType.STRING.ordinal()) {
-				write((String) m.obj);
-			} else if (m.what == ConstantData.MsgType.CLEAR.ordinal()) {
-				clearScreen();
-			} else if (m.what == ConstantData.MsgType.SHOWSRES.ordinal()) {
-				UiCmd.showScreenResolution(ConsoleActivity.this
-						.getWindowManager().getDefaultDisplay(),
-						ConsoleActivity.this);
-			} else if (m.what == ConstantData.MsgType.SHOWFONTSIZE.ordinal()) {
-				int fontSize = outputTextView.getFontSize();
-				writeln(CFunc.getString(R.string.current_fontsize)
-						+ ": "
-						+ ConstantData.ConsoleFontSize.toFontSize(fontSize)
-								.name() + " (" + fontSize + ")");
-			} else if (m.what == ConstantData.MsgType.SETFONTSIZE.ordinal()) {
-				setConsoleFontSize((Integer) m.obj);
-			} else if (m.what == ConstantData.MsgType.EXIT.ordinal()) {
-				finish();
-			}
-		}
-	};
 }

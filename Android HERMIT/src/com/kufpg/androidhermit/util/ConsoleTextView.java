@@ -1,23 +1,17 @@
 package com.kufpg.androidhermit.util;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-
-import org.xml.sax.XMLReader;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Html;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ConsoleTextView extends TextView implements Serializable {
 
@@ -93,6 +87,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 					if (color != null) {
 						res += "<font color='" + color + "'>" +
 								//"<a href='console://test' style='text-decoration:none;'>" +
+								//In the future, the above line could be used to hyperlink commands
 								word + //"</a>
 								"</font> ";
 					} else {
