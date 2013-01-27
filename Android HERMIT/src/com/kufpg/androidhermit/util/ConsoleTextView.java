@@ -111,8 +111,15 @@ public class ConsoleTextView extends TextView implements Serializable {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		setBackground(getResources().getDrawable(R.drawable.console_text_border));
-		return super.onTouchEvent(event);
+		if(event.getAction() == MotionEvent.ACTION_DOWN)
+		{
+			setBackground(getResources().getDrawable(R.drawable.console_text_border));
+		}
+		else if(event.getAction() == MotionEvent.ACTION_UP)
+		{
+			setBackgroundColor(Color.parseColor("#80000000"));
+		}
+		return super.onTouchEvent(event);	
 	}
 
 }
