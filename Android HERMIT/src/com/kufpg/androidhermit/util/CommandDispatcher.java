@@ -7,6 +7,7 @@ import java.util.Map;
 import android.widget.Toast;
 
 import com.kufpg.androidhermit.ConsoleActivity;
+import com.kufpg.androidhermit.util.ConsoleTextView.PrettyPrinter;
 
 @SuppressWarnings("unused")
 public class CommandDispatcher {
@@ -52,9 +53,9 @@ public class CommandDispatcher {
 	};
 	private static HashMap<String, Command> mCommandMap = mapOfInstances(Command.class);
 	
-	private static Keyword red = new Keyword("red", "toast");
-	private static Keyword green = new Keyword("green", "toast");
-	private static Keyword blue = new Keyword("blue", "toast");
+	private static Keyword red = new Keyword("red", "toast", PrettyPrinter.RED);
+	private static Keyword green = new Keyword("green", "toast", PrettyPrinter.GREEN);
+	private static Keyword blue = new Keyword("blue", "toast", PrettyPrinter.BLUE);
 	private static HashMap<String, Keyword> mKeywordMap = mapOfInstances(Keyword.class);
 
 	public CommandDispatcher(ConsoleActivity console) {
@@ -208,14 +209,16 @@ public class CommandDispatcher {
 
 		private String mKeywordName;
 		private Command mCommand;
+		private String mColor;
 		
-		public Keyword(String keywordName, String commandName) {
+		public Keyword(String keywordName, String commandName, String color) {
 			mKeywordName = keywordName;
 			if (isCommand(commandName)) {
 				mCommand = mCommandMap.get(commandName);
 			} else {
 				mCommand = toast;
 			}
+			mColor = color;
 		}
 		
 		public String getKeywordName() {
@@ -224,6 +227,10 @@ public class CommandDispatcher {
 		
 		public Command getCommand() {
 			return mCommand;
+		}
+		
+		public String getColor() {
+			return mColor;
 		}
 	}
 

@@ -32,7 +32,7 @@ public class ConsoleActivity extends StandardActivity {
 	private TextView mInputHeader;
 	private ConsoleTextView mCurConsoleTextView;
 	private ConsoleTextView mPrevConsoleTextView = null;
-	private ArrayList<String> mKeywords = new ArrayList<String>();
+	private ArrayList<String> mTempKeywords = new ArrayList<String>();
 	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
 	private int mCommandCount = 0;
 	private CommandDispatcher mDispatcher;
@@ -106,7 +106,7 @@ public class ConsoleActivity extends StandardActivity {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle(R.string.context_menu_title);
 		int order = 0;
-		for (String keyword : mKeywords) {
+		for (String keyword : mTempKeywords) {
 			menu.add(0, v.getId(), order, keyword);
 			order++;
 		}
@@ -144,17 +144,9 @@ public class ConsoleActivity extends StandardActivity {
 		mCurConsoleTextView.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {	
-				mKeywords.clear();
-				String[] inputArr = mCurConsoleTextView.getText().toString().split(" ");
-				
-				for(int i = 1; i < inputArr.length; i++) {
-					if(CommandDispatcher.isKeyword(inputArr[i])) {
-						mKeywords.add(inputArr[i]);
-					}
-				}
-				
-				if (!mKeywords.isEmpty()) {
-					ConsoleActivity.this.openContextMenu(mCurConsoleTextView);
+				mTempKeywords = ((ConsoleTextView) v).getKeywords();
+				if (!mTempKeywords.isEmpty()) {
+					ConsoleActivity.this.openContextMenu(v);
 					return true;
 				}
 				return false;

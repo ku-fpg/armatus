@@ -2,4 +2,5 @@
 <resources>
     <dimen name="item_height">67dp</dimen>
     <dimen name="section_div_height">20dp</dimen>
+    <dimen name="console_line_padding">5px</dimen>
 </resources>

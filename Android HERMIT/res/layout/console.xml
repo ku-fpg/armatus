@@ -30,6 +30,7 @@
 
             <LinearLayout
                 android:id="@+id/code_input_line"
+                android:paddingTop="@dimen/console_line_padding"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
