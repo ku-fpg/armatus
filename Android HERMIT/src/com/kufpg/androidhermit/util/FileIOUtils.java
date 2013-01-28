@@ -30,7 +30,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-public class FileIOManager {
+public class FileIOUtils {
 
 	public static ArrayList<String> getTextArrayFromDisk(InputStream textStream) {
 		ArrayList<String> textArray = new ArrayList<String>();

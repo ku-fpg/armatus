@@ -2,7 +2,6 @@ package com.kufpg.androidhermit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -18,16 +17,14 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class ConsoleActivity extends StandardActivity {
-
+	
 	private RelativeLayout mCodeLayout;
 	private LayoutParams mCodeLayoutParams;
 	private ScrollView mScrollView;
@@ -35,15 +32,10 @@ public class ConsoleActivity extends StandardActivity {
 	private TextView mInputHeader;
 	private ConsoleTextView mCurConsoleTextView;
 	private ConsoleTextView mPrevConsoleTextView = null;
-
+	private ArrayList<String> mKeywords = new ArrayList<String>();
 	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
 	private int mCommandCount = 0;
 	private CommandDispatcher mDispatcher;
-	private static final String RED = "red";
-	private static final String BLUE = "blue";
-	private static final String GREEN = "green";
-	private HashMap<String,String> mContextMenuMap = new HashMap<String, String> ();
-	private ArrayList<String> mValues = new ArrayList<String>();
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,20 +47,17 @@ public class ConsoleActivity extends StandardActivity {
 		mInputHeader = (TextView) findViewById(R.id.code_command_num);
 		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 		mInputEditText = (EditText) findViewById(R.id.code_input_box);
-		mContextMenuMap.put(BLUE, BLUE);
-		mContextMenuMap.put(RED, RED);
-		mContextMenuMap.put(GREEN, GREEN);
 		mInputEditText.setOnKeyListener(new EditText.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP) {
 					String[] inputs = mInputEditText.getText().toString().split(" ");
-					if(mDispatcher.isCommand(inputs[0])) {
-						if(inputs.length == 1) {
-							mDispatcher.execute(inputs[0]);
+					if (CommandDispatcher.isCommand(inputs[0])) {
+						if (inputs.length == 1) {
+							mDispatcher.runOnConsole(inputs[0]);
 						} else {
-							mDispatcher.execute(inputs[0], Arrays.copyOfRange
+							mDispatcher.runOnConsole(inputs[0], Arrays.copyOfRange
 									(inputs, 1, inputs.length));
 						}
 					} else {
@@ -113,24 +102,21 @@ public class ConsoleActivity extends StandardActivity {
 	}
 	
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-	{
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.setHeaderTitle(R.string.Context_Menu_Title);
+		menu.setHeaderTitle(R.string.context_menu_title);
 		int order = 0;
-		for(String value: mValues)
-		{
-			menu.add(0, v.getId(), order, value);
+		for (String keyword : mKeywords) {
+			menu.add(0, v.getId(), order, keyword);
 			order++;
 		}
 	}
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item)
-	{
-		if(item != null)
-		{
-			makeToast(item.getTitle().toString());
+	public boolean onContextItemSelected(MenuItem item) {
+		if (item != null) {
+			String keywordNStr = item.getTitle().toString();
+			mDispatcher.runFromContextMenu(keywordNStr, keywordNStr);
 		}
 		return super.onContextItemSelected(item);
 	}
@@ -144,7 +130,7 @@ public class ConsoleActivity extends StandardActivity {
 	}
 	
 	public void exit() {
-		this.finish();
+		finish();
 		startActivity(new Intent(this, MainActivity.class));
 	}
 
@@ -156,40 +142,23 @@ public class ConsoleActivity extends StandardActivity {
 		mCurConsoleTextView = new ConsoleTextView(ConsoleActivity.this, msg, mCommandCount);
 		registerForContextMenu(mCurConsoleTextView);
 		mCurConsoleTextView.setOnLongClickListener(new OnLongClickListener() {
-
 			@Override
-			public boolean onLongClick(View v) {
+			public boolean onLongClick(View v) {	
+				mKeywords.clear();
+				String[] inputArr = mCurConsoleTextView.getText().toString().split(" ");
 				
-				mValues.clear();
-				String [] mArry = mCurConsoleTextView.getText().toString().split(" ");
-				
-				for(int i = 1; i < mArry.length; i++)
-				{
-					if(mArry[i].equals(mContextMenuMap.get(BLUE)))
-					{
-						mValues.add("Blue");
+				for(int i = 1; i < inputArr.length; i++) {
+					if(CommandDispatcher.isKeyword(inputArr[i])) {
+						mKeywords.add(inputArr[i]);
 					}
-					else if(mArry[i].equals(mContextMenuMap.get(GREEN)))
-					{
-						mValues.add("Green");
-					}
-					else if(mArry[i].equals(mContextMenuMap.get(RED)))
-					{
-						mValues.add("Red");
-					}
-						
 				}
 				
-				
-				if(!mValues.isEmpty())
-				{
+				if (!mKeywords.isEmpty()) {
 					ConsoleActivity.this.openContextMenu(mCurConsoleTextView);
 					return true;
 				}
-				
 				return false;
-			}
-			
+			}	
 		});
 		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);
 		mCommandCount++;

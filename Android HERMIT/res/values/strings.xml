@@ -52,6 +52,6 @@
     <string name="netinfo_netintf_name">Interface name</string>
     <string name="current_fontsize">Font size</string>
     <string name="external_program_running">External program is running</string>
-    <string name="Context_Menu_Title">Commands found in this line</string>
+    <string name="context_menu_title">Commands found in this line</string>
 
 </resources>

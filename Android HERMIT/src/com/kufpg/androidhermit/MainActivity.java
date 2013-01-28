@@ -3,7 +3,7 @@ package com.kufpg.androidhermit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.kufpg.androidhermit.util.FileIOManager;
+import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
 import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 import com.kufpg.androidhermit.util.TreeNode;
@@ -91,7 +91,7 @@ public class MainActivity extends StandardActivity {
 				ImageView imgView = new ImageView(MainActivity.this);
 				imgToast.setView(imgView);
 				imgToast.setDuration(Toast.LENGTH_LONG);
-				FileIOManager
+				FileIOUtils
 						.downloadImage(
 								"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
 								imgView, mProgressCheckBox.isChecked(),
@@ -110,7 +110,7 @@ public class MainActivity extends StandardActivity {
 				rootNode.addChild(childNode);
 				rootNode.addChildren(3, 4, 5, 6);
 				childNode.addChildren(7, 8, 9, 10);
-				makeToast(testTree.toString(TreeTraversalOrder.PRE_ORDER));
+				showToast(testTree.toString(TreeTraversalOrder.PRE_ORDER));
 			}
 		});
 

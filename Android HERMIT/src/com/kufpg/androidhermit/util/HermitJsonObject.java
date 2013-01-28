@@ -13,7 +13,7 @@ public class HermitJsonObject extends JSONObject {
 	private ArrayList<String> jsonContents = new ArrayList<String>();
 
 	public HermitJsonObject(InputStream jsonStream) throws JSONException {
-		super(FileIOManager.getTextFromDisk(jsonStream));
+		super(FileIOUtils.getTextFromDisk(jsonStream));
 		jsonName = this.getString("fileName");
 		JSONArray fileContents = (JSONArray) this.get("fileContents");
 		for (int i = 0; i < fileContents.length(); i++) {

@@ -1,7 +1,9 @@
 package com.kufpg.androidhermit.util;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
+import com.kufpg.androidhermit.ConsoleActivity;
 import com.kufpg.androidhermit.R;
 
 import android.content.Context;
@@ -19,11 +21,10 @@ import android.widget.TextView;
 public class ConsoleTextView extends TextView implements Serializable {
 
 	private static final long serialVersionUID = 492620301229198361L;
-	private static final String RED = "red";
-	private static final String BLUE = "blue";
-	private static final String GREEN = "green";
 
-	public final static float TEXT_SIZE = 15;
+	public final static int DEFAULT_FONT_SIZE = 15;
+	public final static int MAX_FONT_SIZE = 40;
+	public final static int MIN_FONT_SIZE = 10;
 	public final static String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 
 	private int mCommandOrderNum;
@@ -54,7 +55,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 
 		this.setTypeface(mTypeface);
 		this.setTextColor(Color.WHITE);
-		this.setTextSize(TEXT_SIZE);
+		this.setTextSize(DEFAULT_FONT_SIZE);
 		this.setGravity(Gravity.BOTTOM);
 		// TODO: Make a better ID system
 		this.setId((int) System.currentTimeMillis());
@@ -64,9 +65,27 @@ public class ConsoleTextView extends TextView implements Serializable {
 
 		mCommandOrderNum = cmdOrderNum;
 	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if(event.getAction() == MotionEvent.ACTION_DOWN)
+		{
+			setBackground(getResources().getDrawable(R.drawable.console_text_border));
+		}
+		else if(event.getAction() == MotionEvent.ACTION_UP)
+		{
+			setBackgroundColor(Color.parseColor("#80000000"));
+		}
+		return super.onTouchEvent(event);	
+	}
 
-	protected class PrettyPrinter implements TextWatcher {
-		String lastText = null;
+	public class PrettyPrinter implements TextWatcher {
+		public static final String RED = "red";
+		public static final String BLUE = "blue";
+		public static final String GREEN = "green";
+		
+		private HashMap<String,String> mKeywordMap = new HashMap<String, String> ();
+		private String lastText = null;
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
@@ -107,19 +126,9 @@ public class ConsoleTextView extends TextView implements Serializable {
 		@Override
 		public void afterTextChanged(Editable s) {}
 
-	}
-	
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if(event.getAction() == MotionEvent.ACTION_DOWN)
-		{
-			setBackground(getResources().getDrawable(R.drawable.console_text_border));
+		public boolean isKeyword(String query) {
+			return mKeywordMap.containsKey(query);
 		}
-		else if(event.getAction() == MotionEvent.ACTION_UP)
-		{
-			setBackgroundColor(Color.parseColor("#80000000"));
-		}
-		return super.onTouchEvent(event);	
 	}
 
 }

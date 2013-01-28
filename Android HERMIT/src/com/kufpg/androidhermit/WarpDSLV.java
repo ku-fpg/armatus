@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kufpg.androidhermit.dragsort.DragSortListView;
-import com.kufpg.androidhermit.util.FileIOManager;
+import com.kufpg.androidhermit.util.FileIOUtils;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -121,8 +121,8 @@ public class WarpDSLV extends ListActivity {
 						public void onClick(DialogInterface dialog,
 								int whichButton) {
 							String textInput = inputBox.getText().toString();
-							if (FileIOManager.isTextFile(textInput)) {
-								ArrayList<String> code = FileIOManager
+							if (FileIOUtils.isTextFile(textInput)) {
+								ArrayList<String> code = FileIOUtils
 										.getTextArrayFromUrl(textInput);
 								Intent codeIntent = new Intent(mContext,
 										WarpDSLV.class);
@@ -150,7 +150,7 @@ public class WarpDSLV extends ListActivity {
 			alert.show();
 			return true;
 		case R.id.save_file:
-			if (FileIOManager.saveTextArray(mList,
+			if (FileIOUtils.saveTextArray(mList,
 					StandardActivity.getSaveDir(), mFileName)) {
 				makeToast(mFileName + " saved successfully!");
 			} else {
@@ -182,7 +182,7 @@ public class WarpDSLV extends ListActivity {
 				Uri diskTextFile = intent.getData();
 				ArrayList<String> code = null;
 				try {
-					code = FileIOManager
+					code = FileIOUtils
 							.getTextArrayFromDisk(getContentResolver()
 									.openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {

@@ -3,7 +3,7 @@ package com.kufpg.androidhermit;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import com.kufpg.androidhermit.util.FileIOManager;
+import com.kufpg.androidhermit.util.FileIOUtils;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -90,8 +90,8 @@ public class StandardActivity extends Activity {
 						public void onClick(DialogInterface dialog,
 								int whichButton) {
 							String textInput = inputBox.getText().toString();
-							if (FileIOManager.isTextFile(textInput)) {
-								ArrayList<String> code = FileIOManager
+							if (FileIOUtils.isTextFile(textInput)) {
+								ArrayList<String> code = FileIOUtils
 										.getTextArrayFromUrl(textInput);
 								Intent codeIntent = new Intent(mContext,
 										WarpDSLV.class);
@@ -101,7 +101,7 @@ public class StandardActivity extends Activity {
 										uriBits[uriBits.length - 1]);
 								startActivity(codeIntent);
 							} else {
-								makeToast("The entered URL is not a plaintext file.");
+								showToast("The entered URL is not a plaintext file.");
 							}
 						}
 					});
@@ -127,7 +127,7 @@ public class StandardActivity extends Activity {
 		}
 	}
 
-	public void makeToast(String message) {
+	public void showToast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
@@ -142,7 +142,7 @@ public class StandardActivity extends Activity {
 				Uri diskTextFile = intent.getData();
 				ArrayList<String> code = null;
 				try {
-					code = FileIOManager
+					code = FileIOUtils
 							.getTextArrayFromDisk(getContentResolver()
 									.openInputStream(diskTextFile));
 				} catch (FileNotFoundException e) {
