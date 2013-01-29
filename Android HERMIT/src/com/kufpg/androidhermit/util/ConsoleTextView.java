@@ -21,7 +21,6 @@ import android.widget.TextView;
 public class ConsoleTextView extends TextView implements Serializable {
 
 	private static final long serialVersionUID = 492620301229198361L;
-	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 
 	private int mCommandOrderNum;
 	private ArrayList<String> mKeywords = new ArrayList<String>();
@@ -45,7 +44,8 @@ public class ConsoleTextView extends TextView implements Serializable {
 
 	protected void setupView(ConsoleActivity console, String msg, int cmdOrderNum) {
 		mCommandOrderNum = cmdOrderNum;
-		Typeface mTypeface = Typeface.createFromAsset(getResources().getAssets(), TYPEFACE);
+		Typeface typeface = Typeface.createFromAsset(getResources().getAssets(),
+				ConsoleActivity.TYPEFACE);
 
 		addTextChangedListener(new PrettyPrinter());
 		setGravity(Gravity.BOTTOM);
@@ -55,12 +55,12 @@ public class ConsoleTextView extends TextView implements Serializable {
 				(R.dimen.console_line_padding), 0, 0);
 		setTextColor(Color.WHITE);
 		setTextSize(ConsoleActivity.DEFAULT_FONT_SIZE);
-		setTypeface(mTypeface);
+		setTypeface(typeface);
 
 		setText("hermit<" + cmdOrderNum + "> ");		
 		if (msg != null) {
 			append(msg);
-			String[] inputArr = msg.split(" ");
+			String[] inputArr = msg.split(ConsoleActivity.WHITESPACE);
 			for(String word : inputArr) {
 				if(CommandDispatcher.isKeyword(word)) {
 					mKeywords.add(word);
@@ -106,7 +106,8 @@ public class ConsoleTextView extends TextView implements Serializable {
 
 				String res = "";
 				//Make sure to sanitize string for HTML parsing
-				String[] sentence = TextUtils.htmlEncode(s.toString()).split(" ");
+				String[] sentence = TextUtils.htmlEncode(s.toString())
+						.split(ConsoleActivity.WHITESPACE);
 				for (String word : sentence) {
 					String color = null;
 					if (CommandDispatcher.isKeyword(word)) {
@@ -120,6 +121,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 						res += word + " ";
 					}
 				};
+				res.trim();
 				ConsoleTextView.this.setText(Html.fromHtml(res));
 			}
 		}

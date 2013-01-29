@@ -8,21 +8,20 @@ import java.util.Map.Entry;
 import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.ConsoleTextView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -34,9 +33,12 @@ public class ConsoleActivity extends StandardActivity {
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int MAX_FONT_SIZE = 40;
 	public static final int MIN_FONT_SIZE = 15;
+	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
+	public static final String WHITESPACE = "\\s+";
 
 	private RelativeLayout mCodeLayout;
 	private LayoutParams mCodeLayoutParams;
+	private View mRootView;
 	private ScrollView mScrollView;
 	private EditText mInputEditText;
 	private TextView mInputHeader;
@@ -53,24 +55,33 @@ public class ConsoleActivity extends StandardActivity {
 		setContentView(R.layout.console);
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = false);
 
+		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				int rootHeight = mRootView.getRootView().getHeight();
+				int heightDiff = rootHeight - mRootView.getHeight();
+				if (heightDiff > rootHeight/3) { //This works on Nexus 7s, at the very least
+					mIsSoftKeyboardVisible = true;
+				} else {
+					mIsSoftKeyboardVisible = false;
+				}
+			}
+		});
+		
 		mDispatcher = new CommandDispatcher(this);
 		mScrollView = (ScrollView) findViewById(R.id.code_scroll_view);
 		mCodeLayout = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
 		mInputHeader = (TextView) findViewById(R.id.code_command_num);
 		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 		mInputEditText = (EditText) findViewById(R.id.code_input_box);
-		mInputEditText.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mIsSoftKeyboardVisible = true;
-			}
-		});
 		mInputEditText.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP) {
-					String[] inputs = mInputEditText.getText().toString().split(" ");
+					String[] inputs = mInputEditText.getText().
+							toString().trim().split(WHITESPACE);
 					if (CommandDispatcher.isCommand(inputs[0])) {
 						if (inputs.length == 1) {
 							mDispatcher.runOnConsole(inputs[0]);
@@ -88,9 +99,9 @@ public class ConsoleActivity extends StandardActivity {
 			}
 		});
 
-		Typeface mTypeface = Typeface.createFromAsset(getAssets(), ConsoleTextView.TYPEFACE);
-		mInputEditText.setTypeface(mTypeface);
-		mInputHeader.setTypeface(mTypeface);
+		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
+		mInputEditText.setTypeface(typeface);
+		mInputHeader.setTypeface(typeface);
 	}
 
 	@Override
@@ -119,6 +130,7 @@ public class ConsoleActivity extends StandardActivity {
 		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
 		mIsSoftKeyboardVisible = savedInstanceState.getBoolean("SoftKeyboardVisibility");
 		refreshConsole(mCommandHistory);
+		Log.d("Test2", "Test2");
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible);
 	}
 
@@ -227,7 +239,7 @@ public class ConsoleActivity extends StandardActivity {
 			addTextView(entry.getValue());
 		}
 	}
-	
+
 	private void setSoftKeyboardVisibility(boolean visibility) {
 		if (visibility) {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
