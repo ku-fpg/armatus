@@ -21,11 +21,6 @@ import android.widget.TextView;
 public class ConsoleTextView extends TextView implements Serializable {
 
 	private static final long serialVersionUID = 492620301229198361L;
-	private static final String TRANSPARENT = "#80000000";
-
-	public static final int DEFAULT_FONT_SIZE = 15;
-	public static final int MAX_FONT_SIZE = 40;
-	public static final int MIN_FONT_SIZE = 10;
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 
 	private int mCommandOrderNum;
@@ -48,7 +43,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setupView(console, msg, cmdOrderNum);
 	}
 
-	protected void setupView(Context context, String msg, int cmdOrderNum) {
+	protected void setupView(ConsoleActivity console, String msg, int cmdOrderNum) {
 		mCommandOrderNum = cmdOrderNum;
 		Typeface mTypeface = Typeface.createFromAsset(getResources().getAssets(), TYPEFACE);
 
@@ -59,7 +54,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setPaddingRelative(0, getResources().getDimensionPixelSize
 				(R.dimen.console_line_padding), 0, 0);
 		setTextColor(Color.WHITE);
-		setTextSize(DEFAULT_FONT_SIZE);
+		setTextSize(ConsoleActivity.DEFAULT_FONT_SIZE);
 		setTypeface(mTypeface);
 
 		setText("hermit<" + cmdOrderNum + "> ");		
@@ -86,8 +81,9 @@ public class ConsoleTextView extends TextView implements Serializable {
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN) {
 			setBackground(getResources().getDrawable(R.drawable.console_text_border));
-		} else if(event.getAction() == MotionEvent.ACTION_UP) {
-			setBackgroundColor(Color.parseColor(TRANSPARENT));
+		} else if(event.getAction() == MotionEvent.ACTION_UP
+				|| event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+			setBackgroundColor(getResources().getColor(android.R.color.transparent));
 		}
 		return super.onTouchEvent(event);	
 	}

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.ConsoleTextView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -16,7 +17,12 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -24,7 +30,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class ConsoleActivity extends StandardActivity {
-	
+
+	public static final int DEFAULT_FONT_SIZE = 15;
+	public static final int MAX_FONT_SIZE = 40;
+	public static final int MIN_FONT_SIZE = 15;
+
 	private RelativeLayout mCodeLayout;
 	private LayoutParams mCodeLayoutParams;
 	private ScrollView mScrollView;
@@ -34,12 +44,14 @@ public class ConsoleActivity extends StandardActivity {
 	private ConsoleTextView mPrevConsoleTextView = null;
 	private ArrayList<String> mTempKeywords = new ArrayList<String>();
 	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
-	private int mCommandCount = 0;
 	private CommandDispatcher mDispatcher;
+	private int mCommandCount = 0;
+	private boolean mIsSoftKeyboardVisible;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console);
+		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = false);
 
 		mDispatcher = new CommandDispatcher(this);
 		mScrollView = (ScrollView) findViewById(R.id.code_scroll_view);
@@ -47,7 +59,13 @@ public class ConsoleActivity extends StandardActivity {
 		mInputHeader = (TextView) findViewById(R.id.code_command_num);
 		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 		mInputEditText = (EditText) findViewById(R.id.code_input_box);
-		mInputEditText.setOnKeyListener(new EditText.OnKeyListener() {
+		mInputEditText.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mIsSoftKeyboardVisible = true;
+			}
+		});
+		mInputEditText.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
@@ -88,6 +106,7 @@ public class ConsoleActivity extends StandardActivity {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putInt("CmdCount", mCommandCount);
 		savedInstanceState.putSerializable("CmdHistory", mCommandHistory);
+		savedInstanceState.putBoolean("SoftKeyboardVisibility", mIsSoftKeyboardVisible);
 		mCodeLayout.removeAllViews();
 		mPrevConsoleTextView = null;
 	}
@@ -98,9 +117,11 @@ public class ConsoleActivity extends StandardActivity {
 		super.onRestoreInstanceState(savedInstanceState);
 		mCommandCount = savedInstanceState.getInt("CmdCount");
 		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
+		mIsSoftKeyboardVisible = savedInstanceState.getBoolean("SoftKeyboardVisibility");
 		refreshConsole(mCommandHistory);
+		setSoftKeyboardVisibility(mIsSoftKeyboardVisible);
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -111,7 +132,7 @@ public class ConsoleActivity extends StandardActivity {
 			order++;
 		}
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
@@ -128,7 +149,7 @@ public class ConsoleActivity extends StandardActivity {
 		mPrevConsoleTextView = null;
 		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 	}
-	
+
 	public void exit() {
 		finish();
 		startActivity(new Intent(this, MainActivity.class));
@@ -172,7 +193,9 @@ public class ConsoleActivity extends StandardActivity {
 
 	/**
 	 * Similar to addMessage(String), but you can add an already built ConsoleTextView as an argument.
-	 * Useful for when you have to rotate the screen and reconstruct the console buffer.
+	 * Useful for when you have to rotate the screen and reconstruct the console buffer. Note that
+	 * this assumes that the ConsoleTextView has already been associated with an appropriate
+	 * LayoutParams.
 	 * @param ctv
 	 */
 	public void addTextView(final ConsoleTextView ctv) {
@@ -180,12 +203,7 @@ public class ConsoleActivity extends StandardActivity {
 			mCommandHistory.put(ctv.getId(), ctv);
 			mCommandCount++;
 		}
-
-		mCodeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
-		if (mPrevConsoleTextView != null)
-			mCodeLayoutParams.addRule(RelativeLayout.BELOW, mPrevConsoleTextView.getId());
-		mCodeLayout.addView(ctv, mCodeLayoutParams);
+		mCodeLayout.addView(ctv);
 
 		mScrollView.post(new Runnable() {
 			public void run() {
@@ -207,6 +225,14 @@ public class ConsoleActivity extends StandardActivity {
 		mPrevConsoleTextView = null;
 		for (Entry<Integer, ConsoleTextView> entry : cmdHistory.entrySet()) {
 			addTextView(entry.getValue());
+		}
+	}
+	
+	private void setSoftKeyboardVisibility(boolean visibility) {
+		if (visibility) {
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		} else {
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		}
 	}
 

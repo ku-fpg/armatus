@@ -13,7 +13,7 @@ import com.kufpg.androidhermit.util.ConsoleTextView.PrettyPrinter;
 public class CommandDispatcher {
 	private static ConsoleActivity mConsole;
 	
-	
+	//List of Commands
 	private static Command clear = new Command("clear", 0, false) {
 		@Override
 		protected void run(String... args) {
@@ -53,6 +53,7 @@ public class CommandDispatcher {
 	};
 	private static HashMap<String, Command> mCommandMap = mapOfInstances(Command.class);
 	
+	//List of Keywords
 	private static Keyword red = new Keyword("red", "toast", PrettyPrinter.RED);
 	private static Keyword green = new Keyword("green", "toast", PrettyPrinter.GREEN);
 	private static Keyword blue = new Keyword("blue", "toast", PrettyPrinter.BLUE);
