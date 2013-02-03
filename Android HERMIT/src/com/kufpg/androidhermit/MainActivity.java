@@ -135,13 +135,14 @@ public class MainActivity extends StandardActivity {
 		});
 		
 		mLeftSlidingMenu = new SlidingMenu(this);
-		mLeftSlidingMenu.setMode(SlidingMenu.LEFT);
+		mLeftSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
 		mLeftSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		mLeftSlidingMenu.setFadeDegree(0.35f);
 		mLeftSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		mLeftSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		mLeftSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		mLeftSlidingMenu.setMenu(R.layout.drawer_menu);
+		mLeftSlidingMenu.setSecondaryMenu(R.layout.drawer_menu);
 	}
 
 	@Override
