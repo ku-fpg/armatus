@@ -1,5 +1,7 @@
 package com.kufpg.androidhermit;
 
+import com.kufpg.androidhermit.util.ActivitySwipeDetector;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +13,7 @@ import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class TextSizePinchZoomActivity extends Activity {
@@ -22,6 +25,7 @@ public class TextSizePinchZoomActivity extends Activity {
 	private TextView mScalingView;
 	private ScaleGestureDetector mScaleGestureDetector;
 	private PopupWindow mPopup;
+	private RelativeLayout mLayout;
 	private View mPopupView;
 	private TextView mPopupTextView;
 	private int mIntFontSize = DEFAULT_FONT_SIZE;
@@ -34,6 +38,11 @@ public class TextSizePinchZoomActivity extends Activity {
 		mScalingView = (TextView) findViewById(R.id.resize_me);
 		mScalingView.setTextSize(DEFAULT_FONT_SIZE);
 		mScaleGestureDetector = new ScaleGestureDetector(this, new OnConsoleScaleGestureListener());
+		
+		//Fling test
+		ActivitySwipeDetector activitySwipeDetector = new ActivitySwipeDetector(this);
+		mLayout = (RelativeLayout) this.findViewById(R.id.fling_layout);
+		mLayout.setOnTouchListener(activitySwipeDetector);
 		
 		LayoutInflater inflater = (LayoutInflater)
 				getSystemService(Context.LAYOUT_INFLATER_SERVICE);

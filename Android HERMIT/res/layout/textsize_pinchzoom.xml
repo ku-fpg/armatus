@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fling_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -8,7 +9,8 @@
         android:id="@+id/resize_me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is a test of Android's pinch-zoom. Will it work?" />
+        android:text="This is a test of Android&apos;s pinch-zoom. Will it work?" />
+
     <TextView
         android:id="@+id/resize_me2"
         android:layout_width="wrap_content"
