@@ -7,6 +7,7 @@ import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
 import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 import com.kufpg.androidhermit.util.TreeNode;
+import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ public class MainActivity extends StandardActivity {
 	private boolean mIsLocked = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
 	private final Condition mLockInEffect = mLock.newCondition();
+	private SlidingMenu mLeftSlidingMenu, mRightSlidingMenu;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -131,6 +133,15 @@ public class MainActivity extends StandardActivity {
 				startActivity(pinchZoomIntent);
 			}
 		});
+		
+		mLeftSlidingMenu = new SlidingMenu(this);
+		mLeftSlidingMenu.setMode(SlidingMenu.LEFT);
+		mLeftSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		mLeftSlidingMenu.setFadeDegree(0.35f);
+		mLeftSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+		mLeftSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		mLeftSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+		mLeftSlidingMenu.setMenu(R.layout.drawer_menu);
 	}
 
 	@Override
