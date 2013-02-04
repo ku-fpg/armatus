@@ -24,13 +24,13 @@ public class MainActivity extends StandardActivity {
 
 	private TextView mButtonsView;
 	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton,
-			mConsoleButton, mPinchZoomButton;
+			mConsoleButton, mPinchZoomButton, mDragNDropButton;
 	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
 	private final Condition mLockInEffect = mLock.newCondition();
-	private SlidingMenu mLeftSlidingMenu, mRightSlidingMenu;
+	private SlidingMenu mSlidingMenu;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,7 @@ public class MainActivity extends StandardActivity {
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
+		mDragNDropButton = (Button) findViewById(R.id.dragndrop_button);
 
 		mLockButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -119,30 +120,33 @@ public class MainActivity extends StandardActivity {
 		mConsoleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent consoleIntent = new Intent(mContext,
-						ConsoleActivity.class);
-				startActivity(consoleIntent);
+				startActivity(new Intent(mContext, ConsoleActivity.class));
 			}
 		});
 		
 		mPinchZoomButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent pinchZoomIntent = new Intent(mContext,
-						TextSizePinchZoomActivity.class);
-				startActivity(pinchZoomIntent);
+				startActivity(new Intent(mContext, TextSizePinchZoomActivity.class));
 			}
 		});
 		
-		mLeftSlidingMenu = new SlidingMenu(this);
-		mLeftSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
-		mLeftSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		mLeftSlidingMenu.setFadeDegree(0.35f);
-		mLeftSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-		mLeftSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-		mLeftSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		mLeftSlidingMenu.setMenu(R.layout.drawer_menu);
-		mLeftSlidingMenu.setSecondaryMenu(R.layout.drawer_menu);
+		mDragNDropButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(mContext, DragNDropActivity.class));
+			}
+		});
+		
+		mSlidingMenu = new SlidingMenu(this);
+		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		mSlidingMenu.setFadeDegree(0.35f);
+		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+		mSlidingMenu.setMenu(R.layout.drawer_menu);
+		mSlidingMenu.setSecondaryMenu(R.layout.drawer_menu);
 	}
 
 	@Override

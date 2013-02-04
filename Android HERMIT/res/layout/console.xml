@@ -1,67 +1,54 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/code_scroll_view"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content" >
 
-    <ScrollView
-        android:id="@+id/code_scroll_view"
+    <LinearLayout
+        android:id="@+id/code_scroll_linear_layout"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/code_scroll_linear_layout"
+        <RelativeLayout
+            android:id="@+id/code_scroll_relative_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+        </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/code_scroll_relative_layout"
-                android:layout_width="fill_parent"
+        <LinearLayout
+            android:id="@+id/code_input_line"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/console_line_padding" >
+
+            <TextView
+                android:id="@+id/code_command_num"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-            </RelativeLayout>
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textCursorDrawable="@null"
+                android:textSize="15sp"
+                android:typeface="monospace" />
 
-            <FrameLayout
-                android:id="@+id/code_frame_layout"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1" >
-            </FrameLayout>
-
-            <LinearLayout
-                android:id="@+id/code_input_line"
-                android:paddingTop="@dimen/console_line_padding"
-                android:layout_width="fill_parent"
+            <EditText
+                android:id="@+id/code_input_box"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/code_command_num"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:background="@null"
-                    android:singleLine="true"
-                    android:textColor="@android:color/white"
-                    android:textCursorDrawable="@null"
-                    android:textSize="15sp"
-                    android:typeface="monospace" />
-
-                <EditText
-                    android:id="@+id/code_input_box"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:inputType="textNoSuggestions"
-                    android:singleLine="true"
-                    android:textColor="@android:color/white"
-                    android:textCursorDrawable="@null"
-                    android:textSize="15sp"
-                    android:typeface="monospace" />
-            </LinearLayout>
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@null"
+                android:inputType="textNoSuggestions"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textCursorDrawable="@null"
+                android:textSize="15sp"
+                android:typeface="monospace" />
         </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 
-</RelativeLayout>
+</ScrollView>
