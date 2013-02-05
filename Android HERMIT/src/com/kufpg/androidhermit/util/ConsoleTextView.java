@@ -51,8 +51,8 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setGravity(Gravity.BOTTOM);
 		// TODO: Make a better ID system
 		setId((int) System.currentTimeMillis());
-		setPaddingRelative(0, getResources().getDimensionPixelSize
-				(R.dimen.console_line_padding), 0, 0);
+		final int PADDING = getResources().getDimensionPixelSize(R.dimen.console_line_padding);
+		setPaddingRelative(PADDING, PADDING, PADDING, 0);
 		setTextColor(Color.WHITE);
 		setTextSize(ConsoleActivity.DEFAULT_FONT_SIZE);
 		setTypeface(typeface);

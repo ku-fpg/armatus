@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.ConsoleTextView;
+import com.kufpg.androidhermit.util.drag.DragImageView;
 import com.kufpg.androidhermit.util.drag.DragImageViewLayout;
 import com.kufpg.androidhermit.util.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
@@ -47,6 +48,7 @@ public class ConsoleActivity extends StandardActivity {
 	private TextView mInputHeader;
 	private ConsoleTextView mCurConsoleTextView;
 	private ConsoleTextView mPrevConsoleTextView = null;
+	private String mTempCommand = null;
 	private ArrayList<String> mTempKeywords = new ArrayList<String>();
 	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
 	private CommandDispatcher mDispatcher;
@@ -56,7 +58,7 @@ public class ConsoleActivity extends StandardActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console);
-		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = false);
+		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = true);
 
 		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -112,7 +114,7 @@ public class ConsoleActivity extends StandardActivity {
 		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		mSlidingMenu.setMenu(R.layout.drag_n_drop);
 		mSlidingMenu.setSecondaryMenu(R.layout.drag_n_drop);
-		
+
 		//This process has to be done twice since the layout is inflated twice. Dumb, but necessary.
 		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topleft)).setSlidingMenu(mSlidingMenu);
 		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topright)).setSlidingMenu(mSlidingMenu);
@@ -160,7 +162,11 @@ public class ConsoleActivity extends StandardActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.setHeaderTitle(R.string.context_menu_title);
+		if (mTempCommand != null) {
+			menu.setHeaderTitle("Execute " + mTempCommand + " on...");
+		} else {
+			menu.setHeaderTitle(R.string.context_menu_title);
+		}
 		int order = 0;
 		for (String keyword : mTempKeywords) {
 			menu.add(0, v.getId(), order, keyword);
@@ -172,7 +178,11 @@ public class ConsoleActivity extends StandardActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
 			String keywordNStr = item.getTitle().toString();
-			mDispatcher.runFromContextMenu(keywordNStr, keywordNStr);
+			if (mTempCommand != null) {
+				mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+			} else {
+				mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+			}
 		}
 		return super.onContextItemSelected(item);
 	}
@@ -199,7 +209,8 @@ public class ConsoleActivity extends StandardActivity {
 		registerForContextMenu(mCurConsoleTextView);
 		mCurConsoleTextView.setOnLongClickListener(new OnLongClickListener() {
 			@Override
-			public boolean onLongClick(View v) {	
+			public boolean onLongClick(View v) {
+				mTempCommand = null;
 				mTempKeywords = ((ConsoleTextView) v).getKeywords();
 				if (!mTempKeywords.isEmpty()) {
 					ConsoleActivity.this.openContextMenu(v);
@@ -210,21 +221,19 @@ public class ConsoleActivity extends StandardActivity {
 		});
 		mCurConsoleTextView.setOnDragListener(new DragSinkListener() {
 			@Override
-			public void onDragEntered(View dragSource, View dragSink) {
+			public void onDragEntered(View dragView, View dragSink) {
 				dragSink.setBackground(getResources().getDrawable(R.drawable.console_text_border));
 			}
-			
+
 			@Override
-			public void onDragExited(View dragSource, View dragSink) {
+			public void onDragExited(View dragView, View dragSink) {
 				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 			}
-			
+
 			@Override
-			public void onDragDropped(View dragSource, View dragSink) {
-				ConsoleActivity.this.showToast("The dragged view is named "
-						+ getResources().getResourceEntryName(dragSource.getId())
-						+ " and was dropped onto ConsoleTextView number "
-						+ ((ConsoleTextView) dragSink).getCommandOrderNum());
+			public void onDragDropped(View dragView, View dragSink) {
+				mTempCommand =  ((DragImageView) dragView).getCommandName();
+				ConsoleActivity.this.openContextMenu(dragSink);
 			}
 		});
 		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);

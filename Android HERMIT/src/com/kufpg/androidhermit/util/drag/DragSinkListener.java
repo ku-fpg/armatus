@@ -5,10 +5,10 @@ import android.view.View;
 import android.view.View.OnDragListener;
 
 public class DragSinkListener implements OnDragListener {
-	public void onDragStarted(View dragSource, View dragSink) {}
-	public void onDragEntered(View dragSource, View dragSink) {}
-	public void onDragExited(View dragSource, View dragSink) {}
-	public void onDragDropped(View dragSource, View dragSink) {}
+	public void onDragStarted(View dragView, View dragSink) {}
+	public void onDragEntered(View dragView, View dragSink) {}
+	public void onDragExited(View dragView, View dragSink) {}
+	public void onDragDropped(View dragView, View dragSink) {}
 
 	@Override
 	public boolean onDrag(View v, DragEvent event) {
@@ -26,15 +26,15 @@ public class DragSinkListener implements OnDragListener {
 			break;
 		}
 		case DragEvent.ACTION_DROP: {
-			View view = (View) event.getLocalState();
-			onDragDropped(view, v);
-			view.setVisibility(View.VISIBLE);
+			View dragView = (View) event.getLocalState();
+			onDragDropped(dragView, v);
+			dragView.setVisibility(View.VISIBLE);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_ENDED: {
-			View view = (View) event.getLocalState();
-			onDragExited(view, v);
-			view.setVisibility(View.VISIBLE);
+			View dragView = (View) event.getLocalState();
+			onDragExited(dragView, v);
+			dragView.setVisibility(View.VISIBLE);
 		}
 		default:
 			break;

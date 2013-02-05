@@ -37,7 +37,7 @@ public class DragImageViewLayout extends LinearLayout {
 	private void setupView() {
 		setOnDragListener(new DragSinkListener() {
 			@Override
-			public void onDragStarted(View dragSource, View dragSink) {
+			public void onDragStarted(View dragView, View dragSink) {
 				mSlidingMenu.showContent();
 			}
 		});

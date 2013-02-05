@@ -95,17 +95,17 @@ public class CommandDispatcher {
 		command.run(args);
 	}
 
-	public void runFromContextMenu(String keywordName, String arg) {
+	public void runKeywordCommand(String keywordName, String arg) {
 		Keyword keyword = mKeywordMap.get(keywordName);
 		if (keyword != null) {
-			runFromContextMenu(keyword, arg);
+			runKeywordCommand(keyword, arg);
 		} else {
 			// Should not happen
 			mConsole.showToast("Error: " + keyword + " is not a valid keyword.");
 		}
 	}
 	
-	private void runFromContextMenu(Keyword keyword, String arg) {
+	private void runKeywordCommand(Keyword keyword, String arg) {
 		Command command = keyword.getCommand();
 		if (command.hasLowerArgBound()) {
 			if (1 < command.getArgsNum()) {
