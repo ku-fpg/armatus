@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="console_line_padding">5px</dimen>
     <dimen name="slidingmenu_offset">240dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
 

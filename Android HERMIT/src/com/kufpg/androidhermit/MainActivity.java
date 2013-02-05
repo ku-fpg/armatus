@@ -7,7 +7,6 @@ import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
 import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 import com.kufpg.androidhermit.util.TreeNode;
-import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
 import android.os.Bundle;

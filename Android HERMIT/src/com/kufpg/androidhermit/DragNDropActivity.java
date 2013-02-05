@@ -1,7 +1,6 @@
 package com.kufpg.androidhermit;
 
 import com.kufpg.androidhermit.util.drag.DragSinkListener;
-import com.kufpg.androidhermit.util.drag.DragSourceClickListener;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.os.Bundle;
@@ -16,10 +15,6 @@ public class DragNDropActivity extends StandardActivity {
 		public void onDragStarted(View dragSource, View dragSink) {
 			mSlidingMenu.showContent();
 		}
-		@Override
-		public void onDragEntered(View dragSource, View dragSink) {}
-	};
-	private DragSinkListener mDragObserver2 = new DragSinkListener() {
 		@Override
 		public void onDragEntered(View dragSource, View dragSink) {}
 	};

@@ -21,7 +21,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="@dimen/console_line_padding" >
+            android:paddingTop="5px"
+            android:paddingLeft="5px"
+            android:paddingRight="5px" >
 
             <TextView
                 android:id="@+id/code_command_num"

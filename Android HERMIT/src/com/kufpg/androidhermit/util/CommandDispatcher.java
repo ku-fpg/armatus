@@ -14,7 +14,7 @@ public class CommandDispatcher {
 	private static ConsoleActivity mConsole;
 	
 	//List of Commands
-	private static Command clear = new Command("clear", 0, false) {
+	private static Command clear = new Command("clear", 0, true) {
 		@Override
 		protected void run(String... args) {
 			mConsole.clear();

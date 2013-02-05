@@ -9,6 +9,7 @@ public class DragSinkListener implements OnDragListener {
 	public void onDragEntered(View dragView, View dragSink) {}
 	public void onDragExited(View dragView, View dragSink) {}
 	public void onDragDropped(View dragView, View dragSink) {}
+	public void onDragEnded(View dragView, View dragSink) {}
 
 	@Override
 	public boolean onDrag(View v, DragEvent event) {
@@ -33,7 +34,7 @@ public class DragSinkListener implements OnDragListener {
 		}
 		case DragEvent.ACTION_DRAG_ENDED: {
 			View dragView = (View) event.getLocalState();
-			onDragExited(dragView, v);
+			onDragEnded(dragView, v);
 			dragView.setVisibility(View.VISIBLE);
 		}
 		default:

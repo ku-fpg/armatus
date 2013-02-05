@@ -11,22 +11,22 @@ public class DragImageView extends ImageView {
 	private String mCommandName = null;
 	
 	public DragImageView(Context context) {
-		super(context, null);
+		this(context, null);
 	}
 
 	public DragImageView(Context context, AttributeSet attrs) {
-		super(context, attrs, 0);
+		this(context, attrs, 0);
 	}
 
 	public DragImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
 		setOnLongClickListener(new DragSourceClickListener());
-/*		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragImageView);
+		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragImageView);
 		mCommandName = ta.getString(R.styleable.DragImageView_command);
 		if (mCommandName == null) {
 			mCommandName = "toast";
-		}*/
+		}
 	}
 
 	public String getCommandName() {

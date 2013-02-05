@@ -36,6 +36,7 @@ public class ConsoleActivity extends StandardActivity {
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int MAX_FONT_SIZE = 40;
 	public static final int MIN_FONT_SIZE = 15;
+	public static final int PADDING = 5;
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 	public static final String WHITESPACE = "\\s+";
 
@@ -213,7 +214,7 @@ public class ConsoleActivity extends StandardActivity {
 				mTempCommand = null;
 				mTempKeywords = ((ConsoleTextView) v).getKeywords();
 				if (!mTempKeywords.isEmpty()) {
-					ConsoleActivity.this.openContextMenu(v);
+					openContextMenu(v);
 					return true;
 				}
 				return false;
@@ -229,11 +230,18 @@ public class ConsoleActivity extends StandardActivity {
 			public void onDragExited(View dragView, View dragSink) {
 				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 			}
+			
+			@Override
+			public void onDragEnded(View dragView, View dragSink) {
+				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+			}
 
 			@Override
 			public void onDragDropped(View dragView, View dragSink) {
 				mTempCommand =  ((DragImageView) dragView).getCommandName();
-				ConsoleActivity.this.openContextMenu(dragSink);
+				mTempKeywords = ((ConsoleTextView) dragSink).getKeywords();
+				if (!mTempKeywords.isEmpty())
+					openContextMenu(dragSink);
 			}
 		});
 		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);

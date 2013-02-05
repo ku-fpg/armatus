@@ -21,6 +21,7 @@ import android.widget.TextView;
 public class ConsoleTextView extends TextView implements Serializable {
 
 	private static final long serialVersionUID = 492620301229198361L;
+	private static final int PADDING = ConsoleActivity.PADDING;
 
 	private int mCommandOrderNum;
 	private ArrayList<String> mKeywords = new ArrayList<String>();
@@ -51,7 +52,6 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setGravity(Gravity.BOTTOM);
 		// TODO: Make a better ID system
 		setId((int) System.currentTimeMillis());
-		final int PADDING = getResources().getDimensionPixelSize(R.dimen.console_line_padding);
 		setPaddingRelative(PADDING, PADDING, PADDING, 0);
 		setTextColor(Color.WHITE);
 		setTextSize(ConsoleActivity.DEFAULT_FONT_SIZE);
