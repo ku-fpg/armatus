@@ -7,11 +7,13 @@ import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.ConsoleTextView;
+import com.kufpg.androidhermit.util.drag.DragImageViewLayout;
+import com.kufpg.androidhermit.util.drag.DragSinkListener;
+import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
@@ -39,6 +41,7 @@ public class ConsoleActivity extends StandardActivity {
 	private RelativeLayout mCodeLayout;
 	private LayoutParams mCodeLayoutParams;
 	private View mRootView;
+	private SlidingMenu mSlidingMenu;
 	private ScrollView mScrollView;
 	private EditText mInputEditText;
 	private TextView mInputHeader;
@@ -68,7 +71,7 @@ public class ConsoleActivity extends StandardActivity {
 				}
 			}
 		});
-		
+
 		mDispatcher = new CommandDispatcher(this);
 		mScrollView = (ScrollView) findViewById(R.id.code_scroll_view);
 		mCodeLayout = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
@@ -98,6 +101,27 @@ public class ConsoleActivity extends StandardActivity {
 				return false;
 			}
 		});
+
+		//Initialize SlidingMenu properties
+		mSlidingMenu = new SlidingMenu(this);
+		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		mSlidingMenu.setFadeDegree(0.35f);
+		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+		mSlidingMenu.setMenu(R.layout.drag_n_drop);
+		mSlidingMenu.setSecondaryMenu(R.layout.drag_n_drop);
+		
+		//This process has to be done twice since the layout is inflated twice. Dumb, but necessary.
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topleft)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topright)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.bottomleft)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.bottomright)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.topleft)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.topright)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.bottomleft)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.bottomright)).setSlidingMenu(mSlidingMenu);
 
 		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
 		mInputEditText.setTypeface(typeface);
@@ -130,7 +154,6 @@ public class ConsoleActivity extends StandardActivity {
 		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
 		mIsSoftKeyboardVisible = savedInstanceState.getBoolean("SoftKeyboardVisibility");
 		refreshConsole(mCommandHistory);
-		Log.d("Test2", "Test2");
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible);
 	}
 
@@ -184,6 +207,25 @@ public class ConsoleActivity extends StandardActivity {
 				}
 				return false;
 			}	
+		});
+		mCurConsoleTextView.setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragEntered(View dragSource, View dragSink) {
+				dragSink.setBackground(getResources().getDrawable(R.drawable.console_text_border));
+			}
+			
+			@Override
+			public void onDragExited(View dragSource, View dragSink) {
+				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+			}
+			
+			@Override
+			public void onDragDropped(View dragSource, View dragSink) {
+				ConsoleActivity.this.showToast("The dragged view is named "
+						+ getResources().getResourceEntryName(dragSource.getId())
+						+ " and was dropped onto ConsoleTextView number "
+						+ ((ConsoleTextView) dragSink).getCommandOrderNum());
+			}
 		});
 		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);
 		mCommandCount++;

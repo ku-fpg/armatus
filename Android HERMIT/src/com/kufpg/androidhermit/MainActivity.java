@@ -30,7 +30,6 @@ public class MainActivity extends StandardActivity {
 	private boolean mIsLocked = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
 	private final Condition mLockInEffect = mLock.newCondition();
-	private SlidingMenu mSlidingMenu;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -137,16 +136,6 @@ public class MainActivity extends StandardActivity {
 				startActivity(new Intent(mContext, DragNDropActivity.class));
 			}
 		});
-		
-		mSlidingMenu = new SlidingMenu(this);
-		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
-		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		mSlidingMenu.setFadeDegree(0.35f);
-		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		mSlidingMenu.setMenu(R.layout.drawer_menu);
-		mSlidingMenu.setSecondaryMenu(R.layout.drawer_menu);
 	}
 
 	@Override

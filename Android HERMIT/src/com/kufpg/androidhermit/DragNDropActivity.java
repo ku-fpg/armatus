@@ -1,82 +1,54 @@
 package com.kufpg.androidhermit;
 
-import android.content.ClipData;
-import android.graphics.drawable.Drawable;
+import com.kufpg.androidhermit.util.drag.DragSinkListener;
+import com.kufpg.androidhermit.util.drag.DragSourceClickListener;
+import com.slidingmenu.lib.SlidingMenu;
+
 import android.os.Bundle;
-import android.view.DragEvent;
-import android.view.HapticFeedbackConstants;
-import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.DragShadowBuilder;
-import android.view.View.OnDragListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 public class DragNDropActivity extends StandardActivity {
-	/** Called when the activity is first created. */
+	private SlidingMenu mSlidingMenu;
+	private DragSinkListener mDragObserver = new DragSinkListener() {
+		@Override
+		public void onDragStarted(View dragSource, View dragSink) {
+			mSlidingMenu.showContent();
+		}
+		@Override
+		public void onDragEntered(View dragSource, View dragSink) {}
+	};
+	private DragSinkListener mDragObserver2 = new DragSinkListener() {
+		@Override
+		public void onDragEntered(View dragSource, View dragSink) {}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drag_n_drop);
-		findViewById(R.id.myimage1).setOnTouchListener(new MyTouchListener());
-		findViewById(R.id.myimage2).setOnTouchListener(new MyTouchListener());
-		findViewById(R.id.myimage3).setOnTouchListener(new MyTouchListener());
-		findViewById(R.id.myimage4).setOnTouchListener(new MyTouchListener());
-		findViewById(R.id.topleft).setOnDragListener(new MyDragListener());
-		findViewById(R.id.topright).setOnDragListener(new MyDragListener());
-		findViewById(R.id.bottomleft).setOnDragListener(new MyDragListener());
-		findViewById(R.id.bottomright).setOnDragListener(new MyDragListener());
-
-	}
-
-	private final class MyTouchListener implements OnTouchListener {
-		public boolean onTouch(View view, MotionEvent motionEvent) {
-			if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-				ClipData data = ClipData.newPlainText("", "");
-				DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-				view.startDrag(data, shadowBuilder, view, 0);
-				view.setVisibility(View.INVISIBLE);
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
-	class MyDragListener implements OnDragListener {
-		Drawable enterShape = getResources().getDrawable(android.R.color.white);
-		Drawable normalShape = getResources().getDrawable(android.R.color.black);
-
-		@Override
-		public boolean onDrag(View v, DragEvent event) {
-			int action = event.getAction();
-			switch (event.getAction()) {
-			case DragEvent.ACTION_DRAG_STARTED:
-				v.performHapticFeedback(HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
-				break;
-			case DragEvent.ACTION_DRAG_ENTERED:
-				v.setBackground(enterShape);
-				break;
-			case DragEvent.ACTION_DRAG_EXITED:
-				v.setBackground(normalShape);
-				break;
-			case DragEvent.ACTION_DROP:
-				// Dropped, reassign View to ViewGroup
-				View view = (View) event.getLocalState();
-				ViewGroup owner = (ViewGroup) view.getParent();
-				owner.removeView(view);
-				LinearLayout container = (LinearLayout) v;
-				container.addView(view);
-				view.setVisibility(View.VISIBLE);
-				break;
-			case DragEvent.ACTION_DRAG_ENDED:
-				v.setBackground(normalShape);
-			default:
-				break;
-			}
-			return true;
-		}
+		
+		LayoutInflater inflater = getLayoutInflater();
+		View dragView = inflater.inflate(R.layout.drag_n_drop,
+				(ViewGroup) findViewById(R.id.drag_grid));
+//		dragView.findViewById(R.id.myimage1).setOnLongClickListener(mDragListener);
+//		dragView.findViewById(R.id.myimage2).setOnLongClickListener(mDragListener);
+//		dragView.findViewById(R.id.myimage3).setOnLongClickListener(mDragListener);
+//		dragView.findViewById(R.id.myimage4).setOnLongClickListener(mDragListener);
+		dragView.findViewById(R.id.topleft).setOnDragListener(mDragObserver);
+		dragView.findViewById(R.id.topright).setOnDragListener(mDragObserver);
+		dragView.findViewById(R.id.bottomleft).setOnDragListener(mDragObserver);
+		dragView.findViewById(R.id.bottomright).setOnDragListener(mDragObserver);
+		
+		mSlidingMenu = new SlidingMenu(this);
+		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		mSlidingMenu.setFadeDegree(0.35f);
+		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+		mSlidingMenu.setMenu(R.layout.drag_n_drop);
+		mSlidingMenu.setSecondaryMenu(R.layout.drag_n_drop);
 	}
 } 
