@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.CommandDispatcher;
+import com.kufpg.androidhermit.util.drag.CommandLayout;
 import com.kufpg.androidhermit.util.ConsoleTextView;
 import com.kufpg.androidhermit.util.drag.CommandIcon;
-import com.kufpg.androidhermit.util.drag.CommandLayout;
 import com.kufpg.androidhermit.util.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -41,10 +41,12 @@ public class ConsoleActivity extends StandardActivity {
 	public static final int MAX_FONT_SIZE = 40;
 	public static final int MIN_FONT_SIZE = 15;
 	public static final int PADDING = 5;
+	public static final String COMMAND_LAYOUT = "layout";
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 	public static final String WHITESPACE = "\\s+";
 
 	private RelativeLayout mCodeLayout;
+	private RelativeLayout mCommandRelativeLayout;
 	private LayoutParams mCodeLayoutParams;
 	private View mRootView;
 	private SlidingMenu mSlidingMenu;
@@ -140,26 +142,21 @@ public class ConsoleActivity extends StandardActivity {
 
 		//Initialize SlidingMenu properties
 		mSlidingMenu = new SlidingMenu(this);
-		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+		mSlidingMenu.setMode(SlidingMenu.LEFT);
 		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		mSlidingMenu.setFadeDegree(0.35f);
 		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		mSlidingMenu.setMenu(R.layout.drag_n_drop);
-		mSlidingMenu.setSecondaryMenu(R.layout.drag_n_drop);
 		refreshSlidingMenu();
 
-		//This process has to be done twice since the layout is inflated twice. Dumb, but necessary.
-		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
-		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
+		//creates the side menu and iterates through the layouts in drap_n_drop to populate icons
+		mCommandRelativeLayout = (RelativeLayout) findViewById(R.id.command_relative_layout);
+		for (int i = 1; i <= mCommandRelativeLayout.getChildCount(); i++) {
+			String layoutId = COMMAND_LAYOUT + i;
+			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
+			((CommandLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);
+		}
 
 		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
 		mInputEditText.setTypeface(typeface);
@@ -334,7 +331,7 @@ public class ConsoleActivity extends StandardActivity {
 			addTextView(entry.getValue());
 		}
 	}
-	
+
 	private void refreshSlidingMenu() {
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_portrait);
