@@ -13,6 +13,7 @@ import com.kufpg.androidhermit.util.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.view.DragEvent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -63,9 +64,11 @@ public class ConsoleActivity extends StandardActivity {
 		setContentView(R.layout.console);
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = true);
 
+		//Used for detecting screen width/height
 		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
+			//Used for detecting whether soft keyboard is open or closed
 			public void onGlobalLayout() {
 				int rootHeight = mRootView.getRootView().getHeight();
 				int heightDiff = rootHeight - mRootView.getHeight();
@@ -129,10 +132,10 @@ public class ConsoleActivity extends StandardActivity {
 		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		mSlidingMenu.setFadeDegree(0.35f);
 		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		mSlidingMenu.setMenu(R.layout.drag_n_drop);
 		mSlidingMenu.setSecondaryMenu(R.layout.drag_n_drop);
+		refreshSlidingMenu();
 
 		//This process has to be done twice since the layout is inflated twice. Dumb, but necessary.
 		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topleft)).setSlidingMenu(mSlidingMenu);
@@ -175,6 +178,7 @@ public class ConsoleActivity extends StandardActivity {
 		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");
 		mIsSoftKeyboardVisible = savedInstanceState.getBoolean("SoftKeyboardVisibility");
 		refreshConsole(mCommandHistory);
+		refreshSlidingMenu();
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible);
 	}
 
@@ -314,6 +318,14 @@ public class ConsoleActivity extends StandardActivity {
 		mPrevConsoleTextView = null;
 		for (Entry<Integer, ConsoleTextView> entry : cmdHistory.entrySet()) {
 			addTextView(entry.getValue());
+		}
+	}
+	
+	private void refreshSlidingMenu() {
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_portrait);
+		} else {
+			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_landscape);
 		}
 	}
 

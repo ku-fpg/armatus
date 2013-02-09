@@ -41,7 +41,7 @@ public class DragNDropActivity extends StandardActivity {
 		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		mSlidingMenu.setFadeDegree(0.35f);
 		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+		mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_portrait);
 		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		mSlidingMenu.setMenu(R.layout.drag_n_drop);
 		mSlidingMenu.setSecondaryMenu(R.layout.drag_n_drop);
