@@ -138,14 +138,16 @@ public class ConsoleActivity extends StandardActivity {
 		refreshSlidingMenu();
 
 		//This process has to be done twice since the layout is inflated twice. Dumb, but necessary.
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topleft)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.topright)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.bottomleft)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.bottomright)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.topleft)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.topright)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.bottomleft)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.bottomright)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
+		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
 
 		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
 		mInputEditText.setTypeface(typeface);

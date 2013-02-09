@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:drag="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
     android:id="@+id/drag_grid"
     android:layout_width="match_parent"
@@ -12,72 +12,77 @@
     android:background="@android:color/white" >
 
     <com.kufpg.androidhermit.util.drag.DragImageViewLayout
-        android:id="@+id/topleft"
-        android:layout_width="160dp"
-        android:layout_height="200dp"
-        android:layout_column="0"
-        android:layout_row="0"
+        android:id="@+id/layout1"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:background="@android:color/white" >
 
         <com.kufpg.androidhermit.util.drag.DragImageView
             android:id="@+id/myimage1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:src="@drawable/ks_hermit" />
+            android:src="@drawable/toast"
+            drag:command="toast" />
     </com.kufpg.androidhermit.util.drag.DragImageViewLayout>
 
     <com.kufpg.androidhermit.util.drag.DragImageViewLayout
-        android:id="@+id/topright"
-        android:layout_width="160dp"
-        android:layout_height="200dp"
-        android:layout_column="1"
-        android:layout_row="0"
+        android:id="@+id/layout2"
+        android:layout_below="@+id/layout1"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:background="@android:color/white" >
 
         <com.kufpg.androidhermit.util.drag.DragImageView
             android:id="@+id/myimage2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:src="@drawable/ks_hermit"
-            drag:command="toast" />
+            android:src="@drawable/consider"
+            drag:command="consider" />
     </com.kufpg.androidhermit.util.drag.DragImageViewLayout>
 
     <com.kufpg.androidhermit.util.drag.DragImageViewLayout
-        android:id="@+id/bottomleft"
-        android:layout_width="160dp"
-        android:layout_height="200dp"
-        android:layout_column="0"
-        android:layout_row="1"
+        android:id="@+id/layout3"
+        android:layout_below="@+id/layout2"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:background="@android:color/white" >
 
         <com.kufpg.androidhermit.util.drag.DragImageView
             android:id="@+id/myimage3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ks_hermit"
-            drag:command="consider" />
+            android:src="@drawable/clear"
+            drag:command="clear" />
     </com.kufpg.androidhermit.util.drag.DragImageViewLayout>
 
     <com.kufpg.androidhermit.util.drag.DragImageViewLayout
-        android:id="@+id/bottomright"
-        android:layout_width="160dp"
-        android:layout_height="200dp"
-        android:layout_column="1"
-        android:layout_row="1"
+        android:id="@+id/layout4"
+        android:layout_below="@+id/layout3"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:background="@android:color/white" >
 
         <com.kufpg.androidhermit.util.drag.DragImageView
             android:id="@+id/myimage4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:src="@drawable/ks_hermit"
-            drag:command="clear" />
+            android:src="@drawable/resume"
+            drag:command="resume" />
+    </com.kufpg.androidhermit.util.drag.DragImageViewLayout>
+    
+    <com.kufpg.androidhermit.util.drag.DragImageViewLayout
+        android:id="@+id/layout5"
+        android:layout_below="@+id/layout4"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:background="@android:color/white" >
+
+        <com.kufpg.androidhermit.util.drag.DragImageView
+            android:id="@+id/myimage5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/exit"
+            drag:command="exit" />
     </com.kufpg.androidhermit.util.drag.DragImageViewLayout>
 
-</GridLayout>
+</RelativeLayout>
