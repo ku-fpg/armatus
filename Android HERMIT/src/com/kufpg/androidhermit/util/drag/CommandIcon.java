@@ -7,18 +7,18 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
-public class DragImageView extends ImageView {
+public class CommandIcon extends ImageView {
 	private String mCommandName = null;
 	
-	public DragImageView(Context context) {
+	public CommandIcon(Context context) {
 		this(context, null);
 	}
 
-	public DragImageView(Context context, AttributeSet attrs) {
+	public CommandIcon(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public DragImageView(Context context, AttributeSet attrs, int defStyle) {
+	public CommandIcon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
 		setOnLongClickListener(new DragSourceClickListener());

@@ -7,25 +7,25 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class DragImageViewLayout extends LinearLayout {
+public class CommandLayout extends LinearLayout {
 	private SlidingMenu mSlidingMenu;
 
-	public DragImageViewLayout(Context context) {
+	public CommandLayout(Context context) {
 		super(context);
 		setupView();
 	}
 
-	public DragImageViewLayout(Context context, AttributeSet attrs) {
+	public CommandLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setupView();
 	}
 
-	public DragImageViewLayout(Context context, AttributeSet attrs, int defStyle) {
+	public CommandLayout(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		setupView();
 	}
 
-	public DragImageViewLayout(Context context, SlidingMenu draggableViewSource) {
+	public CommandLayout(Context context, SlidingMenu draggableViewSource) {
 		super(context);
 		setupView();
 	}

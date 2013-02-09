@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 
 import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.ConsoleTextView;
-import com.kufpg.androidhermit.util.drag.DragImageView;
-import com.kufpg.androidhermit.util.drag.DragImageViewLayout;
+import com.kufpg.androidhermit.util.drag.CommandIcon;
+import com.kufpg.androidhermit.util.drag.CommandLayout;
 import com.kufpg.androidhermit.util.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -150,16 +150,16 @@ public class ConsoleActivity extends StandardActivity {
 		refreshSlidingMenu();
 
 		//This process has to be done twice since the layout is inflated twice. Dumb, but necessary.
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
-		((DragImageViewLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout1)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout2)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout3)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout4)).setSlidingMenu(mSlidingMenu);
+		((CommandLayout) mSlidingMenu.getSecondaryMenu().findViewById(R.id.layout5)).setSlidingMenu(mSlidingMenu);
 
 		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
 		mInputEditText.setTypeface(typeface);
@@ -274,7 +274,7 @@ public class ConsoleActivity extends StandardActivity {
 
 			@Override
 			public void onDragDropped(View dragView, View dragSink) {
-				mTempCommand =  ((DragImageView) dragView).getCommandName();
+				mTempCommand =  ((CommandIcon) dragView).getCommandName();
 				mTempKeywords = ((ConsoleTextView) dragSink).getKeywords();
 				if (!mTempKeywords.isEmpty())
 					openContextMenu(dragSink);
