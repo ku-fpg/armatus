@@ -14,6 +14,8 @@ import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.DragEvent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -102,6 +104,16 @@ public class ConsoleActivity extends StandardActivity {
 		mInputHeader = (TextView) findViewById(R.id.code_command_num);
 		mInputHeader.setText("hermit<" + mCommandCount + "> ");
 		mInputEditText = (EditText) findViewById(R.id.code_input_box);
+		mInputEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable s) {}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				mSlidingMenu.showContent();
+			}
+		});
 		mInputEditText.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
