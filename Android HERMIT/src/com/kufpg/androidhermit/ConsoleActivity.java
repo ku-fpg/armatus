@@ -13,6 +13,7 @@ import com.kufpg.androidhermit.util.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
+import android.view.DragEvent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -55,6 +56,7 @@ public class ConsoleActivity extends StandardActivity {
 	private CommandDispatcher mDispatcher;
 	private int mCommandCount = 0;
 	private boolean mIsSoftKeyboardVisible;
+	private float mScrollDistance = 0;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,6 +79,22 @@ public class ConsoleActivity extends StandardActivity {
 
 		mDispatcher = new CommandDispatcher(this);
 		mScrollView = (ScrollView) findViewById(R.id.code_scroll_view);
+		mScrollView.setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragNearBoundary(View dragView, View dragSink, DragEvent event) {
+				int y = Math.round(event.getY());
+				int translatedY = y - (int) mScrollDistance;
+				int topThreshhold = 80;
+				int bottomThreshold = mRootView.getHeight() - topThreshhold;
+				int scrollIncrement = 30;
+				if (translatedY < topThreshhold) {
+					mScrollView.scrollBy(0, -scrollIncrement);
+				}
+				if (translatedY > bottomThreshold) {
+					mScrollView.scrollBy(0, scrollIncrement);
+				}
+			}
+		});
 		mCodeLayout = (RelativeLayout) findViewById(R.id.code_scroll_relative_layout);
 		mInputHeader = (TextView) findViewById(R.id.code_command_num);
 		mInputHeader.setText("hermit<" + mCommandCount + "> ");
@@ -230,7 +248,7 @@ public class ConsoleActivity extends StandardActivity {
 			public void onDragExited(View dragView, View dragSink) {
 				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 			}
-			
+
 			@Override
 			public void onDragEnded(View dragView, View dragSink) {
 				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
