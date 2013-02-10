@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.util.CommandDispatcher;
 import com.kufpg.androidhermit.util.drag.CommandLayout;
 import com.kufpg.androidhermit.util.ConsoleTextView;
@@ -30,6 +31,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
@@ -46,7 +48,7 @@ public class ConsoleActivity extends StandardActivity {
 	public static final String WHITESPACE = "\\s+";
 
 	private RelativeLayout mCodeLayout;
-	private RelativeLayout mCommandRelativeLayout;
+	private LinearLayout mLinearLayout;
 	private LayoutParams mCodeLayoutParams;
 	private View mRootView;
 	private SlidingMenu mSlidingMenu;
@@ -151,8 +153,14 @@ public class ConsoleActivity extends StandardActivity {
 		refreshSlidingMenu();
 
 		//creates the side menu and iterates through the layouts in drap_n_drop to populate icons
-		mCommandRelativeLayout = (RelativeLayout) findViewById(R.id.command_relative_layout);
-		for (int i = 1; i <= mCommandRelativeLayout.getChildCount(); i++) {
+		int commandLayoutCount = 0;
+		mLinearLayout = (LinearLayout) findViewById(R.id.expando_root_layout);
+		for(int i = 0; i < mLinearLayout.getChildCount(); i += 2){
+			//we retrieve child 1 form expando layout because there is a explicit child 0 that you cannot see. We found this out by accident and random number changing
+			commandLayoutCount += ((RelativeLayout) ((ExpandoLayout) mLinearLayout.getChildAt(i)).getChildAt(1)).getChildCount(); 
+		}
+		
+		for (int i = 1; i <= commandLayoutCount; i++) {
 			String layoutId = COMMAND_LAYOUT + i;
 			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
 			((CommandLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);

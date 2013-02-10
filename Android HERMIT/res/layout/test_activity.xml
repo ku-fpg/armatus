@@ -15,7 +15,7 @@
         <com.djpsoft.moreDroid.ExpandoLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            ExpandoLayout:text="Red Commands"
+            ExpandoLayout:text="ExpandoLayout #01"
             ExpandoLayout:textSize="20"
             android:background="#222222" >
 
@@ -51,7 +51,7 @@
         <com.djpsoft.moreDroid.ExpandoLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            ExpandoLayout:text="Blue Commands"
+            ExpandoLayout:text="ExpandoLayout #02"
             ExpandoLayout:textSize="20"
             android:background="#222222" >
 
@@ -104,7 +104,7 @@
         <com.djpsoft.moreDroid.ExpandoLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            ExpandoLayout:text="Green Commands"
+            ExpandoLayout:text="ExpandoLayout #03"
             ExpandoLayout:textSize="20"
             android:background="#222222" >
 
