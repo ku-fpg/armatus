@@ -1,5 +1,7 @@
 package com.kufpg.androidhermit;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -23,7 +25,7 @@ public class MainActivity extends StandardActivity {
 
 	private TextView mButtonsView;
 	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton,
-			mConsoleButton, mPinchZoomButton;
+	mConsoleButton, mPinchZoomButton, mHtmlTestButton;
 	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
@@ -44,6 +46,7 @@ public class MainActivity extends StandardActivity {
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
+		mHtmlTestButton = (Button) findViewById(R.id.panels_test_button);
 
 		mLockButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -92,10 +95,10 @@ public class MainActivity extends StandardActivity {
 				imgToast.setView(imgView);
 				imgToast.setDuration(Toast.LENGTH_LONG);
 				FileIOUtils
-						.downloadImage(
-								"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
-								imgView, mProgressCheckBox.isChecked(),
-								MainActivity.this);
+				.downloadImage(
+						"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
+						imgView, mProgressCheckBox.isChecked(),
+						MainActivity.this);
 				imgToast.show();
 			}
 		});
@@ -120,13 +123,34 @@ public class MainActivity extends StandardActivity {
 				startActivity(new Intent(mContext, ConsoleActivity.class));
 			}
 		});
-		
+
 		mPinchZoomButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(mContext, TextSizePinchZoomActivity.class));
 			}
 		});
+
+		mHtmlTestButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(mContext, TestPanels.class));
+			}
+		});
+			
+	}
+
+	public static List<Integer> getIndexesInString(String searchable, String keyword) {
+		List<Integer> indexesList = new ArrayList<Integer>();
+		int index = searchable.indexOf(keyword);
+		if (index != -1) {
+			indexesList.add(index);
+		}
+		while (index >=0){
+			index = searchable.indexOf(keyword, index+keyword.length());
+			indexesList.add(index);
+		}
+		return indexesList;
 	}
 
 	@Override

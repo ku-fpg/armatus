@@ -98,31 +98,11 @@ public class CommandDispatcher {
 	public void runKeywordCommand(String keywordName, String arg) {
 		Keyword keyword = mKeywordMap.get(keywordName);
 		if (keyword != null) {
-			runKeywordCommand(keyword, arg);
+			runOnConsole(keyword.getCommand(), arg);
 		} else {
 			// Should not happen
-			mConsole.showToast("Error: " + keyword + " is not a valid keyword.");
+			mConsole.addMessage("Error: " + keyword + " is not a valid keyword.");
 		}
-	}
-	
-	private void runKeywordCommand(Keyword keyword, String arg) {
-		Command command = keyword.getCommand();
-		if (command.hasLowerArgBound()) {
-			if (1 < command.getArgsNum()) {
-				mConsole.showToast("Error: " + command.getCommandName() +
-						" requires at least " + command.getArgsNum() +
-						(command.getArgsNum() == 1 ? " argument." :
-								" arguments."));
-				return;
-			}
-		} else if (1 != command.getArgsNum()) {
-			mConsole.showToast("Error: " + command.getCommandName() +
-					" requires exactly " + command.getArgsNum() +
-					(command.getArgsNum() == 1 ? " argument." :
-							" arguments."));
-			return;
-		}
-		command.run(arg);
 	}
 	
 	public static boolean isCommand(String commandName) {

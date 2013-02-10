@@ -48,6 +48,10 @@
             android:name=".DragNDropActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name=".TestPanels"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>
