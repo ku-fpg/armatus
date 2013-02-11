@@ -40,7 +40,7 @@ public class ExpandoLayout extends ViewGroup implements AnimationListener {
     private String compactText = DEFAULT_COMPACT_TEXT;
     private String expandedText = DEFAULT_EXPANDED_TEXT;
     private boolean showAndHideChildren = false;
-    private boolean useAnimation = true;
+    private boolean useAnimation = false;
 
     private Context context;
     private LinearLayout titleRow;
@@ -84,7 +84,7 @@ public class ExpandoLayout extends ViewGroup implements AnimationListener {
         super.onFinishInflate();
         titleRow = new LinearLayout(context);
         titleRow.setOrientation(LinearLayout.HORIZONTAL);
-        titleRow.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+        titleRow.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         titleRow.setPadding(titleRowPadding, titleRowPadding, titleRowPadding, titleRowPadding);
         titleRow.setGravity(Gravity.CENTER_VERTICAL);
         // TODO: setting this causes the icon drawable to not draw/size properly if it is the

@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.util.drag;
+package com.kufpg.androidhermit.drag;
 
 import android.view.DragEvent;
 import android.view.View;

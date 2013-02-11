@@ -1,5 +1,7 @@
 package com.kufpg.androidhermit;
 
+import com.kufpg.androidhermit.console.ConsoleActivity;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;

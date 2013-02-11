@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.kufpg.androidhermit.console.ConsoleActivity;
 import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
-import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 import com.kufpg.androidhermit.util.TreeNode;
+import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,7 +36,7 @@ public class MainActivity extends StandardActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main_activity);
 
 		mButtonsView = (TextView) findViewById(R.id.code_text_view);
 		setCodeText(mNumTextChanges, mIsLocked);

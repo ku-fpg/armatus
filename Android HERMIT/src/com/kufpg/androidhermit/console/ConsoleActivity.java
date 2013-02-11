@@ -1,16 +1,17 @@
-package com.kufpg.androidhermit;
+package com.kufpg.androidhermit.console;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.djpsoft.moreDroid.ExpandoLayout;
-import com.kufpg.androidhermit.util.CommandDispatcher;
-import com.kufpg.androidhermit.util.drag.CommandLayout;
-import com.kufpg.androidhermit.util.ConsoleTextView;
-import com.kufpg.androidhermit.util.drag.CommandIcon;
-import com.kufpg.androidhermit.util.drag.DragSinkListener;
+import com.kufpg.androidhermit.MainActivity;
+import com.kufpg.androidhermit.R;
+import com.kufpg.androidhermit.StandardActivity;
+import com.kufpg.androidhermit.drag.CommandLayout;
+import com.kufpg.androidhermit.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
@@ -27,7 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnKeyListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -55,10 +55,9 @@ public class ConsoleActivity extends StandardActivity {
 	private ScrollView mScrollView;
 	private EditText mInputEditText;
 	private TextView mInputHeader;
-	private ConsoleTextView mCurConsoleTextView;
-	private ConsoleTextView mPrevConsoleTextView = null;
+	private ConsoleTextView mCurConsoleTextView, mPrevConsoleTextView;
 	private String mTempCommand = null;
-	private ArrayList<String> mTempKeywords = new ArrayList<String>();
+	private List<String> mTempKeywords = new ArrayList<String>();
 	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
 	private CommandDispatcher mDispatcher;
 	private int mCommandCount = 0;
@@ -152,14 +151,17 @@ public class ConsoleActivity extends StandardActivity {
 		mSlidingMenu.setMenu(R.layout.drag_n_drop);
 		refreshSlidingMenu();
 
-		//creates the side menu and iterates through the layouts in drap_n_drop to populate icons
+		//Creates the sliding menu and iterates through the CommandLayouts
+		//in drap_n_drop.xml to link them to mSlidingMenu in this activity
 		int commandLayoutCount = 0;
 		mLinearLayout = (LinearLayout) findViewById(R.id.expando_root_layout);
-		for(int i = 0; i < mLinearLayout.getChildCount(); i += 2){
-			//we retrieve child 1 form expando layout because there is a explicit child 0 that you cannot see. We found this out by accident and random number changing
-			commandLayoutCount += ((RelativeLayout) ((ExpandoLayout) mLinearLayout.getChildAt(i)).getChildAt(1)).getChildCount(); 
-		}
-		
+		//Increment by two, sice each CommandLayout is separated by a divider View
+		for(int i = 0; i < mLinearLayout.getChildCount(); i += 2) {
+			//Retrieve child 1 from ExpandoLayout because there is an implicit child 0 that is not viewable.
+			//We found this out by accident and random number changing. We recommend not changing this code.
+			commandLayoutCount += ((RelativeLayout) ((ExpandoLayout) mLinearLayout.
+					getChildAt(i)).getChildAt(1)).getChildCount(); 
+		}	
 		for (int i = 1; i <= commandLayoutCount; i++) {
 			String layoutId = COMMAND_LAYOUT + i;
 			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
@@ -241,6 +243,14 @@ public class ConsoleActivity extends StandardActivity {
 		finish();
 		startActivity(new Intent(this, MainActivity.class));
 	}
+	
+	public void setTempCommand(String commandName) {
+		mTempCommand = commandName;
+	}
+	
+	public void setTempKeywords(List<String> keywords) {
+		mTempKeywords = keywords;
+	}
 
 	/**
 	 * Adds a new "line" to the console with msg as its contents.
@@ -249,42 +259,6 @@ public class ConsoleActivity extends StandardActivity {
 	public void addMessage(String msg) {
 		mCurConsoleTextView = new ConsoleTextView(ConsoleActivity.this, msg, mCommandCount);
 		registerForContextMenu(mCurConsoleTextView);
-		mCurConsoleTextView.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				mTempCommand = null;
-				mTempKeywords = ((ConsoleTextView) v).getKeywords();
-				if (!mTempKeywords.isEmpty()) {
-					openContextMenu(v);
-					return true;
-				}
-				return false;
-			}	
-		});
-		mCurConsoleTextView.setOnDragListener(new DragSinkListener() {
-			@Override
-			public void onDragEntered(View dragView, View dragSink) {
-				dragSink.setBackground(getResources().getDrawable(R.drawable.console_text_border));
-			}
-
-			@Override
-			public void onDragExited(View dragView, View dragSink) {
-				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-			}
-
-			@Override
-			public void onDragEnded(View dragView, View dragSink) {
-				dragSink.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-			}
-
-			@Override
-			public void onDragDropped(View dragView, View dragSink) {
-				mTempCommand =  ((CommandIcon) dragView).getCommandName();
-				mTempKeywords = ((ConsoleTextView) dragSink).getKeywords();
-				if (!mTempKeywords.isEmpty())
-					openContextMenu(dragSink);
-			}
-		});
 		mCommandHistory.put(mCurConsoleTextView.getId(), mCurConsoleTextView);
 		mCommandCount++;
 

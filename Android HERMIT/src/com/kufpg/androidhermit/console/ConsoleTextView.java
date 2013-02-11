@@ -1,10 +1,12 @@
-package com.kufpg.androidhermit.util;
+package com.kufpg.androidhermit.console;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
-import com.kufpg.androidhermit.ConsoleActivity;
 import com.kufpg.androidhermit.R;
+import com.kufpg.androidhermit.drag.CommandIcon;
+import com.kufpg.androidhermit.drag.DragSinkListener;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 
 public class ConsoleTextView extends TextView implements Serializable {
@@ -24,7 +27,10 @@ public class ConsoleTextView extends TextView implements Serializable {
 	private static final int PADDING = ConsoleActivity.PADDING;
 
 	private int mCommandOrderNum;
-	private ArrayList<String> mKeywords = new ArrayList<String>();
+	private String mMessage = "";
+	private List<String> mKeywords = new ArrayList<String>();
+	//Don't try to serialize a ConsoleActivity; you're in for pain
+	private transient ConsoleActivity mConsole;
 
 	public ConsoleTextView(Context context) {
 		super(context);
@@ -44,6 +50,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 	}
 
 	protected void setupView(ConsoleActivity console, String msg, int cmdOrderNum) {
+		mConsole = console;
 		mCommandOrderNum = cmdOrderNum;
 		Typeface typeface = Typeface.createFromAsset(getResources().getAssets(),
 				ConsoleActivity.TYPEFACE);
@@ -52,6 +59,43 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setGravity(Gravity.BOTTOM);
 		// TODO: Make a better ID system
 		setId((int) System.currentTimeMillis());
+		setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragEntered(View dragView, View dragSink) {
+				setBackground(getResources().getDrawable(R.drawable.console_text_border));
+			}
+
+			@Override
+			public void onDragExited(View dragView, View dragSink) {
+				setBackgroundColor(getResources().getColor(android.R.color.transparent));
+			}
+
+			@Override
+			public void onDragEnded(View dragView, View dragSink) {
+				setBackgroundColor(getResources().getColor(android.R.color.transparent));
+			}
+
+			@Override
+			public void onDragDropped(View dragView, View dragSink) {
+				if (!mKeywords.isEmpty()) {
+					mConsole.setTempCommand(((CommandIcon) dragView).getCommandName());
+					mConsole.setTempKeywords(mKeywords);
+					mConsole.openContextMenu(dragSink);
+				}
+			}
+		});
+		setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				if (!mKeywords.isEmpty()) {
+					mConsole.setTempCommand(null);
+					mConsole.setTempKeywords(mKeywords);
+					mConsole.openContextMenu(v);
+					return true;
+				}
+				return false;
+			}
+		});
 		setPaddingRelative(PADDING, PADDING, PADDING, 0);
 		setTextColor(Color.WHITE);
 		setTextSize(ConsoleActivity.DEFAULT_FONT_SIZE);
@@ -59,6 +103,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 
 		setText("hermit<" + cmdOrderNum + "> ");		
 		if (msg != null) {
+			mMessage = msg;
 			append(msg);
 			String[] inputArr = msg.split(ConsoleActivity.WHITESPACE);
 			for(String word : inputArr) {
@@ -73,26 +118,27 @@ public class ConsoleTextView extends TextView implements Serializable {
 		return mCommandOrderNum;
 	}
 
-	public ArrayList<String> getKeywords() {
+	public String getMessage() {
+		return mMessage;
+	}
+
+	public List<String> getKeywords() {
 		return mKeywords;
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN) {
-			setBackground(getResources().getDrawable(R.drawable.console_text_border));
+			setBackgroundResource(R.drawable.console_text_border);
 		} else if(event.getAction() == MotionEvent.ACTION_UP
-				|| event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-			setBackgroundColor(getResources().getColor(android.R.color.transparent));
+				|| event.getAction() == MotionEvent.ACTION_OUTSIDE
+				|| event.getAction() == MotionEvent.ACTION_CANCEL) {
+			setBackgroundResource(android.R.color.transparent);
 		}
 		return super.onTouchEvent(event);	
 	}
 
 	public class PrettyPrinter implements TextWatcher {
-		//		public static final String RED = "red";
-		//		public static final String BLUE = "blue";
-		//		public static final String GREEN = "green";
-
 		public static final String RED = "#CC060B";
 		public static final String GREEN = "#1DDA1C";
 		public static final String BLUE = "#0090D3";
@@ -112,16 +158,11 @@ public class ConsoleTextView extends TextView implements Serializable {
 					String color = null;
 					if (CommandDispatcher.isKeyword(word)) {
 						color = CommandDispatcher.getKeyword(word).getColor();
-						res += "<font color='" + color + "'>" +
-								//"<a href='console://test' style='text-decoration:none;'>" +
-								//In the future, the above line could be used to hyperlink commands
-								word + //"</a>
-								"</font> ";
+						res += "<font color='" + color + "'>" +	word + "</font> ";
 					} else {
 						res += word + " ";
 					}
 				};
-				res.trim();
 				ConsoleTextView.this.setText(Html.fromHtml(res));
 			}
 		}

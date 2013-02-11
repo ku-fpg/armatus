@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.util;
+package com.kufpg.androidhermit.json;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.kufpg.androidhermit.util.FileIOUtils;
 
 public class HermitJsonObject extends JSONObject {
 

@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.util;
+package com.kufpg.androidhermit.console;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -6,8 +6,7 @@ import java.util.Map;
 
 import android.widget.Toast;
 
-import com.kufpg.androidhermit.ConsoleActivity;
-import com.kufpg.androidhermit.util.ConsoleTextView.PrettyPrinter;
+import com.kufpg.androidhermit.console.ConsoleTextView.PrettyPrinter;
 
 @SuppressWarnings("unused")
 public class CommandDispatcher {

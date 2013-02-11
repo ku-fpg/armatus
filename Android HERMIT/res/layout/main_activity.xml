@@ -3,11 +3,7 @@
     android:id="@+id/swipeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF" >
-
-    <com.kufpg.androidhermit.multitouch.MultiTouchView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    android:background="@android:color/white" >
 
     <ScrollView
         android:id="@+id/code_scroll_view"
@@ -95,7 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/pinchzoom_button"
-        android:text="Panels test"
+        android:text="ExpandoLayout test"
         android:textColor="@android:color/black" />
     
     <Button
@@ -104,7 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/expandolayout_button"
-        android:text="Launch Test Activity"
+        android:text="Launch TestActivity"
         android:textColor="@android:color/black" />
 
 </RelativeLayout>

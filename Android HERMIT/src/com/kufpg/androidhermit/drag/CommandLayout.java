@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.util.drag;
+package com.kufpg.androidhermit.drag;
 
 import com.slidingmenu.lib.SlidingMenu;
 

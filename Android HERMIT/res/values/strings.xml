@@ -5,11 +5,7 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Android HERMIT</string>
     <string name="title_preference_screen">Android HERMIT preferences</string>
-    <string name="open_from_disk">Open from disk</string>
-    <string name="open_from_url">Open from URL</string>
-    <string name="save_file">Save file</string>
     <string name="default_pref_message">Are you sure you want to restore the default settings?</string>
-    <string name="open_from_url_message">Please enter the URL of the text file to open:</string>
     <string name="context_menu_title">Commands found in this line</string>
     <string name="popup_text">Font size:</string>
 
