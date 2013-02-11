@@ -50,13 +50,13 @@ public class CommandDispatcher {
 			theToast.show();
 		}
 	};
-	private static HashMap<String, Command> mCommandMap = mapOfInstances(Command.class);
+	private static Map<String, Command> mCommandMap = mapOfInstances(Command.class);
 	
 	//List of Keywords
 	private static Keyword red = new Keyword("red", "toast", PrettyPrinter.RED);
 	private static Keyword green = new Keyword("green", "toast", PrettyPrinter.GREEN);
 	private static Keyword blue = new Keyword("blue", "toast", PrettyPrinter.BLUE);
-	private static HashMap<String, Keyword> mKeywordMap = mapOfInstances(Keyword.class);
+	private static Map<String, Keyword> mKeywordMap = mapOfInstances(Keyword.class);
 
 	public CommandDispatcher(ConsoleActivity console) {
 		mConsole = console;
@@ -130,8 +130,8 @@ public class CommandDispatcher {
 	 * themi into the supplied instanceMap for easy access.
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T> HashMap<String, T> mapOfInstances(Class<T> instanceType) {
-		HashMap<String, T> instanceMap = new HashMap<String, T>();
+	private static <T> Map<String, T> mapOfInstances(Class<T> instanceType) {
+		Map<String, T> instanceMap = new HashMap<String, T>();
 		Field[] fields = CommandDispatcher.class.getDeclaredFields();
 		for (Field f : fields) {
 			if (f.getType().equals(instanceType)) {

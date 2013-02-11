@@ -9,12 +9,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <RelativeLayout
+        <com.kufpg.androidhermit.console.CodeRelativeLayout
             android:id="@+id/code_scroll_relative_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-        </RelativeLayout>
+        </com.kufpg.androidhermit.console.CodeRelativeLayout>
 
         <LinearLayout
             android:id="@+id/code_input_line"

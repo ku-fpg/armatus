@@ -26,8 +26,8 @@ public class ConsoleTextView extends TextView implements Serializable {
 	private static final long serialVersionUID = 492620301229198361L;
 	private static final int PADDING = ConsoleActivity.PADDING;
 
-	private int mCommandOrderNum;
 	private String mMessage = "";
+	private int mCommandNum;
 	private List<String> mKeywords = new ArrayList<String>();
 	//Don't try to serialize a ConsoleActivity; you're in for pain
 	private transient ConsoleActivity mConsole;
@@ -44,20 +44,20 @@ public class ConsoleTextView extends TextView implements Serializable {
 		super(context, attrs, defStyle);
 	}
 
-	public ConsoleTextView(ConsoleActivity console, String msg, int cmdOrderNum) {
+	public ConsoleTextView(ConsoleActivity console, String msg, int commandNum) {
 		super(console);
-		setupView(console, msg, cmdOrderNum);
+		setupView(console, msg, commandNum);
 	}
 
-	protected void setupView(ConsoleActivity console, String msg, int cmdOrderNum) {
+	protected void setupView(ConsoleActivity console, String msg, int commandNum) {
 		mConsole = console;
-		mCommandOrderNum = cmdOrderNum;
+		mCommandNum = commandNum;
 		Typeface typeface = Typeface.createFromAsset(getResources().getAssets(),
 				ConsoleActivity.TYPEFACE);
 
 		addTextChangedListener(new PrettyPrinter());
 		setGravity(Gravity.BOTTOM);
-		// TODO: Make a better ID system
+		//TODO: Better ID system
 		setId((int) System.currentTimeMillis());
 		setOnDragListener(new DragSinkListener() {
 			@Override
@@ -101,7 +101,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setTextSize(ConsoleActivity.DEFAULT_FONT_SIZE);
 		setTypeface(typeface);
 
-		setText("hermit<" + cmdOrderNum + "> ");		
+		setText("hermit<" + commandNum + "> ");		
 		if (msg != null) {
 			mMessage = msg;
 			append(msg);
@@ -114,12 +114,12 @@ public class ConsoleTextView extends TextView implements Serializable {
 		}
 	}
 
-	public int getCommandOrderNum() {
-		return mCommandOrderNum;
-	}
-
 	public String getMessage() {
 		return mMessage;
+	}
+	
+	public int getCommandNum() {
+		return mCommandNum;
 	}
 
 	public List<String> getKeywords() {

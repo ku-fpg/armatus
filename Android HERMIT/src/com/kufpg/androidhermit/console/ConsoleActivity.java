@@ -66,7 +66,7 @@ public class ConsoleActivity extends StandardActivity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.console);
+		setContentView(R.layout.console_activity);
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = true);
 
 		//Used for detecting screen width/height
