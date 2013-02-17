@@ -29,7 +29,7 @@ public class StandardActivity extends Activity {
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
 
-		mContext = getApplicationContext();
+		mContext = this;
 		mSaveDir = getCacheDir().toString();
 		mDefaultSaveDir = mSaveDir;
 		mEditModeValue = "0";

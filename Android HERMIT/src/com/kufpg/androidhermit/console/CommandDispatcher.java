@@ -4,13 +4,23 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
+import android.content.Context;
 import android.widget.Toast;
 
 import com.kufpg.androidhermit.console.ConsoleTextView.PrettyPrinter;
+import com.kufpg.androidhermit.util.HermitServer;
+
 
 @SuppressWarnings("unused")
 public class CommandDispatcher {
+	private static Context mContext;
 	private static ConsoleActivity mConsole;
+	
+	public void setContext(Context context){
+		mContext = context;
+	}
 	
 	//List of Commands
 	private static Command clear = new Command("clear", 0, true) {
@@ -20,9 +30,19 @@ public class CommandDispatcher {
 		}
 	};
 	private static Command consider = new Command("consider", 1, false) {
+		
 		@Override
 		protected void run(String... args) {
-			mConsole.addMessage("TODO: Figure out what consider " + args[0] + " does.");
+			try{
+				String jstr = "{command:consider},{args:" + args[0] + "}";
+				HermitServer request = new HermitServer(new JSONObject(jstr),mConsole, mContext);
+				request.execute();				
+			} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+			}				
+			// mConsole.addMessage("TODO: Figure out what consider " + args[0] + " does.");
 		}
 	};
 	private static Command exit = new Command("exit", 0, false) {
