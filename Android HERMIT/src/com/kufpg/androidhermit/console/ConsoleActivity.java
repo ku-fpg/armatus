@@ -14,8 +14,11 @@ import com.kufpg.androidhermit.drag.CommandLayout;
 import com.kufpg.androidhermit.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.DragEvent;
@@ -43,6 +46,7 @@ public class ConsoleActivity extends StandardActivity {
 	public static final int MAX_FONT_SIZE = 40;
 	public static final int MIN_FONT_SIZE = 15;
 	public static final int PADDING = 5;
+	public static final int COPYID = 19;
 	public static final String COMMAND_LAYOUT = "layout";
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 	public static final String WHITESPACE = "\\s+";
@@ -56,7 +60,7 @@ public class ConsoleActivity extends StandardActivity {
 	private EditText mInputEditText;
 	private TextView mInputHeader;
 	private ConsoleTextView mCurConsoleTextView, mPrevConsoleTextView;
-	private String mTempCommand = null;
+	private String mTempCommand = null, mTempCopiedString;
 	private List<String> mTempKeywords = new ArrayList<String>();
 	private LinkedHashMap<Integer, ConsoleTextView> mCommandHistory = new LinkedHashMap<Integer, ConsoleTextView>();
 	private CommandDispatcher mDispatcher;
@@ -210,8 +214,14 @@ public class ConsoleActivity extends StandardActivity {
 			menu.setHeaderTitle("Execute " + mTempCommand + " on...");
 		} else {
 			menu.setHeaderTitle(R.string.context_menu_title);
+			menu.add(0, COPYID, 0, "Copy Contents");
+			
+			//cast the received View to TextView so that you can get its text
+		    TextView yourTextView = (TextView) v;
+		    
+		    mTempCopiedString = yourTextView.getText().toString();
 		}
-		int order = 0;
+		int order = 1;
 		for (String keyword : mTempKeywords) {
 			menu.add(0, v.getId(), order, keyword);
 			order++;
@@ -221,11 +231,17 @@ public class ConsoleActivity extends StandardActivity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
-			String keywordNStr = item.getTitle().toString();
-			if (mTempCommand != null) {
-				mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+			if(item.getItemId() == COPYID){
+			    //place your TextView's text in clipboard
+			    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+			    clipboard.setText(mTempCopiedString);
 			} else {
-				mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+				String keywordNStr = item.getTitle().toString();
+				if (mTempCommand != null) {
+					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+				} else {
+					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+				}
 			}
 		}
 		return super.onContextItemSelected(item);

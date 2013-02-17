@@ -23,14 +23,14 @@
                 android:id="@+id/command_relative_layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
                 <com.kufpg.androidhermit.drag.CommandLayout
                     android:id="@+id/layout1"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
-                    android:background="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.CommandIcon
@@ -59,7 +59,7 @@
                 android:id="@+id/command_relative_layout2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
                 <com.kufpg.androidhermit.drag.CommandLayout
@@ -67,7 +67,7 @@
                     android:layout_width="300dp"
                     android:layout_height="100dp"
                     android:layout_below="@+id/layout1"
-                    android:background="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.CommandIcon
@@ -83,7 +83,7 @@
                     android:layout_width="300dp"
                     android:layout_height="100dp"
                     android:layout_below="@+id/layout2"
-                    android:background="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.CommandIcon
@@ -112,7 +112,7 @@
                 android:id="@+id/command_relative_layout3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
                 <com.kufpg.androidhermit.drag.CommandLayout
@@ -120,7 +120,7 @@
                     android:layout_width="300dp"
                     android:layout_height="100dp"
                     android:layout_below="@+id/layout3"
-                    android:background="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.CommandIcon
@@ -136,7 +136,7 @@
                     android:layout_width="300dp"
                     android:layout_height="100dp"
                     android:layout_below="@+id/layout4"
-                    android:background="@android:color/white"
+                    android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.CommandIcon

@@ -89,10 +89,10 @@ public class ConsoleTextView extends TextView implements Serializable {
 			public boolean onLongClick(View v) {
 				if (!mKeywords.isEmpty()) {
 					mConsole.setTempCommand(null);
-					mConsole.setTempKeywords(mKeywords);
-					mConsole.openContextMenu(v);
 					return true;
 				}
+				mConsole.setTempKeywords(mKeywords);
+				mConsole.openContextMenu(v);
 				return false;
 			}
 		});
