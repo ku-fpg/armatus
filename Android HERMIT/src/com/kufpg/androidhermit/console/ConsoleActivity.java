@@ -14,8 +14,6 @@ import com.kufpg.androidhermit.drag.CommandLayout;
 import com.kufpg.androidhermit.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
-import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.text.ClipboardManager;
@@ -186,18 +184,18 @@ public class ConsoleActivity extends StandardActivity {
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putInt("CmdCount", mCommandCount);
-		savedInstanceState.putSerializable("CmdHistory", mCommandHistory);
-		savedInstanceState.putBoolean("SoftKeyboardVisibility", mIsSoftKeyboardVisible);
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("CmdCount", mCommandCount);
+		outState.putSerializable("CmdHistory", mCommandHistory);
+		outState.putBoolean("SoftKeyboardVisibility", mIsSoftKeyboardVisible);
 		mCodeLayout.removeAllViews();
 		mPrevConsoleTextView = null;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		mCommandCount = savedInstanceState.getInt("CmdCount");
 		mCommandHistory = (LinkedHashMap<Integer, ConsoleTextView>) savedInstanceState.getSerializable("CmdHistory");

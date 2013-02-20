@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.kufpg.androidhermit.console.ConsoleActivity;
+import com.kufpg.androidhermit.test.TestActivity;
 import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
 import com.kufpg.androidhermit.util.TreeNode;
@@ -34,7 +35,7 @@ public class MainActivity extends StandardActivity {
 	private final Condition mLockInEffect = mLock.newCondition();
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
 

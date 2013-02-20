@@ -1,153 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:drag="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
-    xmlns:ExpandoLayout="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
-    android:id="@+id/command_scroll_view"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/code_scroll_linear_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <ListView
+        android:id="@+id/code_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
 
     <LinearLayout
-        android:id="@+id/expando_root_layout"
-        android:layout_width="match_parent"
+        android:id="@+id/test_code_input_line"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="horizontal"
+        android:paddingLeft="5px"
+        android:paddingRight="5px"
+        android:paddingTop="5px" >
 
-        <com.djpsoft.moreDroid.ExpandoLayout
-            android:layout_width="fill_parent"
+        <TextView
+            android:id="@+id/test_code_input_num"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            ExpandoLayout:text="ExpandoLayout #01"
-            ExpandoLayout:textSize="20"
-            android:background="#222222" >
+            android:layout_gravity="top"
+            android:background="@null"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:textCursorDrawable="@null"
+            android:textSize="15sp"
+            android:typeface="monospace" />
 
-            <RelativeLayout
-                android:id="@+id/command_relative_layout1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:orientation="vertical" >
-
-                <com.kufpg.androidhermit.drag.CommandLayout
-                    android:id="@+id/layout1"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:background="@android:color/white"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.CommandIcon
-                        android:id="@+id/myimage1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/toast"
-                        drag:command="toast" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
-            </RelativeLayout>
-        </com.djpsoft.moreDroid.ExpandoLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2px"
-            android:background="#DDFFDD" />
-
-        <com.djpsoft.moreDroid.ExpandoLayout
-            android:layout_width="fill_parent"
+        <com.kufpg.androidhermit.console.ActionEditText
+            android:id="@+id/test_code_input_edit_text"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
-            ExpandoLayout:text="ExpandoLayout #02"
-            ExpandoLayout:textSize="20"
-            android:background="#222222" >
-
-            <RelativeLayout
-                android:id="@+id/command_relative_layout2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:orientation="vertical" >
-
-                <com.kufpg.androidhermit.drag.CommandLayout
-                    android:id="@+id/layout2"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/layout1"
-                    android:background="@android:color/white"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.CommandIcon
-                        android:id="@+id/myimage2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/consider"
-                        drag:command="consider" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
-
-                <com.kufpg.androidhermit.drag.CommandLayout
-                    android:id="@+id/layout3"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/layout2"
-                    android:background="@android:color/white"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.CommandIcon
-                        android:id="@+id/myimage3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/clear"
-                        drag:command="clear" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
-            </RelativeLayout>
-        </com.djpsoft.moreDroid.ExpandoLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2px"
-            android:background="#DDFFDD" />
-
-        <com.djpsoft.moreDroid.ExpandoLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            ExpandoLayout:text="ExpandoLayout #03"
-            ExpandoLayout:textSize="20"
-            android:background="#222222" >
-
-            <RelativeLayout
-                android:id="@+id/command_relative_layout3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:orientation="vertical" >
-
-                <com.kufpg.androidhermit.drag.CommandLayout
-                    android:id="@+id/layout4"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/layout3"
-                    android:background="@android:color/white"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.CommandIcon
-                        android:id="@+id/myimage4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/resume"
-                        drag:command="resume" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
-
-                <com.kufpg.androidhermit.drag.CommandLayout
-                    android:id="@+id/layout5"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/layout4"
-                    android:background="@android:color/white"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.CommandIcon
-                        android:id="@+id/myimage5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/exit"
-                        drag:command="exit" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
-            </RelativeLayout>
-        </com.djpsoft.moreDroid.ExpandoLayout>
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@null"
+            android:imeOptions="actionGo"
+            android:inputType="textNoSuggestions|textMultiLine"
+            android:singleLine="false"
+            android:textColor="@android:color/white"
+            android:textCursorDrawable="@null"
+            android:textSize="15sp"
+            android:typeface="monospace" />
     </LinearLayout>
 
-</ScrollView>
+</LinearLayout>

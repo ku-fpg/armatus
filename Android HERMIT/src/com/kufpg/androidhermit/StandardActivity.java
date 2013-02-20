@@ -24,7 +24,7 @@ public class StandardActivity extends Activity {
 	protected static SharedPreferences.Editor prefsEditor;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getActionBar();
 		actionBar.show();

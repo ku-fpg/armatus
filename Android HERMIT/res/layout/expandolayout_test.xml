@@ -4,62 +4,69 @@
     http://code.google.com/p/android/issues/detail?id=9656
     regarding the xmlns:ExpandoLayout namespace declaration
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ExpandoLayout="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
     <com.djpsoft.moreDroid.ExpandoLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         ExpandoLayout:text="ExpandoLayout #01"
         ExpandoLayout:textSize="20"
-        android:background="#222222">
+        android:background="#222222" >
+
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingLeft="25dip"
-            android:paddingRight="25dip">
+            android:paddingRight="25dip" >
+
             <CheckBox
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Checkbox #01"/>
+                android:text="Checkbox #01" />
+
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Button #02"/>
+                android:text="Button #02" />
         </LinearLayout>
     </com.djpsoft.moreDroid.ExpandoLayout>
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="2px"
-        android:background="#DDFFDD"
-    />
+        android:background="#DDFFDD" />
+
     <com.djpsoft.moreDroid.ExpandoLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        ExpandoLayout:compactText="More (ExpandoLayout #2)"
+        ExpandoLayout:expanded="false"
+        ExpandoLayout:expandedText="Less (ExpandoLayout #2)"
         ExpandoLayout:moreBar="true"
-        ExpandoLayout:moreBarOnRight="true"
         ExpandoLayout:moreBarDefaultViewHeight="50"
         ExpandoLayout:moreBarFadeColor="#333333"
-        ExpandoLayout:compactText="More (ExpandoLayout #2)"
-        ExpandoLayout:expandedText="Less (ExpandoLayout #2)"
-        ExpandoLayout:expanded="false"
-        android:background="#333333">
+        ExpandoLayout:moreBarOnRight="true"
+        android:background="#333333" >
+
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingLeft="25dip"
-            android:paddingRight="25dip">
+            android:paddingRight="25dip" >
+
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris malesuada ultrices leo vel blandit. Suspendisse posuere, nulla et pulvinar convallis, lectus tortor dapibus est, et adipiscing lorem neque vel tortor. Nam et sapien erat, et aliquam elit. Donec dapibus pulvinar euismod. Quisque sit amet eros sit amet nulla ultricies sagittis. Proin ut massa in nibh rhoncus tristique id et mi. Ut pellentesque facilisis augue, at pulvinar augue consequat eu."
                 android:fadingEdge="vertical"
-                android:fadingEdgeLength="25dip"/>
-            </LinearLayout>
+                android:fadingEdgeLength="25dip"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris malesuada ultrices leo vel blandit. Suspendisse posuere, nulla et pulvinar convallis, lectus tortor dapibus est, et adipiscing lorem neque vel tortor. Nam et sapien erat, et aliquam elit. Donec dapibus pulvinar euismod. Quisque sit amet eros sit amet nulla ultricies sagittis. Proin ut massa in nibh rhoncus tristique id et mi. Ut pellentesque facilisis augue, at pulvinar augue consequat eu." />
+        </LinearLayout>
     </com.djpsoft.moreDroid.ExpandoLayout>
+
 </LinearLayout>
