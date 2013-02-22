@@ -4,5 +4,6 @@
     <dimen name="slidingmenu_offset_portrait">400dp</dimen>
     <dimen name="slidingmenu_offset_landscape">750dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
+    <dimen name="entry_padding">5dp</dimen>
 
 </resources>

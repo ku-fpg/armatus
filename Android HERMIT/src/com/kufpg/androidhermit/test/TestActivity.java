@@ -14,6 +14,7 @@ import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,6 +47,7 @@ public class TestActivity extends StandardActivity {
 	private ListView mListView;
 	private TestConsoleEntryAdapter mAdapter;
 	private ArrayList<TestConsoleEntry> mEntries = new ArrayList<TestConsoleEntry>();
+	private View mInputView, mRootView;
 	private TextView mInputNum;
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
@@ -53,12 +55,11 @@ public class TestActivity extends StandardActivity {
 	private TestCommandDispatcher mDispatcher;
 	private String mTempCommand;
 	private List<String> mTempKeywords = new ArrayList<String>();
-	private View mRootView;
 	private boolean mIsSoftKeyboardVisible;
 	private int mEntryCount = 0;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_activity);
 
@@ -79,6 +80,7 @@ public class TestActivity extends StandardActivity {
 		});
 
 		mDispatcher = new TestCommandDispatcher(this);
+		mAdapter = new TestConsoleEntryAdapter(this, mEntries);
 		mListView = (ListView) findViewById(R.id.code_list_view);
 		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
@@ -94,9 +96,10 @@ public class TestActivity extends StandardActivity {
 				return false;
 			}
 		});
-		mInputNum = (TextView) findViewById(R.id.test_code_input_num);
+		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
+		mInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
-		mInputEditText = (EditText) findViewById(R.id.test_code_input_edit_text);
+		mInputEditText = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
 		mInputEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {}
@@ -105,6 +108,11 @@ public class TestActivity extends StandardActivity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				mSlidingMenu.showContent();
+				mListView.post(new Runnable() {
+					public void run() {
+						mListView.setSelection(mListView.getCount() - 1);
+					}
+				});
 			}
 		});
 		mInputEditText.setOnKeyListener(new OnKeyListener() {
@@ -130,7 +138,15 @@ public class TestActivity extends StandardActivity {
 				return false;
 			}
 		});
+		mInputEditText.requestFocus();
+		mListView.addFooterView(mInputView);
+		mListView.setAdapter(mAdapter);
 		updateEntries();
+		
+		//Typeface tinkering
+		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
+		mInputNum.setTypeface(typeface);
+		mInputEditText.setTypeface(typeface);
 
 		//Initialize SlidingMenu properties
 		mSlidingMenu = new SlidingMenu(this);
@@ -163,6 +179,8 @@ public class TestActivity extends StandardActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		outState.putString("Input", mInputEditText.getText().toString());
+		outState.putInt("CursorPos", mInputEditText.getSelectionStart());
 		outState.putInt("EntryCount", mEntryCount);
 		outState.putBoolean("SoftKeyboardVisibility", mIsSoftKeyboardVisible);
 		outState.putSerializable("Entries", mEntries);
@@ -172,9 +190,14 @@ public class TestActivity extends StandardActivity {
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
+		mInputEditText.setText(savedInstanceState.getString("Input"));
+		mInputEditText.setSelection(savedInstanceState.getInt("CursorPos"));
+		mInputEditText.requestFocus();
 		mEntryCount = savedInstanceState.getInt("EntryCount");
 		mIsSoftKeyboardVisible = savedInstanceState.getBoolean("SoftKeyboardVisibility");
 		mEntries = (ArrayList<TestConsoleEntry>) savedInstanceState.getSerializable("Entries");
+		mAdapter = new TestConsoleEntryAdapter(this, mEntries);
+		mListView.setAdapter(mAdapter);
 		updateEntries();
 	}
 
@@ -217,19 +240,19 @@ public class TestActivity extends StandardActivity {
 		mEntries.add(ce);
 		updateEntries();
 		mEntryCount++;
-		mListView.post(new Runnable() {
-			public void run() {
-				mListView.setSelection(mListView.getCount() - 1);
-			}
-		});
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
+		mListView.postDelayed(new Runnable() {
+			public void run() {
+				mListView.setSelection(mListView.getCount());
+				mListView.smoothScrollToPosition(mListView.getCount());
+			}
+		}, 100);
 	}
 
 	public void clear() {
 		mEntries.clear();
-		mAdapter.notifyDataSetChanged();
 		mEntryCount = 0;
-		mInputNum.setText("hermit<" + mEntryCount + "> ");
+		updateEntries();
 	}
 
 	public void exit() {
@@ -265,8 +288,7 @@ public class TestActivity extends StandardActivity {
 		if (mEntries.size() > LINE_LIMIT) {
 			mEntries.remove(0);
 		}
-		mAdapter = new TestConsoleEntryAdapter(this, mEntries);
-		mListView.setAdapter(mAdapter);
+		mAdapter.notifyDataSetChanged();
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
 	}
 

@@ -8,10 +8,14 @@ import com.kufpg.androidhermit.drag.DragSinkListener;
 
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 
@@ -75,9 +79,37 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 				List<String> keywords = mEntries.get(thepos).getKeywords();
 				if (!keywords.isEmpty()) {
 					mConsole.setTempCommand(((CommandIcon) dragView).getCommandName());
+					Toast.makeText(mConsole, ((CommandIcon) dragView).getCommandName(), Toast.LENGTH_LONG).show();
 					mConsole.setTempKeywords(keywords);
-					mConsole.openContextMenu(theview);
+					mConsole.openContextMenu(dragSink);
 				}
+			}
+		});
+		entryView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					v.setBackgroundResource(R.drawable.console_text_border);
+					return true;
+				} else if (event.getAction() == MotionEvent.ACTION_UP
+						|| event.getAction() == MotionEvent.ACTION_OUTSIDE
+						|| event.getAction() == MotionEvent.ACTION_CANCEL) {
+					v.setBackgroundResource(android.R.color.transparent);
+				}
+				return false;
+			}
+		});
+		entryView.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				List<String> keywords = mEntries.get(thepos).getKeywords();
+				if (!keywords.isEmpty()) {
+					mConsole.setTempCommand(null);
+					return true;
+				}
+				mConsole.setTempKeywords(keywords);
+				//mConsole.openContextMenu(v);
+				return false;
 			}
 		});
 		

@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/test_code_input_line"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingLeft="@dimen/entry_padding"
     android:paddingRight="@dimen/entry_padding"
     android:paddingBottom="@dimen/entry_padding" >
 
     <TextView
-        android:id="@+id/console_entry_num"
+        android:id="@+id/test_code_input_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="top"
         android:background="@null"
         android:singleLine="true"
         android:textColor="@android:color/white"
@@ -19,16 +20,19 @@
         android:textSize="15sp"
         android:typeface="monospace" />
 
-    <TextView
-        android:id="@+id/console_entry_contents"
-        android:layout_width="wrap_content"
+    <com.kufpg.androidhermit.console.ActionEditText
+        android:id="@+id/test_code_input_edit_text"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_toRightOf="@id/console_entry_num"
+        android:layout_weight="1"
         android:background="@null"
+        android:imeOptions="actionGo"
+        android:inputType="textNoSuggestions|textMultiLine"
+        android:singleLine="false"
         android:textColor="@android:color/white"
         android:textCursorDrawable="@null"
         android:textSize="15sp"
         android:typeface="monospace" />
 
-</RelativeLayout>
+</LinearLayout>

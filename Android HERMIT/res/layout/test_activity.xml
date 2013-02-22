@@ -7,44 +7,10 @@
     <ListView
         android:id="@+id/code_list_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-
-    <LinearLayout
-        android:id="@+id/test_code_input_line"
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="5px"
-        android:paddingRight="5px"
-        android:paddingTop="5px" >
-
-        <TextView
-            android:id="@+id/test_code_input_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:background="@null"
-            android:singleLine="true"
-            android:textColor="@android:color/white"
-            android:textCursorDrawable="@null"
-            android:textSize="15sp"
-            android:typeface="monospace" />
-
-        <com.kufpg.androidhermit.console.ActionEditText
-            android:id="@+id/test_code_input_edit_text"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:background="@null"
-            android:imeOptions="actionGo"
-            android:inputType="textNoSuggestions|textMultiLine"
-            android:singleLine="false"
-            android:textColor="@android:color/white"
-            android:textCursorDrawable="@null"
-            android:textSize="15sp"
-            android:typeface="monospace" />
-    </LinearLayout>
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:paddingTop="@dimen/entry_padding" >
+    </ListView>
 
 </LinearLayout>
