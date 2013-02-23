@@ -2,7 +2,6 @@ package com.kufpg.androidhermit.test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.MainActivity;
@@ -20,6 +19,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +27,17 @@ import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnKeyListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemLongClickListener;
 
+/**
+ * Activity that displays an interactive, feature-rich
+ * (at least it will be some day) HERMIT console.
+ */
 public class TestActivity extends StandardActivity {
 
 	public static final String COMMAND_LAYOUT = "layout";
@@ -42,19 +45,19 @@ public class TestActivity extends StandardActivity {
 	public static final String WHITESPACE = "\\s+";
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int PADDING = 5;
-	public static final int LINE_LIMIT = 50;
+	public static final int ENTRY_LIMIT = 50;
+	public static final int SELECT_ID = 19;
 
 	private ListView mListView;
 	private TestConsoleEntryAdapter mAdapter;
 	private ArrayList<TestConsoleEntry> mEntries = new ArrayList<TestConsoleEntry>();
 	private View mInputView, mRootView;
-	private TextView mInputNum;
+	private TextView mInputNum, mSelectedContents;
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
 	private LinearLayout mExpandoLayoutGroup;
 	private TestCommandDispatcher mDispatcher;
 	private String mTempCommand;
-	private List<String> mTempKeywords = new ArrayList<String>();
 	private boolean mIsSoftKeyboardVisible;
 	private int mEntryCount = 0;
 
@@ -63,11 +66,12 @@ public class TestActivity extends StandardActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.test_activity);
 
+		//Ensures soft keyboard is opened on activity start
 		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = true);
 		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
-			//Used for detecting whether soft keyboard is open or closed
+			//Detects whether soft keyboard is open or closed
 			public void onGlobalLayout() {
 				int rootHeight = mRootView.getRootView().getHeight();
 				int heightDiff = rootHeight - mRootView.getHeight();
@@ -82,20 +86,8 @@ public class TestActivity extends StandardActivity {
 		mDispatcher = new TestCommandDispatcher(this);
 		mAdapter = new TestConsoleEntryAdapter(this, mEntries);
 		mListView = (ListView) findViewById(R.id.code_list_view);
-		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent,
-					View view, int position, long id) {
-				List<String> keywords = mAdapter.getItem(position).getKeywords();
-				if (!keywords.isEmpty()) {
-					setTempCommand(null);
-					setTempKeywords(keywords);
-					//openContextMenu(view);
-					return true;
-				}
-				return false;
-			}
-		});
+		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
+		registerForContextMenu(mListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
@@ -107,14 +99,17 @@ public class TestActivity extends StandardActivity {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
 				mListView.post(new Runnable() {
 					public void run() {
+						//DON'T use scrollToBottom(); it will cause a strange jaggedy scroll effect
 						mListView.setSelection(mListView.getCount() - 1);
 					}
 				});
 			}
 		});
+		//Processes user input (and runs command, if input is a command) when Enter is pressed
 		mInputEditText.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -130,7 +125,7 @@ public class TestActivity extends StandardActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						addMessage(mInputEditText.getText().toString());
+						addEntry(mInputEditText.getText().toString());
 					}
 					mInputEditText.setText(""); 
 					return true;
@@ -139,10 +134,10 @@ public class TestActivity extends StandardActivity {
 			}
 		});
 		mInputEditText.requestFocus();
-		mListView.addFooterView(mInputView);
-		mListView.setAdapter(mAdapter);
+		mListView.addFooterView(mInputView, null, false);
+		mListView.setAdapter(mAdapter); //MUST be called after addFooterView()
 		updateEntries();
-		
+
 		//Typeface tinkering
 		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
 		mInputNum.setTypeface(typeface);
@@ -203,71 +198,117 @@ public class TestActivity extends StandardActivity {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		//TODO: Add Adam's clipboard stuff here later
 		super.onCreateContextMenu(menu, v, menuInfo);
-		if (mTempCommand != null) {
-			menu.setHeaderTitle("Execute " + mTempCommand + " on...");
-		} else {
-			menu.setHeaderTitle(R.string.context_menu_title);
-		}
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		int order = 0;
-		for (String keyword : mTempKeywords) {
-			menu.add(0, v.getId(), order, keyword);
-			order++;
+		if (mTempCommand != null) { //If user dragged CommandIcon onto entry
+			menu.setHeaderTitle("Execute " + mTempCommand + " on...");
+		} else { //If user long-clicked entry
+			menu.setHeaderTitle(R.string.context_menu_title);
+			menu.add(0, SELECT_ID, 0, "Select contents");
+			order = 1;
+		}
+		if (info.position != mEntries.size()) { //To prevent footer from spawning a ContextMenu
+			for (String keyword : mEntries.get(info.position).getKeywords()) {
+				menu.add(0, v.getId(), order, keyword);
+				order++;
+			}
 		}
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		//TODO; Add Adam's clipboard stuff here later
 		if (item != null) {
-			String keywordNStr = item.getTitle().toString();
-			if (mTempCommand != null) {
-				mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+			if (item.getItemId() == SELECT_ID) {
+				//TODO: Do stuff involving ViewSwitcher here
 			} else {
-				mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+				String keywordNStr = item.getTitle().toString();
+				if (mTempCommand != null) { //If CommandIcon command is run
+					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+				} else { //If keyword command is run
+					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+				}
+				mInputEditText.requestFocus(); //Prevents ListView from stealing focus
 			}
 		}
+		mTempCommand = null;
+		mSelectedContents = null;
 		return super.onContextItemSelected(item);
+	}
+	
+	@Override
+	public void onContextMenuClosed(Menu menu) {
+		//Ensures that the temp variables do not persist to next context menu opening
+		mTempCommand = null;
+		mSelectedContents = null;
 	}
 
 	/**
-	 * Adds a new "line" to the console with msg as its contents.
-	 * @param msg
+	 * Adds a new entry to the console.
+	 * @param contents The message to be shown in the entry.
 	 */
-	public void addMessage(String msg) {
-		TestConsoleEntry ce = new TestConsoleEntry(msg, mEntryCount);
+	public void addEntry(String contents) {
+		TestConsoleEntry ce = new TestConsoleEntry(contents, mEntryCount);
 		mEntries.add(ce);
 		updateEntries();
 		mEntryCount++;
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
-		mListView.postDelayed(new Runnable() {
-			public void run() {
-				mListView.setSelection(mListView.getCount());
-				mListView.smoothScrollToPosition(mListView.getCount());
-			}
-		}, 100);
+		scrollToBottom();
+	}
+	
+	/**
+	 * Appends a newline and newContents to the most recent entry.
+	 * @param newContents The message to be appended to the entry.
+	 */
+	public void appendEntry(String newContents) {
+		String contents = mEntries.get(mEntries.size() - 1).getContents();
+		contents += "<br />" + newContents;
+		mEntries.remove(mEntries.size() - 1);
+		TestConsoleEntry ce = new TestConsoleEntry(contents, mEntryCount);
+		mEntries.add(ce);
+		updateEntries();
+		scrollToBottom();
 	}
 
+	/**
+	 * Removes all console entries and resets the entry count.
+	 */
 	public void clear() {
 		mEntries.clear();
 		mEntryCount = 0;
 		updateEntries();
 	}
 
+	/**
+	 * Exits the console activity.
+	 */
 	public void exit() {
 		finish();
 		startActivity(new Intent(this, MainActivity.class));
 	}
 
+	/**
+	 * Sets the TextView in a console entry whose text can be selected through a ContextMenu option.
+	 * Intended to be called from ConsoleEntryAdapter.
+	 * @param contentsView The TextView from ConsoleEntryAdapter that can have its text selected.
+	 */
+	void setSelectedContents(TextView contentsView) {
+		mSelectedContents = contentsView;
+	}
+	
+	/**
+	 * Sets the name of the Command to be run on a keyword when selected from a ContextMenu.
+	 * Intended to be used in conjunction with CommandIcon.
+	 * @param commandName The name of the Command that will be run (if selected).
+	 */
 	public void setTempCommand(String commandName) {
 		mTempCommand = commandName;
 	}
 
-	public void setTempKeywords(List<String> keywords) {
-		mTempKeywords = keywords;
-	}
-
+	/**
+	 * Changes the SlidingMenu offset depending on which screen orientation is enabled.
+	 * This probably works best on Nexus 7s.
+	 */
 	private void refreshSlidingMenu() {
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_portrait);
@@ -275,7 +316,23 @@ public class TestActivity extends StandardActivity {
 			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_landscape);
 		}
 	}
+	
+	/**
+	 * Show the entry at the bottom of the console ListView.
+	 */
+	private void scrollToBottom() {
+		mListView.post(new Runnable() {
+			public void run() {
+				mListView.setSelection(mListView.getCount());
+				mListView.smoothScrollToPosition(mListView.getCount());
+			}
+		});
+	}
 
+	/**
+	 * Shows or hides the soft keyboard.
+	 * @param visibility Set to true to show soft keyboard, false to hide.
+	 */
 	private void setSoftKeyboardVisibility(boolean visibility) {
 		if (visibility) {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -284,8 +341,11 @@ public class TestActivity extends StandardActivity {
 		}
 	}
 
+	/**
+	 * Refreshes the console entries, removing excessive entries from the top if ENTRY_LIMIT is exceeded.
+	 */
 	private void updateEntries() {
-		if (mEntries.size() > LINE_LIMIT) {
+		if (mEntries.size() > ENTRY_LIMIT) {
 			mEntries.remove(0);
 		}
 		mAdapter.notifyDataSetChanged();

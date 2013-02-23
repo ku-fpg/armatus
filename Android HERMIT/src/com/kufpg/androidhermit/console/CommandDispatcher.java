@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.kufpg.androidhermit.console.ConsoleTextView.PrettyPrinter;
 import com.kufpg.androidhermit.util.HermitServer;
 
-
 @SuppressWarnings("unused")
 public class CommandDispatcher {
 	private static Context mContext;
