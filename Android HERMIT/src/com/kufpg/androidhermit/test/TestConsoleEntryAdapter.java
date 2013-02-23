@@ -15,13 +15,18 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
+/**
+ * ListView adapter used in conjunction with TestActivity. This initializes the values of
+ * each TestConsoleEntry and defines event-driven behavior for everything in the ListView
+ * (except for the footer).
+ */
 public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 
 	private TestActivity mConsole;
 	private List<TestConsoleEntry> mEntries;
 	private Typeface mTypeface;
+	private ConsoleEntryHolder mHolder;
 	
 	public TestConsoleEntryAdapter(TestActivity console, List<TestConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
@@ -34,30 +39,29 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View entryView = convertView;
-		ConsoleEntryHolder holder = null;
-		if (entryView == null) {
+		if (entryView == null) { //If this is a new TestConsoleEntry
 			LayoutInflater inflater = mConsole.getLayoutInflater();
 			entryView = inflater.inflate(R.layout.console_entry, parent, false);
-			holder = new ConsoleEntryHolder();
-			holder.num = (TextView) entryView.findViewById(R.id.console_entry_num);
-			holder.contents = (TextView) entryView.findViewById(R.id.console_entry_contents);
-			entryView.setTag(holder);
+			mHolder = new ConsoleEntryHolder();
+			mHolder.num = (TextView) entryView.findViewById(R.id.console_entry_num);
+			mHolder.contents = (TextView) entryView.findViewById(R.id.console_entry_contents);
+			entryView.setTag(mHolder);
 		} else {
-			holder = (ConsoleEntryHolder) entryView.getTag();
+			mHolder = (ConsoleEntryHolder) entryView.getTag();
 		}
 		
-		holder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
-		holder.num.setTextSize(TestActivity.DEFAULT_FONT_SIZE);
-		holder.num.setTypeface(mTypeface);
+		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
+		mHolder.num.setTextSize(TestActivity.DEFAULT_FONT_SIZE);
+		mHolder.num.setTypeface(mTypeface);
 		
-		//mEntryContents.addTextChangedListener(new TestPrettyPrinter(mEntryContents));
-		holder.contents.setText(mEntries.get(position).getContents());
-		holder.contents.setTextSize(TestActivity.DEFAULT_FONT_SIZE);
-		holder.contents.setTypeface(mTypeface);
+		TestPrettyPrinter.setPrettyText(mHolder.contents,
+				mEntries.get(position).getContents());
+		mHolder.contents.setTextSize(TestActivity.DEFAULT_FONT_SIZE);
+		mHolder.contents.setTypeface(mTypeface);
 		
-		mConsole.registerForContextMenu(entryView);
+		//A strangely redundant, but necessary, step to get onLongClickListener to work
 		final int thepos = position;
-		final View theview = entryView;
+		
 		entryView.setOnDragListener(new DragSinkListener() {
 			@Override
 			public void onDragEntered(View dragView, View dragSink) {
@@ -79,10 +83,19 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 				List<String> keywords = mEntries.get(thepos).getKeywords();
 				if (!keywords.isEmpty()) {
 					mConsole.setTempCommand(((CommandIcon) dragView).getCommandName());
-					Toast.makeText(mConsole, ((CommandIcon) dragView).getCommandName(), Toast.LENGTH_LONG).show();
-					mConsole.setTempKeywords(keywords);
 					mConsole.openContextMenu(dragSink);
 				}
+			}
+		});
+		entryView.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				if (!mEntries.get(thepos).getContents().isEmpty()) {
+					mConsole.setSelectedContents(mHolder.contents);
+					mConsole.openContextMenu(v);
+					return true;
+				}
+				return false;
 			}
 		});
 		entryView.setOnTouchListener(new OnTouchListener() {
@@ -90,7 +103,6 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					v.setBackgroundResource(R.drawable.console_text_border);
-					return true;
 				} else if (event.getAction() == MotionEvent.ACTION_UP
 						|| event.getAction() == MotionEvent.ACTION_OUTSIDE
 						|| event.getAction() == MotionEvent.ACTION_CANCEL) {
@@ -99,30 +111,17 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 				return false;
 			}
 		});
-		entryView.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				List<String> keywords = mEntries.get(thepos).getKeywords();
-				if (!keywords.isEmpty()) {
-					mConsole.setTempCommand(null);
-					return true;
-				}
-				mConsole.setTempKeywords(keywords);
-				//mConsole.openContextMenu(v);
-				return false;
-			}
-		});
 		
 		return entryView;
 	}
 	
+	/**
+	 * Helper class that stores the views displaying the data of a TestConsoleEntry.
+	 * This is supposed to improve performance, if StackOverflow is to be believed.
+	 */
 	static class ConsoleEntryHolder {
-		TextView num;
-		TextView contents;
-	}
-	
-	public TestActivity getConsole() {
-		return mConsole;
+		public TextView num;
+		public TextView contents;
 	}
 
 }

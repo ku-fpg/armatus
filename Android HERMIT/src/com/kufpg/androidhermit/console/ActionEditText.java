@@ -6,7 +6,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 
-// An EditText that lets you use actions ("Done", "Go", etc.) on multi-line edits.
+/**
+ * An EditText that lets you use actions ("Done", "Go", etc.) on multi-line edits.
+ */
 public class ActionEditText extends EditText {
 	public ActionEditText(Context context) {
 		super(context);

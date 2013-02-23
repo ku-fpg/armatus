@@ -9,7 +9,10 @@ import android.view.View.DragShadowBuilder;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 
-public class DragSourceClickListener implements OnTouchListener, OnLongClickListener {	
+/**
+ * Allows a View to be dragged upon a long click.
+ */
+public class DragViewClickListener implements OnTouchListener, OnLongClickListener {	
 	@Override
 	public boolean onLongClick(View v) {
 		ClipData dragData = ClipData.newPlainText("", "");

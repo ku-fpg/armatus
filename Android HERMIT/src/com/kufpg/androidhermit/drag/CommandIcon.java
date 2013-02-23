@@ -7,6 +7,9 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+/**
+ * A draggable image that represents a Command that can be run on console entry Keywords.
+ */
 public class CommandIcon extends ImageView {
 	private String mCommandName = null;
 	
@@ -21,12 +24,13 @@ public class CommandIcon extends ImageView {
 	public CommandIcon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
-		setOnLongClickListener(new DragSourceClickListener());
+		setOnLongClickListener(new DragViewClickListener());
 		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragImageView);
 		mCommandName = ta.getString(R.styleable.DragImageView_command);
 		if (mCommandName == null) {
 			mCommandName = "toast";
 		}
+		ta.recycle();
 	}
 
 	public String getCommandName() {

@@ -20,7 +20,7 @@ public class TestCommandDispatcher {
 	private static Command consider = new Command("consider", 1, false) {
 		@Override
 		protected void run(String... args) {
-			mConsole.addMessage("TODO: Figure out what consider " + args[0] + " does.");
+			mConsole.appendEntry("TODO: Figure out what consider " + args[0] + " does.");
 		}
 	};
 	private static Command exit = new Command("exit", 0, false) {
@@ -32,7 +32,7 @@ public class TestCommandDispatcher {
 	private static Command resume = new Command("resume", 0, false) {
 		@Override
 		protected void run(String... args) {
-			mConsole.addMessage("TODO: Figure out what resume does.");
+			mConsole.appendEntry("TODO: Figure out what resume does.");
 		}
 	};
 	private static Command toast = new Command("toast", 0, true) {
@@ -65,25 +65,25 @@ public class TestCommandDispatcher {
 		if (command != null) {
 			runOnConsole(command, args);
 		} else {
-			mConsole.addMessage("Error: " + commandName + " is not a valid command.");
+			mConsole.appendEntry("Error: " + commandName + " is not a valid command.");
 		}
 	}
 
 	private void runOnConsole(Command command, String... args) {
 		String commandString = command.getCommandName()
 				+ " " + varargsToString(args);
-		mConsole.addMessage(commandString);
+		mConsole.addEntry(commandString);
 
 		if (command.hasLowerArgBound()) {
 			if (args.length < command.getArgsNum()) {
-				mConsole.addMessage("Error: " + command.getCommandName() +
+				mConsole.appendEntry("Error: " + command.getCommandName() +
 						" requires at least " + command.getArgsNum() +
 						(command.getArgsNum() == 1 ? " argument." :
 								" arguments."));
 				return;
 			}
 		} else if (args.length != command.getArgsNum()) {
-			mConsole.addMessage("Error: " + command.getCommandName() +
+			mConsole.appendEntry("Error: " + command.getCommandName() +
 					" requires exactly " + command.getArgsNum() +
 					(command.getArgsNum() == 1 ? " argument." :
 							" arguments."));
@@ -98,7 +98,7 @@ public class TestCommandDispatcher {
 			runOnConsole(keyword.getCommand(), arg);
 		} else {
 			// Should not happen
-			mConsole.addMessage("Error: " + keyword + " is not a valid keyword.");
+			mConsole.appendEntry("Error: " + keyword + " is not a valid keyword.");
 		}
 	}
 	
