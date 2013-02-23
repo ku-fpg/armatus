@@ -7,8 +7,10 @@ import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.StandardActivity;
+import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
 import com.kufpg.androidhermit.drag.CommandLayout;
+import com.kufpg.androidhermit.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
@@ -18,6 +20,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
+import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +41,7 @@ import android.widget.TextView;
  * Activity that displays an interactive, feature-rich
  * (at least it will be some day) HERMIT console.
  */
-public class TestActivity extends StandardActivity {
+public class TestActivity extends StandardListActivity {
 
 	public static final String COMMAND_LAYOUT = "layout";
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
@@ -60,6 +63,7 @@ public class TestActivity extends StandardActivity {
 	private String mTempCommand;
 	private boolean mIsSoftKeyboardVisible;
 	private int mEntryCount = 0;
+	private float mScrollDistance = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +89,7 @@ public class TestActivity extends StandardActivity {
 
 		mDispatcher = new TestCommandDispatcher(this);
 		mAdapter = new TestConsoleEntryAdapter(this, mEntries);
-		mListView = (ListView) findViewById(R.id.code_list_view);
+		mListView = getListView();
 		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
 		registerForContextMenu(mListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
@@ -104,7 +108,7 @@ public class TestActivity extends StandardActivity {
 				mListView.post(new Runnable() {
 					public void run() {
 						//DON'T use scrollToBottom(); it will cause a strange jaggedy scroll effect
-						mListView.setSelection(mListView.getCount() - 1);
+						setSelection(mListView.getCount() - 1);
 					}
 				});
 			}
@@ -135,7 +139,7 @@ public class TestActivity extends StandardActivity {
 		});
 		mInputEditText.requestFocus();
 		mListView.addFooterView(mInputView, null, false);
-		mListView.setAdapter(mAdapter); //MUST be called after addFooterView()
+		setListAdapter(mAdapter); //MUST be called after addFooterView()
 		updateEntries();
 
 		//Typeface tinkering
@@ -183,16 +187,16 @@ public class TestActivity extends StandardActivity {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		mInputEditText.setText(savedInstanceState.getString("Input"));
-		mInputEditText.setSelection(savedInstanceState.getInt("CursorPos"));
+	protected void onRestoreInstanceState(Bundle state) {
+		super.onRestoreInstanceState(state);
+		mInputEditText.setText(state.getString("Input"));
+		mInputEditText.setSelection(state.getInt("CursorPos"));
 		mInputEditText.requestFocus();
-		mEntryCount = savedInstanceState.getInt("EntryCount");
-		mIsSoftKeyboardVisible = savedInstanceState.getBoolean("SoftKeyboardVisibility");
-		mEntries = (ArrayList<TestConsoleEntry>) savedInstanceState.getSerializable("Entries");
+		mEntryCount = state.getInt("EntryCount");
+		mIsSoftKeyboardVisible = state.getBoolean("SoftKeyboardVisibility");
+		mEntries = (ArrayList<TestConsoleEntry>) state.getSerializable("Entries");
 		mAdapter = new TestConsoleEntryAdapter(this, mEntries);
-		mListView.setAdapter(mAdapter);
+		setListAdapter(mAdapter);
 		updateEntries();
 	}
 
@@ -323,7 +327,7 @@ public class TestActivity extends StandardActivity {
 	private void scrollToBottom() {
 		mListView.post(new Runnable() {
 			public void run() {
-				mListView.setSelection(mListView.getCount());
+				setSelection(mListView.getCount());
 				mListView.smoothScrollToPosition(mListView.getCount());
 			}
 		});
