@@ -16,6 +16,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -61,7 +62,7 @@ public class ConsoleTextView extends TextView implements Serializable {
 		setId((int) System.currentTimeMillis());
 		setOnDragListener(new DragSinkListener() {
 			@Override
-			public void onDragEntered(View dragView, View dragSink) {
+			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
 				setBackground(getResources().getDrawable(R.drawable.console_text_border));
 			}
 

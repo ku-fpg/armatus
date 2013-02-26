@@ -7,6 +7,7 @@ import com.kufpg.androidhermit.drag.CommandIcon;
 import com.kufpg.androidhermit.drag.DragSinkListener;
 
 import android.graphics.Typeface;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -51,20 +52,18 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 		}
 		
 		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
-		mHolder.num.setTextSize(TestActivity.DEFAULT_FONT_SIZE);
 		mHolder.num.setTypeface(mTypeface);
 		
 		TestPrettyPrinter.setPrettyText(mHolder.contents,
 				mEntries.get(position).getContents());
-		mHolder.contents.setTextSize(TestActivity.DEFAULT_FONT_SIZE);
 		mHolder.contents.setTypeface(mTypeface);
 		
 		//A strangely redundant, but necessary, step to get onLongClickListener to work
 		final int thepos = position;
 		
-		entryView.setOnDragListener(new DragSinkListener() {
+		entryView.setOnDragListener(new DragSinkListener() {	
 			@Override
-			public void onDragEntered(View dragView, View dragSink) {
+			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
 				dragSink.setBackground(dragSink.getResources().getDrawable(R.drawable.console_text_border));
 			}
 
@@ -91,7 +90,6 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 			@Override
 			public boolean onLongClick(View v) {
 				if (!mEntries.get(thepos).getContents().isEmpty()) {
-					mConsole.setSelectedContents(mHolder.contents);
 					mConsole.openContextMenu(v);
 					return true;
 				}

@@ -6,11 +6,9 @@ import java.util.Arrays;
 import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
-import com.kufpg.androidhermit.StandardActivity;
 import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
 import com.kufpg.androidhermit.drag.CommandLayout;
-import com.kufpg.androidhermit.drag.DragSinkListener;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.content.Intent;
@@ -20,7 +18,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
-import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,7 +52,7 @@ public class TestActivity extends StandardListActivity {
 	private TestConsoleEntryAdapter mAdapter;
 	private ArrayList<TestConsoleEntry> mEntries = new ArrayList<TestConsoleEntry>();
 	private View mInputView, mRootView;
-	private TextView mInputNum, mSelectedContents;
+	private TextView mInputNum;
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
 	private LinearLayout mExpandoLayoutGroup;
@@ -63,7 +60,6 @@ public class TestActivity extends StandardListActivity {
 	private String mTempCommand;
 	private boolean mIsSoftKeyboardVisible;
 	private int mEntryCount = 0;
-	private float mScrollDistance = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -202,17 +198,17 @@ public class TestActivity extends StandardListActivity {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		int order = 0;
-		if (mTempCommand != null) { //If user dragged CommandIcon onto entry
-			menu.setHeaderTitle("Execute " + mTempCommand + " on...");
-		} else { //If user long-clicked entry
-			menu.setHeaderTitle(R.string.context_menu_title);
-			menu.add(0, SELECT_ID, 0, "Select contents");
-			order = 1;
-		}
 		if (info.position != mEntries.size()) { //To prevent footer from spawning a ContextMenu
+			super.onCreateContextMenu(menu, v, menuInfo);
+			int order = 0;
+			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
+				menu.setHeaderTitle("Execute " + mTempCommand + " on...");
+			} else { //If user long-clicked entry
+				menu.setHeaderTitle(R.string.context_menu_title);
+				menu.add(0, SELECT_ID, 0, "Select contents");
+				order = 1;
+			}
 			for (String keyword : mEntries.get(info.position).getKeywords()) {
 				menu.add(0, v.getId(), order, keyword);
 				order++;
@@ -224,7 +220,7 @@ public class TestActivity extends StandardListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
 			if (item.getItemId() == SELECT_ID) {
-				//TODO: Do stuff involving ViewSwitcher here
+				//TODO: Open PopupMenu allowing user to select text
 			} else {
 				String keywordNStr = item.getTitle().toString();
 				if (mTempCommand != null) { //If CommandIcon command is run
@@ -236,15 +232,13 @@ public class TestActivity extends StandardListActivity {
 			}
 		}
 		mTempCommand = null;
-		mSelectedContents = null;
 		return super.onContextItemSelected(item);
 	}
-	
+
 	@Override
 	public void onContextMenuClosed(Menu menu) {
 		//Ensures that the temp variables do not persist to next context menu opening
 		mTempCommand = null;
-		mSelectedContents = null;
 	}
 
 	/**
@@ -259,7 +253,7 @@ public class TestActivity extends StandardListActivity {
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
 		scrollToBottom();
 	}
-	
+
 	/**
 	 * Appends a newline and newContents to the most recent entry.
 	 * @param newContents The message to be appended to the entry.
@@ -292,15 +286,6 @@ public class TestActivity extends StandardListActivity {
 	}
 
 	/**
-	 * Sets the TextView in a console entry whose text can be selected through a ContextMenu option.
-	 * Intended to be called from ConsoleEntryAdapter.
-	 * @param contentsView The TextView from ConsoleEntryAdapter that can have its text selected.
-	 */
-	void setSelectedContents(TextView contentsView) {
-		mSelectedContents = contentsView;
-	}
-	
-	/**
 	 * Sets the name of the Command to be run on a keyword when selected from a ContextMenu.
 	 * Intended to be used in conjunction with CommandIcon.
 	 * @param commandName The name of the Command that will be run (if selected).
@@ -320,7 +305,7 @@ public class TestActivity extends StandardListActivity {
 			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_landscape);
 		}
 	}
-	
+
 	/**
 	 * Show the entry at the bottom of the console ListView.
 	 */

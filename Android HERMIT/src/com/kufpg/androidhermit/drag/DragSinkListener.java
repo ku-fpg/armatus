@@ -9,18 +9,21 @@ import android.view.View.OnDragListener;
  * near, inside, or outside of it.
  */
 public class DragSinkListener implements OnDragListener {
+	
 	/**
 	 * Occurs when dragView begins a DragEvent.
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
 	public void onDragStarted(View dragView, View dragSink) {}
+	
 	/**
-	 * Occurs when dragView is brought within the boundaries of dragSink.
+	 * Occurs when dragView is within the boundaries of dragSink.
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
-	public void onDragEntered(View dragView, View dragSink) {}
+	public void onDragEntered(View dragView, View dragSink, DragEvent event) {}
+	
 	/**
 	 * Occurs when dragView is within the boundaries of dragSink and is brought close
 	 * to one of the boundaries.
@@ -29,18 +32,21 @@ public class DragSinkListener implements OnDragListener {
 	 * @param event dragView's DragEvent.
 	 */
 	public void onDragNearBoundary(View dragView, View dragSink, DragEvent event) {}
+	
 	/**
 	 * Occurs when dragView is brought outside the boundaries of dragSink.
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
 	public void onDragExited(View dragView, View dragSink) {}
+	
 	/**
 	 * Occurs when dragView's DragEvent ends within the boundaries of dragSink.
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
 	public void onDragDropped(View dragView, View dragSink) {}
+	
 	/**
 	 * Occurs when dragView's DragEvent ends, regardless of location.
 	 * @param dragView The View being dragged.
@@ -56,7 +62,7 @@ public class DragSinkListener implements OnDragListener {
 			break;
 		}
 		case DragEvent.ACTION_DRAG_ENTERED: {
-			onDragEntered((View) event.getLocalState(), v);
+			onDragEntered((View) event.getLocalState(), v, event);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_LOCATION: {
