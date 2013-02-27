@@ -11,6 +11,9 @@ import com.kufpg.androidhermit.console.CommandDispatcher;
 import com.kufpg.androidhermit.drag.CommandLayout;
 import com.slidingmenu.lib.SlidingMenu;
 
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -47,6 +50,7 @@ public class TestActivity extends StandardListActivity {
 	public static final int PADDING = 5;
 	public static final int ENTRY_LIMIT = 50;
 	public static final int SELECT_ID = 19;
+	public static final int DIALOG_ID = 20;
 
 	private ListView mListView;
 	private TestConsoleEntryAdapter mAdapter;
@@ -220,7 +224,10 @@ public class TestActivity extends StandardListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
 			if (item.getItemId() == SELECT_ID) {
-				//TODO: Open PopupMenu allowing user to select text
+				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+				int entryNum = mEntries.get(info.position).getNum();
+				String entryContents = mEntries.get(info.position).getContents();
+				showEntryDialog(entryNum, entryContents);
 			} else {
 				String keywordNStr = item.getTitle().toString();
 				if (mTempCommand != null) { //If CommandIcon command is run
@@ -262,7 +269,9 @@ public class TestActivity extends StandardListActivity {
 		String contents = mEntries.get(mEntries.size() - 1).getContents();
 		contents += "<br />" + newContents;
 		mEntries.remove(mEntries.size() - 1);
-		TestConsoleEntry ce = new TestConsoleEntry(contents, mEntryCount);
+		/* Use 1 less than mEntryCount, since we are retroactively modifying an entry after
+		 * addEntry() was called (which incremented mEntryCount) */
+		TestConsoleEntry ce = new TestConsoleEntry(contents, mEntryCount - 1);
 		mEntries.add(ce);
 		updateEntries();
 		scrollToBottom();
@@ -328,6 +337,18 @@ public class TestActivity extends StandardListActivity {
 		} else {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		}
+	}
+	
+	private void showEntryDialog(int entryNum, String entryContents) {
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.addToBackStack(null);
+		
+		DialogFragment newFrag = TestConsoleDialog.newInstance(entryNum, entryContents);
+		newFrag.show(ft, "dialog");
 	}
 
 	/**
