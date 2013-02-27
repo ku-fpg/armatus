@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:paddingTop="@dimen/entry_padding" >
-    </ListView>
+        android:paddingTop="@dimen/entry_padding" />
 
 </LinearLayout>

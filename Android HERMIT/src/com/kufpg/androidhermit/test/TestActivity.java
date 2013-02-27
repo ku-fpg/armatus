@@ -203,7 +203,8 @@ public class TestActivity extends StandardListActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		if (info.position != mEntries.size()) { //To prevent footer from spawning a ContextMenu
+		if (info.position != mEntries.size() && //To prevent footer from spawning a ContextMenu
+				!mEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
 			int order = 0;
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
