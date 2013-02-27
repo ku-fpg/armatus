@@ -8,7 +8,7 @@ import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
-import com.kufpg.androidhermit.drag.CommandLayout;
+import com.kufpg.androidhermit.drag.DragLayout;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.DialogFragment;
@@ -48,13 +48,16 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final String WHITESPACE = "\\s+";
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int PADDING = 5;
-	public static final int ENTRY_LIMIT = 50;
+	public static final int ENTRY_CONSOLE_LIMIT = 100;
+	public static final int ENTRY_COMMAND_LIMIT = 200;
 	public static final int SELECT_ID = 19;
 	public static final int DIALOG_ID = 20;
 
-	private ListView mListView;
-	private ConsoleEntryAdapter mAdapter;
-	private ArrayList<ConsoleEntry> mEntries = new ArrayList<ConsoleEntry>();
+	private ListView mConsoleListView, mCommandListView;
+	private ConsoleEntryAdapter mConsoleAdapter;
+	private CommandHistoryAdapter mCommandAdapter;
+	private ArrayList<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>(); 
+	private ArrayList<String> mCommandEntries = new ArrayList<String>();
 	private View mInputView, mRootView;
 	private TextView mInputNum;
 	private EditText mInputEditText;
@@ -88,10 +91,10 @@ public class ConsoleActivity extends StandardListActivity {
 		});
 
 		mDispatcher = new CommandDispatcher(this);
-		mAdapter = new ConsoleEntryAdapter(this, mEntries);
-		mListView = getListView();
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+		mConsoleListView = getListView();
 		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
-		registerForContextMenu(mListView);
+		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
@@ -105,10 +108,10 @@ public class ConsoleActivity extends StandardListActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
-				mListView.post(new Runnable() {
+				mConsoleListView.post(new Runnable() {
 					public void run() {
 						//DON'T use scrollToBottom(); it will cause a strange jaggedy scroll effect
-						setSelection(mListView.getCount() - 1);
+						setSelection(mConsoleListView.getCount() - 1);
 					}
 				});
 			}
@@ -129,7 +132,7 @@ public class ConsoleActivity extends StandardListActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						addEntry(mInputEditText.getText().toString());
+						addConsoleEntry(mInputEditText.getText().toString());
 					}
 					mInputEditText.setText(""); 
 					return true;
@@ -138,9 +141,9 @@ public class ConsoleActivity extends StandardListActivity {
 			}
 		});
 		mInputEditText.requestFocus();
-		mListView.addFooterView(mInputView, null, false);
-		setListAdapter(mAdapter); //MUST be called after addFooterView()
-		updateEntries();
+		mConsoleListView.addFooterView(mInputView, null, false);
+		setListAdapter(mConsoleAdapter); //MUST be called after addFooterView()
+		updateConsoleEntries();
 
 		//Typeface tinkering
 		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
@@ -149,12 +152,13 @@ public class ConsoleActivity extends StandardListActivity {
 
 		//Initialize SlidingMenu properties
 		mSlidingMenu = new SlidingMenu(this);
-		mSlidingMenu.setMode(SlidingMenu.LEFT);
+		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
 		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		mSlidingMenu.setFadeDegree(0.35f);
 		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
 		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 		mSlidingMenu.setMenu(R.layout.drag_n_drop);
+		mSlidingMenu.setSecondaryMenu(R.layout.command_history);
 		refreshSlidingMenu();
 
 		//Creates the sliding menu and iterates through the CommandLayouts
@@ -171,8 +175,14 @@ public class ConsoleActivity extends StandardListActivity {
 		for (int i = 1; i <= commandLayoutCount; i++) {
 			String layoutId = COMMAND_LAYOUT + i;
 			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
-			((CommandLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);
+			((DragLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);
 		}
+		
+		mCommandListView = (ListView)findViewById(R.id.History);
+		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
+		mCommandListView.setAdapter(mCommandAdapter);
+		updateCommandEntries();
+		
 	}
 
 	@Override
@@ -182,7 +192,8 @@ public class ConsoleActivity extends StandardListActivity {
 		outState.putInt("CursorPos", mInputEditText.getSelectionStart());
 		outState.putInt("EntryCount", mEntryCount);
 		outState.putBoolean("SoftKeyboardVisibility", mIsSoftKeyboardVisible);
-		outState.putSerializable("Entries", mEntries);
+		outState.putSerializable("Entries", mConsoleEntries);
+		outState.putSerializable("cEntries", mCommandEntries);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -194,17 +205,20 @@ public class ConsoleActivity extends StandardListActivity {
 		mInputEditText.requestFocus();
 		mEntryCount = state.getInt("EntryCount");
 		mIsSoftKeyboardVisible = state.getBoolean("SoftKeyboardVisibility");
-		mEntries = (ArrayList<ConsoleEntry>) state.getSerializable("Entries");
-		mAdapter = new ConsoleEntryAdapter(this, mEntries);
-		setListAdapter(mAdapter);
-		updateEntries();
+		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("Entries");
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+		setListAdapter(mConsoleAdapter);
+		updateConsoleEntries();
+		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
+		mCommandListView.setAdapter(mCommandAdapter);
+		updateCommandEntries();
 	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		if (info.position != mEntries.size() && //To prevent footer from spawning a ContextMenu
-				!mEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
+		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
+				!mConsoleEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
 			int order = 0;
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
@@ -214,7 +228,7 @@ public class ConsoleActivity extends StandardListActivity {
 				menu.add(0, SELECT_ID, 0, "Select contents");
 				order = 1;
 			}
-			for (String keyword : mEntries.get(info.position).getKeywords()) {
+			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
 				menu.add(0, v.getId(), order, keyword);
 				order++;
 			}
@@ -226,8 +240,8 @@ public class ConsoleActivity extends StandardListActivity {
 		if (item != null) {
 			if (item.getItemId() == SELECT_ID) {
 				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-				int entryNum = mEntries.get(info.position).getNum();
-				String entryContents = mEntries.get(info.position).getContents();
+				int entryNum = mConsoleEntries.get(info.position).getNum();
+				String entryContents = mConsoleEntries.get(info.position).getContents();
 				showEntryDialog(entryNum, entryContents);
 			} else {
 				String keywordNStr = item.getTitle().toString();
@@ -248,15 +262,20 @@ public class ConsoleActivity extends StandardListActivity {
 		//Ensures that the temp variables do not persist to next context menu opening
 		mTempCommand = null;
 	}
+	
+	public void addCommandEntry(String commandName) {
+		mCommandEntries.add(commandName);
+		updateCommandEntries();
+	}
 
 	/**
 	 * Adds a new entry to the console.
 	 * @param contents The message to be shown in the entry.
 	 */
-	public void addEntry(String contents) {
+	public void addConsoleEntry(String contents) {
 		ConsoleEntry ce = new ConsoleEntry(contents, mEntryCount);
-		mEntries.add(ce);
-		updateEntries();
+		mConsoleEntries.add(ce);
+		updateConsoleEntries();
 		mEntryCount++;
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
 		scrollToBottom();
@@ -266,15 +285,15 @@ public class ConsoleActivity extends StandardListActivity {
 	 * Appends a newline and newContents to the most recent entry.
 	 * @param newContents The message to be appended to the entry.
 	 */
-	public void appendEntry(String newContents) {
-		String contents = mEntries.get(mEntries.size() - 1).getContents();
+	public void appendConsoleEntry(String newContents) {
+		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
 		contents += "<br />" + newContents;
-		mEntries.remove(mEntries.size() - 1);
+		mConsoleEntries.remove(mConsoleEntries.size() - 1);
 		/* Use 1 less than mEntryCount, since we are retroactively modifying an entry after
 		 * addEntry() was called (which incremented mEntryCount) */
 		ConsoleEntry ce = new ConsoleEntry(contents, mEntryCount - 1);
-		mEntries.add(ce);
-		updateEntries();
+		mConsoleEntries.add(ce);
+		updateConsoleEntries();
 		scrollToBottom();
 	}
 
@@ -282,9 +301,9 @@ public class ConsoleActivity extends StandardListActivity {
 	 * Removes all console entries and resets the entry count.
 	 */
 	public void clear() {
-		mEntries.clear();
+		mConsoleEntries.clear();
 		mEntryCount = 0;
-		updateEntries();
+		updateConsoleEntries();
 	}
 
 	/**
@@ -293,6 +312,10 @@ public class ConsoleActivity extends StandardListActivity {
 	public void exit() {
 		finish();
 		startActivity(new Intent(this, MainActivity.class));
+	}
+	
+	public SlidingMenu getSlidingMenu() {
+		return mSlidingMenu;
 	}
 
 	/**
@@ -320,10 +343,10 @@ public class ConsoleActivity extends StandardListActivity {
 	 * Show the entry at the bottom of the console ListView.
 	 */
 	private void scrollToBottom() {
-		mListView.post(new Runnable() {
+		mConsoleListView.post(new Runnable() {
 			public void run() {
-				setSelection(mListView.getCount());
-				mListView.smoothScrollToPosition(mListView.getCount());
+				setSelection(mConsoleListView.getCount());
+				mConsoleListView.smoothScrollToPosition(mConsoleListView.getCount());
 			}
 		});
 	}
@@ -355,12 +378,20 @@ public class ConsoleActivity extends StandardListActivity {
 	/**
 	 * Refreshes the console entries, removing excessive entries from the top if ENTRY_LIMIT is exceeded.
 	 */
-	private void updateEntries() {
-		if (mEntries.size() > ENTRY_LIMIT) {
-			mEntries.remove(0);
+	private void updateConsoleEntries() {
+		if (mConsoleEntries.size() > ENTRY_CONSOLE_LIMIT) {
+			mConsoleEntries.remove(0);
 		}
-		mAdapter.notifyDataSetChanged();
+		mConsoleAdapter.notifyDataSetChanged();
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
+	}
+	
+	private void updateCommandEntries()
+	{
+		if (mCommandEntries.size() > ENTRY_CONSOLE_LIMIT) {
+			mCommandEntries.remove(0);
+		}
+		mCommandAdapter.notifyDataSetChanged();
 	}
 
 }

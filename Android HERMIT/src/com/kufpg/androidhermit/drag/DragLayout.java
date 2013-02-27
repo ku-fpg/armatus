@@ -11,25 +11,25 @@ import android.widget.LinearLayout;
  * A special layout that stores CommandIcons and closes a SlidingMenu when one of
  * its CommandIcons begins a DragEvent.
  */
-public class CommandLayout extends LinearLayout {
+public class DragLayout extends LinearLayout {
 	private SlidingMenu mSlidingMenu;
 
-	public CommandLayout(Context context) {
+	public DragLayout(Context context) {
 		super(context);
 		setupView();
 	}
 
-	public CommandLayout(Context context, AttributeSet attrs) {
+	public DragLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setupView();
 	}
 
-	public CommandLayout(Context context, AttributeSet attrs, int defStyle) {
+	public DragLayout(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		setupView();
 	}
 
-	public CommandLayout(Context context, SlidingMenu draggableViewSource) {
+	public DragLayout(Context context, SlidingMenu draggableViewSource) {
 		super(context);
 		setupView();
 	}

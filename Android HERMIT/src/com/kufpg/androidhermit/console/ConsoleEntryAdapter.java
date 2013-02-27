@@ -3,7 +3,7 @@ package com.kufpg.androidhermit.console;
 import java.util.List;
 
 import com.kufpg.androidhermit.R;
-import com.kufpg.androidhermit.drag.CommandIcon;
+import com.kufpg.androidhermit.drag.DragIcon;
 import com.kufpg.androidhermit.drag.DragSinkListener;
 
 import android.graphics.Typeface;
@@ -81,7 +81,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			public void onDragDropped(View dragView, View dragSink) {
 				List<String> keywords = mEntries.get(thepos).getKeywords();
 				if (!keywords.isEmpty()) {
-					mConsole.setTempCommand(((CommandIcon) dragView).getCommandName());
+					mConsole.setTempCommand(((DragIcon) dragView).getCommandName());
 					mConsole.openContextMenu(dragSink);
 				}
 			}

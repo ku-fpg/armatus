@@ -10,30 +10,38 @@ import android.widget.ImageView;
 /**
  * A draggable image that represents a Command that can be run on console entry Keywords.
  */
-public class CommandIcon extends ImageView {
+public class DragIcon extends ImageView {
 	private String mCommandName = null;
-	
-	public CommandIcon(Context context) {
+
+	public DragIcon(Context context) {
 		this(context, null);
 	}
 
-	public CommandIcon(Context context, AttributeSet attrs) {
+	public DragIcon(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public CommandIcon(Context context, AttributeSet attrs, int defStyle) {
+	public DragIcon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
 		setOnLongClickListener(new DragViewClickListener());
 		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragImageView);
-		mCommandName = ta.getString(R.styleable.DragImageView_command);
-		if (mCommandName == null) {
-			mCommandName = "toast";
-		}
+		setCommandName(ta.getString(R.styleable.DragImageView_command));
 		ta.recycle();
 	}
 
 	public String getCommandName() {
 		return mCommandName;
+	}
+
+	public void setCommandName(String commandName) {
+		if (commandName == null) {
+			mCommandName = "toast"; //Because toast is delicious
+		} else {
+			mCommandName = commandName;
+		}
+
+		int resid = getResources().getIdentifier(mCommandName, "drawable", "com.kufpg.androidhermit");
+		setBackground(getResources().getDrawable(resid));
 	}
 }

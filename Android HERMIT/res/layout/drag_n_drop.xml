@@ -26,20 +26,19 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
-                <com.kufpg.androidhermit.drag.CommandLayout
+                <com.kufpg.androidhermit.drag.DragLayout
                     android:id="@+id/layout1"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
-                    <com.kufpg.androidhermit.drag.CommandIcon
+                    <com.kufpg.androidhermit.drag.DragIcon
                         android:id="@+id/myimage1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/toast"
                         drag:command="toast" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
+                </com.kufpg.androidhermit.drag.DragLayout>
             </RelativeLayout>
         </com.djpsoft.moreDroid.ExpandoLayout>
 
@@ -62,7 +61,7 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
-                <com.kufpg.androidhermit.drag.CommandLayout
+                <com.kufpg.androidhermit.drag.DragLayout
                     android:id="@+id/layout2"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -70,15 +69,14 @@
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
-                    <com.kufpg.androidhermit.drag.CommandIcon
+                    <com.kufpg.androidhermit.drag.DragIcon
                         android:id="@+id/myimage2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/consider"
                         drag:command="consider" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
+                </com.kufpg.androidhermit.drag.DragLayout>
 
-                <com.kufpg.androidhermit.drag.CommandLayout
+                <com.kufpg.androidhermit.drag.DragLayout
                     android:id="@+id/layout3"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -86,13 +84,12 @@
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
-                    <com.kufpg.androidhermit.drag.CommandIcon
+                    <com.kufpg.androidhermit.drag.DragIcon
                         android:id="@+id/myimage3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/clear"
                         drag:command="clear" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
+                </com.kufpg.androidhermit.drag.DragLayout>
             </RelativeLayout>
         </com.djpsoft.moreDroid.ExpandoLayout>
 
@@ -115,7 +112,7 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
-                <com.kufpg.androidhermit.drag.CommandLayout
+                <com.kufpg.androidhermit.drag.DragLayout
                     android:id="@+id/layout4"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -123,15 +120,14 @@
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
-                    <com.kufpg.androidhermit.drag.CommandIcon
+                    <com.kufpg.androidhermit.drag.DragIcon
                         android:id="@+id/myimage4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/resume"
                         drag:command="resume" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
+                </com.kufpg.androidhermit.drag.DragLayout>
 
-                <com.kufpg.androidhermit.drag.CommandLayout
+                <com.kufpg.androidhermit.drag.DragLayout
                     android:id="@+id/layout5"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -139,13 +135,12 @@
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
-                    <com.kufpg.androidhermit.drag.CommandIcon
+                    <com.kufpg.androidhermit.drag.DragIcon
                         android:id="@+id/myimage5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/exit"
                         drag:command="exit" />
-                </com.kufpg.androidhermit.drag.CommandLayout>
+                </com.kufpg.androidhermit.drag.DragLayout>
             </RelativeLayout>
         </com.djpsoft.moreDroid.ExpandoLayout>
     </LinearLayout>
