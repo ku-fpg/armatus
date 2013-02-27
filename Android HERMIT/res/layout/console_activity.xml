@@ -1,57 +1,15 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/code_scroll_view"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/code_scroll_linear_layout"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/code_scroll_linear_layout"
-        android:layout_width="fill_parent"
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:paddingTop="@dimen/entry_padding" />
 
-        <RelativeLayout
-            android:id="@+id/code_scroll_relative_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/code_input_line"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="5px"
-            android:paddingLeft="5px"
-            android:paddingRight="5px" >
-
-            <TextView
-                android:id="@+id/code_command_num"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:background="@null"
-                android:singleLine="true"
-                android:textColor="@android:color/white"
-                android:textCursorDrawable="@null"
-                android:textSize="15sp"
-                android:typeface="monospace" />
-
-            <com.kufpg.androidhermit.console.ActionEditText
-                android:id="@+id/code_input_box"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:background="@null"
-                android:imeOptions="actionGo"
-    			android:inputType="textNoSuggestions|textMultiLine"
-                android:singleLine="false"
-                android:textColor="@android:color/white"
-                android:textCursorDrawable="@null"
-                android:textSize="15sp"
-                android:typeface="monospace" />
-        </LinearLayout>
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

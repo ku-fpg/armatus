@@ -18,8 +18,8 @@ import android.widget.TextView;
 public class TextSizePinchZoomActivity extends Activity {
 
 	private final static int DEFAULT_FONT_SIZE = ConsoleActivity.DEFAULT_FONT_SIZE;
-	private final static int MAX_FONT_SIZE = ConsoleActivity.MAX_FONT_SIZE;
-	private final static int MIN_FONT_SIZE = ConsoleActivity.MIN_FONT_SIZE;
+	private final static int MAX_FONT_SIZE = 40;//ConsoleActivity.MAX_FONT_SIZE;
+	private final static int MIN_FONT_SIZE = 15;//ConsoleActivity.MIN_FONT_SIZE;
 	
 	private TextView mScalingView;
 	private ScaleGestureDetector mScaleGestureDetector;

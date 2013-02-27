@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.test;
+package com.kufpg.androidhermit.console;
 
 import android.text.Html;
 import android.widget.TextView;
@@ -6,9 +6,9 @@ import android.widget.TextView;
 import com.kufpg.androidhermit.console.CommandDispatcher;
 
 /**
- * Colors TestConsoleEntry text depending on its usage of Keywords.
+ * Colors ConsoleEntry text depending on its usage of Keywords.
  */
-public class TestPrettyPrinter {
+public class PrettyPrinter {
 	public static final String RED = "#CC060B";
 	public static final String GREEN = "#1DDA1C";
 	public static final String BLUE = "#0090D3";
@@ -17,7 +17,7 @@ public class TestPrettyPrinter {
 		String res = "";
 		//Make sure to sanitize string for HTML parsing
 		String[] sentence = //TextUtils.htmlEncode(text) ;; Disable this for now; it breaks newlines
-				text.split(TestActivity.WHITESPACE);
+				text.split(ConsoleActivity.WHITESPACE);
 		for (String word : sentence) {
 			String color = null;
 			if (CommandDispatcher.isKeyword(word)) {

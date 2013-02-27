@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.test;
+package com.kufpg.androidhermit.console;
 
 import java.util.List;
 
@@ -18,29 +18,29 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 /**
- * ListView adapter used in conjunction with TestActivity. This initializes the values of
- * each TestConsoleEntry and defines event-driven behavior for everything in the ListView
+ * ListView adapter used in conjunction with ConsoleActivity. This initializes the values of
+ * each ConsoleEntry and defines event-driven behavior for everything in the ListView
  * (except for the footer).
  */
-public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
+public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 
-	private TestActivity mConsole;
-	private List<TestConsoleEntry> mEntries;
+	private ConsoleActivity mConsole;
+	private List<ConsoleEntry> mEntries;
 	private Typeface mTypeface;
 	private ConsoleEntryHolder mHolder;
 	
-	public TestConsoleEntryAdapter(TestActivity console, List<TestConsoleEntry> entries) {
+	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
 		mConsole = console;
 		mEntries = entries;
 		mTypeface = Typeface.createFromAsset(mConsole.getResources().getAssets(),
-				TestActivity.TYPEFACE);
+				ConsoleActivity.TYPEFACE);
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View entryView = convertView;
-		if (entryView == null) { //If this is a new TestConsoleEntry
+		if (entryView == null) { //If this is a new ConsoleEntry
 			LayoutInflater inflater = mConsole.getLayoutInflater();
 			entryView = inflater.inflate(R.layout.console_entry, parent, false);
 			mHolder = new ConsoleEntryHolder();
@@ -54,7 +54,7 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
 		mHolder.num.setTypeface(mTypeface);
 		
-		TestPrettyPrinter.setPrettyText(mHolder.contents,
+		PrettyPrinter.setPrettyText(mHolder.contents,
 				mEntries.get(position).getContents());
 		mHolder.contents.setTypeface(mTypeface);
 		
@@ -114,7 +114,7 @@ public class TestConsoleEntryAdapter extends ArrayAdapter<TestConsoleEntry> {
 	}
 	
 	/**
-	 * Helper class that stores the views displaying the data of a TestConsoleEntry.
+	 * Helper class that stores the views displaying the data of a ConsoleEntry.
 	 * This is supposed to improve performance, if StackOverflow is to be believed.
 	 */
 	static class ConsoleEntryHolder {

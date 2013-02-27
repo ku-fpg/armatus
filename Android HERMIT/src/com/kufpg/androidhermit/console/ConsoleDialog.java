@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.test;
+package com.kufpg.androidhermit.console;
 
 import com.kufpg.androidhermit.R;
 import android.app.DialogFragment;
@@ -9,14 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-public class TestConsoleDialog extends DialogFragment {
+public class ConsoleDialog extends DialogFragment {
 
 	private EditText mContentsView;
 	private int mEntryNum;
 	private String mEntryContents;
 	
-	static TestConsoleDialog newInstance(int entryNum, String entryContents) {
-		TestConsoleDialog cd = new TestConsoleDialog();
+	static ConsoleDialog newInstance(int entryNum, String entryContents) {
+		ConsoleDialog cd = new ConsoleDialog();
 		
 		Bundle args = new Bundle();
 		args.putInt("entryNum", entryNum);

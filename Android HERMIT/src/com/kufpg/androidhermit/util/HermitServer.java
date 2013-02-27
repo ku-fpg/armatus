@@ -44,7 +44,7 @@ public class HermitServer extends AsyncTask<JSONObject, Void, JSONObject>{
 	protected void onPostExecute(JSONObject result) {
 		mDialog.dismiss();		
 		try {
-		mConsole.addMessage(result.getString("text"));
+		mConsole.addEntry(result.getString("text"));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}	
