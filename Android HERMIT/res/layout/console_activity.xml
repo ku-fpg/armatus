@@ -8,6 +8,7 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:choiceMode="singleChoice"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:paddingTop="@dimen/entry_padding"

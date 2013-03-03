@@ -25,7 +25,7 @@ public class DragViewClickListener implements OnTouchListener, OnLongClickListen
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN) {
-			v.setBackground(v.getResources().getDrawable(R.drawable.console_text_border));
+			v.setBackground(v.getResources().getDrawable(R.drawable.console_entry_highlighted));
 		} else if(event.getAction() == MotionEvent.ACTION_UP
 				|| event.getAction() == MotionEvent.ACTION_OUTSIDE) {
 			v.setBackgroundColor(v.getResources().getColor(android.R.color.transparent));

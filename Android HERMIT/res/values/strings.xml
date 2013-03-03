@@ -8,5 +8,7 @@
     <string name="default_pref_message">Are you sure you want to restore the default settings?</string>
     <string name="context_menu_title">Commands found in this line</string>
     <string name="popup_text">Font size:</string>
+    <string name="copy">COPY</string>
+    <string name="select">SELECT</string>
 
 </resources>

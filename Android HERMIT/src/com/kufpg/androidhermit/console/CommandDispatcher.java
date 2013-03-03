@@ -30,17 +30,15 @@ public class CommandDispatcher {
 	private static Command consider = new Command("consider", 1, false) {
 		@Override
 		protected void run(String... args) {
-			try{
+			try {
 				String jstr = "{command:consider},{args:" + args[0] + "}";
-				HermitServer request = new HermitServer(new JSONObject(jstr),mConsole, mContext);
+				HermitServer request = new HermitServer(new JSONObject(jstr), mConsole, mContext);
 				request.execute();     
-			} catch (Exception e) {// TODO Auto-generated catch block
-				e.printStackTrace();	
-
+			} catch (Exception e) {
+				e.printStackTrace();
 				return;
 			}        
 			// mConsole.addMessage("TODO: Figure out what consider " + args[0] + " does.");
-
 		}
 	};
 	private static Command exit = new Command("exit", 0, false) {

@@ -180,7 +180,7 @@ public class ConsoleActivity extends StandardListActivity {
 			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
 			((DragLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);
 		}
-		
+
 		mCommandListView = (ListView)findViewById(R.id.History);
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
 		mCommandListView.setAdapter(mCommandAdapter);
@@ -193,7 +193,7 @@ public class ConsoleActivity extends StandardListActivity {
 			}
 		});
 		updateCommandEntries();
-		
+
 	}
 
 	@Override
@@ -216,12 +216,12 @@ public class ConsoleActivity extends StandardListActivity {
 		mInputEditText.requestFocus();
 		mEntryCount = state.getInt("entryCount");
 		mIsSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
-		
+
 		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		setListAdapter(mConsoleAdapter);
 		updateConsoleEntries();
-		
+
 		mCommandEntries = (ArrayList<String>) state.getSerializable("commandEntries");
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
 		mCommandListView.setAdapter(mCommandAdapter);
@@ -234,14 +234,14 @@ public class ConsoleActivity extends StandardListActivity {
 		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
 				!mConsoleEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
-			int order = 0;
+
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
 				menu.setHeaderTitle("Execute " + mTempCommand + " on...");
 			} else { //If user long-clicked entry
 				menu.setHeaderTitle(R.string.context_menu_title);
-				menu.add(0, SELECT_ID, 0, "Select contents");
-				order = 1;
 			}
+
+			int order = 0;
 			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
 				menu.add(0, v.getId(), order, keyword);
 				order++;
@@ -252,30 +252,23 @@ public class ConsoleActivity extends StandardListActivity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
-			if (item.getItemId() == SELECT_ID) {
-				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-				int entryNum = mConsoleEntries.get(info.position).getNum();
-				String entryContents = mConsoleEntries.get(info.position).getContents();
-				showEntryDialog(entryNum, entryContents);
-			} else {
-				String keywordNStr = item.getTitle().toString();
-				if (mTempCommand != null) { //If CommandIcon command is run
-					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
-					//TODO: Reorder CommandListView stuff
-					if(mTempDragIconPos > 0)
-					{
-						String tempCommandName = mCommandEntries.get(mTempDragIconPos);
-						mCommandEntries.remove(mTempDragIconPos);
-						mCommandEntries.remove(mCommandEntries.size() - 1); //Remove newly added command
-						mCommandEntries.add(0, tempCommandName);
-						updateCommandEntries();
-					}
-					
-				} else { //If keyword command is run
-					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+			String keywordNStr = item.getTitle().toString();
+			if (mTempCommand != null) { //If CommandIcon command is run
+				mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+				//TODO: Reorder CommandListView stuff
+				if(mTempDragIconPos > 0)
+				{
+					String tempCommandName = mCommandEntries.get(mTempDragIconPos);
+					mCommandEntries.remove(mTempDragIconPos);
+					mCommandEntries.remove(mCommandEntries.size() - 1); //Remove newly added command
+					mCommandEntries.add(0, tempCommandName);
+					updateCommandEntries();
 				}
-				mInputEditText.requestFocus(); //Prevents ListView from stealing focus
+
+			} else { //If keyword command is run
+				mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
 			}
+			mInputEditText.requestFocus(); //Prevents ListView from stealing focus
 		}
 		mTempCommand = null;
 		mTempDragIconPos = -1;
@@ -288,7 +281,7 @@ public class ConsoleActivity extends StandardListActivity {
 		mTempCommand = null;
 		mTempDragIconPos = -1;
 	}
-	
+
 	public void addCommandEntry(String commandName) {
 		mCommandEntries.add(commandName);
 		updateCommandEntries();
@@ -339,7 +332,7 @@ public class ConsoleActivity extends StandardListActivity {
 		finish();
 		startActivity(new Intent(this, MainActivity.class));
 	}
-	
+
 	public SlidingMenu getSlidingMenu() {
 		return mSlidingMenu;
 	}
@@ -351,6 +344,18 @@ public class ConsoleActivity extends StandardListActivity {
 	 */
 	public void setTempCommand(String commandName) {
 		mTempCommand = commandName;
+	}
+
+	public void showSelectionDialog(int entryNum, String entryContents) {
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		if (prev != null) {
+			ft.remove(prev);
+		}
+		ft.addToBackStack(null);
+
+		DialogFragment newFrag = ConsoleDialog.newInstance(entryNum, entryContents);
+		newFrag.show(ft, "dialog");
 	}
 
 	/**
@@ -388,18 +393,6 @@ public class ConsoleActivity extends StandardListActivity {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		}
 	}
-	
-	private void showEntryDialog(int entryNum, String entryContents) {
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
-		if (prev != null) {
-			ft.remove(prev);
-		}
-		ft.addToBackStack(null);
-		
-		DialogFragment newFrag = ConsoleDialog.newInstance(entryNum, entryContents);
-		newFrag.show(ft, "dialog");
-	}
 
 	/**
 	 * Refreshes the console entries, removing excessive entries from the top if ENTRY_LIMIT is exceeded.
@@ -411,9 +404,8 @@ public class ConsoleActivity extends StandardListActivity {
 		mConsoleAdapter.notifyDataSetChanged();
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
 	}
-	
-	private void updateCommandEntries()
-	{
+
+	private void updateCommandEntries() {
 		if (mCommandEntries.size() > ENTRY_CONSOLE_LIMIT) {
 			mCommandEntries.remove(0);
 		}

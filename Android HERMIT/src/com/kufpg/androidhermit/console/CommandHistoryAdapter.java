@@ -17,39 +17,33 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 	private List<String> mEntries;
 	private CommandEntryHolder mHolder;
 	
-	public CommandHistoryAdapter(ConsoleActivity console, List<String> hString)
-	{
-		super(console, R.layout.command_history, hString);
+	public CommandHistoryAdapter(ConsoleActivity console, List<String> entries) {
+		super(console, R.layout.command_history, entries);
 		mConsole = console;
-		mEntries = hString;
+		mEntries = entries;
 	}
 	
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
+	public View getView(int position, View convertView, ViewGroup parent){
 		View entryView = convertView;
-		if(entryView == null)
-		{
+		if (entryView == null) {
 			LayoutInflater inflater = mConsole.getLayoutInflater();
 			entryView = inflater.inflate(R.layout.command_entry, parent, false);
 			mHolder = new CommandEntryHolder();
-			mHolder.cIcon = (DragIcon) entryView.findViewById(R.id.commandIcon);
-			mHolder.cLayout = (DragLayout) entryView.findViewById(R.id.commandLayout);
+			mHolder.icon = (DragIcon) entryView.findViewById(R.id.command_icon);
+			mHolder.layout = (DragLayout) entryView.findViewById(R.id.command_layout);
 			entryView.setTag(mHolder);
-		}
-		else
-		{
+		} else {
 			mHolder = (CommandEntryHolder) entryView.getTag();
 		}
-		mHolder.cIcon.setCommandName(mEntries.get(position));
-		mHolder.cLayout.setSlidingMenu(mConsole.getSlidingMenu());
+		mHolder.icon.setCommandName(mEntries.get(position));
+		mHolder.layout.setSlidingMenu(mConsole.getSlidingMenu());
 		
 		return entryView;
 	}
 	
-	static class CommandEntryHolder 
-	{
-		public DragIcon cIcon;
-		public DragLayout cLayout;
+	static class CommandEntryHolder {
+		public DragIcon icon;
+		public DragLayout layout;
 	}
 
 }

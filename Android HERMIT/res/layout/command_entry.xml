@@ -5,14 +5,14 @@
     android:orientation="vertical" >
 
     <com.kufpg.androidhermit.drag.DragLayout
-        android:id="@+id/commandLayout"
+        android:id="@+id/command_layout"
         android:layout_width="300dp"
         android:layout_height="100dp"
         android:background="@android:color/transparent"
         android:gravity="center" >
 
         <com.kufpg.androidhermit.drag.DragIcon
-            android:id="@+id/commandIcon"
+            android:id="@+id/command_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </com.kufpg.androidhermit.drag.DragLayout>

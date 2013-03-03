@@ -7,14 +7,17 @@ import com.kufpg.androidhermit.drag.DragIcon;
 import com.kufpg.androidhermit.drag.DragSinkListener;
 
 import android.graphics.Typeface;
+import android.view.ActionMode;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -23,15 +26,23 @@ import android.widget.TextView;
  * (except for the footer).
  */
 public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
+	public static final int HIGHLIGHTED = R.drawable.console_entry_highlighted;
+	public static final int SELECTED = android.R.color.holo_blue_light;
+	public static final int HIGHLIGHTED_SELECTED = R.drawable.console_entry_highlighted_selected;
+	public static final int TRANSPARENT = android.R.color.transparent;
 
 	private ConsoleActivity mConsole;
+	private ListView mListView;
 	private List<ConsoleEntry> mEntries;
 	private Typeface mTypeface;
 	private ConsoleEntryHolder mHolder;
-	
+	private ActionMode mActionMode;
+	private int mCheckedPos = -1;
+
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
 		mConsole = console;
+		mListView = mConsole.getListView();
 		mEntries = entries;
 		mTypeface = Typeface.createFromAsset(mConsole.getResources().getAssets(),
 				ConsoleActivity.TYPEFACE);
@@ -50,31 +61,30 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		} else {
 			mHolder = (ConsoleEntryHolder) entryView.getTag();
 		}
-		
+
 		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
 		mHolder.num.setTypeface(mTypeface);
-		
+
 		PrettyPrinter.setPrettyText(mHolder.contents,
 				mEntries.get(position).getContents());
 		mHolder.contents.setTypeface(mTypeface);
-		
-		//A strangely redundant, but necessary, step to get onLongClickListener to work
+
 		final int thepos = position;
-		
+
 		entryView.setOnDragListener(new DragSinkListener() {
 			@Override
 			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
-				dragSink.setBackground(dragSink.getResources().getDrawable(R.drawable.console_text_border));
+				dragSink.setBackgroundResource(HIGHLIGHTED);
 			}
 
 			@Override
 			public void onDragExited(View dragView, View dragSink) {
-				dragSink.setBackgroundColor(dragSink.getResources().getColor(android.R.color.transparent));
+				dragSink.setBackgroundResource(TRANSPARENT);
 			}
 
 			@Override
 			public void onDragEnded(View dragView, View dragSink) {
-				dragSink.setBackgroundColor(dragSink.getResources().getColor(android.R.color.transparent));
+				dragSink.setBackgroundResource(TRANSPARENT);
 			}
 
 			@Override
@@ -91,28 +101,52 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			public boolean onLongClick(View v) {
 				if (!mEntries.get(thepos).getContents().isEmpty()) {
 					mConsole.openContextMenu(v);
-					return true;
 				}
-				return false;
+				return true;
 			}
 		});
 		entryView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				int mTouchedPos = mListView.getPositionForView(v);
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					v.setBackgroundResource(R.drawable.console_text_border);
+					if (mTouchedPos != mCheckedPos
+							|| mCheckedPos == -1) {
+						v.setBackgroundResource(HIGHLIGHTED);
+					} else {
+						v.setBackgroundResource(HIGHLIGHTED_SELECTED);
+					}
 				} else if (event.getAction() == MotionEvent.ACTION_UP
 						|| event.getAction() == MotionEvent.ACTION_OUTSIDE
 						|| event.getAction() == MotionEvent.ACTION_CANCEL) {
-					v.setBackgroundResource(android.R.color.transparent);
+					if (mTouchedPos != mCheckedPos) {
+						v.setBackgroundResource(TRANSPARENT);
+					} else {
+						v.setBackgroundResource(SELECTED);
+					}
 				}
 				return false;
 			}
 		});
-		
+		entryView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int clickedPos = mListView.getPositionForView(v);
+				if (mCheckedPos != clickedPos) {
+					if (mCheckedPos != -1) {
+						mListView.getChildAt(mCheckedPos).setBackgroundResource(TRANSPARENT);
+					}
+					selectEntry(clickedPos);
+					mCheckedPos = mListView.getCheckedItemPosition();
+				} else {
+					hideActionBar();
+				}
+			}
+		});
+
 		return entryView;
 	}
-	
+
 	/**
 	 * Helper class that stores the views displaying the data of a ConsoleEntry.
 	 * This is supposed to improve performance, if StackOverflow is to be believed.
@@ -120,6 +154,49 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	static class ConsoleEntryHolder {
 		public TextView num;
 		public TextView contents;
+	}
+
+	public int getCheckedPos() {
+		return mCheckedPos;
+	}
+
+	/**
+	 * Sets an entry's value as checked and highlights it.
+	 * @param pos The position of the entry to select.
+	 */
+	public void selectEntry(int pos) {
+		mListView.setItemChecked(pos, true);
+		mListView.getChildAt(pos).setBackgroundResource(SELECTED);
+		showActionBar(pos);
+	}
+
+	/**
+	 * Removes an entry's checked value and restores the default background color.
+	 * Calling hideActionBar() will call this method.
+	 * @param pos The position of the entry to deselect.
+	 */
+	public void deselectEntry() {
+		if (mCheckedPos != -1) {
+			mListView.getChildAt(mCheckedPos).setBackgroundResource(TRANSPARENT);
+			mListView.setItemChecked(mCheckedPos, false);
+			mCheckedPos = -1;
+		}
+	}
+
+	/**
+	 * Note: this gets called in selectEntry()
+	 * @param checkedPos
+	 */
+	private void showActionBar(int checkedPos) {
+		mActionMode = mConsole.startActionMode(new ConsoleEntryCallback(mConsole, this,
+				getItem(checkedPos).getNum(), getItem(checkedPos).getContents()));
+	}
+
+	private void hideActionBar() {
+		if (mActionMode != null) {
+			mActionMode.finish();
+			mActionMode = null;
+		}
 	}
 
 }
