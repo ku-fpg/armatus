@@ -30,7 +30,9 @@ import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnKeyListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -67,6 +69,7 @@ public class ConsoleActivity extends StandardListActivity {
 	private String mTempCommand;
 	private boolean mIsSoftKeyboardVisible;
 	private int mEntryCount = 0;
+	private int mTempDragIconPos = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +184,14 @@ public class ConsoleActivity extends StandardListActivity {
 		mCommandListView = (ListView)findViewById(R.id.History);
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
 		mCommandListView.setAdapter(mCommandAdapter);
+		mCommandListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				mTempDragIconPos = position;
+				return false;
+			}
+		});
 		updateCommandEntries();
 		
 	}
@@ -247,6 +258,16 @@ public class ConsoleActivity extends StandardListActivity {
 				String keywordNStr = item.getTitle().toString();
 				if (mTempCommand != null) { //If CommandIcon command is run
 					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+					//TODO: Reorder CommandListView stuff
+					if(mTempDragIconPos > 0)
+					{
+						String tempCommandName = mCommandEntries.get(mTempDragIconPos);
+						mCommandEntries.remove(mTempDragIconPos);
+						mCommandEntries.remove(mCommandEntries.size() - 1); //Remove newly added command
+						mCommandEntries.add(0, tempCommandName);
+						updateCommandEntries();
+					}
+					
 				} else { //If keyword command is run
 					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
 				}
@@ -254,6 +275,7 @@ public class ConsoleActivity extends StandardListActivity {
 			}
 		}
 		mTempCommand = null;
+		mTempDragIconPos = -1;
 		return super.onContextItemSelected(item);
 	}
 
@@ -261,6 +283,7 @@ public class ConsoleActivity extends StandardListActivity {
 	public void onContextMenuClosed(Menu menu) {
 		//Ensures that the temp variables do not persist to next context menu opening
 		mTempCommand = null;
+		mTempDragIconPos = -1;
 	}
 	
 	public void addCommandEntry(String commandName) {

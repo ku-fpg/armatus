@@ -44,8 +44,6 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 		{
 			mHolder = (CommandEntryHolder) entryView.getTag();
 		}
-		
-		Log.d("TESTTESTTEST", mEntries.get(position));
 		mHolder.cIcon.setCommandName(mEntries.get(position));
 		mHolder.cLayout.setSlidingMenu(mConsole.getSlidingMenu());
 		

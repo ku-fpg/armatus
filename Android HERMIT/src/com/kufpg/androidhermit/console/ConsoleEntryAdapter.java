@@ -61,7 +61,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		//A strangely redundant, but necessary, step to get onLongClickListener to work
 		final int thepos = position;
 		
-		entryView.setOnDragListener(new DragSinkListener() {	
+		entryView.setOnDragListener(new DragSinkListener() {
 			@Override
 			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
 				dragSink.setBackground(dragSink.getResources().getDrawable(R.drawable.console_text_border));
