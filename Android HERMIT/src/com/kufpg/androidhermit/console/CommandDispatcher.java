@@ -4,12 +4,22 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
+import com.kufpg.androidhermit.util.HermitServer;
+
+import android.content.Context;
 import android.widget.Toast;
 
 @SuppressWarnings("unused")
 public class CommandDispatcher {
 	private static ConsoleActivity mConsole;
-	
+	private static Context mContext;
+
+	public void setContext(Context context){
+		mContext = context;
+	}
+
 	//List of Commands
 	private static Command clear = new Command("clear", 0, true) {
 		@Override
@@ -20,7 +30,17 @@ public class CommandDispatcher {
 	private static Command consider = new Command("consider", 1, false) {
 		@Override
 		protected void run(String... args) {
-			mConsole.appendConsoleEntry("TODO: Figure out what consider " + args[0] + " does.");
+			try{
+				String jstr = "{command:consider},{args:" + args[0] + "}";
+				HermitServer request = new HermitServer(new JSONObject(jstr),mConsole, mContext);
+				request.execute();     
+			} catch (Exception e) {// TODO Auto-generated catch block
+				e.printStackTrace();	
+
+				return;
+			}        
+			// mConsole.addMessage("TODO: Figure out what consider " + args[0] + " does.");
+
 		}
 	};
 	private static Command exit = new Command("exit", 0, false) {
@@ -49,7 +69,7 @@ public class CommandDispatcher {
 		}
 	};
 	private static Map<String, Command> mCommandMap = mapOfInstances(Command.class);
-	
+
 	//List of Keywords
 	private static Keyword red = new Keyword("red", "toast", PrettyPrinter.RED);
 	private static Keyword green = new Keyword("green", "toast", PrettyPrinter.GREEN);
@@ -59,7 +79,7 @@ public class CommandDispatcher {
 	public CommandDispatcher(ConsoleActivity console) {
 		mConsole = console;
 	}
-	
+
 	public void runOnConsole(String commandName, String... args) {
 		Command command = mCommandMap.get(commandName);
 		if (command != null) {
@@ -102,15 +122,15 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("Error: " + keyword + " is not a valid keyword.");
 		}
 	}
-	
+
 	public static boolean isCommand(String commandName) {
 		return mCommandMap.containsKey(commandName);
 	}
-	
+
 	public static boolean isKeyword(String keywordName) {
 		return mKeywordMap.containsKey(keywordName);
 	}
-	
+
 	public static Keyword getKeyword(String keywordName) {
 		return mKeywordMap.get(keywordName);
 	}
@@ -123,7 +143,7 @@ public class CommandDispatcher {
 		newString.trim();
 		return newString;
 	}
-	
+
 	/**
 	 * This gets all of this class's instance variables of type instanceType and puts
 	 * them into the supplied instanceMap for easy access.
@@ -145,7 +165,7 @@ public class CommandDispatcher {
 		}
 		return instanceMap;
 	}
-	
+
 	/**
 	 * A Command is a series of instructions that is ran when run(args) is called.
 	 * A Command can have any number of arguments and may accept at least a
@@ -156,29 +176,29 @@ public class CommandDispatcher {
 		private String mCommandName;
 		private int mArgsNum;
 		private boolean mLowerArgBound;
-		
+
 		public Command(String commandName, int minArgs, boolean lowerArgBound) {
 			mArgsNum = minArgs;
 			mLowerArgBound = lowerArgBound;
 			mCommandName = commandName;
 		}
-		
+
 		public String getCommandName() {
 			return mCommandName;
 		}
-		
+
 		public int getArgsNum() {
 			return mArgsNum;
 		}
-		
+
 		public boolean hasLowerArgBound() {
 			return mLowerArgBound;
 		}
-		
+
 		protected abstract void run(String... args);
-		
+
 	}
-	
+
 	/**
 	 * As opposed to a Command, a Keyword is a word that ConsoleTextView.PrettyPrinter
 	 * singles out as important (by coloring it). When a keyword is accessed by long-
@@ -189,7 +209,7 @@ public class CommandDispatcher {
 		private String mKeywordName;
 		private Command mCommand;
 		private String mColor;
-		
+
 		public Keyword(String keywordName, String commandName, String color) {
 			mKeywordName = keywordName;
 			if (isCommand(commandName)) {
@@ -199,15 +219,15 @@ public class CommandDispatcher {
 			}
 			mColor = color;
 		}
-		
+
 		public String getKeywordName() {
 			return mKeywordName;
 		}
-		
+
 		public Command getCommand() {
 			return mCommand;
 		}
-		
+
 		public String getColor() {
 			return mColor;
 		}
