@@ -3,17 +3,13 @@ package com.kufpg.androidhermit.console;
 import java.util.List;
 
 import com.kufpg.androidhermit.R;
-import com.kufpg.androidhermit.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import com.kufpg.androidhermit.drag.DragIcon;
 import com.kufpg.androidhermit.drag.DragLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class CommandHistoryAdapter extends ArrayAdapter<String> {
 	

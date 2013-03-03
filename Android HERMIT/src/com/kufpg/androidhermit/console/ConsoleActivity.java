@@ -199,27 +199,30 @@ public class ConsoleActivity extends StandardListActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString("Input", mInputEditText.getText().toString());
-		outState.putInt("CursorPos", mInputEditText.getSelectionStart());
-		outState.putInt("EntryCount", mEntryCount);
-		outState.putBoolean("SoftKeyboardVisibility", mIsSoftKeyboardVisible);
-		outState.putSerializable("Entries", mConsoleEntries);
-		outState.putSerializable("cEntries", mCommandEntries);
+		outState.putString("input", mInputEditText.getText().toString());
+		outState.putInt("cursorPos", mInputEditText.getSelectionStart());
+		outState.putInt("entryCount", mEntryCount);
+		outState.putBoolean("softKeyboardVisibility", mIsSoftKeyboardVisible);
+		outState.putSerializable("consoleEntries", mConsoleEntries);
+		outState.putSerializable("commandEntries", mCommandEntries);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onRestoreInstanceState(Bundle state) {
 		super.onRestoreInstanceState(state);
-		mInputEditText.setText(state.getString("Input"));
-		mInputEditText.setSelection(state.getInt("CursorPos"));
+		mInputEditText.setText(state.getString("input"));
+		mInputEditText.setSelection(state.getInt("cursorPos"));
 		mInputEditText.requestFocus();
-		mEntryCount = state.getInt("EntryCount");
-		mIsSoftKeyboardVisible = state.getBoolean("SoftKeyboardVisibility");
-		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("Entries");
+		mEntryCount = state.getInt("entryCount");
+		mIsSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
+		
+		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		setListAdapter(mConsoleAdapter);
 		updateConsoleEntries();
+		
+		mCommandEntries = (ArrayList<String>) state.getSerializable("commandEntries");
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
 		mCommandListView.setAdapter(mCommandAdapter);
 		updateCommandEntries();

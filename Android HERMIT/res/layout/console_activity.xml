@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:paddingTop="@dimen/entry_padding" />
+        android:paddingTop="@dimen/entry_padding"
+        android:splitMotionEvents="false" />
 
 </LinearLayout>

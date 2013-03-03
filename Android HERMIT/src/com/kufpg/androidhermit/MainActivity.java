@@ -6,7 +6,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.kufpg.androidhermit.console.ConsoleActivity;
-import com.kufpg.androidhermit.console.ConsoleActivity;
 import com.kufpg.androidhermit.test.TestActivity;
 import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
