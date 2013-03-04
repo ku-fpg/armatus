@@ -2,8 +2,9 @@ package com.kufpg.androidhermit.console;
 
 import com.kufpg.androidhermit.R;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
-import android.text.ClipboardManager;
 import android.view.ActionMode;
 import android.view.ActionMode.Callback;
 import android.view.Menu;
@@ -29,7 +30,8 @@ public class ConsoleEntryCallback implements Callback {
 		switch (item.getItemId()) {
 		case R.id.copy:
 			ClipboardManager clipboard = (ClipboardManager) mConsole.getSystemService(Context.CLIPBOARD_SERVICE); 
-			clipboard.setText(mEntryContents);
+			ClipData copiedText = ClipData.newPlainText("copiedText", mEntryContents);
+			clipboard.setPrimaryClip(copiedText);
 			mConsole.showToast("Entry copied to clipboard!");
 			mode.finish(); // Action picked, so close the CAB
 			return true;

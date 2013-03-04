@@ -6,19 +6,13 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.kufpg.androidhermit.util.HermitServer;
+import com.kufpg.androidhermit.server.HermitServer;
 
-import android.content.Context;
 import android.widget.Toast;
 
 @SuppressWarnings("unused")
 public class CommandDispatcher {
 	private static ConsoleActivity mConsole;
-	private static Context mContext;
-
-	public void setContext(Context context){
-		mContext = context;
-	}
 
 	//List of Commands
 	private static Command clear = new Command("clear", 0, true) {
@@ -32,8 +26,8 @@ public class CommandDispatcher {
 		protected void run(String... args) {
 			try {
 				String jstr = "{command:consider},{args:" + args[0] + "}";
-				HermitServer request = new HermitServer(new JSONObject(jstr), mConsole, mContext);
-				request.execute();     
+				HermitServer request = new HermitServer(mConsole, new JSONObject(jstr));
+				request.execute();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;

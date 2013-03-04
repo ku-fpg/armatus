@@ -5,29 +5,32 @@
     android:layout_height="match_parent"
     android:background="@android:color/white" >
 
-    <ScrollView
-        android:id="@+id/code_scroll_view"
-        android:layout_width="fill_parent"
+    <Button
+        android:id="@+id/console_button"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="true"
+        android:background="@android:color/holo_green_light"
+        android:text="Launch console"
+        android:textColor="@android:color/black"
+        android:textSize="50sp" />
 
-        <TextView
-            android:id="@+id/code_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:freezesText="true"
-            android:text="@string/hello_world"
-            android:textColor="#000000"
-            tools:context=".MainActivity" />
-    </ScrollView>
+    <TextView
+        android:id="@+id/code_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/console_button"
+        android:freezesText="true"
+        android:text="@string/hello_world"
+        android:textColor="#000000"
+        tools:context=".MainActivity" />
 
     <Button
         android:id="@+id/lock_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/code_scroll_view"
+        android:layout_below="@+id/code_text_view"
         android:text="Do something important (and lock)"
         android:textColor="@android:color/black" />
 
@@ -68,20 +71,11 @@
         android:textColor="@android:color/black" />
 
     <Button
-        android:id="@+id/console_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/tree_button"
-        android:text="Launch console"
-        android:textColor="@android:color/black" />
-
-    <Button
         android:id="@+id/pinchzoom_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/console_button"
+        android:layout_below="@+id/tree_button"
         android:text="Launch pinch-zoom test"
         android:textColor="@android:color/black" />
 
@@ -93,7 +87,7 @@
         android:layout_below="@+id/pinchzoom_button"
         android:text="ExpandoLayout test"
         android:textColor="@android:color/black" />
-    
+
     <Button
         android:id="@+id/test_activity_button"
         android:layout_width="wrap_content"

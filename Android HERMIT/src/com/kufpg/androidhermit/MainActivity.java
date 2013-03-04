@@ -6,7 +6,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.kufpg.androidhermit.console.ConsoleActivity;
-import com.kufpg.androidhermit.test.TestActivity;
+import com.kufpg.androidhermit.server.RotationAsync;
 import com.kufpg.androidhermit.util.FileIOUtils;
 import com.kufpg.androidhermit.util.Tree;
 import com.kufpg.androidhermit.util.TreeNode;
@@ -144,7 +144,7 @@ public class MainActivity extends StandardActivity {
 		mTestActivityButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(mContext, TestActivity.class));
+				startActivity(new Intent(mContext, RotationAsync.class));
 			}
 		});
 			

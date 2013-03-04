@@ -3,12 +3,15 @@ package com.kufpg.androidhermit.console;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.json.JSONObject;
+
 import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
 import com.kufpg.androidhermit.drag.DragLayout;
+import com.kufpg.androidhermit.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.DialogFragment;
@@ -193,7 +196,6 @@ public class ConsoleActivity extends StandardListActivity {
 			}
 		});
 		updateCommandEntries();
-
 	}
 
 	@Override
@@ -337,6 +339,9 @@ public class ConsoleActivity extends StandardListActivity {
 		return mSlidingMenu;
 	}
 
+	public void serverRequest(JSONObject request) {
+	}
+
 	/**
 	 * Sets the name of the Command to be run on a keyword when selected from a ContextMenu.
 	 * Intended to be used in conjunction with CommandIcon.
@@ -348,14 +353,14 @@ public class ConsoleActivity extends StandardListActivity {
 
 	public void showSelectionDialog(int entryNum, String entryContents) {
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getFragmentManager().findFragmentByTag("selecDialog");
 		if (prev != null) {
 			ft.remove(prev);
 		}
 		ft.addToBackStack(null);
 
 		DialogFragment newFrag = ConsoleDialog.newInstance(entryNum, entryContents);
-		newFrag.show(ft, "dialog");
+		newFrag.show(ft, "selecDialog");
 	}
 
 	/**
