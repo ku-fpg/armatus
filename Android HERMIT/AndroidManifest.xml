@@ -48,7 +48,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".server.RotationAsync"
+            android:name=".test.TestActivity"
             android:label="@string/app_name" >
         </activity>
     </application>

@@ -31,8 +31,7 @@ public class CommandDispatcher {
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;
-			}        
-			// mConsole.addMessage("TODO: Figure out what consider " + args[0] + " does.");
+			}
 		}
 	};
 	private static Command exit = new Command("exit", 0, false) {

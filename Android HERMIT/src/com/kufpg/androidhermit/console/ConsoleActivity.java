@@ -3,8 +3,6 @@ package com.kufpg.androidhermit.console;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.json.JSONObject;
-
 import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
@@ -69,8 +67,10 @@ public class ConsoleActivity extends StandardListActivity {
 	private SlidingMenu mSlidingMenu;
 	private LinearLayout mExpandoLayoutGroup;
 	private CommandDispatcher mDispatcher;
+	private HermitServer mServer;
 	private String mTempCommand;
-	private boolean mIsSoftKeyboardVisible;
+	private boolean mInputEnabled = true;
+	private boolean mSoftKeyboardVisible;
 	private int mEntryCount = 0;
 	private int mTempDragIconPos = -1;
 
@@ -80,7 +80,7 @@ public class ConsoleActivity extends StandardListActivity {
 		setContentView(R.layout.console_activity);
 
 		//Ensures soft keyboard is opened on activity start
-		setSoftKeyboardVisibility(mIsSoftKeyboardVisible = true);
+		setSoftKeyboardVisibility(mSoftKeyboardVisible = true);
 		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
@@ -89,9 +89,9 @@ public class ConsoleActivity extends StandardListActivity {
 				int rootHeight = mRootView.getRootView().getHeight();
 				int heightDiff = rootHeight - mRootView.getHeight();
 				if (heightDiff > rootHeight/3) { //This works on Nexus 7s, at the very least
-					mIsSoftKeyboardVisible = true;
+					mSoftKeyboardVisible = true;
 				} else {
-					mIsSoftKeyboardVisible = false;
+					mSoftKeyboardVisible = false;
 				}
 			}
 		});
@@ -127,7 +127,8 @@ public class ConsoleActivity extends StandardListActivity {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
-						&& event.getAction() == KeyEvent.ACTION_UP) {
+						&& event.getAction() == KeyEvent.ACTION_UP
+						&& mInputEnabled) {
 					String[] inputs = mInputEditText.getText().
 							toString().trim().split(WHITESPACE);
 					if (CommandDispatcher.isCommand(inputs[0])) {
@@ -204,9 +205,13 @@ public class ConsoleActivity extends StandardListActivity {
 		outState.putString("input", mInputEditText.getText().toString());
 		outState.putInt("cursorPos", mInputEditText.getSelectionStart());
 		outState.putInt("entryCount", mEntryCount);
-		outState.putBoolean("softKeyboardVisibility", mIsSoftKeyboardVisible);
+		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putSerializable("consoleEntries", mConsoleEntries);
 		outState.putSerializable("commandEntries", mCommandEntries);
+		if (mServer != null) {
+			mServer.detach();
+		}
+		outState.putSerializable("server", mServer);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -217,7 +222,7 @@ public class ConsoleActivity extends StandardListActivity {
 		mInputEditText.setSelection(state.getInt("cursorPos"));
 		mInputEditText.requestFocus();
 		mEntryCount = state.getInt("entryCount");
-		mIsSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
+		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 
 		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
@@ -228,6 +233,19 @@ public class ConsoleActivity extends StandardListActivity {
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
 		mCommandListView.setAdapter(mCommandAdapter);
 		updateCommandEntries();
+
+		mServer = (HermitServer) state.getSerializable("server");
+		if (mServer != null) {
+			mServer.attach(this);
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mServer != null) {
+			mServer.cancel(true);
+		}
+		super.onBackPressed();
 	}
 
 	@Override
@@ -256,19 +274,25 @@ public class ConsoleActivity extends StandardListActivity {
 		if (item != null) {
 			String keywordNStr = item.getTitle().toString();
 			if (mTempCommand != null) { //If CommandIcon command is run
-				mDispatcher.runOnConsole(mTempCommand, keywordNStr);
-				//TODO: Reorder CommandListView stuff
-				if(mTempDragIconPos > 0)
-				{
+				if (mInputEnabled) {
+					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+				} else {
+					mInputEditText.setText(mTempCommand + " " + keywordNStr);
+				}
+				if(mTempDragIconPos > 0) {
 					String tempCommandName = mCommandEntries.get(mTempDragIconPos);
 					mCommandEntries.remove(mTempDragIconPos);
 					mCommandEntries.remove(mCommandEntries.size() - 1); //Remove newly added command
 					mCommandEntries.add(0, tempCommandName);
 					updateCommandEntries();
 				}
-
 			} else { //If keyword command is run
-				mDispatcher.runKeywordCommand(keywordNStr, keywordNStr); 
+				if (mInputEnabled) {
+					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
+				} else {
+					mInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
+							.getCommand().getCommandName() + " " + keywordNStr);
+				}
 			}
 			mInputEditText.requestFocus(); //Prevents ListView from stealing focus
 		}
@@ -319,12 +343,34 @@ public class ConsoleActivity extends StandardListActivity {
 	}
 
 	/**
+	 * Appends a progress spinner below the most recent entry's contents. Ideal for
+	 * doing asynchronous tasks (such as HermitServer requests). The loading bar
+	 * will be destroyed when appendConsoleEntry() is called.
+	 */
+	public void appendProgressSpinner() {
+		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
+		mConsoleEntries.remove(mConsoleEntries.size() - 1);
+		ConsoleEntry ce = new ConsoleEntry(contents, mEntryCount - 1, true);
+		mConsoleEntries.add(ce);
+		updateConsoleEntries();
+		scrollToBottom();
+	}
+
+	/**
 	 * Removes all console entries and resets the entry count.
 	 */
 	public void clear() {
 		mConsoleEntries.clear();
 		mEntryCount = 0;
 		updateConsoleEntries();
+	}
+
+	public void disableInput() {
+		mInputEnabled = false;
+	}
+
+	public void enableInput() {
+		mInputEnabled = true;
 	}
 
 	/**
@@ -339,7 +385,8 @@ public class ConsoleActivity extends StandardListActivity {
 		return mSlidingMenu;
 	}
 
-	public void serverRequest(JSONObject request) {
+	public void setServer(HermitServer server) {
+		mServer = server;
 	}
 
 	/**
@@ -361,6 +408,7 @@ public class ConsoleActivity extends StandardListActivity {
 
 		DialogFragment newFrag = ConsoleDialog.newInstance(entryNum, entryContents);
 		newFrag.show(ft, "selecDialog");
+		ft.commit();
 	}
 
 	/**

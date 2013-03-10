@@ -1,67 +1,74 @@
 package com.kufpg.androidhermit.server;
 
-import android.app.ProgressDialog;
+import java.io.Serializable;
+
 import android.os.AsyncTask;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.kufpg.androidhermit.console.ConsoleActivity;
 
-public class HermitServer extends AsyncTask<JSONObject, Void, JSONObject> {
+public class HermitServer extends AsyncTask<JSONObject, Void, Void> implements Serializable {
 
-	private ProgressDialog mDialog;
+	private static final long serialVersionUID = -1927958718472477046L;
 	private ConsoleActivity mConsole;
-	private JSONObject mJsonObject;
+	private boolean mDone = false;
+	private String mResponse;
 
 	public HermitServer(ConsoleActivity console, JSONObject request) {
 		mConsole = console;
-		mDialog = new ProgressDialog(console);
-		mDialog.setIndeterminate(true);
-		mDialog.setCancelable(false);
-		mDialog.setCanceledOnTouchOutside(false);
-		mDialog.setMessage("Accessing HERMIT server");
-		mDialog.show();
+		mConsole.appendProgressSpinner();
+		mConsole.disableInput();
+		mConsole.setServer(this);
 	}
 
 	//WARNING: Do not use mConsole in doInBackground!
 	@Override
-	protected JSONObject doInBackground(JSONObject... params) {
+	protected Void doInBackground(JSONObject... params) {
 		// TODO Interface with actual Hermit server 
 		// For now, just delay a few seconds to simulate network activity
-		for (long i = 0; i < 99999999; i++) {
-			double j = i / 2.0;
-			j = j - 1;
-		}
+		for (long i = 0; i < 49999999 && !isCancelled(); i++) {}
 
-		String jstr = "{text:\"server response\"}";
-		JSONObject res = null;
-		try {
-			res = new JSONObject(jstr);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		return res;
-	}
-
-	@Override
-	protected void onPostExecute(JSONObject result) {
-		if (mConsole != null) {
-			mDialog.dismiss();
+		if (!isCancelled()) {
+			String jstr = "{text:\"server response\"}";
 			try {
-				mConsole.appendConsoleEntry(result.getString("text"));
-			} catch (JSONException e) {
+				JSONObject res = new JSONObject(jstr);
+				mResponse = res.getString("text");
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
+		mDone = true;
+		return null;
 	}
 
-	public void setConsole(ConsoleActivity console) {
+	@Override
+	protected void onPostExecute(Void response) {
+		appendServerResponse();
+		mConsole.enableInput();
+		mConsole.setServer(null);
+		detach();
+	}
+
+	public void attach(ConsoleActivity console) {
 		mConsole = console;
 	}
-	
-	public void setJsonObject(JSONObject json) {
-		mJsonObject = json;
+
+	public void detach() {
+		mConsole = null;
+	}
+
+	public boolean isDone() {
+		return mDone;
+	}
+
+	/**
+	 * WARNING: Only use this after the server request completes.
+	 * @param The message to append.
+	 */
+	public void appendServerResponse() {
+		mConsole.appendConsoleEntry(mResponse);
 	}
 
 }

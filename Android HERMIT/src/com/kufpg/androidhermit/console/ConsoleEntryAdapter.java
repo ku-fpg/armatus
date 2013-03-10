@@ -18,6 +18,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -57,6 +58,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			mHolder = new ConsoleEntryHolder();
 			mHolder.num = (TextView) entryView.findViewById(R.id.console_entry_num);
 			mHolder.contents = (TextView) entryView.findViewById(R.id.console_entry_contents);
+			mHolder.loader = (RelativeLayout) entryView.findViewById(R.id.console_loading);
 			entryView.setTag(mHolder);
 		} else {
 			mHolder = (ConsoleEntryHolder) entryView.getTag();
@@ -68,6 +70,12 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		PrettyPrinter.setPrettyText(mHolder.contents,
 				mEntries.get(position).getContents());
 		mHolder.contents.setTypeface(mTypeface);
+		
+		if (!mEntries.get(position).isWaiting()) {
+			mHolder.loader.setVisibility(View.GONE);
+		} else {
+			mHolder.loader.setVisibility(View.VISIBLE);
+		}
 
 		final int thepos = position;
 
@@ -154,6 +162,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	static class ConsoleEntryHolder {
 		public TextView num;
 		public TextView contents;
+		public RelativeLayout loader;
 	}
 
 	public int getCheckedPos() {
