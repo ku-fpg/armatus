@@ -25,8 +25,8 @@ public class DragIcon extends ImageView {
 		super(context, attrs, defStyle);
 
 		setOnLongClickListener(new DragViewClickListener());
-		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragImageView);
-		setCommandName(ta.getString(R.styleable.DragImageView_command));
+		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragIcon);
+		setCommandName(ta.getString(R.styleable.DragIcon_command));
 		ta.recycle();
 	}
 

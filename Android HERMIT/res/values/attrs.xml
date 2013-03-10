@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="DragImageView">
+    <declare-styleable name="DragIcon">
         <attr name="command" format="string" />
     </declare-styleable>
 

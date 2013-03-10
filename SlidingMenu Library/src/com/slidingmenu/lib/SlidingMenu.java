@@ -242,6 +242,10 @@ public class SlidingMenu extends RelativeLayout {
 		} else {
 			setMenu(new FrameLayout(context));
 		}
+		int viewBehindSecondary = ta.getResourceId(R.styleable.SlidingMenu_viewBehindSecondary, -1);
+		if (viewBehindSecondary != -1) {
+			setSecondaryMenu(viewBehindSecondary);
+		}
 		int touchModeAbove = ta.getInt(R.styleable.SlidingMenu_touchModeAbove, TOUCHMODE_MARGIN);
 		setTouchModeAbove(touchModeAbove);
 		int touchModeBehind = ta.getInt(R.styleable.SlidingMenu_touchModeBehind, TOUCHMODE_MARGIN);

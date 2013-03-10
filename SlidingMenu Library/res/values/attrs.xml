@@ -24,6 +24,7 @@
         </attr>
         <attr name="viewAbove" format="reference" />
         <attr name="viewBehind" format="reference" />
+        <attr name="viewBehindSecondary" format="reference" />
         <attr name="behindOffset" format="dimension" />
         <attr name="behindWidth" format="dimension" />
         <attr name="behindScrollScale" format="float" />

@@ -46,7 +46,7 @@ import android.widget.TextView;
  */
 public class ConsoleActivity extends StandardListActivity {
 
-	public static final String COMMAND_LAYOUT = "layout";
+	public static final String DRAG_LAYOUT = "drag_layout";
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
 	public static final String WHITESPACE = "\\s+";
 	public static final int DEFAULT_FONT_SIZE = 15;
@@ -157,19 +157,11 @@ public class ConsoleActivity extends StandardListActivity {
 		mInputNum.setTypeface(typeface);
 		mInputEditText.setTypeface(typeface);
 
-		//Initialize SlidingMenu properties
-		mSlidingMenu = new SlidingMenu(this);
-		mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
-		mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		mSlidingMenu.setFadeDegree(0.35f);
-		mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-		mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		mSlidingMenu.setMenu(R.layout.drag_n_drop);
-		mSlidingMenu.setSecondaryMenu(R.layout.command_history);
+		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		refreshSlidingMenu();
 
 		//Creates the sliding menu and iterates through the CommandLayouts
-		//in drap_n_drop.xml to link them to mSlidingMenu in this activity
+		//in command_expandable_menu.xml to link them to mSlidingMenu in this activity
 		int commandLayoutCount = 0;
 		mExpandoLayoutGroup = (LinearLayout) findViewById(R.id.expando_root_layout);
 		//Increment by two, since each CommandLayout is separated by a divider View
@@ -180,7 +172,7 @@ public class ConsoleActivity extends StandardListActivity {
 					getChildAt(i)).getChildAt(1)).getChildCount(); 
 		}	
 		for (int i = 1; i <= commandLayoutCount; i++) {
-			String layoutId = COMMAND_LAYOUT + i;
+			String layoutId = DRAG_LAYOUT + i;
 			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
 			((DragLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);
 		}

@@ -27,14 +27,14 @@
                 android:orientation="vertical" >
 
                 <com.kufpg.androidhermit.drag.DragLayout
-                    android:id="@+id/layout1"
+                    android:id="@+id/drag_layout1"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/myimage1"
+                        android:id="@+id/drag_icon1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="toast" />
@@ -62,30 +62,30 @@
                 android:orientation="vertical" >
 
                 <com.kufpg.androidhermit.drag.DragLayout
-                    android:id="@+id/layout2"
+                    android:id="@+id/drag_layout2"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
-                    android:layout_below="@+id/layout1"
+                    android:layout_below="@+id/drag_layout1"
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/myimage2"
+                        android:id="@+id/drag_icon2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="consider" />
                 </com.kufpg.androidhermit.drag.DragLayout>
 
                 <com.kufpg.androidhermit.drag.DragLayout
-                    android:id="@+id/layout3"
+                    android:id="@+id/drag_layout3"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
-                    android:layout_below="@+id/layout2"
+                    android:layout_below="@+id/drag_layout2"
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/myimage3"
+                        android:id="@+id/drag_icon3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="clear" />
@@ -113,30 +113,30 @@
                 android:orientation="vertical" >
 
                 <com.kufpg.androidhermit.drag.DragLayout
-                    android:id="@+id/layout4"
+                    android:id="@+id/drag_layout4"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
-                    android:layout_below="@+id/layout3"
+                    android:layout_below="@+id/drag_layout3"
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/myimage4"
+                        android:id="@+id/drag_icon4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="resume" />
                 </com.kufpg.androidhermit.drag.DragLayout>
 
                 <com.kufpg.androidhermit.drag.DragLayout
-                    android:id="@+id/layout5"
+                    android:id="@+id/drag_layout5"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
-                    android:layout_below="@+id/layout4"
+                    android:layout_below="@+id/drag_layout4"
                     android:background="@android:color/transparent"
                     android:gravity="center" >
 
                     <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/myimage5"
+                        android:id="@+id/drag_icon5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="exit" />

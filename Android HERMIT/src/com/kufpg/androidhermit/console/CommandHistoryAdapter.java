@@ -18,7 +18,7 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 	private CommandEntryHolder mHolder;
 	
 	public CommandHistoryAdapter(ConsoleActivity console, List<String> entries) {
-		super(console, R.layout.command_history, entries);
+		super(console, R.layout.command_history_menu, entries);
 		mConsole = console;
 		mEntries = entries;
 	}
@@ -27,7 +27,7 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 		View entryView = convertView;
 		if (entryView == null) {
 			LayoutInflater inflater = mConsole.getLayoutInflater();
-			entryView = inflater.inflate(R.layout.command_entry, parent, false);
+			entryView = inflater.inflate(R.layout.command_history_entry, parent, false);
 			mHolder = new CommandEntryHolder();
 			mHolder.icon = (DragIcon) entryView.findViewById(R.id.command_icon);
 			mHolder.layout = (DragLayout) entryView.findViewById(R.id.command_layout);

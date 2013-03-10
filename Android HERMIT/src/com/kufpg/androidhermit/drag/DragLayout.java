@@ -15,36 +15,26 @@ public class DragLayout extends LinearLayout {
 	private SlidingMenu mSlidingMenu;
 
 	public DragLayout(Context context) {
-		super(context);
-		setupView();
+		this(context, null, 0);
 	}
 
 	public DragLayout(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setupView();
+		this(context, attrs, 0);
 	}
 
 	public DragLayout(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		setupView();
-	}
 
-	public DragLayout(Context context, SlidingMenu draggableViewSource) {
-		super(context);
-		setupView();
-	}
-	
-	public void setSlidingMenu(SlidingMenu menu) {
-		mSlidingMenu = menu;
-	}
-
-	private void setupView() {
 		setOnDragListener(new DragSinkListener() {
 			@Override
 			public void onDragStarted(View dragView, View dragSink) {
 				mSlidingMenu.showContent();
 			}
 		});
+	}
+
+	public void setSlidingMenu(SlidingMenu menu) {
+		mSlidingMenu = menu;
 	}
 
 }
