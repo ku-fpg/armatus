@@ -31,9 +31,7 @@ import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnKeyListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -72,7 +70,6 @@ public class ConsoleActivity extends StandardListActivity {
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible;
 	private int mEntryCount = 0;
-	private int mTempDragIconPos = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -141,8 +138,12 @@ public class ConsoleActivity extends StandardListActivity {
 					} else {
 						addConsoleEntry(mInputEditText.getText().toString());
 					}
-					mInputEditText.setText(""); 
+					mInputEditText.setText("");
 					return true;
+				} else if (keyCode == KeyEvent.KEYCODE_ENTER
+						&& event.getAction() == KeyEvent.ACTION_UP
+						&& !mInputEnabled) {
+					mInputEditText.setText("");
 				}
 				return false;
 			}
@@ -180,14 +181,6 @@ public class ConsoleActivity extends StandardListActivity {
 		mCommandListView = (ListView)findViewById(R.id.History);
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
 		mCommandListView.setAdapter(mCommandAdapter);
-		mCommandListView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				mTempDragIconPos = position;
-				return false;
-			}
-		});
 		updateCommandEntries();
 	}
 
@@ -241,6 +234,16 @@ public class ConsoleActivity extends StandardListActivity {
 	}
 
 	@Override
+	public void onRestart() {
+		/* Prevents HermitServer from throwing a NullPointerException
+		 * (since ConsoleActivity doesn't get serialized) */
+		if (mServer != null) {
+			mServer.attach(this);
+		}
+		super.onRestart();
+	}
+
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
@@ -265,20 +268,13 @@ public class ConsoleActivity extends StandardListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
 			String keywordNStr = item.getTitle().toString();
-			if (mTempCommand != null) { //If CommandIcon command is run
+			if (mTempCommand != null) { //If DragIcon command is run
 				if (mInputEnabled) {
 					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
 				} else {
 					mInputEditText.setText(mTempCommand + " " + keywordNStr);
 				}
-				if(mTempDragIconPos > 0) {
-					String tempCommandName = mCommandEntries.get(mTempDragIconPos);
-					mCommandEntries.remove(mTempDragIconPos);
-					mCommandEntries.remove(mCommandEntries.size() - 1); //Remove newly added command
-					mCommandEntries.add(0, tempCommandName);
-					updateCommandEntries();
-				}
-			} else { //If keyword command is run
+			} else { //If Keyword command is run
 				if (mInputEnabled) {
 					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
 				} else {
@@ -289,7 +285,6 @@ public class ConsoleActivity extends StandardListActivity {
 			mInputEditText.requestFocus(); //Prevents ListView from stealing focus
 		}
 		mTempCommand = null;
-		mTempDragIconPos = -1;
 		return super.onContextItemSelected(item);
 	}
 
@@ -297,12 +292,14 @@ public class ConsoleActivity extends StandardListActivity {
 	public void onContextMenuClosed(Menu menu) {
 		//Ensures that the temp variables do not persist to next context menu opening
 		mTempCommand = null;
-		mTempDragIconPos = -1;
 	}
 
 	public void addCommandEntry(String commandName) {
-		mCommandEntries.add(commandName);
-		updateCommandEntries();
+		if (mCommandEntries.size() == 0
+				|| commandName != mCommandEntries.get(0)) {
+			mCommandEntries.add(0, commandName);
+			updateCommandEntries();
+		}
 	}
 
 	/**
