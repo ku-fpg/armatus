@@ -15,6 +15,7 @@
         android:background="@null"
         android:singleLine="true"
         android:textColor="@android:color/white"
+        android:textIsSelectable="false"
         android:textSize="15sp"
         android:typeface="monospace" />
 
@@ -26,6 +27,7 @@
         android:layout_toRightOf="@id/console_entry_num"
         android:background="@null"
         android:textColor="@android:color/white"
+        android:textIsSelectable="false"
         android:textSize="15sp"
         android:typeface="monospace" />
 

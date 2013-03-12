@@ -81,6 +81,11 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 
 		entryView.setOnDragListener(new DragSinkListener() {
 			@Override
+			public void onDragStarted(View dragView, View dragSink) {
+				mConsole.getSlidingMenu().showContent();
+			}
+			
+			@Override
 			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
 				dragSink.setBackgroundResource(HIGHLIGHTED);
 			}

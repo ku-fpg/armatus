@@ -3,12 +3,10 @@ package com.kufpg.androidhermit.console;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.djpsoft.moreDroid.ExpandoLayout;
 import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
-import com.kufpg.androidhermit.drag.DragLayout;
 import com.kufpg.androidhermit.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -33,9 +31,7 @@ import android.view.View.OnKeyListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -63,7 +59,6 @@ public class ConsoleActivity extends StandardListActivity {
 	private TextView mInputNum;
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
-	private LinearLayout mExpandoLayoutGroup;
 	private CommandDispatcher mDispatcher;
 	private HermitServer mServer;
 	private String mTempCommand;
@@ -160,23 +155,6 @@ public class ConsoleActivity extends StandardListActivity {
 
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		refreshSlidingMenu();
-
-		//Creates the sliding menu and iterates through the CommandLayouts
-		//in command_expandable_menu.xml to link them to mSlidingMenu in this activity
-		int commandLayoutCount = 0;
-		mExpandoLayoutGroup = (LinearLayout) findViewById(R.id.expando_root_layout);
-		//Increment by two, since each CommandLayout is separated by a divider View
-		for(int i = 0; i < mExpandoLayoutGroup.getChildCount(); i += 2) {
-			//Retrieve child 1 from ExpandoLayout because there is an implicit child 0 that is not viewable.
-			//We found this out by accident and random number changing. We recommend not changing this code.
-			commandLayoutCount += ((RelativeLayout) ((ExpandoLayout) mExpandoLayoutGroup.
-					getChildAt(i)).getChildAt(1)).getChildCount(); 
-		}	
-		for (int i = 1; i <= commandLayoutCount; i++) {
-			String layoutId = DRAG_LAYOUT + i;
-			int resId = getResources().getIdentifier(layoutId, "id", "com.kufpg.androidhermit");
-			((DragLayout) mSlidingMenu.getMenu().findViewById(resId)).setSlidingMenu(mSlidingMenu);
-		}
 
 		mCommandListView = (ListView)findViewById(R.id.History);
 		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);

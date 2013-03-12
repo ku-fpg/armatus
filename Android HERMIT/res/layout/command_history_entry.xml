@@ -1,21 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:slidingMenu="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/command_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="5dp" >
 
-    <com.kufpg.androidhermit.drag.DragLayout
-        android:id="@+id/command_layout"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:background="@android:color/transparent"
-        android:gravity="center" >
+    <com.kufpg.androidhermit.drag.DragIcon
+        android:id="@+id/command_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <com.kufpg.androidhermit.drag.DragIcon
-            android:id="@+id/command_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </com.kufpg.androidhermit.drag.DragLayout>
-
-</RelativeLayout>
+</LinearLayout>

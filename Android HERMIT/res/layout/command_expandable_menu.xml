@@ -26,7 +26,7 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
-                <com.kufpg.androidhermit.drag.DragLayout
+                <LinearLayout
                     android:id="@+id/drag_layout1"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -38,13 +38,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="toast" />
-                </com.kufpg.androidhermit.drag.DragLayout>
+                </LinearLayout>
             </RelativeLayout>
         </com.djpsoft.moreDroid.ExpandoLayout>
 
         <View
             android:layout_width="fill_parent"
-            android:layout_height="2px"
+            android:layout_height="1dp"
             android:background="#DDFFDD" />
 
         <com.djpsoft.moreDroid.ExpandoLayout
@@ -61,7 +61,7 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
-                <com.kufpg.androidhermit.drag.DragLayout
+                <LinearLayout
                     android:id="@+id/drag_layout2"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -74,9 +74,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="consider" />
-                </com.kufpg.androidhermit.drag.DragLayout>
+                </LinearLayout>
 
-                <com.kufpg.androidhermit.drag.DragLayout
+                <LinearLayout
                     android:id="@+id/drag_layout3"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -89,13 +89,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="clear" />
-                </com.kufpg.androidhermit.drag.DragLayout>
+                </LinearLayout>
             </RelativeLayout>
         </com.djpsoft.moreDroid.ExpandoLayout>
 
         <View
             android:layout_width="fill_parent"
-            android:layout_height="2px"
+            android:layout_height="1dp"
             android:background="#DDFFDD" />
 
         <com.djpsoft.moreDroid.ExpandoLayout
@@ -112,7 +112,7 @@
                 android:background="@android:color/transparent"
                 android:orientation="vertical" >
 
-                <com.kufpg.androidhermit.drag.DragLayout
+                <LinearLayout
                     android:id="@+id/drag_layout4"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -125,9 +125,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="resume" />
-                </com.kufpg.androidhermit.drag.DragLayout>
+                </LinearLayout>
 
-                <com.kufpg.androidhermit.drag.DragLayout
+                <LinearLayout
                     android:id="@+id/drag_layout5"
                     android:layout_width="300dp"
                     android:layout_height="100dp"
@@ -140,7 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         drag:command="exit" />
-                </com.kufpg.androidhermit.drag.DragLayout>
+                </LinearLayout>
             </RelativeLayout>
         </com.djpsoft.moreDroid.ExpandoLayout>
     </LinearLayout>

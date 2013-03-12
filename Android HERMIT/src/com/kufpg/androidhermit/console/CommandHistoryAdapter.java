@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.drag.DragIcon;
-import com.kufpg.androidhermit.drag.DragLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,20 +29,17 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 			entryView = inflater.inflate(R.layout.command_history_entry, parent, false);
 			mHolder = new CommandEntryHolder();
 			mHolder.icon = (DragIcon) entryView.findViewById(R.id.command_icon);
-			mHolder.layout = (DragLayout) entryView.findViewById(R.id.command_layout);
 			entryView.setTag(mHolder);
 		} else {
 			mHolder = (CommandEntryHolder) entryView.getTag();
 		}
 		mHolder.icon.setCommandName(mEntries.get(position));
-		mHolder.layout.setSlidingMenu(mConsole.getSlidingMenu());
 		
 		return entryView;
 	}
 	
 	static class CommandEntryHolder {
 		public DragIcon icon;
-		public DragLayout layout;
 	}
 
 }
