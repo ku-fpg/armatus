@@ -96,5 +96,14 @@
         android:layout_below="@+id/expandolayout_button"
         android:text="Launch TestActivity"
         android:textColor="@android:color/black" />
+    
+    <Button
+        android:id="@+id/terminal_activity_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/test_activity_button"
+        android:text="Launch terminal emulator"
+        android:textColor="@android:color/black" />
 
 </RelativeLayout>

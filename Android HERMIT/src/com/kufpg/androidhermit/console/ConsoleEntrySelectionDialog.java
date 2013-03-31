@@ -9,21 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-public class ConsoleDialog extends DialogFragment {
+public class ConsoleEntrySelectionDialog extends DialogFragment {
 
 	private EditText mContentsView;
 	private int mEntryNum;
 	private String mEntryContents;
 	
-	static ConsoleDialog newInstance(int entryNum, String entryContents) {
-		ConsoleDialog cd = new ConsoleDialog();
+	static ConsoleEntrySelectionDialog newInstance(int entryNum, String entryContents) {
+		ConsoleEntrySelectionDialog cesd = new ConsoleEntrySelectionDialog();
 		
 		Bundle args = new Bundle();
 		args.putInt("entryNum", entryNum);
 		args.putString("entryContents", entryContents);
-		cd.setArguments(args);
+		cesd.setArguments(args);
 		
-		return cd;
+		return cesd;
 	}
 	
 	@Override

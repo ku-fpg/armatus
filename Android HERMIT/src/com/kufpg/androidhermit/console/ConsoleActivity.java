@@ -373,7 +373,7 @@ public class ConsoleActivity extends StandardListActivity {
 		}
 		ft.addToBackStack(null);
 
-		DialogFragment newFrag = ConsoleDialog.newInstance(entryNum, entryContents);
+		DialogFragment newFrag = ConsoleEntrySelectionDialog.newInstance(entryNum, entryContents);
 		ft.add(newFrag, "selecDialog");
 		ft.commit();
 	}

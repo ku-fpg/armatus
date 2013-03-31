@@ -13,6 +13,7 @@ import com.kufpg.androidhermit.util.TreeNode;
 import com.kufpg.androidhermit.util.Tree.TreeTraversalOrder;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -26,8 +27,8 @@ import android.widget.Toast;
 public class MainActivity extends StandardActivity {
 
 	private TextView mButtonsView;
-	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton,
-	mConsoleButton, mPinchZoomButton, mExpandoLayoutButton,mTestActivityButton;
+	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton, mConsoleButton,
+	mPinchZoomButton, mExpandoLayoutButton, mTestActivityButton, mTerminalButton;
 	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
@@ -50,6 +51,7 @@ public class MainActivity extends StandardActivity {
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
 		mExpandoLayoutButton = (Button) findViewById(R.id.expandolayout_button);
 		mTestActivityButton = (Button) findViewById(R.id.test_activity_button);
+		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 
 		mLockButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -133,21 +135,38 @@ public class MainActivity extends StandardActivity {
 				startActivity(new Intent(mContext, TextSizePinchZoomActivity.class));
 			}
 		});
-		
+
 		mExpandoLayoutButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(mContext, ExpandoLayoutActivity.class));
 			}
 		});
-		
+
 		mTestActivityButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(mContext, TestActivity.class));
 			}
 		});
-			
+
+		mTerminalButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String packageName = "jackpal.androidterm";
+				boolean installed = appInstalledOrNot(packageName);  
+				if (installed) {
+					Intent i = new Intent("jackpal.androidterm.RUN_SCRIPT");
+					i.addCategory(Intent.CATEGORY_DEFAULT);
+					i.putExtra("jackpal.androidterm.iInitialCommand", "echo 'Hello, Armatus!'");
+					startActivity(i);
+				} else {
+					TerminalNotInstalledDialog tnid = new TerminalNotInstalledDialog();
+					tnid.show(getFragmentManager(), "tnid");
+				}
+			}
+		});
+
 	}
 
 	public static List<Integer> getIndexesInString(String searchable, String keyword) {
@@ -173,6 +192,18 @@ public class MainActivity extends StandardActivity {
 		mButtonsView.setText("Button pushed " + numTextChanges
 				+ " times. (Status: " + (isLocked ? "locked" : "unlocked")
 				+ ".)");
+	}
+
+	private boolean appInstalledOrNot(String uri) {
+		PackageManager pm = getPackageManager();
+		boolean appInstalled = false;
+		try {
+			pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+			appInstalled = true;
+		} catch (PackageManager.NameNotFoundException e){
+			appInstalled = false;
+		}
+		return appInstalled ;
 	}
 
 }
