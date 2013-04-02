@@ -12,5 +12,8 @@
     <string name="select">SELECT</string>
     <string name="terminal_not_installed_title">Error: ATE not installed</string>
     <string name="terminal_not_installed_message">To use the terminal, you must install the Android Terminal Emulator app. Afterwards, you must reinstall Armatus. Would you like to install ATE from the Play store now?</string>
-
+	<string name="console_exit_title">Are you sure you want to exit?</string>
+	<string name="console_exit_message">All progress will be lost. Do you still want to exit the console?</string>
+	<string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
+    
 </resources>

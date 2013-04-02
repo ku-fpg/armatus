@@ -7,6 +7,9 @@ import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
+import com.kufpg.androidhermit.dialog.ConsoleEntrySelectionDialog;
+import com.kufpg.androidhermit.dialog.ConsoleExitDialog;
+import com.kufpg.androidhermit.dialog.GestureDialog;
 import com.kufpg.androidhermit.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -47,8 +50,8 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final int PADDING = 5;
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
 	public static final int ENTRY_COMMAND_LIMIT = 200;
-	public static final int SELECT_ID = 19;
-	public static final int DIALOG_ID = 20;
+
+	private static final int GESTURE_ID = 19;
 
 	private ListView mConsoleListView, mCommandListView;
 	private ConsoleEntryAdapter mConsoleAdapter;
@@ -205,10 +208,8 @@ public class ConsoleActivity extends StandardListActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (mServer != null) {
-			mServer.cancel(true);
-		}
-		super.onBackPressed();
+		ConsoleExitDialog ced = new ConsoleExitDialog();
+		ced.show(getFragmentManager(), "exit");
 	}
 
 	@Override
@@ -232,9 +233,10 @@ public class ConsoleActivity extends StandardListActivity {
 				menu.setHeaderTitle("Execute " + mTempCommand + " on...");
 			} else { //If user long-clicked entry
 				menu.setHeaderTitle(R.string.context_menu_title);
+				menu.add(0, GESTURE_ID, 0, "Perform gesture");
 			}
 
-			int order = 0;
+			int order = 1;
 			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
 				menu.add(0, v.getId(), order, keyword);
 				order++;
@@ -252,12 +254,17 @@ public class ConsoleActivity extends StandardListActivity {
 				} else {
 					mInputEditText.setText(mTempCommand + " " + keywordNStr);
 				}
-			} else { //If Keyword command is run
-				if (mInputEnabled) {
-					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
+			} else { //If long-click command is run
+				if (item.getItemId() == GESTURE_ID) {
+					GestureDialog gd = new GestureDialog();
+					gd.show(getFragmentManager(), "gesture");
 				} else {
-					mInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
-							.getCommand().getCommandName() + " " + keywordNStr);
+					if (mInputEnabled) {
+						mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
+					} else {
+						mInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
+								.getCommand().getCommandName() + " " + keywordNStr);
+					}
 				}
 			}
 			mInputEditText.requestFocus(); //Prevents ListView from stealing focus
@@ -344,6 +351,9 @@ public class ConsoleActivity extends StandardListActivity {
 	 * Exits the console activity.
 	 */
 	public void exit() {
+		if (mServer != null) {
+			mServer.cancel(true);
+		}
 		finish();
 		startActivity(new Intent(this, MainActivity.class));
 	}

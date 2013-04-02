@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit;
+package com.kufpg.androidhermit.dialog;
 
 import com.kufpg.androidhermit.R;
 

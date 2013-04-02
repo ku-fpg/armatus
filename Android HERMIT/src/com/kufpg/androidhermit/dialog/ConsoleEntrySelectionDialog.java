@@ -1,4 +1,4 @@
-package com.kufpg.androidhermit.console;
+package com.kufpg.androidhermit.dialog;
 
 import com.kufpg.androidhermit.R;
 import android.app.DialogFragment;
@@ -15,7 +15,7 @@ public class ConsoleEntrySelectionDialog extends DialogFragment {
 	private int mEntryNum;
 	private String mEntryContents;
 	
-	static ConsoleEntrySelectionDialog newInstance(int entryNum, String entryContents) {
+	public static ConsoleEntrySelectionDialog newInstance(int entryNum, String entryContents) {
 		ConsoleEntrySelectionDialog cesd = new ConsoleEntrySelectionDialog();
 		
 		Bundle args = new Bundle();
