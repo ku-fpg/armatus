@@ -6,7 +6,7 @@
     android:padding="@dimen/entry_padding" >
 
     <EditText
-        android:id="@+id/console_dialog_contents"
+        android:id="@+id/console_entry_selection_dialog_contents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textNoSuggestions|textMultiLine"

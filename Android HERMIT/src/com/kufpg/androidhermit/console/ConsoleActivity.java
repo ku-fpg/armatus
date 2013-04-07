@@ -7,9 +7,9 @@ import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.StandardListActivity;
 import com.kufpg.androidhermit.console.CommandDispatcher;
+import com.kufpg.androidhermit.dialog.ConsoleEntryRearrangeDialog;
 import com.kufpg.androidhermit.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.androidhermit.dialog.ConsoleExitDialog;
-import com.kufpg.androidhermit.dialog.GestureDialog;
 import com.kufpg.androidhermit.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -50,8 +50,10 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final int PADDING = 5;
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
 	public static final int ENTRY_COMMAND_LIMIT = 200;
+	public static final String SELECTION_TAG = "selection";
+	public static final String REARRANGE_TAG = "rearrange";
 
-	private static final int GESTURE_ID = 19;
+	private static final int REARRANGE_ID = 19;
 
 	private ListView mConsoleListView, mCommandListView;
 	private ConsoleEntryAdapter mConsoleAdapter;
@@ -233,7 +235,7 @@ public class ConsoleActivity extends StandardListActivity {
 				menu.setHeaderTitle("Execute " + mTempCommand + " on...");
 			} else { //If user long-clicked entry
 				menu.setHeaderTitle(R.string.context_menu_title);
-				menu.add(0, GESTURE_ID, 0, "Perform gesture");
+				menu.add(0, REARRANGE_ID, 0, "Rearrange words");
 			}
 
 			int order = 1;
@@ -255,9 +257,10 @@ public class ConsoleActivity extends StandardListActivity {
 					mInputEditText.setText(mTempCommand + " " + keywordNStr);
 				}
 			} else { //If long-click command is run
-				if (item.getItemId() == GESTURE_ID) {
-					GestureDialog gd = new GestureDialog();
-					gd.show(getFragmentManager(), "gesture");
+				if (item.getItemId() == REARRANGE_ID) {
+					//WARNING: This doesn't work yet
+					//ConsoleEntry sEntry = mConsoleEntries.get(((AdapterContextMenuInfo) item.getMenuInfo()).position);
+					//showEntryDialog(sEntry.getNum(), sEntry.getContents(), REARRANGE_TAG);
 				} else {
 					if (mInputEnabled) {
 						mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
@@ -375,16 +378,20 @@ public class ConsoleActivity extends StandardListActivity {
 		mTempCommand = commandName;
 	}
 
-	public void showSelectionDialog(int entryNum, String entryContents) {
+	public void showEntryDialog(int entryNum, String entryContents, String tag) {
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		Fragment prev = getFragmentManager().findFragmentByTag("selecDialog");
 		if (prev != null) {
 			ft.remove(prev);
 		}
 		ft.addToBackStack(null);
-
-		DialogFragment newFrag = ConsoleEntrySelectionDialog.newInstance(entryNum, entryContents);
-		ft.add(newFrag, "selecDialog");
+		DialogFragment newFrag = null;
+		if (tag == SELECTION_TAG) {
+			newFrag = ConsoleEntrySelectionDialog.newInstance(entryNum, entryContents);
+		} else if (tag == REARRANGE_TAG) {
+			newFrag = ConsoleEntryRearrangeDialog.newInstance(entryNum, entryContents);
+		}
+		ft.add(newFrag, tag);
 		ft.commit();
 	}
 

@@ -36,11 +36,11 @@ public class ConsoleEntrySelectionDialog extends DialogFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		View v = inflater.inflate(R.layout.console_dialog, container, false);
+		View v = inflater.inflate(R.layout.console_entry_selection_dialog, container, false);
 		setCancelable(true);
 
 		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
-		mContentsView = (EditText) v.findViewById(R.id.console_dialog_contents);
+		mContentsView = (EditText) v.findViewById(R.id.console_entry_selection_dialog_contents);
 		mContentsView.setText(Html.fromHtml(mEntryContents)); //Don't forget, there could be special HTML formatting!
 		
 		return v;

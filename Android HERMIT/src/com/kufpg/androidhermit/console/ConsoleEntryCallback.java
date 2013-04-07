@@ -36,7 +36,7 @@ public class ConsoleEntryCallback implements Callback {
 			mode.finish(); // Action picked, so close the CAB
 			return true;
 		case R.id.select:
-			mConsole.showSelectionDialog(mEntryNum, mEntryContents);
+			mConsole.showEntryDialog(mEntryNum, mEntryContents, ConsoleActivity.SELECTION_TAG);
 			mode.finish();
 			return true;
 		}
