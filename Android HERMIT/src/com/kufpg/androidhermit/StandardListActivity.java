@@ -1,5 +1,7 @@
 package com.kufpg.androidhermit;
 
+import com.kufpg.androidhermit.dialog.GestureDialog;
+
 import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
@@ -14,7 +16,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class StandardListActivity extends ListActivity {
-	
+
 	public final static int FILE_FROM_DISK = 1;
 	protected static Context mContext;
 	protected static String mSaveDir;
@@ -42,7 +44,7 @@ public class StandardListActivity extends ListActivity {
 		// This prevents some exceptions from being thrown when the Internet is
 		// accessed
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-				.permitAll().build();
+		.permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 	}
 
@@ -56,6 +58,10 @@ public class StandardListActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.gestures:
+			GestureDialog gd = new GestureDialog();
+			gd.show(getFragmentManager(), "gesture");
+			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
 					Preferences.class);
