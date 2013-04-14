@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
@@ -106,6 +107,17 @@ public class StandardActivity extends Activity {
 		prefsEditor.putString("savedir_pref", mSaveDir);
 		prefsEditor.putString("editmode_pref", mEditModeValue);
 		prefsEditor.commit();
+	}
+	public static boolean appInstalledOrNot(String uri) {
+		PackageManager pm = mContext.getPackageManager();
+		boolean appInstalled = false;
+		try {
+			pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+			appInstalled = true;
+		} catch (PackageManager.NameNotFoundException e){
+			appInstalled = false;
+		}
+		return appInstalled ;
 	}
 
 }

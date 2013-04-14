@@ -42,6 +42,8 @@ public class DragIcon extends ImageView {
 		}
 
 		int resid = getResources().getIdentifier(mCommandName, "drawable", "com.kufpg.androidhermit");
-		setBackground(getResources().getDrawable(resid));
+		if (resid != 0) {
+			setBackground(getResources().getDrawable(resid));
+		}
 	}
 }

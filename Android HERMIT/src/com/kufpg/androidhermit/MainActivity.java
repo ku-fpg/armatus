@@ -195,16 +195,4 @@ public class MainActivity extends StandardActivity {
 				+ ".)");
 	}
 
-	private boolean appInstalledOrNot(String uri) {
-		PackageManager pm = getPackageManager();
-		boolean appInstalled = false;
-		try {
-			pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-			appInstalled = true;
-		} catch (PackageManager.NameNotFoundException e){
-			appInstalled = false;
-		}
-		return appInstalled ;
-	}
-
 }

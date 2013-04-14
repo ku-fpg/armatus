@@ -6,8 +6,12 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import com.kufpg.androidhermit.StandardActivity;
+import com.kufpg.androidhermit.console.CommandDispatcher.Command;
+import com.kufpg.androidhermit.dialog.TerminalNotInstalledDialog;
 import com.kufpg.androidhermit.server.HermitServer;
 
+import android.content.Intent;
 import android.widget.Toast;
 
 @SuppressWarnings("unused")
@@ -57,6 +61,22 @@ public class CommandDispatcher {
 						varargsToString(args), Toast.LENGTH_SHORT);
 			}
 			theToast.show();
+		}
+	};
+	private static Command terminal = new Command("terminal",0,true){
+		@Override
+		protected void run(String... args){
+			String packageName = "jackpal.androidterm";
+			boolean installed = StandardActivity.appInstalledOrNot(packageName);  
+			if (installed) {
+				Intent i = new Intent("jackpal.androidterm.RUN_SCRIPT");
+				i.addCategory(Intent.CATEGORY_DEFAULT);
+				i.putExtra("jackpal.androidterm.iInitialCommand", varargsToString(args));
+				mConsole.startActivity(i);
+			} else {
+				TerminalNotInstalledDialog tnid = new TerminalNotInstalledDialog();
+				tnid.show(mConsole.getFragmentManager(), "tnid");
+			}
 		}
 	};
 	private static Map<String, Command> mCommandMap = mapOfInstances(Command.class);
