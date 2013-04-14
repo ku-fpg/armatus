@@ -258,9 +258,8 @@ public class ConsoleActivity extends StandardListActivity {
 				}
 			} else { //If long-click command is run
 				if (item.getItemId() == REARRANGE_ID) {
-					//WARNING: This doesn't work yet
-					//ConsoleEntry sEntry = mConsoleEntries.get(((AdapterContextMenuInfo) item.getMenuInfo()).position);
-					//showEntryDialog(sEntry.getNum(), sEntry.getContents(), REARRANGE_TAG);
+					ConsoleEntry sEntry = mConsoleEntries.get(((AdapterContextMenuInfo) item.getMenuInfo()).position);
+					showEntryDialog(sEntry.getNum(), sEntry.getContents(), REARRANGE_TAG);
 				} else {
 					if (mInputEnabled) {
 						mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);

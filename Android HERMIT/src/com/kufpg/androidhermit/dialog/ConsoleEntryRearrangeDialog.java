@@ -6,9 +6,10 @@ import java.util.Random;
 
 import com.animoto.android.views.DraggableGridView;
 import com.animoto.android.views.OnRearrangeListener;
-import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.console.ConsoleActivity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,17 +17,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 
 public class ConsoleEntryRearrangeDialog extends DialogFragment {
 
 	private DraggableGridView mGridView;
-	private Button mCoolStuffButton;
+	//private Button mCoolStuffButton;
 	private int mEntryNum;
 	private String mEntryContents;
 	private List<String> mSentence = new ArrayList<String>();
@@ -44,20 +40,11 @@ public class ConsoleEntryRearrangeDialog extends DialogFragment {
 	}
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
 		mEntryNum = getArguments().getInt("entryNum");
 		mEntryContents = getArguments().getString("entryContents");
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		super.onCreateView(inflater, container, savedInstanceState);
-		View v = inflater.inflate(R.layout.console_entry_rearrange_dialog, container, false);
-		setCancelable(false);
-
-		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
-		mGridView = (DraggableGridView) v.findViewById(R.id.console_entry_rearrange_dialog_contents);
+		
+		mGridView = new DraggableGridView(getActivity());
 		for (String word : mEntryContents.split(ConsoleActivity.WHITESPACE)) {
 			ImageView wordView = new ImageView(getActivity());
 			wordView.setImageBitmap(getThumb(word));
@@ -74,20 +61,22 @@ public class ConsoleEntryRearrangeDialog extends DialogFragment {
 			}
 		});
 		
-		mCoolStuffButton = (Button) v.findViewById(R.id.console_entry_rearrange_done);
-		mCoolStuffButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String newSentence = "";
-				for (String word : mSentence) {
-					newSentence += word;
-				}
-				((ConsoleActivity) getActivity()).showToast(newSentence);
-			}
-		});
-		
-		return v;
-	}
+		//mCoolStuffButton = (Button) v.findViewById(R.id.console_entry_rearrange_done);
+//		mCoolStuffButton.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				String newSentence = "";
+//				for (String word : mSentence) {
+//					newSentence += word;
+//				}
+//				((ConsoleActivity) getActivity()).showToast(newSentence);
+//			}
+//		});
+
+        return new AlertDialog.Builder(getActivity())
+                .setTitle("Entry number " + String.valueOf(mEntryNum))
+                .setView(mGridView).create();
+    }
 	
 	private Bitmap getThumb(String s) {
 		Bitmap bmp = Bitmap.createBitmap(150, 150, Bitmap.Config.RGB_565);
