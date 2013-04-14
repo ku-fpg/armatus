@@ -15,5 +15,6 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/select" android:titleCondensed="@string/select">
     </item>
+    <item android:id="@+id/swap" android:title="@string/swap" android:orderInCategory="3" android:titleCondensed="@string/swap" android:showAsAction="ifRoom|withText" android:icon="@drawable/icon_swap"></item>
 
 </menu>

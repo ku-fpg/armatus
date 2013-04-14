@@ -15,5 +15,6 @@
 	<string name="console_exit_title">Are you sure you want to exit?</string>
 	<string name="console_exit_message">All progress will be lost. Do you still want to exit the console?</string>
 	<string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
+	<string name="swap">swap</string>
     
 </resources>
