@@ -49,6 +49,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -362,7 +363,7 @@ public class DragDropGrid extends ViewGroup implements OnTouchListener, OnLongCl
 							hideDeleteView();
 							scroll(onRightEdge, onLeftEdge);
 							cancelAnimations();
-							animateMoveAllItems();
+							//animateMoveAllItems();
 							animateDragged();
 							popDeleteView();
 						}
@@ -544,16 +545,16 @@ public class DragDropGrid extends ViewGroup implements OnTouchListener, OnLongCl
 	}
 
 	private void animateMoveToNewPosition(View targetView, Point oldOffset, Point newOffset) {
-		AnimationSet set = new AnimationSet(true);
+		//AnimationSet set = new AnimationSet(true);
 
-		Animation rotate = createFastRotateAnimation();
+		//Animation rotate = createFastRotateAnimation();
 		Animation translate = createTranslateAnimation(oldOffset, newOffset);
 
-		set.addAnimation(rotate);
-		set.addAnimation(translate);
+		//set.addAnimation(rotate);
+		//set.addAnimation(translate);
 
 		targetView.clearAnimation();
-		targetView.startAnimation(set);
+		targetView.startAnimation(translate);
 	}
 
 	private TranslateAnimation createTranslateAnimation(Point oldOffset, Point newOffset) {
@@ -866,7 +867,7 @@ public class DragDropGrid extends ViewGroup implements OnTouchListener, OnLongCl
     		movingView = true;
     		dragged = positionForView(v);
     
-    		animateMoveAllItems();
+    		//animateMoveAllItems();
     
     		animateDragged();
     		popDeleteView();
