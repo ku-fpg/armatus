@@ -28,11 +28,13 @@
  */
 package ca.laplanete.mobile.pageddragdropgrid;
 
+import android.graphics.Bitmap;
+
 public class Item {
 
 	private long id;
-	private String name;
-	private int drawable;
+	//private String name;
+	private Bitmap drawable;
 	
 	public long getId() {
 		return id;
@@ -40,22 +42,22 @@ public class Item {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public int getDrawable() {
+//	public String getName() {
+//		return name;
+//	}
+//	public void setName(String name) {
+//		this.name = name;
+//	}
+	public Bitmap getDrawable() {
 		return drawable;
 	}
-	public void setDrawable(int drawable) {
+	public void setDrawable(Bitmap drawable) {
 		this.drawable = drawable;
 	}
-	public Item(long id, String name, int drawable) {
+	public Item(long id, Bitmap drawable) {
 		super();
 		this.id = id;
-		this.name = name;
+		//this.name = name;
 		this.drawable = drawable;
 	}
 }

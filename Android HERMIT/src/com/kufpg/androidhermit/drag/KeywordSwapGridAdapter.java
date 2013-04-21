@@ -32,12 +32,17 @@ package com.kufpg.androidhermit.drag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.console.ConsoleActivity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -56,6 +61,7 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 
 	private Context context;
 	private PagedDragDropGrid gridview;
+	private Random mRandom = new Random();
 
 	List<Page> pages = new ArrayList<Page>();
 
@@ -68,7 +74,7 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 		List<Item> items = new ArrayList<Item>();
 		String[] sentence = entryContents.split(ConsoleActivity.WHITESPACE);
 		for (int i = 0; i < sentence.length; i++) {
-			items.add(new Item(i, sentence[i], R.drawable.ks_hermit));
+			items.add(new Item(i, getThumb(sentence[i])));
 		}
 		page1.setItems(items);
 		pages.add(page1);
@@ -94,17 +100,17 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 
 		ImageView icon = new ImageView(context);
 		Item item = getItem(page, index);
-		icon.setImageResource(item.getDrawable());
+		icon.setImageBitmap(item.getDrawable());
 		icon.setPadding(15, 15, 15, 15);
 
 		layout.addView(icon);
 
-		TextView label = new TextView(context);
-		label.setText(item.getName());	
-		label.setTextColor(Color.BLACK);
-		label.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+//		//TextView label = new TextView(context);
+//		label.setText(item.getName());	
+//		label.setTextColor(Color.BLACK);
+//		label.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
 
-		label.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
+		//label.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
 
 		layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
@@ -117,7 +123,7 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 			}
 		});
 
-		layout.addView(label);
+		//layout.addView(label);
 		return layout;
 	}
 
@@ -188,6 +194,22 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 	@Override
 	public void deleteItem(int pageIndex, int itemIndex) {
 		getPage(pageIndex).deleteItem(itemIndex);
+	}
+	
+	private Bitmap getThumb(String s) {
+		Bitmap bmp = Bitmap.createBitmap(150, 150, Bitmap.Config.RGB_565);
+		Canvas canvas = new Canvas(bmp);
+		Paint paint = new Paint();
+
+		paint.setColor(Color.rgb(mRandom.nextInt(128), mRandom.nextInt(128), mRandom.nextInt(128)));
+		paint.setTextSize(24);
+		paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+		canvas.drawRect(new Rect(0, 0, 150, 150), paint);
+		paint.setColor(Color.WHITE);
+		paint.setTextAlign(Paint.Align.CENTER);
+		canvas.drawText(s, 75, 75, paint);
+
+		return bmp;
 	}
 
 }
