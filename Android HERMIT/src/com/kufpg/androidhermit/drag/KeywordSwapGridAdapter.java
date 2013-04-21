@@ -43,14 +43,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import ca.laplanete.mobile.pageddragdropgrid.Item;
 import ca.laplanete.mobile.pageddragdropgrid.Page;
@@ -59,16 +58,20 @@ import ca.laplanete.mobile.pageddragdropgrid.PagedDragDropGridAdapter;
 
 public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 
-	private Context context;
-	private PagedDragDropGrid gridview;
+	private Context mContext;
+	private PagedDragDropGrid mGridview;
+	private Typeface mTypeface;
 	private Random mRandom = new Random();
+	private final int CHAR_WIDTH_PIXELS = 15;
+	private final int DEFAULT_MAX_CHARS = 10;
 
-	List<Page> pages = new ArrayList<Page>();
+	List<Page> mPages = new ArrayList<Page>();
 
 	public KeywordSwapGridAdapter(Context context, PagedDragDropGrid gridView, String entryContents) {
 		super();
-		this.context = context;
-		this.gridview = gridView;
+		mContext = context;
+		mGridview = gridView;
+		mTypeface = Typeface.createFromAsset(context.getAssets(), ConsoleActivity.TYPEFACE);
 
 		Page page1 = new Page();
 		List<Item> items = new ArrayList<Item>();
@@ -77,17 +80,17 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 			items.add(new Item(i, getThumb(sentence[i])));
 		}
 		page1.setItems(items);
-		pages.add(page1);
+		mPages.add(page1);
 	}
 
 	@Override
 	public int pageCount() {
-		return pages.size();
+		return mPages.size();
 	}
 
 	private List<Item> itemsInPage(int page) {
-		if (pages.size() > page) {
-			return pages.get(page).getItems();
+		if (mPages.size() > page) {
+			return mPages.get(page).getItems();
 		}	
 		return Collections.emptyList();
 	}
@@ -95,31 +98,31 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 	@Override
 	public View view(int page, int index) {
 
-		LinearLayout layout = new LinearLayout(context);
+		LinearLayout layout = new LinearLayout(mContext);
 		layout.setOrientation(LinearLayout.VERTICAL);
 
-		ImageView icon = new ImageView(context);
+		ImageView icon = new ImageView(mContext);
 		Item item = getItem(page, index);
 		icon.setImageBitmap(item.getDrawable());
 		icon.setPadding(15, 15, 15, 15);
 
 		layout.addView(icon);
 
-//		//TextView label = new TextView(context);
-//		label.setText(item.getName());	
-//		label.setTextColor(Color.BLACK);
-//		label.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+		//		//TextView label = new TextView(context);
+		//		label.setText(item.getName());	
+		//		label.setTextColor(Color.BLACK);
+		//		label.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
 
 		//label.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
 
 		layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-		layout.setBackground(context.getResources().getDrawable(R.drawable.list_selector_holo_light));
+		layout.setBackground(mContext.getResources().getDrawable(R.drawable.list_selector_holo_light));
 		layout.setClickable(true);
 		layout.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				return gridview.onLongClick(v);
+				return mGridview.onLongClick(v);
 			}
 		});
 
@@ -149,7 +152,7 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 
 	public void printLayout() {
 		int i=0;
-		for (Page page : pages) {
+		for (Page page : mPages) {
 			Log.d("Page", Integer.toString(i++));
 
 			for (Item item : page.getItems()) {
@@ -159,7 +162,7 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 	}
 
 	private Page getPage(int pageIndex) {
-		return pages.get(pageIndex);
+		return mPages.get(pageIndex);
 	}
 
 	@Override
@@ -195,19 +198,28 @@ public class KeywordSwapGridAdapter implements PagedDragDropGridAdapter {
 	public void deleteItem(int pageIndex, int itemIndex) {
 		getPage(pageIndex).deleteItem(itemIndex);
 	}
-	
+
 	private Bitmap getThumb(String s) {
-		Bitmap bmp = Bitmap.createBitmap(150, 150, Bitmap.Config.RGB_565);
+		int x = 150;
+		if (s.length() <= DEFAULT_MAX_CHARS) {
+			x = DEFAULT_MAX_CHARS * CHAR_WIDTH_PIXELS;
+		} else {
+			x = s.length() * CHAR_WIDTH_PIXELS;
+		}
+		int y = 100;
+
+		Bitmap bmp = Bitmap.createBitmap(x, y, Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(bmp);
 		Paint paint = new Paint();
 
 		paint.setColor(Color.rgb(mRandom.nextInt(128), mRandom.nextInt(128), mRandom.nextInt(128)));
 		paint.setTextSize(24);
+		paint.setTypeface(mTypeface);
 		paint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		canvas.drawRect(new Rect(0, 0, 150, 150), paint);
+		canvas.drawRect(new Rect(0, 0, x, y), paint);
 		paint.setColor(Color.WHITE);
 		paint.setTextAlign(Paint.Align.CENTER);
-		canvas.drawText(s, 75, 75, paint);
+		canvas.drawText(s, x/2.0f, y/2.0f, paint);
 
 		return bmp;
 	}

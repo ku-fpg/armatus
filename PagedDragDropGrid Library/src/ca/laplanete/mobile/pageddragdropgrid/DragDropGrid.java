@@ -34,7 +34,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -45,11 +45,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +63,7 @@ public class DragDropGrid extends ViewGroup implements OnTouchListener, OnLongCl
 	private OnClickListener onClickListener = null;
 	private PagedContainer container;
 
-	private SparseArray<Integer> newPositions = new SparseArray<Integer>();
+	private SparseIntArray newPositions = new SparseIntArray();
 
 	private int gridPageWidth = 0;
 	private int dragged = -1;
@@ -149,14 +146,14 @@ public class DragDropGrid extends ViewGroup implements OnTouchListener, OnLongCl
 		deleteZone.bringToFront();
 	}
 
-	private void animateMoveAllItems() {
-		Animation rotateAnimation = createFastRotateAnimation();
-
-		for (int i=0; i < getItemViewCount(); i++) {
-			View child = getChildAt(i);
-			child.startAnimation(rotateAnimation);
-		 }
-	}
+//	private void animateMoveAllItems() {
+//		Animation rotateAnimation = createFastRotateAnimation();
+//
+//		for (int i=0; i < getItemViewCount(); i++) {
+//			View child = getChildAt(i);
+//			child.startAnimation(rotateAnimation);
+//		 }
+//	}
 
 	private void cancelAnimations() {
 		 for (int i=0; i < getItemViewCount(); i++) {
@@ -569,21 +566,21 @@ public class DragDropGrid extends ViewGroup implements OnTouchListener, OnLongCl
 		return translate;
 	}
 
-	private Animation createFastRotateAnimation() {
-		Animation rotate = new RotateAnimation(-2.0f,
-										  2.0f,
-										  Animation.RELATIVE_TO_SELF,
-										  0.5f,
-										  Animation.RELATIVE_TO_SELF,
-										  0.5f);
-
-	 	rotate.setRepeatMode(Animation.REVERSE);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setDuration(60);
-        rotate.setInterpolator(new AccelerateDecelerateInterpolator());
-
-		return rotate;
-	}
+//	private Animation createFastRotateAnimation() {
+//		Animation rotate = new RotateAnimation(-2.0f,
+//										  2.0f,
+//										  Animation.RELATIVE_TO_SELF,
+//										  0.5f,
+//										  Animation.RELATIVE_TO_SELF,
+//										  0.5f);
+//
+//	 	rotate.setRepeatMode(Animation.REVERSE);
+//        rotate.setRepeatCount(Animation.INFINITE);
+//        rotate.setDuration(60);
+//        rotate.setInterpolator(new AccelerateDecelerateInterpolator());
+//
+//		return rotate;
+//	}
 
 	private int currentViewAtPosition(int targetLocation) {
 		int viewAtPosition = targetLocation;
