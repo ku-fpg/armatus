@@ -12,6 +12,7 @@ public class PrettyPrinter {
 	public static final String RED = "#CC060B";
 	public static final String GREEN = "#1DDA1C";
 	public static final String BLUE = "#0090D3";
+	public static final String GRAY = "#969696";
 	
 	public static void setPrettyText(TextView tv, String text) {
 		String res = "";

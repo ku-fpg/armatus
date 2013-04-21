@@ -10,6 +10,7 @@ import com.kufpg.androidhermit.console.CommandDispatcher;
 import com.kufpg.androidhermit.dialog.ConsoleEntryRearrangeDialog;
 import com.kufpg.androidhermit.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.androidhermit.dialog.ConsoleExitDialog;
+import com.kufpg.androidhermit.dialog.KeywordSwapDialog;
 import com.kufpg.androidhermit.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -52,6 +53,7 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final int ENTRY_COMMAND_LIMIT = 200;
 	public static final String SELECTION_TAG = "selection";
 	public static final String REARRANGE_TAG = "rearrange";
+	public static final String KEYWORD_SWAP_TAG = "keywordswap";
 
 	private static final int REARRANGE_ID = 19;
 
@@ -389,6 +391,8 @@ public class ConsoleActivity extends StandardListActivity {
 			newFrag = ConsoleEntrySelectionDialog.newInstance(entryNum, entryContents);
 		} else if (tag == REARRANGE_TAG) {
 			newFrag = ConsoleEntryRearrangeDialog.newInstance(entryNum, entryContents);
+		} else if (tag == KEYWORD_SWAP_TAG) {
+			newFrag = KeywordSwapDialog.newInstance(entryNum, entryContents);
 		}
 		ft.add(newFrag, tag);
 		ft.commit();

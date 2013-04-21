@@ -16,7 +16,7 @@ public class ConsoleEntryCallback implements Callback {
 	private ConsoleEntryAdapter mAdapter;
 	private int mEntryNum;
 	private String mEntryContents;
-	
+
 	public ConsoleEntryCallback(ConsoleActivity console, ConsoleEntryAdapter adapter,
 			int entryNum, String entryContents) {
 		mConsole = console;
@@ -24,7 +24,7 @@ public class ConsoleEntryCallback implements Callback {
 		mEntryNum = entryNum;
 		mEntryContents = entryContents;
 	}
-	
+
 	@Override
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
@@ -37,6 +37,10 @@ public class ConsoleEntryCallback implements Callback {
 			return true;
 		case R.id.select:
 			mConsole.showEntryDialog(mEntryNum, mEntryContents, ConsoleActivity.SELECTION_TAG);
+			mode.finish();
+			return true;
+		case R.id.swap:
+			mConsole.showEntryDialog(mEntryNum, mEntryContents, ConsoleActivity.KEYWORD_SWAP_TAG);
 			mode.finish();
 			return true;
 		}
