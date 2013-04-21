@@ -18,7 +18,7 @@ public class KeywordSwapDialog extends DialogFragment {
 	private int mEntryNum;
 	private String mEntryContents;
 	private PagedDragDropGrid mGridView;
-	private Button mResetButton, mCoolStuffButton;
+	private Button mResetButton;//, mCoolStuffButton;
 	
 	public static KeywordSwapDialog newInstance(int entryNum, String entryContents) {
 		KeywordSwapDialog ksd = new KeywordSwapDialog();
@@ -55,7 +55,7 @@ public class KeywordSwapDialog extends DialogFragment {
                 mGridView.notifyDataSetChanged();
 			}
 		});
-		mCoolStuffButton = (Button) v.findViewById(R.id.keyword_swap_coolstuff_button);
+		//mCoolStuffButton = (Button) v.findViewById(R.id.keyword_swap_coolstuff_button);
 		
 		return v;
 	}
