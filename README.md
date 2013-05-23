@@ -25,4 +25,8 @@ Software used
 
 —moreDroid's <a href="https://github.com/djpnewton/moreDroid">ExpandoLayout</a> class by <a href="https://github.com/djpnewton">djpnewton</a>
 
+—<a href="https://github.com/mrKlar/PagedDragDropGrid">PagedDragDropGrid</a> by <a href="https://github.com/mrKlar">Nicolas "mrKlar" Desjardins</a> under a custom open-source license
+
+—<a href="https://github.com/thquinn/DraggableGridView">DraggableGridView</a> by <a href="https://github.com/thquinn">Tom "thquinn" Quinn</a> under the Apache License 2.0
+
 —<a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> by <a href="https://github.com/jackpal">Jack "jackpal" Palevich</a> under the Apache Licence 2.0
