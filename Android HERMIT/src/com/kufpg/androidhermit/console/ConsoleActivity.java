@@ -2,6 +2,7 @@ package com.kufpg.androidhermit.console;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 import com.kufpg.androidhermit.MainActivity;
 import com.kufpg.androidhermit.R;
@@ -19,6 +20,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -35,6 +37,7 @@ import android.view.View.OnKeyListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -50,18 +53,22 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int PADDING = 5;
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
-	public static final int ENTRY_COMMAND_LIMIT = 200;
+	public static final int ENTRY_COMMAND_HISTORY_LIMIT = 200;
 	public static final String SELECTION_TAG = "selection";
 	public static final String REARRANGE_TAG = "rearrange";
 	public static final String KEYWORD_SWAP_TAG = "keywordswap";
 
 	private static final int REARRANGE_ID = 19;
 
-	private ListView mConsoleListView, mCommandListView;
+	private ListView mConsoleListView, mCommandHistoryListView;
+	private ExpandableListView mCommandExpandableMenuView;
 	private ConsoleEntryAdapter mConsoleAdapter;
-	private CommandHistoryAdapter mCommandAdapter;
+	private CommandHistoryAdapter mCommandHistoryAdapter;
+	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
 	private ArrayList<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>(); 
-	private ArrayList<String> mCommandEntries = new ArrayList<String>();
+	private ArrayList<String> mCommandHistoryEntries = new ArrayList<String>();
+	private ArrayList<String> mCommandExpandableGroups = new ArrayList<String>();
+	private LinkedHashMap<String, ArrayList<String>> mCommandExpandableGroupMap = new LinkedHashMap<String, ArrayList<String>>();
 	private View mInputView, mRootView;
 	private TextView mInputNum;
 	private EditText mInputEditText;
@@ -163,10 +170,17 @@ public class ConsoleActivity extends StandardListActivity {
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		refreshSlidingMenu();
 
-		mCommandListView = (ListView)findViewById(R.id.History);
-		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
-		mCommandListView.setAdapter(mCommandAdapter);
-		updateCommandEntries();
+		mCommandHistoryListView = (ListView)findViewById(R.id.History);
+		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
+		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
+		updateCommandHistoryEntries();
+		
+		loadExpandableMenuData();
+		
+		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
+		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
+				(this, mCommandExpandableGroups, mCommandExpandableGroupMap);
+		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 	}
 
 	@Override
@@ -177,7 +191,7 @@ public class ConsoleActivity extends StandardListActivity {
 		outState.putInt("entryCount", mEntryCount);
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putSerializable("consoleEntries", mConsoleEntries);
-		outState.putSerializable("commandEntries", mCommandEntries);
+		outState.putSerializable("commandEntries", mCommandHistoryEntries);
 		if (mServer != null) {
 			mServer.detach();
 		}
@@ -199,10 +213,10 @@ public class ConsoleActivity extends StandardListActivity {
 		setListAdapter(mConsoleAdapter);
 		updateConsoleEntries();
 
-		mCommandEntries = (ArrayList<String>) state.getSerializable("commandEntries");
-		mCommandAdapter = new CommandHistoryAdapter(this, mCommandEntries);
-		mCommandListView.setAdapter(mCommandAdapter);
-		updateCommandEntries();
+		mCommandHistoryEntries = (ArrayList<String>) state.getSerializable("commandEntries");
+		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
+		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
+		updateCommandHistoryEntries();
 
 		mServer = (HermitServer) state.getSerializable("server");
 		if (mServer != null) {
@@ -284,10 +298,10 @@ public class ConsoleActivity extends StandardListActivity {
 	}
 
 	public void addCommandEntry(String commandName) {
-		if (mCommandEntries.size() == 0
-				|| commandName != mCommandEntries.get(0)) {
-			mCommandEntries.add(0, commandName);
-			updateCommandEntries();
+		if (mCommandHistoryEntries.size() == 0
+				|| commandName != mCommandHistoryEntries.get(0)) {
+			mCommandHistoryEntries.add(0, commandName);
+			updateCommandHistoryEntries();
 		}
 	}
 
@@ -397,6 +411,40 @@ public class ConsoleActivity extends StandardListActivity {
 		ft.add(newFrag, tag);
 		ft.commit();
 	}
+	
+	private void loadExpandableMenuData() {
+		TypedArray ta = getResources().obtainTypedArray(R.array.command_group_arrays);
+		for (int i = 0; i < ta.length(); i++) {
+			String[] parents = getResources().getStringArray(R.array.command_groups);
+			int id = ta.getResourceId(i, 0);
+			if (id > 0) {
+				String[] children = getResources().getStringArray(id);
+				for (int j = 1; j < children.length; j++) { //Don't include id
+					addCommand(parents[i], children[j]);
+				}
+			}
+		}
+
+		ta.recycle();
+	}
+	
+	private int addCommand(String groupName, String commandName) {
+		int groupPosition = 0;
+
+		//check the hash map if the group already exists
+		ArrayList<String> commandNames = mCommandExpandableGroupMap.get(groupName); 
+		//add the group if doesn't exists
+		if(commandNames == null) {
+			commandNames = new ArrayList<String>();
+			mCommandExpandableGroupMap.put(groupName, commandNames);
+			mCommandExpandableGroups.add(groupName);
+		}
+		commandNames.add(commandName);
+
+		//find the group position inside the list
+		groupPosition = mCommandExpandableGroups.indexOf(groupName);
+		return groupPosition;
+	}
 
 	/**
 	 * Changes the SlidingMenu offset depending on which screen orientation is enabled.
@@ -445,11 +493,11 @@ public class ConsoleActivity extends StandardListActivity {
 		mInputNum.setText("hermit<" + mEntryCount + "> ");
 	}
 
-	private void updateCommandEntries() {
-		if (mCommandEntries.size() > ENTRY_CONSOLE_LIMIT) {
-			mCommandEntries.remove(0);
+	private void updateCommandHistoryEntries() {
+		if (mCommandHistoryEntries.size() > ENTRY_COMMAND_HISTORY_LIMIT) {
+			mCommandHistoryEntries.remove(0);
 		}
-		mCommandAdapter.notifyDataSetChanged();
+		mCommandHistoryAdapter.notifyDataSetChanged();
 	}
 
 }

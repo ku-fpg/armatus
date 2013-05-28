@@ -16,5 +16,36 @@
 	<string name="console_exit_message">All progress will be lost. Do you still want to exit the console?</string>
 	<string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
 	<string name="swap">swap</string>
+	
+	<string-array name="command_groups">
+        <item>Red Commands</item>
+        <item>Blue Commands</item>
+        <item>Green Commands</item>
+    </string-array>
+    
+    <array name="command_group_arrays">
+        <item>@array/red_commands</item>
+        <item>@array/blue_commands</item>
+        <item>@array/green_commands</item>
+    </array>
+    
+    <string-array name="red_commands">
+        <item name="id">1</item>
+        <item>toast</item>
+    </string-array>
+    
+    <string-array name="blue_commands">
+        <item name="id">2</item>
+        <item>consider</item>
+        <item>clear</item>
+        <item>clear</item>
+        <item>clear</item>
+    </string-array>
+    
+    <string-array name="green_commands">
+        <item name="id">3</item>
+        <item>resume</item>
+        <item>exit</item>
+    </string-array>
     
 </resources>

@@ -1,148 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:drag="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
-    xmlns:ExpandoLayout="http://schemas.android.com/apk/res/com.kufpg.androidhermit"
     android:id="@+id/command_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
-        android:id="@+id/expando_root_layout"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content" >
 
-        <com.djpsoft.moreDroid.ExpandoLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            ExpandoLayout:text="Red Commands"
-            ExpandoLayout:textSize="20"
-            android:background="#222222" >
-
-            <RelativeLayout
-                android:id="@+id/command_relative_layout1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:id="@+id/drag_layout1"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:background="@android:color/transparent"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/drag_icon1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        drag:command="toast" />
-                </LinearLayout>
-            </RelativeLayout>
-        </com.djpsoft.moreDroid.ExpandoLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="#DDFFDD" />
-
-        <com.djpsoft.moreDroid.ExpandoLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            ExpandoLayout:text="Blue Commands"
-            ExpandoLayout:textSize="20"
-            android:background="#222222" >
-
-            <RelativeLayout
-                android:id="@+id/command_relative_layout2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:id="@+id/drag_layout2"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/drag_layout1"
-                    android:background="@android:color/transparent"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/drag_icon2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        drag:command="consider" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/drag_layout3"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/drag_layout2"
-                    android:background="@android:color/transparent"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/drag_icon3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        drag:command="clear" />
-                </LinearLayout>
-            </RelativeLayout>
-        </com.djpsoft.moreDroid.ExpandoLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="#DDFFDD" />
-
-        <com.djpsoft.moreDroid.ExpandoLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            ExpandoLayout:text="Green Commands"
-            ExpandoLayout:textSize="20"
-            android:background="#222222" >
-
-            <RelativeLayout
-                android:id="@+id/command_relative_layout3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:orientation="vertical" >
-
-                <LinearLayout
-                    android:id="@+id/drag_layout4"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/drag_layout3"
-                    android:background="@android:color/transparent"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/drag_icon4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        drag:command="resume" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/drag_layout5"
-                    android:layout_width="300dp"
-                    android:layout_height="100dp"
-                    android:layout_below="@+id/drag_layout4"
-                    android:background="@android:color/transparent"
-                    android:gravity="center" >
-
-                    <com.kufpg.androidhermit.drag.DragIcon
-                        android:id="@+id/drag_icon5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        drag:command="exit" />
-                </LinearLayout>
-            </RelativeLayout>
-        </com.djpsoft.moreDroid.ExpandoLayout>
-    </LinearLayout>
+        <ExpandableListView
+            android:id="@+id/command_expandable_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null" />
+    </RelativeLayout>
 
 </ScrollView>
