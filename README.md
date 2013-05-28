@@ -11,7 +11,14 @@ Android app
 -----
 The Armatus Android app enhances HERMIT through graphical shortcuts such as draggable command icons, an interactive command history menu, context-aware entry selection, rearrangment of words in an entry, and finger gestures. For more information, visit the features (TODO) page on the wiki.
 
-The Armatus app was designed to work on the Nexus 7, but in theory, it should run on any Android 4.1 (Jelly Bean) device. Armatus can also be used to launch the <a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> (<a href="https://play.google.com/store/apps/details?id=jackpal.androidterm">download</a>), but this is optional and not an integral part of Armatus.
+The Armatus app was designed to work on the Nexus 7, but in theory, it should run on any Android 4.1 (Jelly Bean) device. Armatus can also be used to launch the <a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> (<a href="https://play.google.com/store/apps/details?id=jackpal.androidterm">download</a>), but this is optional and not an integral part of Armatus. 
+Within the application specifically the icons that have been built the color sceme is follows:
+Alpha Conversation-Red
+New/Debug/Navigation/GHC-Blue
+Fix Point-Green
+Local-Purple
+Unfold/Inline/Fold-Yellow.
+With naming of these icon images need to make sure that it is completely lowercase and only use letters and numbers. For spacing need to use "_" in between different words in the title.
 
 RESTful server
 -----
