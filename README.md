@@ -23,8 +23,6 @@ Software used
 
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
 
-—moreDroid's <a href="https://github.com/djpnewton/moreDroid">ExpandoLayout</a> class by <a href="https://github.com/djpnewton">djpnewton</a>
-
 —<a href="https://github.com/mrKlar/PagedDragDropGrid">PagedDragDropGrid</a> by <a href="https://github.com/mrKlar">Nicolas "mrKlar" Desjardins</a> under a custom open-source license
 
 —<a href="https://github.com/thquinn/DraggableGridView">DraggableGridView</a> by <a href="https://github.com/thquinn">Tom "thquinn" Quinn</a> under the Apache License 2.0
