@@ -1,4 +1,4 @@
-android-hermit (prototype for Armatus)
+Armatus
 =====
 
 Armatus is a project of the <a href="http://www.ittc.ku.edu/csdl/fpg/index.html">Functional Programming Group</a> at the University of Kansas. Armatus aims to bring the <a href="http://www.ittc.ku.edu/csdl/fpg/software/hermit.html">HERMIT</a> project to Android devices (specifically, tablet interfaces). The full project description can be read <a href="http://www.ittc.ku.edu/view_project.phtml?id=438">here</a>.
@@ -22,8 +22,6 @@ Software used
 —<a href="http://www.cosmix.org/software/">Droid Sans Mono</a> (w/ dotted zero) copyright Ascender Corp. under the Apache License, modified by <a href="http://www.cosmix.org">cosmix.org</a>
 
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
-
-—moreDroid's <a href="https://github.com/djpnewton/moreDroid">ExpandoLayout</a> class by <a href="https://github.com/djpnewton">djpnewton</a>
 
 —<a href="https://github.com/mrKlar/PagedDragDropGrid">PagedDragDropGrid</a> by <a href="https://github.com/mrKlar">Nicolas "mrKlar" Desjardins</a> under a custom open-source license
 
