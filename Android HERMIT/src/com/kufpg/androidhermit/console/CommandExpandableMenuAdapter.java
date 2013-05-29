@@ -7,6 +7,7 @@ import com.kufpg.androidhermit.R;
 import com.kufpg.androidhermit.drag.DragIcon;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,9 +47,9 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			view = inflater.inflate(R.layout.command_expandable_child, null);
 		}
 
-		DragIcon icon = (DragIcon) view.findViewById(R.id.drag_icon);
-		icon.setCommandName(commandName);
-
+		DragIcon dragIcon = (DragIcon) view.findViewById(R.id.drag_icon);
+		dragIcon.setCommandName(commandName);
+		
 		return view;
 	}
 
@@ -85,6 +86,8 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 		TextView heading = (TextView) view.findViewById(R.id.group_heading);
 		heading.setText(groupName);
+		View groupColor = (View) view.findViewById(R.id.group_color);
+		groupColor.setBackgroundColor(Color.parseColor(CommandDispatcher.getGroupColor(groupName)));
 
 		return view;
 	}

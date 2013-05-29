@@ -12,40 +12,119 @@
     <string name="select">SELECT</string>
     <string name="terminal_not_installed_title">Error: ATE not installed</string>
     <string name="terminal_not_installed_message">To use the terminal, you must install the Android Terminal Emulator app. Afterwards, you must reinstall Armatus. Would you like to install ATE from the Play store now?</string>
-	<string name="console_exit_title">Are you sure you want to exit?</string>
-	<string name="console_exit_message">All progress will be lost. Do you still want to exit the console?</string>
-	<string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
-	<string name="swap">swap</string>
-	
-	<string-array name="command_groups">
-        <item>Red Commands</item>
-        <item>Blue Commands</item>
-        <item>Green Commands</item>
+    <string name="console_exit_title">Are you sure you want to exit?</string>
+    <string name="console_exit_message">All progress will be lost. Do you still want to exit the console?</string>
+    <string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
+    <string name="swap">swap</string>
+
+    <string-array name="command_groups">
+        <item>Alpha Conversation</item>
+        <item>Fix Point</item>
+        <item>Local</item>
+        <item>New/Debug/Nav/GHC</item>
+        <item>Unfold/Fold/Inline</item>
+        <item>Miscellaneous</item>
     </string-array>
-    
+
     <array name="command_group_arrays">
-        <item>@array/red_commands</item>
-        <item>@array/blue_commands</item>
-        <item>@array/green_commands</item>
+        <item>@array/alpha_conversation_commands</item>
+        <item>@array/fix_point_commands</item>
+        <item>@array/local_commands</item>
+        <item>@array/new_debug_nav_ghc_commands</item>
+        <item>@array/unfold_fold_inline_commands</item>
+        <item>@array/miscellaneous_commands</item>
     </array>
-    
-    <string-array name="red_commands">
+
+    <string-array name="alpha_conversation_commands">
         <item name="id">1</item>
+        <item>alpha</item>
+        <item>alpha-alt</item>
+        <item>alpha-case</item>
+        <item>alpha-case-binder</item>
+        <item>alpha-lam</item>
+        <item>alpha-let</item>
+        <item>alpha-top</item>
+        <item>undershadow</item>
+    </string-array>
+    <string-array name="fix_point_commands">
+        <item name="id">2</item>
+        <item>fix-computation</item>
+        <item>fix-intro</item>
+        <item>rolling-rule</item>
+        <item>ww-assumption-a</item>
+        <item>ww-assumption-b</item>
+        <item>ww-assumption-c</item>
+        <item>ww-factorisation</item>
+        <item>ww-fusion</item>
+        <item>ww-split</item>
+        <item>ww-split-param</item>
+    </string-array>
+    <string-array name="local_commands">
+        <item name="id">3</item>
+        <item>abstract</item>
+        <item>beta-expand</item>
+        <item>beta-reduce</item>
+        <item>beta-reduce-plus</item>
+        <item>eta-expand</item>
+        <item>eta-reduce</item>
+        <item>flatten-module</item>
+        <item>flatten-program</item>
+        <item>nonrec-to-rec</item>
+    </string-array>
+    <string-array name="new_debug_nav_ghc_commands">
+        <item name="id">4</item>
+        <item>add-rule</item>
+        <item>any-call</item>
+        <item>apply-rule</item>
+        <item>apply-rules</item>
+        <item>binding-group-of</item>
+        <item>cast-eliminate</item>
+        <item>cleanup-unfold</item>
+        <item>compare-values</item>
+        <item>consider</item>
+        <item>consider-construct</item>
+        <item>consider-name</item>
+        <item>debug-unfold</item>
+        <item>deshadow-program</item>
+        <item>free-ids</item>
+        <item>info</item>
+        <item>inline-all</item>
+        <item>let-sub</item>
+        <item>let-tuple</item>
+        <item>observe</item>
+        <item>observe-fail</item>
+        <item>occure-analysis</item>
+        <item>push</item>
+        <item>resume</item>
+        <item>rewrites</item>
+        <item>rewrites-one-fail</item>
+        <item>rhs-of</item>
+        <item>safe-let-sub</item>
+        <item>simplify</item>
+        <item>static-argument</item>
+        <item>test</item>
+        <item>trace</item>
+        <item>translate-rewrite</item>
+        <item>unfold-rule</item>
+        <item>unsafe-replace</item>
+        <item>variable</item>
+    </string-array>
+    <string-array name="unfold_fold_inline_commands">
+        <item name="id">5</item>
+        <item>fold</item>
+        <item>fold-remembered</item>
+        <item>inline</item>
+        <item>inline-case-binder</item>
+        <item>inline-name</item>
+        <item>inline-scrutinee</item>
+        <item>remember</item>
+        <item>unfold</item>
+    </string-array>
+    <string-array name="miscellaneous_commands">
+        <item name="id">6</item>
+        <item>clear</item>
+        <item>exit</item>
         <item>toast</item>
     </string-array>
-    
-    <string-array name="blue_commands">
-        <item name="id">2</item>
-        <item>consider</item>
-        <item>clear</item>
-        <item>clear</item>
-        <item>clear</item>
-    </string-array>
-    
-    <string-array name="green_commands">
-        <item name="id">3</item>
-        <item>resume</item>
-        <item>exit</item>
-    </string-array>
-    
+
 </resources>

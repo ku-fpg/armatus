@@ -12,6 +12,7 @@ import com.kufpg.androidhermit.dialog.ConsoleEntryRearrangeDialog;
 import com.kufpg.androidhermit.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.androidhermit.dialog.ConsoleExitDialog;
 import com.kufpg.androidhermit.dialog.KeywordSwapDialog;
+import com.kufpg.androidhermit.drag.DragSinkListener;
 import com.kufpg.androidhermit.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -155,6 +156,12 @@ public class ConsoleActivity extends StandardListActivity {
 					mInputEditText.setText("");
 				}
 				return false;
+			}
+		});
+		mInputEditText.setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragStarted(View dragView, View dragSink) {
+				getSlidingMenu().showContent();
 			}
 		});
 		mInputEditText.requestFocus();

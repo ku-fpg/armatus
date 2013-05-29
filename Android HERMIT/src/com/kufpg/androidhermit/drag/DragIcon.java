@@ -1,9 +1,11 @@
 package com.kufpg.androidhermit.drag;
 
-import com.kufpg.androidhermit.R;
+import java.util.Locale;
+
+import com.kufpg.androidhermit.console.CommandDispatcher;
+import com.kufpg.androidhermit.console.CommandDispatcher.Command;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -11,7 +13,7 @@ import android.widget.ImageView;
  * A draggable image that represents a Command that can be run on console entry Keywords.
  */
 public class DragIcon extends ImageView {
-	private String mCommandName = null;
+	private String mCommandName, mCommandImagePath;
 
 	public DragIcon(Context context) {
 		this(context, null);
@@ -25,9 +27,6 @@ public class DragIcon extends ImageView {
 		super(context, attrs, defStyle);
 
 		setOnLongClickListener(new DragViewClickListener());
-		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DragIcon);
-		setCommandName(ta.getString(R.styleable.DragIcon_command));
-		ta.recycle();
 	}
 
 	public String getCommandName() {
@@ -35,13 +34,24 @@ public class DragIcon extends ImageView {
 	}
 
 	public void setCommandName(String commandName) {
-		if (commandName == null) {
+		Command command = CommandDispatcher.getCommand(commandName);
+		if (commandName == null || command == null) {
 			mCommandName = "toast"; //Because toast is delicious
+		} else if (commandName.equals("translate-rewrite")) {
+			mCommandName = "<+";
+		} else if (commandName.equals("rewrites")) {
+			mCommandName = ">>>";
+		} else if (commandName.equals("rewrites-one-fail")) {
+			mCommandName = ">+>";
 		} else {
 			mCommandName = commandName;
 		}
+		
+		String groupName = CommandDispatcher.getCommand(mCommandName).getGroupName();	
+		groupName = groupName.replaceAll("[/ ]", "_").toLowerCase(Locale.US);
+		mCommandImagePath = "command_" + groupName + "_" + commandName.replace("-", "").toLowerCase(Locale.US);
 
-		int resid = getResources().getIdentifier(mCommandName, "drawable", "com.kufpg.androidhermit");
+		int resid = getResources().getIdentifier(mCommandImagePath, "drawable", "com.kufpg.androidhermit");
 		if (resid != 0) {
 			setBackground(getResources().getDrawable(resid));
 		}

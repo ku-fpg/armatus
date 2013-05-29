@@ -28,7 +28,7 @@ public class MainActivity extends StandardActivity {
 
 	private TextView mButtonsView;
 	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton, mConsoleButton,
-	mPinchZoomButton, mExpandoLayoutButton, mTestActivityButton, mTerminalButton;
+	mPinchZoomButton, mTestActivityButton, mTerminalButton;
 	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
@@ -49,7 +49,6 @@ public class MainActivity extends StandardActivity {
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
-		mExpandoLayoutButton = (Button) findViewById(R.id.expandolayout_button);
 		mTestActivityButton = (Button) findViewById(R.id.test_activity_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 
@@ -133,13 +132,6 @@ public class MainActivity extends StandardActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(mContext, TextSizePinchZoomActivity.class));
-			}
-		});
-
-		mExpandoLayoutButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(mContext, ExpandoLayoutActivity.class));
 			}
 		});
 
