@@ -1,10 +1,10 @@
 <resources>
 
-    <string name="app_name">Android HERMIT</string>
+    <string name="app_name">Armatus</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">Android HERMIT</string>
-    <string name="title_preference_screen">Android HERMIT preferences</string>
+    <string name="title_activity_main">Armatus</string>
+    <string name="title_preference_screen">Armatus preferences</string>
     <string name="default_pref_message">Are you sure you want to restore the default settings?</string>
     <string name="context_menu_title">Commands found in this line</string>
     <string name="popup_text">Font size:</string>

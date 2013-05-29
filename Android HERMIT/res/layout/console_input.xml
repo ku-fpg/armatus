@@ -21,7 +21,7 @@
         android:textSize="15sp"
         android:typeface="monospace" />
 
-    <com.kufpg.androidhermit.console.ActionEditText
+    <com.kufpg.armatus.console.ActionEditText
         android:id="@+id/test_code_input_edit_text"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
