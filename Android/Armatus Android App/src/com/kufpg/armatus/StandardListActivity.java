@@ -18,6 +18,7 @@ import android.widget.Toast;
 public class StandardListActivity extends ListActivity {
 
 	public final static int FILE_FROM_DISK = 1;
+	public static String PACKAGE_NAME;
 	protected static Context mContext;
 	protected static String mSaveDir;
 	protected static String mDefaultSaveDir;
@@ -32,6 +33,7 @@ public class StandardListActivity extends ListActivity {
 		actionBar.show();
 
 		mContext = this;
+		PACKAGE_NAME = mContext.getApplicationContext().getPackageName();
 		mSaveDir = getCacheDir().toString();
 		mDefaultSaveDir = mSaveDir;
 		mEditModeValue = "0";

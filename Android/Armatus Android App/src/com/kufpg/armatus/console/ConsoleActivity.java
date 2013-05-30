@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
-import com.kufpg.armatus.MainActivity;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.StandardListActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
@@ -12,6 +11,7 @@ import com.kufpg.armatus.dialog.ConsoleEntryRearrangeDialog;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.ConsoleExitDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
+import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 import com.kufpg.armatus.server.HermitServer;
 import com.slidingmenu.lib.SlidingMenu;
@@ -19,7 +19,6 @@ import com.slidingmenu.lib.SlidingMenu;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
@@ -305,8 +304,9 @@ public class ConsoleActivity extends StandardListActivity {
 	}
 
 	public void addCommandEntry(String commandName) {
-		if (mCommandHistoryEntries.size() == 0
-				|| commandName != mCommandHistoryEntries.get(0)) {
+		if ((mCommandHistoryEntries.size() == 0
+				|| commandName != mCommandHistoryEntries.get(0))
+				&& DragIcon.commandHasIcon(this, commandName)) {
 			mCommandHistoryEntries.add(0, commandName);
 			updateCommandHistoryEntries();
 		}
@@ -331,7 +331,7 @@ public class ConsoleActivity extends StandardListActivity {
 	 */
 	public void appendConsoleEntry(String newContents) {
 		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
-		contents += "<br />" + newContents;
+		contents += /*"Disabled pretty-printing <br />"*/ "\n" + newContents;
 		mConsoleEntries.remove(mConsoleEntries.size() - 1);
 		/* Use 1 less than mEntryCount, since we are retroactively modifying an entry after
 		 * addEntry() was called (which incremented mEntryCount) */
@@ -380,7 +380,6 @@ public class ConsoleActivity extends StandardListActivity {
 			mServer.cancel(true);
 		}
 		finish();
-		startActivity(new Intent(this, MainActivity.class));
 	}
 
 	public SlidingMenu getSlidingMenu() {

@@ -2,6 +2,7 @@ package com.kufpg.armatus.drag;
 
 import java.util.Locale;
 
+import com.kufpg.armatus.StandardActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
 
@@ -25,7 +26,6 @@ public class DragIcon extends ImageView {
 
 	public DragIcon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-
 		setOnLongClickListener(new DragViewClickListener());
 	}
 
@@ -34,8 +34,7 @@ public class DragIcon extends ImageView {
 	}
 
 	public void setCommandName(String commandName) {
-		Command command = CommandDispatcher.getCommand(commandName);
-		if (commandName == null || command == null) {
+		if (commandName == null) {
 			mCommandName = "toast"; //Because toast is delicious
 		} else if (commandName.equals("translate-rewrite")) {
 			mCommandName = "<+";
@@ -47,13 +46,50 @@ public class DragIcon extends ImageView {
 			mCommandName = commandName;
 		}
 		
+		Command command = CommandDispatcher.getCommand(mCommandName);
+		if (command == null) {
+			mCommandName = "toast"; //It fills you up right
+		}
+		
+		String pathCommand = new String(commandName);
+		if (commandName.equals("<+")) {
+			pathCommand = "translaterewrite";
+		} else if (commandName.equals(">>>")) {
+			pathCommand = "rewrites";
+		} else if (commandName.equals(">+>")) {
+			pathCommand = "rewritesonefail";
+		}
+
 		String groupName = CommandDispatcher.getCommand(mCommandName).getGroupName();	
 		groupName = groupName.replaceAll("[/ ]", "_").toLowerCase(Locale.US);
-		mCommandImagePath = "command_" + groupName + "_" + commandName.replace("-", "").toLowerCase(Locale.US);
+		mCommandImagePath = "command_" + groupName + "_" + pathCommand.replace("-", "").toLowerCase(Locale.US);
 
-		int resid = getResources().getIdentifier(mCommandImagePath, "drawable", "com.kufpg.armatus");
+		int resid = getResources().getIdentifier(mCommandImagePath, "drawable", StandardActivity.PACKAGE_NAME);
 		if (resid != 0) {
 			setBackground(getResources().getDrawable(resid));
 		}
+	}
+
+	public static boolean commandHasIcon(Context context, String commandName) {
+		Command command = CommandDispatcher.getCommand(commandName);
+		if (commandName == null || command == null) {
+			return false;
+		}
+		String groupName = command.getGroupName();
+		if (groupName == null) {
+			return false;
+		}
+		groupName = groupName.replaceAll("[/ ]", "_").toLowerCase(Locale.US);
+		String pathCommand = new String(commandName);
+		if (commandName.equals("<+")) {
+			pathCommand = "translaterewrite";
+		} else if (commandName.equals(">>>")) {
+			pathCommand = "rewrites";
+		} else if (commandName.equals(">+>")) {
+			pathCommand = "rewritesonefail";
+		}
+		String path = "command_" + groupName + "_" + pathCommand.replace("-", "").toLowerCase(Locale.US);
+		int resid = context.getResources().getIdentifier(path, "drawable", StandardActivity.PACKAGE_NAME);
+		return resid != 0;
 	}
 }

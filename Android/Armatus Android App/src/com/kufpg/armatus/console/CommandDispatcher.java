@@ -12,6 +12,7 @@ import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
 
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 @SuppressWarnings("unused")
@@ -460,7 +461,7 @@ public class CommandDispatcher {
 		@Override
 		protected void run(String... args) {
 			try {
-				String jstr = "{command:consider},{args:" + args[0] + "}";
+				String jstr = "{command:server-test},{args:" + varargsToString(args) + "}";
 				HermitServer request = new HermitServer(mConsole, new JSONObject(jstr));
 				request.execute();
 			} catch (Exception e) {

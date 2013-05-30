@@ -67,8 +67,10 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
 		mHolder.num.setTypeface(mTypeface);
 
-		PrettyPrinter.setPrettyText(mHolder.contents,
-				mEntries.get(position).getContents());
+		//Disabled until better system is found
+		//PrettyPrinter.setPrettyText(mHolder.contents,
+		//		mEntries.get(position).getContents());
+		mHolder.contents.setText(mEntries.get(position).getContents());
 		mHolder.contents.setTypeface(mTypeface);
 		
 		if (!mEntries.get(position).isWaiting()) {
