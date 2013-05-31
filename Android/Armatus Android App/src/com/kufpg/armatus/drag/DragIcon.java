@@ -36,12 +36,8 @@ public class DragIcon extends ImageView {
 	public void setCommandName(String commandName) {
 		if (commandName == null) {
 			mCommandName = "toast"; //Because toast is delicious
-		} else if (commandName.equals("translate-rewrite")) {
-			mCommandName = "<+";
-		} else if (commandName.equals("rewrites")) {
-			mCommandName = ">>>";
-		} else if (commandName.equals("rewrites-one-fail")) {
-			mCommandName = ">+>";
+		} else if (CommandDispatcher.isAlias(commandName)) {
+			mCommandName = CommandDispatcher.unaliasCommand(commandName);
 		} else {
 			mCommandName = commandName;
 		}
@@ -52,12 +48,8 @@ public class DragIcon extends ImageView {
 		}
 		
 		String pathCommand = new String(commandName);
-		if (commandName.equals("<+")) {
-			pathCommand = "translaterewrite";
-		} else if (commandName.equals(">>>")) {
-			pathCommand = "rewrites";
-		} else if (commandName.equals(">+>")) {
-			pathCommand = "rewritesonefail";
+		if (command.getCommandAlias() != null) {
+			pathCommand = command.getCommandAlias();
 		}
 
 		String groupName = CommandDispatcher.getCommand(mCommandName).getGroupName();	

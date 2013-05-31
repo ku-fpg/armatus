@@ -2,6 +2,7 @@ package com.kufpg.armatus.console;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -68,7 +69,7 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	
+
 	private static Command fixComputation = new Command("fix-computation", "Fix Point", 0, false) {
 		@Override
 		protected void run(String... args) {
@@ -129,7 +130,7 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	
+
 	private static Command abstract_ = new Command("abstract", "Local", 0, false) {
 		@Override
 		protected void run(String... args) {
@@ -184,7 +185,7 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	
+
 	private static Command addRule = new Command("add-rule", "New/Debug/Nav/GHC", 0, false) {
 		@Override
 		protected void run(String... args) {
@@ -323,13 +324,13 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	private static Command rewrites = new Command(">>>", "New/Debug/Nav/GHC", 0, false) {
+	private static Command rewrites = new Command(">>>", "rewrites", "New/Debug/Nav/GHC", 0, false) {
 		@Override
 		protected void run(String... args) {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	private static Command rewritesOneFail = new Command(">+>", "New/Debug/Nav/GHC", 0, false) {
+	private static Command rewritesOneFail = new Command(">+>", "rewrites-one-fail", "New/Debug/Nav/GHC", 0, false) {
 		@Override
 		protected void run(String... args) {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
@@ -371,7 +372,7 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	private static Command translateRewrite = new Command("<+", "New/Debug/Nav/GHC", 0, false) {
+	private static Command translateRewrite = new Command("<+", "translate-rewrite", "New/Debug/Nav/GHC", 0, false) {
 		@Override
 		protected void run(String... args) {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
@@ -395,7 +396,7 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	
+
 	private static Command fold = new Command("fold", "Unfold/Fold/Inline", 0, false) {
 		@Override
 		protected void run(String... args) {
@@ -444,7 +445,7 @@ public class CommandDispatcher {
 			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	
+
 	private static Command clear = new Command("clear", "Miscellaneous", 0, true) {
 		@Override
 		protected void run(String... args) {
@@ -499,17 +500,19 @@ public class CommandDispatcher {
 			}
 		}
 	};
-	private static Map<String, Command> mCommandMap = mapOfInstances(Command.class);
+	private static Map<String, Command> mCommandMap = new HashMap<String, Command>();
 	private static Map<String, String> mGroupColorMap = new HashMap<String, String>();
+	private static Map<String, String> mAliasedCommandMap = new HashMap<String, String>();
 
 	//List of Keywords
 	private static Keyword red = new Keyword("red", "toast", PrettyPrinter.RED);
 	private static Keyword green = new Keyword("green", "toast", PrettyPrinter.GREEN);
 	private static Keyword blue = new Keyword("blue", "toast", PrettyPrinter.BLUE);
-	private static Map<String, Keyword> mKeywordMap = mapOfInstances(Keyword.class);
+	private static Map<String, Keyword> mKeywordMap = new HashMap<String, Keyword>();
 
 	public CommandDispatcher(ConsoleActivity console) {
 		mConsole = console;
+		mapInstances();
 
 		mGroupColorMap.put("Alpha Conversation", PrettyPrinter.RED);
 		mGroupColorMap.put("Fix Point", PrettyPrinter.GREEN);
@@ -562,6 +565,10 @@ public class CommandDispatcher {
 		}
 	}
 
+	public static boolean isAlias(String commandName) {
+		return mAliasedCommandMap.containsKey(commandName);
+	}
+	
 	public static boolean isCommand(String commandName) {
 		return mCommandMap.containsKey(commandName);
 	}
@@ -581,6 +588,10 @@ public class CommandDispatcher {
 	public static Keyword getKeyword(String keywordName) {
 		return mKeywordMap.get(keywordName);
 	}
+	
+	public static String unaliasCommand(String alias) {
+		return mAliasedCommandMap.get(alias);
+	}
 
 	private static String varargsToString(String... varargs) {
 		String newString = "";
@@ -591,32 +602,25 @@ public class CommandDispatcher {
 		return newString;
 	}
 
-	/**
-	 * This gets all of this class's instance variables of type instanceType and puts
-	 * them into the supplied instanceMap for easy access.
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> Map<String, T> mapOfInstances(Class<T> instanceType) {
-		Map<String, T> instanceMap = new HashMap<String, T>();
+	private static void mapInstances() {
 		Field[] fields = CommandDispatcher.class.getDeclaredFields();
 		for (Field f : fields) {
-			if (f.getType().equals(instanceType)) {
-				try {
-					if (instanceType.equals(Command.class)) {
-						instanceMap.put(((Command) f.get(instanceType)).getCommandName(), (T) f.get(instanceType));
-					} else if (instanceType.equals(Keyword.class)) {
-						instanceMap.put(((Keyword) f.get(instanceType)).getKeywordName(), (T) f.get(instanceType));
-					} else {
-						instanceMap.put(f.getName(), (T) f.get(instanceType));
+			try {
+				if (f.getType().equals(Command.class)) {
+					Command command = (Command) f.get(Command.class);
+					mCommandMap.put(command.getCommandName(), command);
+					if (command.getCommandAlias() != null) {
+						mAliasedCommandMap.put(command.getCommandAlias(), command.getCommandName());
 					}
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+				} else if (f.getType().equals(Keyword.class)) {
+					mKeywordMap.put(((Keyword) f.get(Keyword.class)).getKeywordName(), (Keyword) f.get(Keyword.class));
 				}
-			} 
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 		}
-		return instanceMap;
 	}
 
 	/**
@@ -627,6 +631,7 @@ public class CommandDispatcher {
 	public static abstract class Command {
 
 		private String mCommandName;
+		private String mCommandAlias;
 		private String mGroupName;
 		private int mArgsNum;
 		private boolean mLowerArgBound;
@@ -638,8 +643,22 @@ public class CommandDispatcher {
 			mLowerArgBound = lowerArgBound;
 		}
 
+		/**
+		 * Use this constructor for commands with special characters in
+		 * their names (e.g., >>>).
+		 */
+		public Command(String commandName, String commandAlias,
+				String groupName, int minArgs, boolean lowerArgBound) {
+			this(commandName, groupName, minArgs, lowerArgBound);
+			mCommandAlias = commandAlias;
+		}
+
 		public String getCommandName() {
 			return mCommandName;
+		}
+
+		public String getCommandAlias() {
+			return mCommandAlias;
 		}
 
 		public String getGroupName() {

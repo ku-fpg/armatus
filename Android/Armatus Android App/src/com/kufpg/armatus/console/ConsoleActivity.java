@@ -462,7 +462,11 @@ public class ConsoleActivity extends StandardListActivity {
 			if (id > 0) {
 				String[] children = getResources().getStringArray(id);
 				for (int j = 1; j < children.length; j++) { //Don't include id
-					addCommandToExpandableMenu(parents[i], children[j]);
+					if (CommandDispatcher.isAlias(children[j])) {
+						addCommandToExpandableMenu(parents[i], CommandDispatcher.unaliasCommand(children[j]));
+					} else {
+						addCommandToExpandableMenu(parents[i], children[j]);
+					}
 				}
 			}
 		}
