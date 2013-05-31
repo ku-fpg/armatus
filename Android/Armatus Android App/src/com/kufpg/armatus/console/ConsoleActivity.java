@@ -11,6 +11,7 @@ import com.kufpg.armatus.dialog.ConsoleEntryRearrangeDialog;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.ConsoleExitDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
+import com.kufpg.armatus.dialog.WordCompletionDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 import com.kufpg.armatus.server.HermitServer;
@@ -57,6 +58,7 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final String SELECTION_TAG = "selection";
 	public static final String REARRANGE_TAG = "rearrange";
 	public static final String KEYWORD_SWAP_TAG = "keywordswap";
+	public static final String WORD_COMPLETION_TAG = "wordcomplete";
 
 	private static final int REARRANGE_ID = 19;
 
@@ -74,6 +76,7 @@ public class ConsoleActivity extends StandardListActivity {
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
+	private WordCompleter mCompleter;
 	private HermitServer mServer;
 	private String mTempCommand;
 	private boolean mInputEnabled = true;
@@ -120,6 +123,10 @@ public class ConsoleActivity extends StandardListActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
+				String input = mInputEditText.getText().toString().trim();
+				if (input.split(WHITESPACE).length <= 1) {
+					mCompleter.filterDictionary(input);
+				}
 				mConsoleListView.post(new Runnable() {
 					public void run() {
 						//DON'T use scrollToBottom(); it will cause a strange jaggedy scroll effect
@@ -180,9 +187,10 @@ public class ConsoleActivity extends StandardListActivity {
 		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
 		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
 		updateCommandHistoryEntries();
-		
+
 		loadExpandableMenuData();
-		
+		mCompleter = new WordCompleter(this, mCommandExpandableGroupMap.values());
+
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
 				(this, mCommandExpandableGroups, mCommandExpandableGroupMap);
@@ -247,6 +255,17 @@ public class ConsoleActivity extends StandardListActivity {
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.complete:
+			attemptWordCompletion();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
@@ -301,6 +320,16 @@ public class ConsoleActivity extends StandardListActivity {
 	public void onContextMenuClosed(Menu menu) {
 		//Ensures that the temp variables do not persist to next context menu opening
 		mTempCommand = null;
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_TAB:
+			attemptWordCompletion();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 	public void addCommandEntry(String commandName) {
@@ -386,6 +415,11 @@ public class ConsoleActivity extends StandardListActivity {
 		return mSlidingMenu;
 	}
 
+	public void setInputText(String text) {
+		mInputEditText.setText(text);
+		mInputEditText.setSelection(mInputEditText.getText().length());
+	}
+
 	public void setServer(HermitServer server) {
 		mServer = server;
 	}
@@ -413,11 +447,13 @@ public class ConsoleActivity extends StandardListActivity {
 			newFrag = ConsoleEntryRearrangeDialog.newInstance(entryNum, entryContents);
 		} else if (tag == KEYWORD_SWAP_TAG) {
 			newFrag = KeywordSwapDialog.newInstance(entryNum, entryContents);
+		} else if (tag == WORD_COMPLETION_TAG) {
+			newFrag = WordCompletionDialog.newInstance(mCompleter);
 		}
 		ft.add(newFrag, tag);
 		ft.commit();
 	}
-	
+
 	private void loadExpandableMenuData() {
 		TypedArray ta = getResources().obtainTypedArray(R.array.command_group_arrays);
 		for (int i = 0; i < ta.length(); i++) {
@@ -426,15 +462,15 @@ public class ConsoleActivity extends StandardListActivity {
 			if (id > 0) {
 				String[] children = getResources().getStringArray(id);
 				for (int j = 1; j < children.length; j++) { //Don't include id
-					addCommand(parents[i], children[j]);
+					addCommandToExpandableMenu(parents[i], children[j]);
 				}
 			}
 		}
 
 		ta.recycle();
 	}
-	
-	private int addCommand(String groupName, String commandName) {
+
+	private int addCommandToExpandableMenu(String groupName, String commandName) {
 		int groupPosition = 0;
 
 		//check the hash map if the group already exists
@@ -450,6 +486,16 @@ public class ConsoleActivity extends StandardListActivity {
 		//find the group position inside the list
 		groupPosition = mCommandExpandableGroups.indexOf(groupName);
 		return groupPosition;
+	}
+
+	private void attemptWordCompletion() {
+		String input = mInputEditText.getText().toString().trim();
+		if (input.split(WHITESPACE).length <= 1) {
+			String completion = mCompleter.completeWord(input);
+			if (completion != null) {
+				setInputText(completion);
+			}
+		}
 	}
 
 	/**

@@ -87,7 +87,11 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		TextView heading = (TextView) view.findViewById(R.id.group_heading);
 		heading.setText(groupName);
 		View groupColor = (View) view.findViewById(R.id.group_color);
-		groupColor.setBackgroundColor(Color.parseColor(CommandDispatcher.getGroupColor(groupName)));
+		String colorHex = CommandDispatcher.getGroupColor(groupName);
+		if (colorHex == null) {
+			colorHex = PrettyPrinter.GRAY;
+		}
+		groupColor.setBackgroundColor(Color.parseColor(colorHex));
 
 		return view;
 	}
