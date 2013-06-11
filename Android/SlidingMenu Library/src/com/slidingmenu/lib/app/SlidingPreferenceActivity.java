@@ -124,7 +124,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	public void showMenu() {
 		mHelper.showMenu();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showSecondaryMenu()
 	 */

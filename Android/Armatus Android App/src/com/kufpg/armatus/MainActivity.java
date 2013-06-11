@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import pl.polidea.treeview.demo.TreeListViewDemo;
+
 import com.kufpg.armatus.console.ConsoleActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.test.TestActivity;
 import com.kufpg.armatus.util.FileIOUtils;
-import com.kufpg.armatus.util.Tree;
-import com.kufpg.armatus.util.TreeNode;
-import com.kufpg.armatus.util.Tree.TreeTraversalOrder;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -110,35 +109,28 @@ public class MainActivity extends StandardActivity {
 		mTreeButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Tree<Integer> testTree = new Tree<Integer>();
-				TreeNode<Integer> rootNode = new TreeNode<Integer>(1);
-				testTree.setRoot(rootNode);
-				TreeNode<Integer> childNode = new TreeNode<Integer>(2);
-				rootNode.addChild(childNode);
-				rootNode.addChildren(3, 4, 5, 6);
-				childNode.addChildren(7, 8, 9, 10);
-				showToast(testTree.toString(TreeTraversalOrder.PRE_ORDER));
+				startActivity(new Intent(MainActivity.this, TreeListViewDemo.class));
 			}
 		});
 
 		mConsoleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(mContext, ConsoleActivity.class));
+				startActivity(new Intent(MainActivity.this, ConsoleActivity.class));
 			}
 		});
 
 		mPinchZoomButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(mContext, TextSizePinchZoomActivity.class));
+				startActivity(new Intent(MainActivity.this, TextSizePinchZoomActivity.class));
 			}
 		});
 
 		mTestActivityButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(mContext, TestActivity.class));
+				startActivity(new Intent(MainActivity.this, TestActivity.class));
 			}
 		});
 
@@ -146,7 +138,7 @@ public class MainActivity extends StandardActivity {
 			@Override
 			public void onClick(View v) {
 				String packageName = "jackpal.androidterm";
-				boolean installed = appInstalledOrNot(packageName);  
+				boolean installed = appInstalledOrNot(MainActivity.this, packageName);  
 				if (installed) {
 					Intent i = new Intent("jackpal.androidterm.RUN_SCRIPT");
 					i.addCategory(Intent.CATEGORY_DEFAULT);

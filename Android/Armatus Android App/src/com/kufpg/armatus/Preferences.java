@@ -19,8 +19,7 @@ public class Preferences extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, new PrefsFragment()).commit();
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
 		mContext = this;
 	}
 
@@ -41,67 +40,49 @@ public class Preferences extends PreferenceActivity {
 			editModePref = (ListPreference) findPreference("editmode_pref");
 			defaultPref = findPreference("default_pref_restore");
 
-			saveDirPref
-					.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			saveDirPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					StandardActivity.setSaveDir((String) newValue);
+					StandardActivity.loadPrefs();
+					return true;
+				}
+			});
+
+			editModePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					StandardActivity.setEditModeValue((String) newValue);
+					StandardActivity.loadPrefs();
+					return false;
+				}
+			});
+
+			defaultPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					AlertDialog.Builder defaultPrefsAlert = new AlertDialog.Builder(mContext);
+					defaultPrefsAlert.setMessage(R.string.default_pref_message);
+					defaultPrefsAlert.setCancelable(true);
+					defaultPrefsAlert.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
 						@Override
-						public boolean onPreferenceChange(
-								Preference preference, Object newValue) {
-							StandardActivity.setSaveDir((String) newValue);
-							StandardActivity.loadPrefs();
-							return true;
+						public void onClick(DialogInterface dialog, int whichButton) {
+							// saveDirPref's default value is not static, so its value has to be
+							//"initialized" in a special fashion
+							saveDirPref.setText(StandardActivity.getDefaultSaveDir());
+							StandardActivity.setDefaultPrefs(mContext);
 						}
 					});
-
-			editModePref
-					.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+					defaultPrefsAlert.setNegativeButton("No", new DialogInterface.OnClickListener() {
 						@Override
-						public boolean onPreferenceChange(
-								Preference preference, Object newValue) {
-							StandardActivity
-									.setEditModeValue((String) newValue);
-							StandardActivity.loadPrefs();
-							return false;
-						}
+						public void onClick(DialogInterface dialog, int whichButton) {}
 					});
 
-			defaultPref
-					.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-						@Override
-						public boolean onPreferenceClick(Preference preference) {
-							AlertDialog.Builder defaultPrefsAlert = new AlertDialog.Builder(
-									mContext);
-							defaultPrefsAlert
-									.setMessage(R.string.default_pref_message);
-							defaultPrefsAlert.setCancelable(true);
-							defaultPrefsAlert.setPositiveButton("Yes",
-									new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int whichButton) {
-											// saveDirPref's default value is
-											// not static, so its value has to
-											// be "initialized" in a special
-											// fashion
-											saveDirPref.setText(StandardActivity
-													.getDefaultSaveDir());
-											StandardActivity.setDefaultPrefs();
-										}
-									});
-							defaultPrefsAlert.setNegativeButton("No",
-									new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int whichButton) {
-											// Canceled.
-										}
-									});
-
-							defaultPrefsAlert.show();
-							return true;
-						}
-					});
+					defaultPrefsAlert.show();
+					return true;
+				}
+			});
 		}
 	}
 }

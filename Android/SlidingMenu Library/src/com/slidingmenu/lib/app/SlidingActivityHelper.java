@@ -14,17 +14,11 @@ import com.slidingmenu.lib.SlidingMenu;
 public class SlidingActivityHelper {
 
 	private Activity mActivity;
-
 	private SlidingMenu mSlidingMenu;
-
 	private View mViewAbove;
-
 	private View mViewBehind;
-
 	private boolean mBroadcasting = false;
-
 	private boolean mOnPostCreateCalled = false;
-
 	private boolean mEnableSlide = true;
 
 	/**
@@ -60,7 +54,7 @@ public class SlidingActivityHelper {
 
 		mSlidingMenu.attachToActivity(mActivity, 
 				mEnableSlide ? SlidingMenu.SLIDING_WINDOW : SlidingMenu.SLIDING_CONTENT);
-		
+
 		final boolean open;
 		final boolean secondary;
 		if (savedInstanceState != null) {

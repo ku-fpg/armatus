@@ -488,7 +488,7 @@ public class CommandDispatcher {
 		@Override
 		protected void run(String... args){
 			String packageName = "jackpal.androidterm";
-			boolean installed = StandardActivity.appInstalledOrNot(packageName);  
+			boolean installed = StandardActivity.appInstalledOrNot(mConsole, packageName);  
 			if (installed) {
 				Intent i = new Intent("jackpal.androidterm.RUN_SCRIPT");
 				i.addCategory(Intent.CATEGORY_DEFAULT);

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/simple_menu_item"
+        android:alphabeticShortcut="s"
+        android:enabled="true"
+        android:numericShortcut="1"
+        android:title="@string/simple_menu_name"
+        android:titleCondensed="@string/simple_menu_condensed"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/fancy_menu_item"
+        android:alphabeticShortcut="f"
+        android:enabled="true"
+        android:numericShortcut="2"
+        android:title="@string/fancy_menu_name"
+        android:titleCondensed="@string/fancy_menu_condensed"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/expand_all_menu_item"
+        android:alphabeticShortcut="e"
+        android:enabled="true"
+        android:numericShortcut="3"
+        android:title="@string/expand_all_menu"
+        android:titleCondensed="@string/expand_all_condensed"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/collapse_all_menu_item"
+        android:alphabeticShortcut="c"
+        android:enabled="true"
+        android:numericShortcut="4"
+        android:title="@string/collapse_all_menu"
+        android:titleCondensed="@string/collapse_all_condesed"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/collapsible_menu_item"
+        android:alphabeticShortcut="c"
+        android:checkable="true"
+        android:checked="true"
+        android:enabled="true"
+        android:numericShortcut="5"
+        android:title="@string/collapsible_menu_disable"
+        android:titleCondensed="@string/collapsible_condensed_disable"
+        android:visible="true">
+    </item>
+
+</menu>

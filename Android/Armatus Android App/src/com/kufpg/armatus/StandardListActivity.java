@@ -19,7 +19,6 @@ public class StandardListActivity extends ListActivity {
 
 	public final static int FILE_FROM_DISK = 1;
 	public static String PACKAGE_NAME;
-	protected static Context mContext;
 	protected static String mSaveDir;
 	protected static String mDefaultSaveDir;
 	protected static String mEditModeValue;
@@ -32,12 +31,11 @@ public class StandardListActivity extends ListActivity {
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
 
-		mContext = this;
-		PACKAGE_NAME = mContext.getApplicationContext().getPackageName();
+		PACKAGE_NAME = getApplicationContext().getPackageName();
 		mSaveDir = getCacheDir().toString();
 		mDefaultSaveDir = mSaveDir;
 		mEditModeValue = "0";
-		prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefsEditor = prefs.edit();
 		if (getSaveDir() == null) {
 			loadPrefs();
@@ -98,9 +96,9 @@ public class StandardListActivity extends ListActivity {
 		mEditModeValue = editModeValue;
 	}
 
-	public static void setDefaultPrefs() {
+	public static void setDefaultPrefs(Context context) {
 		prefsEditor.clear();
-		PreferenceManager.setDefaultValues(mContext, R.xml.preferences, true);
+		PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
 		prefsEditor.commit();
 	}
 
