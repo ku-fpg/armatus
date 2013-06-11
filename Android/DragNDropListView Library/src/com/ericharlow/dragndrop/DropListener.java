@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.ericharlow.DragNDrop;
+package com.ericharlow.dragndrop;
 
 /**
- * Implement to handle removing items.
+ * Implement to handle an item being dropped.
  * An adapter handling the underlying data 
  * will most likely handle this interface.
- * 
+ *  
  * @author Eric Harlow
  */
-public interface RemoveListener {
+public interface DropListener {
 	
 	/**
-	 * Called when an item is to be removed
-	 * @param which - indicates which item to remove.
+	 * Called when an item is to be dropped.
+	 * @param from - index item started at.
+	 * @param to - index to place item at.
 	 */
-	void onRemove(int which);
+	void onDrop(int from, int to);
 }

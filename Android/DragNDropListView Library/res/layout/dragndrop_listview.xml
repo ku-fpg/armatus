@@ -4,11 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <com.ericharlow.DragNDrop.DragNDropListView
+    <com.ericharlow.dragndrop.DragNDropListView
         android:id="@+id/android:list"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
-    </com.ericharlow.DragNDrop.DragNDropListView>
+        android:layout_height="fill_parent" />
 
     <Button
         android:id="@+id/button"

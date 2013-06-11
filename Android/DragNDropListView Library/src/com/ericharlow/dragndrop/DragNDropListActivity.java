@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.ericharlow.DragNDrop;
+package com.ericharlow.dragndrop;
 
 import java.util.ArrayList;
+
+import com.ericharlow.dragndrop.R;
 
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -51,7 +53,6 @@ public class DragNDropListActivity extends ListActivity {
 
 		if (listView instanceof DragNDropListView) {
 			((DragNDropListView) listView).setDropListener(mDropListener);
-			((DragNDropListView) listView).setRemoveListener(mRemoveListener);
 			((DragNDropListView) listView).setDragListener(mDragListener);
 		}
 
@@ -75,17 +76,6 @@ public class DragNDropListActivity extends ListActivity {
 				((DragNDropAdapter)adapter).onDrop(from, to);
 				getListView().getChildAt(to).setDrawingCacheEnabled(false);
 				getListView().getChildAt(from).setDrawingCacheEnabled(false);
-				getListView().invalidateViews();
-			}
-		}
-	};
-
-	private RemoveListener mRemoveListener =
-			new RemoveListener() {
-		public void onRemove(int which) {
-			ListAdapter adapter = getListAdapter();
-			if (adapter instanceof DragNDropAdapter) {
-				((DragNDropAdapter)adapter).onRemove(which);
 				getListView().invalidateViews();
 			}
 		}

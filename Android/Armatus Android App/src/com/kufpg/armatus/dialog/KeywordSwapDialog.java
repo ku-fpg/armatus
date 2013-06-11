@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.ericharlow.DragNDrop.DragListener;
-import com.ericharlow.DragNDrop.DragNDropAdapter;
-import com.ericharlow.DragNDrop.DragNDropListView;
-import com.ericharlow.DragNDrop.DropListener;
-import com.ericharlow.DragNDrop.RemoveListener;
+import com.ericharlow.dragndrop.DragListener;
+import com.ericharlow.dragndrop.DragNDropAdapter;
+import com.ericharlow.dragndrop.DragNDropListView;
+import com.ericharlow.dragndrop.DropListener;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleActivity;
 
@@ -20,9 +19,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class KeywordSwapDialog extends DialogFragment {
 
@@ -65,7 +62,6 @@ public class KeywordSwapDialog extends DialogFragment {
 		mKeywordListView.setAdapter(mKeywordAdapter);
 		mKeywordListView.setDragListener(mDragListener);
 		mKeywordListView.setDropListener(mDropListener);
-		mKeywordListView.setRemoveListener(mRemoveListener);
 
 		mResetButton = (Button) v.findViewById(R.id.keyword_swap_reset);
 		mResetButton.setOnClickListener(new OnClickListener() {
@@ -101,13 +97,6 @@ public class KeywordSwapDialog extends DialogFragment {
 				mKeywordListView.getChildAt(from).setDrawingCacheEnabled(false);
 				mKeywordListView.invalidateViews();
 			}
-		}
-	};
-
-	private RemoveListener mRemoveListener = new RemoveListener() {
-		public void onRemove(int which) {
-			mKeywordAdapter.onRemove(which);
-			mKeywordListView.invalidateViews();
 		}
 	};
 
