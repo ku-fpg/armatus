@@ -33,8 +33,8 @@ public interface DragListener {
 	
 	/**
 	 * Called when a drag is to be performed.
-	 * @param x - horizontal coordinate of MotionEvent.
-	 * @param y - verital coordinate of MotionEvent.
+	 * @param draggedOverIndex - the index of the view being covered by the dragView
+	 * @param dragView - the view of the item to be dragged i.e. the drag view
 	 * @param listView - the listView
 	 */
 	void onDrag(int draggedOverIndex, View dragView, ListView listView);
