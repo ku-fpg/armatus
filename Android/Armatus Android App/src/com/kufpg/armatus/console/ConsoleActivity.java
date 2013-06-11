@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.StandardListActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
-import com.kufpg.armatus.dialog.ConsoleEntryRearrangeDialog;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.ConsoleExitDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -56,11 +55,8 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
 	public static final int ENTRY_COMMAND_HISTORY_LIMIT = 200;
 	public static final String SELECTION_TAG = "selection";
-	public static final String REARRANGE_TAG = "rearrange";
 	public static final String KEYWORD_SWAP_TAG = "keywordswap";
 	public static final String WORD_COMPLETION_TAG = "wordcomplete";
-
-	private static final int REARRANGE_ID = 19;
 
 	private ListView mConsoleListView, mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
@@ -276,7 +272,7 @@ public class ConsoleActivity extends StandardListActivity {
 				menu.setHeaderTitle("Execute " + mTempCommand + " on...");
 			} else { //If user long-clicked entry
 				menu.setHeaderTitle(R.string.context_menu_title);
-				menu.add(0, REARRANGE_ID, 0, "Rearrange words");
+				menu.add(0, 42, 0, "Sample transformation (does nothing)");
 			}
 
 			int order = 1;
@@ -298,16 +294,11 @@ public class ConsoleActivity extends StandardListActivity {
 					mInputEditText.setText(mTempCommand + " " + keywordNStr);
 				}
 			} else { //If long-click command is run
-				if (item.getItemId() == REARRANGE_ID) {
-					ConsoleEntry sEntry = mConsoleEntries.get(((AdapterContextMenuInfo) item.getMenuInfo()).position);
-					showEntryDialog(sEntry.getNum(), sEntry.getContents(), REARRANGE_TAG);
+				if (mInputEnabled) {
+					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
 				} else {
-					if (mInputEnabled) {
-						mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
-					} else {
-						mInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
-								.getCommand().getCommandName() + " " + keywordNStr);
-					}
+					mInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
+							.getCommand().getCommandName() + " " + keywordNStr);
 				}
 			}
 			mInputEditText.requestFocus(); //Prevents ListView from stealing focus
@@ -443,8 +434,6 @@ public class ConsoleActivity extends StandardListActivity {
 		DialogFragment newFrag = null;
 		if (tag == SELECTION_TAG) {
 			newFrag = ConsoleEntrySelectionDialog.newInstance(entryNum, entryContents);
-		} else if (tag == REARRANGE_TAG) {
-			newFrag = ConsoleEntryRearrangeDialog.newInstance(entryNum, entryContents);
 		} else if (tag == KEYWORD_SWAP_TAG) {
 			newFrag = KeywordSwapDialog.newInstance(entryNum, entryContents);
 		} else if (tag == WORD_COMPLETION_TAG) {

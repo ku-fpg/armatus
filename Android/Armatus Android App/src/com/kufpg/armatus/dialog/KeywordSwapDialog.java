@@ -1,9 +1,16 @@
 package com.kufpg.armatus.dialog;
 
-import ca.laplanete.mobile.pageddragdropgrid.PagedDragDropGrid;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import com.ericharlow.DragNDrop.DragListener;
+import com.ericharlow.DragNDrop.DragNDropAdapter;
+import com.ericharlow.DragNDrop.DragNDropListView;
+import com.ericharlow.DragNDrop.DropListener;
+import com.ericharlow.DragNDrop.RemoveListener;
 import com.kufpg.armatus.R;
-import com.kufpg.armatus.drag.KeywordSwapGridAdapter;
+import com.kufpg.armatus.console.ConsoleActivity;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -12,25 +19,31 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class KeywordSwapDialog extends DialogFragment {
-	
+
 	private int mEntryNum;
 	private String mEntryContents;
-	private PagedDragDropGrid mGridView;
-	private Button mResetButton;//, mCoolStuffButton;
-	
+	private List<String> mEntryWords;
+	private DragNDropListView mKeywordListView;
+	private DragNDropAdapter mKeywordAdapter;
+	private Button mResetButton, mToastButton;
+
 	public static KeywordSwapDialog newInstance(int entryNum, String entryContents) {
 		KeywordSwapDialog ksd = new KeywordSwapDialog();
-		
+
 		Bundle args = new Bundle();
 		args.putInt("entryNum", entryNum);
 		args.putString("entryContents", entryContents);
 		ksd.setArguments(args);
-		
+
 		return ksd;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,19 +58,118 @@ public class KeywordSwapDialog extends DialogFragment {
 		setCancelable(true);
 
 		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
-		mGridView = (PagedDragDropGrid) v.findViewById(R.id.keyword_swap_grid);
-		mGridView.setAdapter(new KeywordSwapGridAdapter(getActivity(), mGridView, mEntryContents));
-		mResetButton = (Button) v.findViewById(R.id.keyword_swap_reset_button);
+		mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(ConsoleActivity.WHITESPACE)));
+
+		mKeywordListView = (DragNDropListView) v.findViewById(R.id.keyword_swap_list);
+		mKeywordAdapter = new DragNDropAdapter(getActivity(), mEntryWords);
+		mKeywordListView.setAdapter(mKeywordAdapter);
+		mKeywordListView.setDragListener(mDragListener);
+		mKeywordListView.setDropListener(mDropListener);
+		mKeywordListView.setRemoveListener(mRemoveListener);
+
+		mResetButton = (Button) v.findViewById(R.id.keyword_swap_reset);
 		mResetButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mGridView.setAdapter(new KeywordSwapGridAdapter(getActivity(), mGridView, mEntryContents));
-                mGridView.notifyDataSetChanged();
+				mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(ConsoleActivity.WHITESPACE)));
+				mKeywordAdapter = new DragNDropAdapter(getActivity(), mEntryWords);
+				mKeywordListView.setAdapter(mKeywordAdapter);
+				mKeywordAdapter.notifyDataSetChanged();
 			}
 		});
-		//mCoolStuffButton = (Button) v.findViewById(R.id.keyword_swap_coolstuff_button);
-		
+
+		mToastButton = (Button) v.findViewById(R.id.keyword_swap_toast);
+		mToastButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String message = "";
+				for (String word : mEntryWords) {
+					message += word + " ";
+				}
+				((ConsoleActivity) getActivity()).showToast(message.trim());
+			}
+		});
+
 		return v;
+	}
+
+	private DropListener mDropListener = new DropListener() {
+		public void onDrop(int from, int to) {
+			if (canBeSwapped(from, to)) {
+				mKeywordAdapter.onDrop(from, to);
+				mKeywordListView.getChildAt(to).setDrawingCacheEnabled(false);
+				mKeywordListView.getChildAt(from).setDrawingCacheEnabled(false);
+				mKeywordListView.invalidateViews();
+			}
+		}
+	};
+
+	private RemoveListener mRemoveListener = new RemoveListener() {
+		public void onRemove(int which) {
+			mKeywordAdapter.onRemove(which);
+			mKeywordListView.invalidateViews();
+		}
+	};
+
+	private DragListener mDragListener = new DragListener() {
+		View mHighlightedView = null;
+		int mDragViewColor = 0xe0103010; //Dark green
+		int mHighlightColor = 0xffd17d10; //Light orange
+		int mHighlightedIndex = -1;
+		int mDefaultBackgroundColor;
+
+		@Override
+		public synchronized void onDrag(int draggedOverIndex, View dragView, ListView listView) {
+			if (mHighlightedIndex != draggedOverIndex) {
+				mHighlightedView = null;
+				if (mHighlightedIndex != -1) {
+					mHighlightedView = listView.getChildAt(mHighlightedIndex);
+					if (mHighlightedView != null) {
+						mHighlightedView.setBackgroundColor(mDefaultBackgroundColor);
+					}
+				}
+
+				mHighlightedView = listView.getChildAt(draggedOverIndex);
+				int draggingIndex = listView.indexOfChild(dragView);
+				if (mHighlightedView != null && canBeSwapped(draggingIndex, draggedOverIndex)) {
+					mHighlightedView.setBackgroundColor(mHighlightColor);
+				}
+				mHighlightedIndex = draggedOverIndex;
+			}
+		}
+
+		@Override
+		public void onStartDrag(View dragView) {
+			dragView.setVisibility(View.INVISIBLE);
+			mDefaultBackgroundColor = dragView.getDrawingCacheBackgroundColor();
+			dragView.setBackgroundColor(mDragViewColor);
+			dragView.setAlpha(0.5f);
+			ImageView iv = (ImageView)dragView.findViewById(R.id.drag_indicator);
+			if (iv != null) iv.setVisibility(View.INVISIBLE);
+		}
+
+		@Override
+		public void onStopDrag(View dragView) {
+			if (mHighlightedView != null) {
+				mHighlightedView.setBackgroundColor(mDefaultBackgroundColor);
+			}
+
+			dragView.setVisibility(View.VISIBLE);
+			dragView.setBackgroundColor(mDefaultBackgroundColor);
+			dragView.setAlpha(1);
+			ImageView iv = (ImageView)dragView.findViewById(R.id.drag_indicator);
+			if (iv != null) iv.setVisibility(View.VISIBLE);
+		}
+
+	};
+
+	private boolean canBeSwapped(int pos1, int pos2) {
+		if ((pos1 == 0 && pos2 == mKeywordListView.getChildCount() - 1) ||
+				(pos2 == 0 && pos1 == mKeywordListView.getChildCount() - 1)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
