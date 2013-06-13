@@ -9,7 +9,6 @@ import pl.polidea.treeview.demo.TreeListViewDemo;
 
 import com.kufpg.armatus.console.ConsoleActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
-import com.kufpg.armatus.test.TestActivity;
 import com.kufpg.armatus.util.FileIOUtils;
 
 import android.content.Intent;
@@ -27,7 +26,7 @@ public class MainActivity extends StandardActivity {
 
 	private TextView mButtonsView;
 	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton, mConsoleButton,
-	mPinchZoomButton, mTestActivityButton, mTerminalButton;
+	mPinchZoomButton, mTerminalButton;
 	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
@@ -48,7 +47,6 @@ public class MainActivity extends StandardActivity {
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
-		mTestActivityButton = (Button) findViewById(R.id.test_activity_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 
 		mLockButton.setOnClickListener(new OnClickListener() {
@@ -122,13 +120,6 @@ public class MainActivity extends StandardActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(MainActivity.this, TextSizePinchZoomActivity.class));
-			}
-		});
-
-		mTestActivityButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, TestActivity.class));
 			}
 		});
 

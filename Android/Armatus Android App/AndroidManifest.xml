@@ -28,30 +28,21 @@
         </activity>
         <activity
             android:name=".Preferences"
-            android:label="@string/title_preference_screen" >
-        </activity>
+            android:label="@string/title_preference_screen" />
         <activity
             android:name=".console.ConsoleActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan" >
-        </activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="pl.polidea.treeview.demo.TreeListViewDemo"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".TextSizePinchZoomActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".ExpandoLayoutActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".test.TestActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
     </application>
 
 </manifest>

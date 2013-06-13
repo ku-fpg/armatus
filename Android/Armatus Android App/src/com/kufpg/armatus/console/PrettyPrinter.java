@@ -1,6 +1,9 @@
 package com.kufpg.armatus.console;
 
-import android.text.Html;
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
 import com.kufpg.armatus.console.CommandDispatcher;
@@ -15,22 +18,21 @@ public class PrettyPrinter {
 	public static final String GRAY = "#969696";
 	public static final String PURPLE = "#7300FB";
 	public static final String YELLOW = "#FDFD0D";
-	
+
 	public static void setPrettyText(TextView tv, String text) {
-		String res = "";
-		//Make sure to sanitize string for HTML parsing
-		String[] sentence = //TextUtils.htmlEncode(text) ;; Disable this for now; it breaks newlines
-				text.split(ConsoleActivity.WHITESPACE);
-		for (String word : sentence) {
-			String color = null;
+		SpannableStringBuilder builder = new SpannableStringBuilder();
+		for (String word : text.split(" ")) {
 			if (CommandDispatcher.isKeyword(word)) {
-				color = CommandDispatcher.getKeyword(word).getColor();
-				res += "<font color='" + color + "'>" +	word + "</font> ";
+				SpannableString spanWord = new SpannableString(word + " ");
+				spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(CommandDispatcher.
+						getKeyword(word).getColor())), 0, word.length(), 0);
+				builder.append(spanWord);
 			} else {
-				res += word + " ";
+				builder.append(word + " ");
 			}
-		};
-		res.trim();
-		tv.setText(Html.fromHtml(res));
+		}
+		builder.delete(builder.length() - 1, builder.length()); //Trim trailing whitespace
+		tv.setText(builder);
 	}
+
 }
