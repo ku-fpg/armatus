@@ -2,7 +2,6 @@ package com.kufpg.armatus.dialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.ericharlow.dragndrop.DragListener;
 import com.ericharlow.dragndrop.DragNDropAdapter;
@@ -25,7 +24,7 @@ public class KeywordSwapDialog extends DialogFragment {
 
 	private int mEntryNum;
 	private String mEntryContents;
-	private List<String> mEntryWords;
+	private ArrayList<String> mEntryWords;
 	private DragNDropListView mKeywordListView;
 	private DragNDropAdapter mKeywordAdapter;
 	private Button mResetButton, mToastButton;
@@ -99,6 +98,29 @@ public class KeywordSwapDialog extends DialogFragment {
 			}
 		}
 	};
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putSerializable("entryWords", mEntryWords);
+		if (mKeywordListView != null) {
+			mKeywordListView.setDropListener(null);
+			mKeywordListView.cancelDrag();
+		}
+		super.onSaveInstanceState(outState);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		if (savedInstanceState != null) {
+			mKeywordListView.setDropListener(mDropListener);
+			mEntryWords = (ArrayList<String>) savedInstanceState.getSerializable("entryWords");
+			mKeywordAdapter = new DragNDropAdapter(getActivity(), mEntryWords);
+			mKeywordListView.setAdapter(mKeywordAdapter);
+			mKeywordAdapter.notifyDataSetChanged();
+		}
+	}
 
 	private DragListener mDragListener = new DragListener() {
 		View mHighlightedView = null;

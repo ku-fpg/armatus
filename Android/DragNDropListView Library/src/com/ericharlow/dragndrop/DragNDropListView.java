@@ -70,7 +70,7 @@ public class DragNDropListView extends ListView {
 		final int action = ev.getAction();
 		final int x = (int) ev.getX();
 		final int y = (int) ev.getY();
-		
+
 		BitmapFactory.Options dimensions = new BitmapFactory.Options(); 
 		dimensions.inJustDecodeBounds = true;
 		BitmapFactory.decodeResource(getResources(), R.drawable.icmpmove, dimensions);
@@ -166,9 +166,14 @@ public class DragNDropListView extends ListView {
 
 	// destroy drag view
 	private void stopDrag(int itemIndex) {
+		if (mDragListener != null) {
+			mDragListener.onStopDrag(getChildAt(itemIndex));
+		}
+		cancelDrag();
+	}
+
+	public void cancelDrag() {
 		if (mDragView != null) {
-			if (mDragListener != null)
-				mDragListener.onStopDrag(getChildAt(itemIndex));
 			mDragView.setVisibility(GONE);
 			WindowManager wm = (WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE);
 			wm.removeView(mDragView);

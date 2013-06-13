@@ -3,6 +3,7 @@ package com.kufpg.armatus.dialog;
 import java.util.ArrayList;
 
 import com.kufpg.armatus.R;
+import com.kufpg.armatus.console.ConsoleActivity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,57 +15,85 @@ import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.GestureOverlayView.OnGesturePerformedListener;
 import android.gesture.Prediction;
-import android.graphics.Rect;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
-import android.view.Window;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class GestureDialog extends DialogFragment implements OnGesturePerformedListener {
 
-	private GestureLibrary gestureLib;
+	private GestureLibrary mGestureLib;
+	private GestureOverlayView mGestureView;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		// retrieve display dimensions
-		Rect displayRectangle = new Rect();
-		Window window = getActivity().getWindow();
-		window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
-
 		TextView tv = new TextView(getActivity());
 		tv.setGravity(Gravity.CENTER);
-		tv.setMinimumWidth((int)(displayRectangle.width() * 0.9f));
-		tv.setMinimumHeight((int)(displayRectangle.height() * 0.9f));
 		tv.setText(R.string.gesture_dialog_message);
 
-		GestureOverlayView gestureOverlayView = new GestureOverlayView(getActivity());
-		gestureOverlayView.addView(tv);
-		gestureOverlayView.addOnGesturePerformedListener(this);
-		gestureLib = GestureLibraries.fromRawResource(getActivity(), R.raw.gestures);
-		if (!gestureLib.load()) {
+		mGestureView = new GestureOverlayView(getActivity());
+		resizeGestureView();
+		mGestureView.addView(tv, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		mGestureView.addOnGesturePerformedListener(this);
+		mGestureLib = GestureLibraries.fromRawResource(getActivity(), R.raw.gestures);
+		if (!mGestureLib.load()) {
 			//Exception?
 		}
+		mGestureView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_POINTER_DOWN:
+					mGestureView.cancelGesture();
+					mGestureView.cancelClearAnimation();
+					Log.d("TESTTESTTEST", "Two fingers whoa!!!");
+					return true;
+				}
+				return false;
+			}
+		});
 
 		return new AlertDialog.Builder(getActivity())
-		.setView(gestureOverlayView)
+		.setView(mGestureView)
 		.setNegativeButton("Never mind", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				//Do nothing
-			}
-		})
-		.create();
+			public void onClick(DialogInterface dialog, int whichButton) {}
+		}).create();
 	}
 
 	@Override
 	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
-		ArrayList<Prediction> predictions = gestureLib.recognize(gesture);
-		for (Prediction prediction : predictions) {
-			if (prediction.score > 1.0) {
-				Toast.makeText(getActivity(), prediction.name, Toast.LENGTH_SHORT)
-				.show();
+		ArrayList<Prediction> predictions = mGestureLib.recognize(gesture);
+		if (!predictions.isEmpty()) {
+			Prediction bestPrediction = predictions.get(0);
+			double maxScore = predictions.get(0).score;
+			for (Prediction prediction : predictions) {
+				if (prediction.score > maxScore) {
+					bestPrediction = prediction;
+					maxScore = prediction.score;
+				}
 			}
+			((ConsoleActivity) getActivity()).showToast(bestPrediction.name);
 		}
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		resizeGestureView();
+	}
+
+	private void resizeGestureView() {
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		mGestureView.setMinimumHeight((int)(size.x * 0.9));
+		mGestureView.setMinimumWidth((int)(size.y * 0.9));
 	}
 
 }

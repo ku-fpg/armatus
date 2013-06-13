@@ -9,6 +9,7 @@ import com.kufpg.armatus.StandardListActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.ConsoleExitDialog;
+import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
 import com.kufpg.armatus.dialog.WordCompletionDialog;
 import com.kufpg.armatus.drag.DragIcon;
@@ -28,6 +29,7 @@ import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -249,10 +251,27 @@ public class ConsoleActivity extends StandardListActivity {
 		}
 		super.onRestart();
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.default_action_bar, menu);
+		
+		MenuItem gestures = menu.findItem(R.id.gestures);
+		MenuItem complete = menu.findItem(R.id.complete);
+		
+		gestures.setVisible(true);
+		complete.setVisible(true);
+		return true;
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.gestures:
+			GestureDialog gd = new GestureDialog();
+			gd.show(getFragmentManager(), "gesture");
+			return true;
 		case R.id.complete:
 			attemptWordCompletion();
 			return true;

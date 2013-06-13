@@ -97,11 +97,9 @@ public class MainActivity extends StandardActivity {
 				ImageView imgView = new ImageView(MainActivity.this);
 				imgToast.setView(imgView);
 				imgToast.setDuration(Toast.LENGTH_LONG);
-				FileIOUtils
-				.downloadImage(
+				FileIOUtils.downloadImage(
 						"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
-						imgView, mProgressCheckBox.isChecked(),
-						MainActivity.this);
+						imgView, mProgressCheckBox.isChecked(), MainActivity.this);
 				imgToast.show();
 			}
 		});
@@ -173,9 +171,8 @@ public class MainActivity extends StandardActivity {
 	}
 
 	private void setCodeText(int numTextChanges, boolean isLocked) {
-		mButtonsView.setText("Button pushed " + numTextChanges
-				+ " times. (Status: " + (isLocked ? "locked" : "unlocked")
-				+ ".)");
+		mButtonsView.setText("Button pushed " + numTextChanges + " times. (Status: "
+				+ (isLocked ? "locked" : "unlocked") + ".)");
 	}
 
 }

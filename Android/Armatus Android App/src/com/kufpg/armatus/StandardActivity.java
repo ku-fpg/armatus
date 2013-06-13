@@ -1,7 +1,5 @@
 package com.kufpg.armatus;
 
-import com.kufpg.armatus.dialog.GestureDialog;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -59,10 +57,6 @@ public class StandardActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.gestures:
-			GestureDialog gd = new GestureDialog();
-			gd.show(getFragmentManager(), "gesture");
-			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
 					Preferences.class);
