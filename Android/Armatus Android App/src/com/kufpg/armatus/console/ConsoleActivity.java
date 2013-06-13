@@ -8,10 +8,10 @@ import com.kufpg.armatus.R;
 import com.kufpg.armatus.StandardListActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
-import com.kufpg.armatus.dialog.ConsoleExitDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
 import com.kufpg.armatus.dialog.WordCompletionDialog;
+import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 import com.kufpg.armatus.server.HermitServer;
@@ -20,6 +20,7 @@ import com.slidingmenu.lib.SlidingMenu;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
@@ -238,8 +239,15 @@ public class ConsoleActivity extends StandardListActivity {
 
 	@Override
 	public void onBackPressed() {
-		ConsoleExitDialog ced = new ConsoleExitDialog();
-		ced.show(getFragmentManager(), "exit");
+		String title = getResources().getString(R.string.console_exit_title);
+		String message = getResources().getString(R.string.console_exit_message);
+		YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
+			@Override
+			protected void yes(DialogInterface dialog, int whichButton) {
+				exit();
+			}
+		};
+		exitDialog.show(getFragmentManager(), "exit");
 	}
 
 	@Override
