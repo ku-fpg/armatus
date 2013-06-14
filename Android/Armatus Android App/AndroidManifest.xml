@@ -40,9 +40,6 @@
         <activity
             android:name=".TextSizePinchZoomActivity"
             android:label="@string/app_name" />
-        <activity
-            android:name=".ExpandoLayoutActivity"
-            android:label="@string/app_name" />
     </application>
 
 </manifest>

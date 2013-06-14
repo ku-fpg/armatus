@@ -69,37 +69,37 @@ public class StandardListActivity extends ListActivity {
 	public void showToast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
+	
+	public void showToast(Object message) {
+		showToast(message.toString());
+	}
 
 	public static String getSaveDir() {
-		return mSaveDir;
+		return StandardActivity.getSaveDir();
 	}
 
 	public static void setSaveDir(String saveDir) {
-		mSaveDir = saveDir;
+		StandardActivity.setSaveDir(saveDir);
 	}
 
 	public static String getDefaultSaveDir() {
-		return mDefaultSaveDir;
+		return StandardActivity.getDefaultSaveDir();
 	}
 
 	public static String getEditModeValue() {
-		return mEditModeValue;
+		return StandardActivity.getEditModeValue();
 	}
 
 	public static void setEditModeValue(String editModeValue) {
-		mEditModeValue = editModeValue;
+		StandardActivity.setEditModeValue(editModeValue);
 	}
 
 	public static void setDefaultPrefs(Context context) {
-		prefsEditor.clear();
-		PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-		prefsEditor.commit();
+		StandardActivity.setDefaultPrefs(context);
 	}
 
 	public static void loadPrefs() {
-		prefsEditor.putString("savedir_pref", mSaveDir);
-		prefsEditor.putString("editmode_pref", mEditModeValue);
-		prefsEditor.commit();
+		StandardActivity.loadPrefs();
 	}
 
 }

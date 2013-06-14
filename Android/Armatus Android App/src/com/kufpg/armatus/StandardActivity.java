@@ -70,6 +70,10 @@ public class StandardActivity extends Activity {
 	public void showToast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
+	
+	public void showToast(Object message) {
+		showToast(message.toString());
+	}
 
 	public static String getSaveDir() {
 		return mSaveDir;

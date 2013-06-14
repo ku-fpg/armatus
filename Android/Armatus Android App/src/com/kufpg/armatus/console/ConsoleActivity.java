@@ -20,6 +20,7 @@ import com.slidingmenu.lib.SlidingMenu;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -33,11 +34,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnKeyListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -70,7 +73,7 @@ public class ConsoleActivity extends StandardListActivity {
 	private ArrayList<String> mCommandHistoryEntries = new ArrayList<String>();
 	private ArrayList<String> mCommandExpandableGroups = new ArrayList<String>();
 	private LinkedHashMap<String, ArrayList<String>> mCommandExpandableGroupMap = new LinkedHashMap<String, ArrayList<String>>();
-	private View mInputView, mRootView;
+	private View mInputView, mRootView, mBackground;
 	private TextView mInputNum;
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
@@ -79,7 +82,7 @@ public class ConsoleActivity extends StandardListActivity {
 	private HermitServer mServer;
 	private String mTempCommand;
 	private boolean mInputEnabled = true;
-	private boolean mSoftKeyboardVisible;
+	private boolean mSoftKeyboardVisible = true;
 	private int mEntryCount = 0;
 
 	@Override
@@ -87,8 +90,8 @@ public class ConsoleActivity extends StandardListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_activity);
 
-		//Ensures soft keyboard is opened on activity start
-		setSoftKeyboardVisibility(mSoftKeyboardVisible = true);
+		//Ensures soft keyboard remains open
+		setSoftKeyboardVisibility(true);
 		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
@@ -100,6 +103,17 @@ public class ConsoleActivity extends StandardListActivity {
 					mSoftKeyboardVisible = true;
 				} else {
 					mSoftKeyboardVisible = false;
+				}
+			}
+		});
+
+		mBackground = (View) findViewById(R.id.console_empty_space);
+		mBackground.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (!mSoftKeyboardVisible) {
+					((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+					.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 				}
 			}
 		});
@@ -220,6 +234,7 @@ public class ConsoleActivity extends StandardListActivity {
 		mInputEditText.requestFocus();
 		mEntryCount = state.getInt("entryCount");
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
+		setSoftKeyboardVisibility(mSoftKeyboardVisible);
 
 		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
@@ -259,15 +274,15 @@ public class ConsoleActivity extends StandardListActivity {
 		}
 		super.onRestart();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.default_action_bar, menu);
-		
+
 		MenuItem gestures = menu.findItem(R.id.gestures);
 		MenuItem complete = menu.findItem(R.id.complete);
-		
+
 		gestures.setVisible(true);
 		complete.setVisible(true);
 		return true;
@@ -546,9 +561,9 @@ public class ConsoleActivity extends StandardListActivity {
 	 * Shows or hides the soft keyboard.
 	 * @param visibility Set to true to show soft keyboard, false to hide.
 	 */
-	private void setSoftKeyboardVisibility(boolean visibility) {
+	public void setSoftKeyboardVisibility(boolean visibility) {
 		if (visibility) {
-			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		} else {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		}
