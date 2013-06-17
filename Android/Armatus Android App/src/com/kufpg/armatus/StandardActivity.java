@@ -5,9 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,11 +18,8 @@ public class StandardActivity extends Activity {
 
 	public final static int FILE_FROM_DISK = 1;
 	public static String PACKAGE_NAME;
-	protected static String mSaveDir;
-	protected static String mDefaultSaveDir;
-	protected static String mEditModeValue;
-	protected static SharedPreferences prefs;
-	protected static SharedPreferences.Editor prefsEditor;
+	public static SharedPreferences mPrefs;
+	public static Editor mEditor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,20 +28,8 @@ public class StandardActivity extends Activity {
 		actionBar.show();
 
 		PACKAGE_NAME = getApplicationContext().getPackageName();
-		mSaveDir = getCacheDir().toString();
-		mDefaultSaveDir = mSaveDir;
-		mEditModeValue = "0";
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		prefsEditor = prefs.edit();
-		if (getSaveDir() == null) {
-			loadPrefs();
-		}
-
-		// This prevents some exceptions from being thrown when the Internet is
-		// accessed
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-		.permitAll().build();
-		StrictMode.setThreadPolicy(policy);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mEditor = mPrefs.edit();
 	}
 
 	@Override
@@ -58,8 +43,7 @@ public class StandardActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
-			Intent settingsActivity = new Intent(getBaseContext(),
-					Preferences.class);
+			Intent settingsActivity = new Intent(this, PrefsActivity.class);
 			startActivity(settingsActivity);
 			return true;
 		default:
@@ -75,37 +59,6 @@ public class StandardActivity extends Activity {
 		showToast(message.toString());
 	}
 
-	public static String getSaveDir() {
-		return mSaveDir;
-	}
-
-	public static void setSaveDir(String saveDir) {
-		mSaveDir = saveDir;
-	}
-
-	public static String getDefaultSaveDir() {
-		return mDefaultSaveDir;
-	}
-
-	public static String getEditModeValue() {
-		return mEditModeValue;
-	}
-
-	public static void setEditModeValue(String editModeValue) {
-		mEditModeValue = editModeValue;
-	}
-
-	public static void setDefaultPrefs(Context context) {
-		prefsEditor.clear();
-		PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-		prefsEditor.commit();
-	}
-
-	public static void loadPrefs() {
-		prefsEditor.putString("savedir_pref", mSaveDir);
-		prefsEditor.putString("editmode_pref", mEditModeValue);
-		prefsEditor.commit();
-	}
 	public static boolean appInstalledOrNot(Context context, String uri) {
 		PackageManager pm = context.getPackageManager();
 		boolean appInstalled = false;
@@ -115,7 +68,15 @@ public class StandardActivity extends Activity {
 		} catch (PackageManager.NameNotFoundException e){
 			appInstalled = false;
 		}
-		return appInstalled ;
+		return appInstalled;
+	}
+	
+	public static SharedPreferences getPrefs() {
+		return mPrefs;
+	}
+	
+	public static Editor getPrefsEditor() {
+		return mEditor;
 	}
 
 }

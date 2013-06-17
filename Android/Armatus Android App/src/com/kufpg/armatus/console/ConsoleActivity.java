@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.kufpg.armatus.PrefsActivity;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.StandardListActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
@@ -15,6 +20,7 @@ import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 import com.kufpg.armatus.server.HermitServer;
+import com.kufpg.armatus.util.FileIOUtils;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.DialogFragment;
@@ -282,9 +288,13 @@ public class ConsoleActivity extends StandardListActivity {
 
 		MenuItem gestures = menu.findItem(R.id.gestures);
 		MenuItem complete = menu.findItem(R.id.complete);
+		MenuItem saveHistory = menu.findItem(R.id.save_history);
+		//MenuItem loadHistory = menu.findItem(R.id.load_history);
 
 		gestures.setVisible(true);
 		complete.setVisible(true);
+		saveHistory.setVisible(true);
+		//loadHistory magic
 		return true;
 	}
 
@@ -297,6 +307,39 @@ public class ConsoleActivity extends StandardListActivity {
 			return true;
 		case R.id.complete:
 			attemptWordCompletion();
+			return true;
+		case R.id.save_history:
+			if (mInputEnabled) {
+				try {
+					JSONArray consoleHistory = new JSONArray();
+					for (ConsoleEntry entry : mConsoleEntries) {
+						JSONObject entryJson = new JSONObject();
+						entryJson.put("num", entry.getNum());
+						entryJson.put("contents", entry.getContents());
+						consoleHistory.put(entryJson);
+					}
+
+					JSONArray commandHistory = new JSONArray();
+					for (String command : mCommandHistoryEntries) {
+						commandHistory.put(command);
+					}
+					
+					JSONObject history = new JSONObject();
+					history.put("console", consoleHistory);
+					history.put("commands", commandHistory);
+					
+					if (getPrefs().getBoolean(PrefsActivity.HISTORY_SOURCE_KEY, true)) {
+						//Open file browser
+					} else {
+						FileIOUtils.saveJsonFile(history, FileIOUtils.CACHE_DIR + "history.txt");
+						showToast("Save complete!");
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			return true;
+		case R.id.load_history:
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

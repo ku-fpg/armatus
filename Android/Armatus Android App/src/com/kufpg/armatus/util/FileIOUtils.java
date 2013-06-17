@@ -1,23 +1,20 @@
 package com.kufpg.armatus.util;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -27,129 +24,65 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.ImageView;
 
 public class FileIOUtils {
+	
+	public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() + "/data/armatus/";
 
-	public static ArrayList<String> getTextArrayFromDisk(InputStream textStream) {
-		ArrayList<String> textArray = new ArrayList<String>();
+	public static void saveJsonFile(JSONObject obj, String path) {
 		try {
-			FileInputStream fileIS = (FileInputStream) textStream;
-			BufferedReader buf = new BufferedReader(new InputStreamReader(
-					fileIS));
-			String readString;
-			while ((readString = buf.readLine()) != null) {
-				textArray.add(readString);
+			File file = new File(path);
+			file.getParentFile().mkdirs();
+			FileWriter writer = new FileWriter(path);
+			writer.write(obj.toString());
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static JSONObject openJsonFile(String path) {	 
+		try {	 
+			return new JSONObject(openTextFile(path)); 
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static String openTextFile(String path) {
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(path));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+
+			while (line != null) {
+				sb.append(line + "\n");
+				line = br.readLine();
 			}
-			buf.close();
+			
+			br.close();
+			return sb.toString();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return textArray;
+		return null;
 	}
 
-	public static String getTextFromDisk(InputStream textStream) {
-		String text = "";
-		try {
-			FileInputStream fileIS = (FileInputStream) textStream;
-			BufferedReader buf = new BufferedReader(new InputStreamReader(
-					fileIS));
-			String readString;
-			while ((readString = buf.readLine()) != null) {
-				text += readString + "\n";
-			}
-			buf.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return text;
-	}
-
-	public static ArrayList<String> getTextArrayFromUrl(String textUrlLoc) {
-		ArrayList<String> textArray = new ArrayList<String>();
-		try {
-			URL textUrl = new URL(textUrlLoc);
-			BufferedReader buf = new BufferedReader(new InputStreamReader(
-					textUrl.openStream()));
-			String readString;
-			while ((readString = buf.readLine()) != null) {
-				textArray.add(readString);
-			}
-			buf.close();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return textArray;
-	}
-
-	public static boolean saveTextArray(ArrayList<String> textArray,
-			String path, String fileName) {
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(path + "/" + fileName);
-			for (String str : textArray) {
-				writer.write(str + System.getProperty("line.separator"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			try {
-				writer.close();
-				return true;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-
-	public static boolean isTextFile(String urlLoc) {
-		URL url = null;
-		try {
-			url = new URL(urlLoc);
-			HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
-			urlc.setAllowUserInteraction(false);
-			urlc.setDoInput(true);
-			urlc.setDoOutput(false);
-			urlc.setUseCaches(true);
-			urlc.setRequestMethod("HEAD");
-			urlc.connect();
-			String mime = urlc.getContentType();
-			if (mime != null) {
-				mime = mime.replaceAll(";[^;]*$", ""); // Get rid of some extra
-														// stuff after the MIME
-														// type
-				if (mime.equals("text/plain")) {
-					return true;
-				}
-			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	public static void downloadImage(String url, ImageView imageView,
-			boolean showProgress, Context context) {
-		BitmapDownloaderTask task = new BitmapDownloaderTask(imageView,
-				showProgress, context);
+	public static void downloadImage(String url, ImageView imageView, boolean showProgress, Context context) {
+		BitmapDownloaderTask task = new BitmapDownloaderTask(imageView, showProgress, context);
 		task.execute(url);
 	}
 
 	public static class BitmapDownloaderTask extends
-			AsyncTask<String, Long, Bitmap> {
+	AsyncTask<String, Long, Bitmap> {
 		private final WeakReference<ImageView> imageViewReference;
 		private final boolean mShowProgress;
 		private ProgressDialog mDialog;
@@ -164,14 +97,12 @@ public class FileIOUtils {
 				mDialog.setTitle("Downloading image");
 				mDialog.setMessage("Please wait...");
 				mDialog.setCancelable(false);
-				mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-						new OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								BitmapDownloaderTask.this.cancel(true);
-							}
-						});
+				mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						BitmapDownloaderTask.this.cancel(true);
+					}
+				});
 				mDialog.show();
 			}
 		}
@@ -201,16 +132,14 @@ public class FileIOUtils {
 		}
 
 		public Bitmap downloadBitmap(String url) {
-			final AndroidHttpClient client = AndroidHttpClient
-					.newInstance("Android");
+			final AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 			final HttpGet getRequest = new HttpGet(url);
 
 			try {
 				HttpResponse response = client.execute(getRequest);
 				final int statusCode = response.getStatusLine().getStatusCode();
 				if (statusCode != HttpStatus.SC_OK) {
-					Log.w("ImageDownloader", "Error " + statusCode
-							+ " while retrieving bitmap from " + url);
+					Log.w("ImageDownloader", "Error " + statusCode + " while retrieving bitmap from " + url);
 					return null;
 				}
 
@@ -219,8 +148,7 @@ public class FileIOUtils {
 					InputStream inputStream = null;
 					try {
 						inputStream = entity.getContent();
-						final Bitmap bitmap = BitmapFactory
-								.decodeStream(inputStream);
+						final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 						return bitmap;
 					} finally {
 						if (inputStream != null) {
@@ -230,11 +158,9 @@ public class FileIOUtils {
 					}
 				}
 			} catch (Exception e) {
-				// Could provide a more explicit error message for IOException
-				// or IllegalStateException
+				// Could provide a more explicit error message for IOException or IllegalStateException
 				getRequest.abort();
-				Log.w("ImageDownloader", "Error " + e.toString()
-						+ " while retrieving bitmap from " + url);
+				Log.w("ImageDownloader", "Error " + e.toString() + " while retrieving bitmap from " + url);
 			} finally {
 				if (client != null) {
 					client.close();

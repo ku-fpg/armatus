@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Preferences"
+            android:name=".PrefsActivity"
             android:label="@string/title_preference_screen" />
         <activity
             android:name=".console.ConsoleActivity"

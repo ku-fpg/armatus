@@ -2,26 +2,32 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="Editor settings" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_history_source"
+            android:summaryOff="Use app cache"
+            android:summaryOn="Specify location manually"
+            android:title="Saved history source" />
+
         <EditTextPreference
-            android:dialogTitle="Enter the save directory"
-            android:key="savedir_pref"
-            android:summary="The location on the SD card where files will be saved"
-            android:title="Save directory" />
+            android:dependency="pref_history_source"
+            android:dialogTitle="Enter the new saved history directory:"
+            android:key="@string/pref_history_dir"
+            android:title="Edit saved history directory" />
 
         <ListPreference
             android:defaultValue="0"
             android:dialogTitle="Select an edit mode"
             android:entries="@array/edit_mode_entries"
             android:entryValues="@array/edit_mode_values"
-            android:key="editmode_pref"
+            android:key="@string/pref_edit_mode"
             android:summary="Defines what commands can be performed on the code"
             android:title="Edit mode" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Miscellaneous" >
         <Preference
-            android:key="default_pref_restore"
-            android:summary="Restores the app&apos;s original preferences"
-            android:title="Default settings" />
+            android:key="@string/pref_restore_defaults"
+            android:title="Restore default settings" />
     </PreferenceCategory>
 
 </PreferenceScreen>
