@@ -27,4 +27,6 @@ Software used
 
 —<a href="http://code.google.com/p/tree-view-list-android/">tree-view-list-android</a> by <a href="http://code.google.com/u/109485687940011053436/">Jarek Potiuk</a> under the New BSD License
 
+—<a href="https://github.com/iPaulPro/aFileChooser">aFileChooser</a> by <a href="https://github.com/iPaulPro">Paul "iPaulPro" Burke</a> under the Apache License 2.0
+
 —<a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> by <a href="https://github.com/jackpal">Jack "jackpal" Palevich</a> under the Apache Licence 2.0
