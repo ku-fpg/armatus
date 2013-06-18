@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/console_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:choiceMode="singleChoice"
@@ -18,6 +18,6 @@
         android:id="@+id/console_empty_space"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@android:id/list" />
+        android:layout_below="@+id/console_list_view" />
 
 </RelativeLayout>

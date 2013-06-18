@@ -1,5 +1,7 @@
 package com.kufpg.armatus.console;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -8,9 +10,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.kufpg.armatus.PrefsActivity;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.kufpg.armatus.R;
-import com.kufpg.armatus.StandardListActivity;
+import com.kufpg.armatus.StandardActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
@@ -20,7 +22,7 @@ import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 import com.kufpg.armatus.server.HermitServer;
-import com.kufpg.armatus.util.FileIOUtils;
+import com.kufpg.armatus.util.JsonUtils;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.DialogFragment;
@@ -28,9 +30,11 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -57,7 +61,7 @@ import android.widget.TextView;
  * Activity that displays an interactive, feature-rich
  * (at least it will be some day) HERMIT console.
  */
-public class ConsoleActivity extends StandardListActivity {
+public class ConsoleActivity extends StandardActivity {
 
 	public static final String DRAG_LAYOUT = "drag_layout";
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
@@ -69,6 +73,11 @@ public class ConsoleActivity extends StandardListActivity {
 	public static final String SELECTION_TAG = "selection";
 	public static final String KEYWORD_SWAP_TAG = "keywordswap";
 	public static final String WORD_COMPLETION_TAG = "wordcomplete";
+	public static final String CONSOLE_TAG = "console";
+	public static final String COMMANDS_TAG = "commands";
+	public static final String HISTORY_FILENAME = "history.txt";
+	private static final int LOAD_CODE = 4836;
+	private static final int SAVE_CODE = 6384;
 
 	private ListView mConsoleListView, mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
@@ -87,6 +96,7 @@ public class ConsoleActivity extends StandardListActivity {
 	private WordCompleter mCompleter;
 	private HermitServer mServer;
 	private String mTempCommand;
+	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible = true;
 	private int mEntryCount = 0;
@@ -125,13 +135,13 @@ public class ConsoleActivity extends StandardListActivity {
 		});
 
 		mDispatcher = new CommandDispatcher(this);
+		mConsoleListView = (ListView) findViewById(R.id.console_list_view);
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
-		mConsoleListView = getListView();
 		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
 		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
-		mInputNum.setText("hermit<" + mEntryCount + "> ");
+		updateEntryCount(mEntryCount);
 		mInputEditText = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
 		mInputEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -149,7 +159,7 @@ public class ConsoleActivity extends StandardListActivity {
 				mConsoleListView.post(new Runnable() {
 					public void run() {
 						//DON'T use scrollToBottom(); it will cause a strange jaggedy scroll effect
-						setSelection(mConsoleListView.getCount() - 1);
+						mConsoleListView.setSelection(mConsoleListView.getCount() - 1);
 					}
 				});
 			}
@@ -191,7 +201,7 @@ public class ConsoleActivity extends StandardListActivity {
 		});
 		mInputEditText.requestFocus();
 		mConsoleListView.addFooterView(mInputView, null, false);
-		setListAdapter(mConsoleAdapter); //MUST be called after addFooterView()
+		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
 
 		//Typeface tinkering
@@ -244,7 +254,7 @@ public class ConsoleActivity extends StandardListActivity {
 
 		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
-		setListAdapter(mConsoleAdapter);
+		mConsoleListView.setAdapter(mConsoleAdapter);
 		updateConsoleEntries();
 
 		mCommandHistoryEntries = (ArrayList<String>) state.getSerializable("commandEntries");
@@ -286,15 +296,10 @@ public class ConsoleActivity extends StandardListActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.default_action_bar, menu);
 
-		MenuItem gestures = menu.findItem(R.id.gestures);
-		MenuItem complete = menu.findItem(R.id.complete);
-		MenuItem saveHistory = menu.findItem(R.id.save_history);
-		//MenuItem loadHistory = menu.findItem(R.id.load_history);
-
-		gestures.setVisible(true);
-		complete.setVisible(true);
-		saveHistory.setVisible(true);
-		//loadHistory magic
+		menu.findItem(R.id.gestures).setVisible(true);
+		menu.findItem(R.id.complete).setVisible(true);
+		menu.findItem(R.id.save_history).setVisible(true);
+		menu.findItem(R.id.load_history).setVisible(true);
 		return true;
 	}
 
@@ -323,16 +328,28 @@ public class ConsoleActivity extends StandardListActivity {
 					for (String command : mCommandHistoryEntries) {
 						commandHistory.put(command);
 					}
-					
-					JSONObject history = new JSONObject();
-					history.put("console", consoleHistory);
-					history.put("commands", commandHistory);
-					
-					if (getPrefs().getBoolean(PrefsActivity.HISTORY_SOURCE_KEY, true)) {
-						//Open file browser
+
+					mHistory = new JSONObject();
+					mHistory.put(CONSOLE_TAG, consoleHistory);
+					mHistory.put(COMMANDS_TAG, commandHistory);
+
+					if (getPrefs().getBoolean(HISTORY_SOURCE_KEY, true)) {
+						String path = getPrefs().getString(HISTORY_DIR_KEY, null);
+						File file = new File(path);
+						if (file.isFile()) {
+							path = file.getParent();
+							getPrefsEditor().putString(HISTORY_DIR_KEY, path);
+						} else if (!file.exists()) {
+							showToast("Error: saved history location doesn't exist");
+						}
+						Intent target = FileUtils.createGetContentIntent(FileUtils.MIME_TYPE_TEXT, path);
+						Intent intent = Intent.createChooser(target, "Save history with...");
+						startActivityForResult(intent, SAVE_CODE);
 					} else {
-						FileIOUtils.saveJsonFile(history, FileIOUtils.CACHE_DIR + "history.txt");
-						showToast("Save complete!");
+						Intent intent = new Intent();
+						Uri.Builder builder = new Uri.Builder();
+						intent.setData(builder.path(CACHE_DIR + HISTORY_FILENAME).build());
+						onActivityResult(SAVE_CODE, RESULT_OK, intent);
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -340,10 +357,101 @@ public class ConsoleActivity extends StandardListActivity {
 			}
 			return true;
 		case R.id.load_history:
+			if (mInputEnabled) {
+				if (getPrefs().getBoolean(HISTORY_SOURCE_KEY, true)) {
+					String path = getPrefs().getString(HISTORY_DIR_KEY, null);
+					File file = new File(path);
+					if (file.isFile()) {
+						path = file.getParent();
+						getPrefsEditor().putString(HISTORY_DIR_KEY, path);
+					} else if (!file.exists()) {
+						showToast("Error: saved history location doesn't exist");
+					}
+					Intent target = FileUtils.createGetContentIntent(FileUtils.MIME_TYPE_TEXT, path);
+					Intent intent = Intent.createChooser(target, "Load history with...");
+					startActivityForResult(intent, LOAD_CODE);
+				} else {
+					Intent intent = new Intent();
+					Uri.Builder builder = new Uri.Builder();
+					intent.setData(builder.path(CACHE_DIR + HISTORY_FILENAME).build());
+					onActivityResult(LOAD_CODE, RESULT_OK, intent);
+				}
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case LOAD_CODE:
+			if (resultCode == RESULT_OK) {
+				if (data != null) {
+					final Uri uri = data.getData();
+					final File file = FileUtils.getFile(uri);
+					if (file != null) {
+						if (file.exists()) {
+							JSONObject history = null;
+							try {
+								history = JsonUtils.openJsonFile(file.getAbsolutePath());
+
+								JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
+								mConsoleEntries.clear();
+								for (int i = 0; i < consoleHistory.length(); i++) {
+									JSONObject jsonEntry = consoleHistory.getJSONObject(i);
+									int num = jsonEntry.getInt("num");
+									String contents = jsonEntry.getString("contents");
+									ConsoleEntry entry = new ConsoleEntry(num, contents);
+									mConsoleEntries.add(entry);
+								}
+								mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+								mConsoleListView.setAdapter(mConsoleAdapter);
+								updateConsoleEntries();
+								updateEntryCount(consoleHistory.length());
+
+								JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
+								mCommandHistoryEntries.clear();
+								for (int i = 0; i < commandHistory.length(); i++) {
+									mCommandHistoryEntries.add(commandHistory.getString(i));
+								}
+								mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
+								mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
+								updateCommandHistoryEntries();
+
+								mInputEditText.requestFocus();
+								showToast("Loading complete!");
+								getPrefsEditor().putString(HISTORY_DIR_KEY, file.getParent());
+							} catch (JSONException e) {
+								showToast("Error: invalid JSON");
+							} catch (FileNotFoundException e) {
+								showToast("Error: file not found"); //Should never happen
+							}
+						} else {
+							showToast("Error: file not found");
+						}
+					}
+				}
+			}
+			break;
+		case SAVE_CODE:
+			if (resultCode == RESULT_OK) {		
+				if (data != null) {
+					final Uri uri = data.getData();
+					final File file = FileUtils.getFile(uri);
+					if (file != null) {
+						JsonUtils.saveJsonFile(mHistory, file.getAbsolutePath());
+						getPrefsEditor().putString(HISTORY_DIR_KEY, file.getParent());
+						showToast("Save complete!");
+					} else {
+						showToast("Error: file not found");
+					}
+				}
+			} 
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override
@@ -422,11 +530,10 @@ public class ConsoleActivity extends StandardListActivity {
 	 * @param contents The message to be shown in the entry.
 	 */
 	public void addConsoleEntry(String contents) {
-		ConsoleEntry ce = new ConsoleEntry(contents, mEntryCount);
+		ConsoleEntry ce = new ConsoleEntry(mEntryCount, contents);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
-		mEntryCount++;
-		mInputNum.setText("hermit<" + mEntryCount + "> ");
+		updateEntryCount(mEntryCount + 1);
 		scrollToBottom();
 	}
 
@@ -440,7 +547,7 @@ public class ConsoleActivity extends StandardListActivity {
 		mConsoleEntries.remove(mConsoleEntries.size() - 1);
 		/* Use 1 less than mEntryCount, since we are retroactively modifying an entry after
 		 * addEntry() was called (which incremented mEntryCount) */
-		ConsoleEntry ce = new ConsoleEntry(contents, mEntryCount - 1);
+		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
 		scrollToBottom();
@@ -454,7 +561,7 @@ public class ConsoleActivity extends StandardListActivity {
 	public void appendProgressSpinner() {
 		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
 		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		ConsoleEntry ce = new ConsoleEntry(contents, mEntryCount - 1, true);
+		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents, true);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
 		scrollToBottom();
@@ -485,6 +592,10 @@ public class ConsoleActivity extends StandardListActivity {
 			mServer.cancel(true);
 		}
 		finish();
+	}
+
+	public ListView getListView() {
+		return mConsoleListView;
 	}
 
 	public SlidingMenu getSlidingMenu() {
@@ -594,7 +705,7 @@ public class ConsoleActivity extends StandardListActivity {
 	private void scrollToBottom() {
 		mConsoleListView.post(new Runnable() {
 			public void run() {
-				setSelection(mConsoleListView.getCount());
+				mConsoleListView.setSelection(mConsoleListView.getCount());
 				mConsoleListView.smoothScrollToPosition(mConsoleListView.getCount());
 			}
 		});
@@ -620,7 +731,7 @@ public class ConsoleActivity extends StandardListActivity {
 			mConsoleEntries.remove(0);
 		}
 		mConsoleAdapter.notifyDataSetChanged();
-		mInputNum.setText("hermit<" + mEntryCount + "> ");
+		updateEntryCount(mEntryCount);
 	}
 
 	private void updateCommandHistoryEntries() {
@@ -628,6 +739,11 @@ public class ConsoleActivity extends StandardListActivity {
 			mCommandHistoryEntries.remove(0);
 		}
 		mCommandHistoryAdapter.notifyDataSetChanged();
+	}
+	
+	private void updateEntryCount(int newEntryCount) {
+		mEntryCount = newEntryCount;
+		mInputNum.setText("hermit<" + mEntryCount + "> ");
 	}
 
 }

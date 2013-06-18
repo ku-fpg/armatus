@@ -9,7 +9,6 @@ import pl.polidea.treeview.demo.TreeListViewDemo;
 
 import com.kufpg.armatus.console.ConsoleActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
-import com.kufpg.armatus.util.FileIOUtils;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,17 +16,13 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends StandardActivity {
 
 	private TextView mButtonsView;
-	private Button mLockButton, mUnlockButton, mAsyncButton, mTreeButton, mConsoleButton,
+	private Button mLockButton, mUnlockButton, mTreeButton, mConsoleButton,
 	mPinchZoomButton, mTerminalButton;
-	private CheckBox mProgressCheckBox;
 	private int mNumTextChanges = 0;
 	private boolean mIsLocked = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
@@ -42,8 +37,6 @@ public class MainActivity extends StandardActivity {
 		setCodeText(mNumTextChanges, mIsLocked);
 		mLockButton = (Button) findViewById(R.id.lock_button);
 		mUnlockButton = (Button) findViewById(R.id.unlock_button);
-		mAsyncButton = (Button) findViewById(R.id.async_button);
-		mProgressCheckBox = (CheckBox) findViewById(R.id.progress_checkbox);
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
@@ -85,20 +78,6 @@ public class MainActivity extends StandardActivity {
 				} finally {
 					mLock.unlock();
 				}
-			}
-		});
-
-		mAsyncButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Toast imgToast = new Toast(MainActivity.this);
-				ImageView imgView = new ImageView(MainActivity.this);
-				imgToast.setView(imgView);
-				imgToast.setDuration(Toast.LENGTH_LONG);
-				FileIOUtils.downloadImage(
-						"http://3.bp.blogspot.com/-GYJu10jKqEw/Td2bEbUSzkI/AAAAAAAAAG0/m7t15oHOLWc/s1600/haskell-curry-says.png",
-						imgView, mProgressCheckBox.isChecked(), MainActivity.this);
-				imgToast.show();
 			}
 		});
 

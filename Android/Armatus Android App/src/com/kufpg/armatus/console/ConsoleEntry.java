@@ -17,7 +17,7 @@ public class ConsoleEntry implements Serializable {
 	private final ArrayList<String> mKeywords = new ArrayList<String>();
 	private boolean mIsWaiting = false;
 
-	public ConsoleEntry(String contents, int entryNum) {
+	public ConsoleEntry(int entryNum, String contents) {
 		mNum = entryNum;
 		if (contents != null) {
 			mContents = contents;
@@ -30,8 +30,8 @@ public class ConsoleEntry implements Serializable {
 		}
 	}
 	
-	public ConsoleEntry(String contents, int entryNum, boolean isWaiting) {
-		this(contents, entryNum);
+	public ConsoleEntry(int entryNum, String contents, boolean isWaiting) {
+		this(entryNum, contents);
 		mIsWaiting = isWaiting;
 	}
 	

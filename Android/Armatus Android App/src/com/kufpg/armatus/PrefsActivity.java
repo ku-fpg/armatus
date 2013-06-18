@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.kufpg.armatus.dialog.YesOrNoDialog;
-import com.kufpg.armatus.util.FileIOUtils;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,9 +24,18 @@ import android.preference.PreferenceFragment;
 
 public class PrefsActivity extends PreferenceActivity {
 
-	public static String HISTORY_SOURCE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY;
-	private static final String CACHE_DIR = FileIOUtils.CACHE_DIR;
-	private static PrefsActivity mActivity;
+	public static String HISTORY_SOURCE_KEY = StandardActivity.HISTORY_SOURCE_KEY;
+	public static String HISTORY_DIR_KEY = StandardActivity.HISTORY_DIR_KEY;
+	public static String EDIT_MODE_KEY = StandardActivity.EDIT_MODE_KEY;
+	public static String RESTORE_DEFAULTS_KEY = StandardActivity.RESTORE_DEFAULTS_KEY;
+	private static Activity mActivity;
+	private static SharedPreferences mPrefs;
+	private static Editor mEditor;
+	private static CheckBoxPreference mHistorySourcePref;
+	private static EditTextPreference mHistoryDirPref;
+	private static ListPreference mEditModePref;
+	private static Preference mRestoreDefaultsPref;
+	private static Map<String, Object> mStaticPrefDefaults = new HashMap<String, Object>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,15 +45,6 @@ public class PrefsActivity extends PreferenceActivity {
 	}
 
 	public static class PrefsFragment extends PreferenceFragment {
-		private SharedPreferences mPrefs;
-		private Editor mEditor;
-
-		private static CheckBoxPreference mHistorySourcePref;
-		private static EditTextPreference mHistoryDirPref;
-		private static ListPreference mEditModePref;
-		private static Preference mRestoreDefaultsPref;
-		private static Map<Preference, String> mStaticPrefDefaults = new HashMap<Preference, String>();
-
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -53,24 +53,18 @@ public class PrefsActivity extends PreferenceActivity {
 			mPrefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
 			mEditor = mPrefs.edit();
 
-			HISTORY_SOURCE_KEY = getResources().getString(R.string.pref_history_source);
-			HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
-			EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
-			RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
-
 			mHistorySourcePref = (CheckBoxPreference) findPreference(HISTORY_SOURCE_KEY);
 			mHistoryDirPref = (EditTextPreference) findPreference(HISTORY_DIR_KEY);
 			mEditModePref = (ListPreference) findPreference(EDIT_MODE_KEY);
 			mRestoreDefaultsPref = findPreference(RESTORE_DEFAULTS_KEY);
 
-			mStaticPrefDefaults.put(mHistoryDirPref, CACHE_DIR);
-			setStaticPrefValues(true).commit();
+			mStaticPrefDefaults = StandardActivity.getStaticPrefDefaults();
 			updatePrefSummaries();
 
 			mHistorySourcePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					mEditor.putBoolean("pref_history_source", (Boolean) newValue).commit();
+					mEditor.putBoolean(HISTORY_SOURCE_KEY, (Boolean) newValue).commit();
 					updatePrefSummaries();
 					return true;
 				}
@@ -79,7 +73,7 @@ public class PrefsActivity extends PreferenceActivity {
 			mHistoryDirPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					mEditor.putString("pref_history_dir", (String) newValue).commit();
+					mEditor.putString(HISTORY_DIR_KEY, (String) newValue).commit();
 					updatePrefSummaries();
 					return true;
 				}
@@ -88,7 +82,7 @@ public class PrefsActivity extends PreferenceActivity {
 			mEditModePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					mEditor.putString("pref_editmode", (String) newValue).commit();
+					mEditor.putString(EDIT_MODE_KEY, (String) newValue).commit();
 					return true;
 				}
 			});
@@ -113,36 +107,24 @@ public class PrefsActivity extends PreferenceActivity {
 			});
 		}
 
-		private Editor restoreDefaultValues() {
+		private static Editor restoreDefaultValues() {
 			mEditor.clear();
 			PreferenceManager.setDefaultValues(mActivity, R.xml.preferences, true);
-			return setStaticPrefValues(false);
+			return setStaticPrefValues();
 		}
 
-		private Editor setStaticPrefValues(boolean initializing) {
-			if (initializing) {
-				for (Entry<Preference, String> entry : mStaticPrefDefaults.entrySet()) {
-					if (entry.getKey() instanceof EditTextPreference) {
-						EditTextPreference etp = (EditTextPreference) entry.getKey();
-						if (mPrefs.getString(etp.getKey(), null) == null) {
-							mEditor.putString(etp.getKey(), entry.getValue());
-						}
-					}
-				}
-			} else {
-				for (Entry<Preference, String> entry : mStaticPrefDefaults.entrySet()) {
-					if (entry.getKey() instanceof EditTextPreference) {
-						EditTextPreference etp = (EditTextPreference) entry.getKey();
-						mEditor.putString(etp.getKey(), entry.getValue());
-					}
+		private static Editor setStaticPrefValues() {
+			for (Entry<String, Object> entry : mStaticPrefDefaults.entrySet()) {
+				if (entry.getValue() instanceof String) {
+					mEditor.putString(entry.getKey(), (String) entry.getValue());
 				}
 			}
 			return mEditor;
 		}
 
-		private void updatePrefSummaries() {
-			if (mPrefs.getBoolean("pref_history_source", true)) {
-				mHistoryDirPref.setSummary(mPrefs.getString("pref_history_dir", null));
+		private static void updatePrefSummaries() {
+			if (mPrefs.getBoolean(HISTORY_SOURCE_KEY, true)) {
+				mHistoryDirPref.setSummary(mPrefs.getString(HISTORY_DIR_KEY, null));
 			} else {
 				mHistoryDirPref.setSummary(null);
 			}
