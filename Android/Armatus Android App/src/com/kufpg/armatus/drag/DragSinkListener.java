@@ -15,7 +15,7 @@ public class DragSinkListener implements OnDragListener {
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
-	public void onDragStarted(View dragView, View dragSink) {}
+	public void onDragStarted(View dragView, View dragSink, DragEvent event) {}
 	
 	/**
 	 * Occurs when dragView is within the boundaries of dragSink.
@@ -38,27 +38,27 @@ public class DragSinkListener implements OnDragListener {
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
-	public void onDragExited(View dragView, View dragSink) {}
+	public void onDragExited(View dragView, View dragSink, DragEvent event) {}
 	
 	/**
 	 * Occurs when dragView's DragEvent ends within the boundaries of dragSink.
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
-	public void onDragDropped(View dragView, View dragSink) {}
+	public void onDragDropped(View dragView, View dragSink, DragEvent event) {}
 	
 	/**
 	 * Occurs when dragView's DragEvent ends, regardless of location.
 	 * @param dragView The View being dragged.
 	 * @param dragSink The View listening to dragView.
 	 */
-	public void onDragEnded(View dragView, View dragSink) {}
+	public void onDragEnded(View dragView, View dragSink, DragEvent event) {}
 
 	@Override
 	public boolean onDrag(View v, DragEvent event) {
 		switch (event.getAction()) {
 		case DragEvent.ACTION_DRAG_STARTED: {
-			onDragStarted((View) event.getLocalState(), v);
+			onDragStarted((View) event.getLocalState(), v, event);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_ENTERED: {
@@ -70,18 +70,18 @@ public class DragSinkListener implements OnDragListener {
 			break;
 		}
 		case DragEvent.ACTION_DRAG_EXITED: {
-			onDragExited((View) event.getLocalState(), v);
+			onDragExited((View) event.getLocalState(), v, event);
 			break;
 		}
 		case DragEvent.ACTION_DROP: {
 			View dragView = (View) event.getLocalState();
-			onDragDropped(dragView, v);
+			onDragDropped(dragView, v, event);
 			dragView.setVisibility(View.VISIBLE);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_ENDED: {
 			View dragView = (View) event.getLocalState();
-			onDragEnded(dragView, v);
+			onDragEnded(dragView, v, event);
 			dragView.setVisibility(View.VISIBLE);
 		}
 		default:

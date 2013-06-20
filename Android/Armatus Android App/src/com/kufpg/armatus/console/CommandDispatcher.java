@@ -11,6 +11,7 @@ import com.kufpg.armatus.StandardActivity;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
+import com.kufpg.armatus.util.NetworkUtils;
 
 import android.content.Intent;
 import android.util.Log;
@@ -462,9 +463,15 @@ public class CommandDispatcher {
 		@Override
 		protected void run(String... args) {
 			try {
-				String jstr = "{command:server-test},{args:" + varargsToString(args) + "}";
-				HermitServer request = new HermitServer(mConsole, new JSONObject(jstr));
-				request.execute();
+				if (NetworkUtils.isAirplaneModeOn(mConsole)) {
+					mConsole.appendConsoleEntry("Error: Please disable airplane mode before attempting to connect.");
+				} else if (!NetworkUtils.isWifiConnected(mConsole)) {
+					mConsole.appendConsoleEntry("Error: No network connectivity.");
+				} else {
+					String jstr = "{command:server-test},{args:" + varargsToString(args) + "}";
+					HermitServer request = new HermitServer(mConsole, new JSONObject(jstr));
+					request.execute();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;
@@ -568,7 +575,7 @@ public class CommandDispatcher {
 	public static boolean isAlias(String commandName) {
 		return mAliasedCommandMap.containsKey(commandName);
 	}
-	
+
 	public static boolean isCommand(String commandName) {
 		return mCommandMap.containsKey(commandName);
 	}
@@ -588,7 +595,7 @@ public class CommandDispatcher {
 	public static Keyword getKeyword(String keywordName) {
 		return mKeywordMap.get(keywordName);
 	}
-	
+
 	public static String unaliasCommand(String alias) {
 		return mAliasedCommandMap.get(alias);
 	}

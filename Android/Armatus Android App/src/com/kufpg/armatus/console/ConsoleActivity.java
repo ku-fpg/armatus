@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
+import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -195,7 +196,7 @@ public class ConsoleActivity extends StandardActivity {
 		});
 		mInputEditText.setOnDragListener(new DragSinkListener() {
 			@Override
-			public void onDragStarted(View dragView, View dragSink) {
+			public void onDragStarted(View dragView, View dragSink, DragEvent event) {
 				getSlidingMenu().showContent();
 			}
 		});
@@ -543,25 +544,12 @@ public class ConsoleActivity extends StandardActivity {
 	 */
 	public void appendConsoleEntry(String newContents) {
 		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
-		contents += /*"Disabled pretty-printing <br />"*/ "\n" + newContents;
+		boolean waiting = mConsoleEntries.get(mConsoleEntries.size() - 1).isWaiting();
+		contents += "\n" + newContents;
 		mConsoleEntries.remove(mConsoleEntries.size() - 1);
 		/* Use 1 less than mEntryCount, since we are retroactively modifying an entry after
 		 * addEntry() was called (which incremented mEntryCount) */
-		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents);
-		mConsoleEntries.add(ce);
-		updateConsoleEntries();
-		scrollToBottom();
-	}
-
-	/**
-	 * Appends a progress spinner below the most recent entry's contents. Ideal for
-	 * doing asynchronous tasks (such as HermitServer requests). The loading bar
-	 * will be destroyed when appendConsoleEntry() is called.
-	 */
-	public void appendProgressSpinner() {
-		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
-		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents, true);
+		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents, waiting);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
 		scrollToBottom();
@@ -637,6 +625,19 @@ public class ConsoleActivity extends StandardActivity {
 		}
 		ft.add(newFrag, tag);
 		ft.commit();
+	}
+
+	/**
+	 * Appends a progress spinner below the most recent entry's contents. Ideal for
+	 * doing asynchronous tasks (such as HermitServer requests).
+	 */
+	public void updateProgressSpinner(boolean shown) {
+		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
+		mConsoleEntries.remove(mConsoleEntries.size() - 1);
+		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents, shown);
+		mConsoleEntries.add(ce);
+		updateConsoleEntries();
+		scrollToBottom();
 	}
 
 	private void loadExpandableMenuData() {
@@ -740,7 +741,7 @@ public class ConsoleActivity extends StandardActivity {
 		}
 		mCommandHistoryAdapter.notifyDataSetChanged();
 	}
-	
+
 	private void updateEntryCount(int newEntryCount) {
 		mEntryCount = newEntryCount;
 		mInputNum.setText("hermit<" + mEntryCount + "> ");

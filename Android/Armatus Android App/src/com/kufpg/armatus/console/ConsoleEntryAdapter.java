@@ -84,17 +84,17 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			}
 
 			@Override
-			public void onDragExited(View dragView, View dragSink) {
+			public void onDragExited(View dragView, View dragSink, DragEvent event) {
 				dragSink.setBackgroundResource(TRANSPARENT);
 			}
 
 			@Override
-			public void onDragEnded(View dragView, View dragSink) {
+			public void onDragEnded(View dragView, View dragSink, DragEvent event) {
 				dragSink.setBackgroundResource(TRANSPARENT);
 			}
 
 			@Override
-			public void onDragDropped(View dragView, View dragSink) {
+			public void onDragDropped(View dragView, View dragSink, DragEvent event) {
 				List<String> keywords = mEntries.get(thepos).getKeywords();
 				if (!keywords.isEmpty()) {
 					mConsole.setTempCommand(((DragIcon) dragView).getCommandName());

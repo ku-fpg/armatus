@@ -29,17 +29,17 @@ import org.json.JSONObject;
 
 import com.kufpg.armatus.console.ConsoleActivity;
 
-public class HermitServer extends AsyncTask<JSONObject, Void, String> implements Serializable {
+public class HermitServer extends AsyncTask<JSONObject, String, String> implements Serializable {
 
 	private static final long serialVersionUID = -1927958718472477046L;
 	private ConsoleActivity mConsole;
 	private boolean mDone = false;
-	private String SERVER_URL_GET = "https://raw.github.com/ku-fpg/armatus/experimental/Android/Armatus%20Android%20App/docs/test.json";
+	private String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 	private String SERVER_URL_POST = "http://posttestserver.com/post.php?dump&html&dir=armatus&status_code=202";
 
 	public HermitServer(ConsoleActivity console, JSONObject request) {
 		mConsole = console;
-		mConsole.appendProgressSpinner();
+		mConsole.updateProgressSpinner(true);
 		mConsole.disableInput();
 		mConsole.setServer(this);
 	}
@@ -65,8 +65,13 @@ public class HermitServer extends AsyncTask<JSONObject, Void, String> implements
 		//		mDone = true;
 		//		return response;
 
-		return httpGet();
+		return httpGet(this);
 		//return httpPost();
+	}
+	
+	@Override
+	protected void onProgressUpdate(String... progress) {
+		mConsole.appendConsoleEntry(progress[0]);
 	}
 
 	@Override
@@ -77,6 +82,7 @@ public class HermitServer extends AsyncTask<JSONObject, Void, String> implements
 			mConsole.appendConsoleEntry("Error: server request cancelled.");
 		}
 		mConsole.enableInput();
+		mConsole.updateProgressSpinner(false);
 		mConsole.setServer(null);
 		detach();
 	}
@@ -93,7 +99,7 @@ public class HermitServer extends AsyncTask<JSONObject, Void, String> implements
 		return mDone;
 	}
 
-	private String httpGet() {
+	private String httpGet(HermitServer server) {
 		HttpResponse httpResponse = null;
 		HttpClient client = null;
 		String jsonResponse, jsonText = null;
@@ -105,15 +111,18 @@ public class HermitServer extends AsyncTask<JSONObject, Void, String> implements
 			client = new DefaultHttpClient(httpParams);
 			HttpGet request = new HttpGet(SERVER_URL_GET);
 			if (!isCancelled()) {
+				server.publishProgress("Attempting server connection...");
 				httpResponse = client.execute(request);
 			}
+			server.publishProgress("Reading in JSON...");
 			InputStream jsonIS = httpResponse.getEntity().getContent();
 			Scanner jsonScanner = new Scanner(jsonIS).useDelimiter("\\A");
 			jsonResponse = jsonScanner.hasNext() ? jsonScanner.next() : "";
 			jsonScanner.close();
 			if (!isCancelled()) {
+				server.publishProgress("Parsing JSON...");
 				JSONObject json = new JSONObject(jsonResponse);
-				jsonText = json.getString("fileName");
+				jsonText = json.toString();
 			}
 		} catch(ConnectTimeoutException e) {
 			e.printStackTrace();
@@ -135,7 +144,7 @@ public class HermitServer extends AsyncTask<JSONObject, Void, String> implements
 		return jsonText;
 	}
 
-	private String httpPost() {
+	private String httpPost(HermitServer server) {
 		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost(SERVER_URL_POST);
 

@@ -1,18 +1,20 @@
 package com.kufpg.armatus.dialog;
 
 import com.kufpg.armatus.R;
+import com.kufpg.armatus.console.ConsoleActivity;
+import com.kufpg.armatus.console.PrettyPrinter;
 
 import android.app.DialogFragment;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.TextView;
 
 public class ConsoleEntrySelectionDialog extends DialogFragment {
 
-	private EditText mContentsView;
+	private TextView mContentsView;
 	private int mEntryNum;
 	private String mEntryContents;
 	
@@ -41,8 +43,11 @@ public class ConsoleEntrySelectionDialog extends DialogFragment {
 		setCancelable(true);
 
 		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
-		mContentsView = (EditText) v.findViewById(R.id.console_entry_selection_dialog_contents);
-		mContentsView.setText(Html.fromHtml(mEntryContents)); //Don't forget, there could be special HTML formatting!
+		mContentsView = (TextView) v.findViewById(R.id.console_entry_selection_dialog_contents);
+		mContentsView.setCursorVisible(true);
+		Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(), ConsoleActivity.TYPEFACE);
+		mContentsView.setTypeface(typeface);
+		PrettyPrinter.setPrettyText(mContentsView, mEntryContents);
 		
 		return v;
 	}

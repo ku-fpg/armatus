@@ -19,7 +19,7 @@ public class DragViewClickListener implements OnTouchListener, OnLongClickListen
 		DragShadowBuilder shadow = new DragShadowBuilder(v);
 		v.startDrag(dragData, shadow, v, 0);
 		v.setVisibility(View.INVISIBLE);
-		return false;
+		return true;
 	}
 
 	@Override
