@@ -91,6 +91,7 @@ public class MainActivity extends StandardActivity {
 		mConsoleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				getEditManager().discardAllEdits();
 				startActivity(new Intent(MainActivity.this, ConsoleActivity.class));
 			}
 		});

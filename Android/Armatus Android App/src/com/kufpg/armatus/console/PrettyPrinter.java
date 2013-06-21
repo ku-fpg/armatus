@@ -6,7 +6,6 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
-import com.kufpg.armatus.console.CommandDispatcher;
 
 /**
  * Colors ConsoleEntry text depending on its usage of Keywords.

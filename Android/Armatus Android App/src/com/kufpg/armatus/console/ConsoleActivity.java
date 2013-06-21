@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.StandardActivity;
-import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -21,6 +20,7 @@ import com.kufpg.armatus.dialog.WordCompletionDialog;
 import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
+import com.kufpg.armatus.edits.Edit;
 import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.JsonUtils;
 import com.slidingmenu.lib.SlidingMenu;
@@ -100,7 +100,7 @@ public class ConsoleActivity extends StandardActivity {
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible = true;
-	private int mEntryCount = 0;
+	//private int mEntryCount = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +142,6 @@ public class ConsoleActivity extends StandardActivity {
 		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
-		updateEntryCount(mEntryCount);
 		mInputEditText = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
 		mInputEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -182,7 +181,9 @@ public class ConsoleActivity extends StandardActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						addConsoleEntry(mInputEditText.getText().toString());
+						//addConsoleEntry(mInputEditText.getText().toString());
+						ConsoleEntryAdder edit = new ConsoleEntryAdder(mInputEditText.getText().toString());
+						getEditManager().applyEdit(edit);
 					}
 					mInputEditText.setText("");
 					return true;
@@ -232,7 +233,6 @@ public class ConsoleActivity extends StandardActivity {
 		super.onSaveInstanceState(outState);
 		outState.putString("input", mInputEditText.getText().toString());
 		outState.putInt("cursorPos", mInputEditText.getSelectionStart());
-		outState.putInt("entryCount", mEntryCount);
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putSerializable("consoleEntries", mConsoleEntries);
 		outState.putSerializable("commandEntries", mCommandHistoryEntries);
@@ -249,7 +249,6 @@ public class ConsoleActivity extends StandardActivity {
 		mInputEditText.setText(state.getString("input"));
 		mInputEditText.setSelection(state.getInt("cursorPos"));
 		mInputEditText.requestFocus();
-		mEntryCount = state.getInt("entryCount");
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 		setSoftKeyboardVisibility(mSoftKeyboardVisible);
 
@@ -276,6 +275,7 @@ public class ConsoleActivity extends StandardActivity {
 		YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
+				StandardActivity.getEditManager().discardAllEdits();
 				exit();
 			}
 		};
@@ -410,7 +410,6 @@ public class ConsoleActivity extends StandardActivity {
 								mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 								mConsoleListView.setAdapter(mConsoleAdapter);
 								updateConsoleEntries();
-								updateEntryCount(consoleHistory.length());
 
 								JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
 								mCommandHistoryEntries.clear();
@@ -526,33 +525,57 @@ public class ConsoleActivity extends StandardActivity {
 		}
 	}
 
-	/**
-	 * Adds a new entry to the console.
-	 * @param contents The message to be shown in the entry.
-	 */
-	public void addConsoleEntry(String contents) {
-		ConsoleEntry ce = new ConsoleEntry(mEntryCount, contents);
+	private void addConsoleEntry(String contents) {
+		ConsoleEntry ce = new ConsoleEntry(mConsoleEntries.size(), contents);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
-		updateEntryCount(mEntryCount + 1);
 		scrollToBottom();
 	}
 
-	/**
-	 * Appends a newline and newContents to the most recent entry.
-	 * @param newContents The message to be appended to the entry.
-	 */
+	private void removeConsoleEntry() {
+		mConsoleEntries.remove(mConsoleEntries.size() - 1);
+		updateConsoleEntries();
+		scrollToBottom();
+	}
+
 	public void appendConsoleEntry(String newContents) {
 		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
 		boolean waiting = mConsoleEntries.get(mConsoleEntries.size() - 1).isWaiting();
 		contents += "\n" + newContents;
 		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		/* Use 1 less than mEntryCount, since we are retroactively modifying an entry after
-		 * addEntry() was called (which incremented mEntryCount) */
-		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents, waiting);
+		ConsoleEntry ce = new ConsoleEntry(mConsoleEntries.size() - 1, contents, waiting);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
 		scrollToBottom();
+	}
+
+	public class ConsoleEntryAdder implements Edit {
+		private static final long serialVersionUID = -5433642814170050087L;
+		private String mContents;
+
+		public ConsoleEntryAdder(String contents) {
+			mContents = contents;
+		}
+
+		@Override
+		public void applyEdit() {
+			addConsoleEntry(mContents);
+		}
+
+		@Override
+		public boolean isSignificant() {
+			return true;
+		}
+
+		@Override
+		public void redo() {
+			addConsoleEntry(mContents);
+		}
+
+		@Override
+		public void undo() {
+			removeConsoleEntry();
+		}
 	}
 
 	/**
@@ -560,7 +583,6 @@ public class ConsoleActivity extends StandardActivity {
 	 */
 	public void clear() {
 		mConsoleEntries.clear();
-		mEntryCount = 0;
 		updateConsoleEntries();
 	}
 
@@ -580,6 +602,10 @@ public class ConsoleActivity extends StandardActivity {
 			mServer.cancel(true);
 		}
 		finish();
+	}
+
+	public int getNumEntries() {
+		return mConsoleEntries.size();
 	}
 
 	public ListView getListView() {
@@ -634,7 +660,7 @@ public class ConsoleActivity extends StandardActivity {
 	public void updateProgressSpinner(boolean shown) {
 		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
 		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		ConsoleEntry ce = new ConsoleEntry(mEntryCount - 1, contents, shown);
+		ConsoleEntry ce = new ConsoleEntry(mConsoleEntries.size() - 1, contents, shown);
 		mConsoleEntries.add(ce);
 		updateConsoleEntries();
 		scrollToBottom();
@@ -732,7 +758,7 @@ public class ConsoleActivity extends StandardActivity {
 			mConsoleEntries.remove(0);
 		}
 		mConsoleAdapter.notifyDataSetChanged();
-		updateEntryCount(mEntryCount);
+		updateEntryCount();
 	}
 
 	private void updateCommandHistoryEntries() {
@@ -742,9 +768,8 @@ public class ConsoleActivity extends StandardActivity {
 		mCommandHistoryAdapter.notifyDataSetChanged();
 	}
 
-	private void updateEntryCount(int newEntryCount) {
-		mEntryCount = newEntryCount;
-		mInputNum.setText("hermit<" + mEntryCount + "> ");
+	private void updateEntryCount() {
+		mInputNum.setText("hermit<" + mConsoleEntries.size() + "> ");
 	}
 
 }

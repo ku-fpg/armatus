@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kufpg.armatus.console.CommandDispatcher;
 
 /**
  * Class containing values that are binded to Views in ConsoleEntryAdapter.

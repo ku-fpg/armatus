@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.kufpg.armatus.edits.EditManager;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -27,6 +29,7 @@ public class StandardActivity extends Activity {
 	private static Map<String, Object> mStaticPrefDefaults = new HashMap<String, Object>();
 	public static SharedPreferences mPrefs;
 	public static Editor mEditor;
+	public static EditManager mEditManager = new EditManager();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,7 @@ public class StandardActivity extends Activity {
 		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
 
 		mStaticPrefDefaults.put(HISTORY_DIR_KEY, CACHE_DIR);
-		
+
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 		for (Entry<String, Object> entry : mStaticPrefDefaults.entrySet()) {
 			if (entry.getValue() instanceof String) {
@@ -65,6 +68,16 @@ public class StandardActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.undo:
+			if (mEditManager.canUndo()) {
+				mEditManager.undo();
+			}
+			return true;
+		case R.id.redo:
+			if (mEditManager.canRedo()) {
+				mEditManager.redo();
+			}
+			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(this, PrefsActivity.class);
 			startActivity(settingsActivity);
@@ -98,10 +111,14 @@ public class StandardActivity extends Activity {
 		return mPrefs;
 	}
 
+	public static EditManager getEditManager() {
+		return mEditManager;
+	}
+
 	public static Editor getPrefsEditor() {
 		return mEditor;
 	}
-	
+
 	static Map<String, Object> getStaticPrefDefaults() {
 		return mStaticPrefDefaults;
 	}

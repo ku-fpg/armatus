@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import com.kufpg.armatus.StandardActivity;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
+import com.kufpg.armatus.console.ConsoleActivity.ConsoleEntryAdder;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.NetworkUtils;
@@ -469,8 +470,8 @@ public class CommandDispatcher {
 					mConsole.appendConsoleEntry("Error: No network connectivity.");
 				} else {
 					String jstr = "{command:server-test},{args:" + varargsToString(args) + "}";
-					HermitServer request = new HermitServer(mConsole, new JSONObject(jstr));
-					request.execute();
+					HermitServer request = new HermitServer(mConsole);
+					request.execute(new JSONObject(jstr));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -541,7 +542,9 @@ public class CommandDispatcher {
 	private void runOnConsole(Command command, String... args) {
 		String commandString = command.getCommandName()
 				+ " " + varargsToString(args);
-		mConsole.addConsoleEntry(commandString);
+		//mConsole.addConsoleEntry(commandString);
+		ConsoleEntryAdder edit = mConsole.new ConsoleEntryAdder(commandString);
+		StandardActivity.getEditManager().applyEdit(edit);
 		mConsole.addCommandEntry(command.getCommandName());
 
 		if (command.hasLowerArgBound()) {
@@ -567,7 +570,6 @@ public class CommandDispatcher {
 		if (keyword != null) {
 			runOnConsole(keyword.getCommand(), arg);
 		} else {
-			// Should not happen
 			mConsole.appendConsoleEntry("Error: " + keyword + " is not a valid keyword.");
 		}
 	}
@@ -622,9 +624,7 @@ public class CommandDispatcher {
 				} else if (f.getType().equals(Keyword.class)) {
 					mKeywordMap.put(((Keyword) f.get(Keyword.class)).getKeywordName(), (Keyword) f.get(Keyword.class));
 				}
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -681,7 +681,6 @@ public class CommandDispatcher {
 		}
 
 		protected abstract void run(String... args);
-
 	}
 
 	/**

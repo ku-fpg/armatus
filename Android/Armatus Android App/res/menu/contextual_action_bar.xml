@@ -3,18 +3,27 @@
 
     <item
         android:id="@+id/copy"
-        android:icon="@drawable/icon_copy"
+        android:icon="@drawable/ic_action_copy"
         android:orderInCategory="1"
         android:showAsAction="ifRoom|withText"
-        android:title="@string/copy" android:titleCondensed="@string/copy">
+        android:title="@string/copy"
+        android:titleCondensed="@string/copy">
     </item>
     <item
         android:id="@+id/select"
-        android:icon="@drawable/icon_select"
+        android:icon="@drawable/ic_action_select"
         android:orderInCategory="2"
         android:showAsAction="ifRoom|withText"
-        android:title="@string/select" android:titleCondensed="@string/select">
+        android:title="@string/select"
+        android:titleCondensed="@string/select">
     </item>
-    <item android:id="@+id/swap" android:title="@string/swap" android:orderInCategory="3" android:titleCondensed="@string/swap" android:showAsAction="ifRoom|withText" android:icon="@drawable/icon_swap"></item>
+    <item
+        android:id="@+id/swap"
+        android:icon="@drawable/ic_action_swap"
+        android:orderInCategory="3"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/swap"
+        android:titleCondensed="@string/swap">
+    </item>
 
 </menu>

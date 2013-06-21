@@ -37,7 +37,7 @@ public class HermitServer extends AsyncTask<JSONObject, String, String> implemen
 	private String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 	private String SERVER_URL_POST = "http://posttestserver.com/post.php?dump&html&dir=armatus&status_code=202";
 
-	public HermitServer(ConsoleActivity console, JSONObject request) {
+	public HermitServer(ConsoleActivity console) {
 		mConsole = console;
 		mConsole.updateProgressSpinner(true);
 		mConsole.disableInput();
@@ -47,26 +47,8 @@ public class HermitServer extends AsyncTask<JSONObject, String, String> implemen
 	//WARNING: Do not use mConsole in doInBackground!
 	@Override
 	protected String doInBackground(JSONObject... params) {
-		// TODO Interface with actual Hermit server 
-
-		//		for (long i = 0; i < 49999999 && !isCancelled(); i++) {}
-		//
-		//		String response = null;
-		//		if (!isCancelled()) {
-		//			String jstr = "{text:\"server response\"}";
-		//			try {
-		//				JSONObject resJson = new JSONObject(jstr);
-		//				response = resJson.getString("text");
-		//			} catch (Exception e) {
-		//				e.printStackTrace();
-		//			}
-		//		}
-		//
-		//		mDone = true;
-		//		return response;
-
 		return httpGet(this);
-		//return httpPost();
+		//return httpPost(this);
 	}
 	
 	@Override
@@ -79,12 +61,17 @@ public class HermitServer extends AsyncTask<JSONObject, String, String> implemen
 		if (response != null) {
 			mConsole.appendConsoleEntry(response);
 		} else {
-			mConsole.appendConsoleEntry("Error: server request cancelled.");
+			mConsole.appendConsoleEntry("Error: server request failed to complete.");
 		}
 		mConsole.enableInput();
 		mConsole.updateProgressSpinner(false);
 		mConsole.setServer(null);
 		detach();
+	}
+	
+	@Override
+	protected void onCancelled() {
+		mConsole.appendConsoleEntry("Error: server request cancelled.");
 	}
 
 	public void attach(ConsoleActivity console) {
