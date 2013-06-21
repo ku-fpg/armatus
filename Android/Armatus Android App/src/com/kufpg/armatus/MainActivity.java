@@ -18,7 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends StandardActivity {
+public class MainActivity extends BaseActivity {
 
 	private TextView mButtonsView;
 	private Button mLockButton, mUnlockButton, mTreeButton, mConsoleButton,

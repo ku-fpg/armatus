@@ -2,7 +2,7 @@ package com.kufpg.armatus.drag;
 
 import java.util.Locale;
 
-import com.kufpg.armatus.StandardActivity;
+import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
 
@@ -56,7 +56,7 @@ public class DragIcon extends ImageView {
 		groupName = groupName.replaceAll("[/ ]", "_").toLowerCase(Locale.US);
 		mCommandImagePath = "command_" + groupName + "_" + pathCommand.replace("-", "").toLowerCase(Locale.US);
 
-		int resid = getResources().getIdentifier(mCommandImagePath, "drawable", StandardActivity.PACKAGE_NAME);
+		int resid = getResources().getIdentifier(mCommandImagePath, "drawable", BaseActivity.PACKAGE_NAME);
 		if (resid != 0) {
 			setBackground(getResources().getDrawable(resid));
 		}
@@ -81,7 +81,7 @@ public class DragIcon extends ImageView {
 			pathCommand = "rewritesonefail";
 		}
 		String path = "command_" + groupName + "_" + pathCommand.replace("-", "").toLowerCase(Locale.US);
-		int resid = context.getResources().getIdentifier(path, "drawable", StandardActivity.PACKAGE_NAME);
+		int resid = context.getResources().getIdentifier(path, "drawable", BaseActivity.PACKAGE_NAME);
 		return resid != 0;
 	}
 }

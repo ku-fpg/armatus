@@ -4,23 +4,20 @@
         android:id="@+id/undo"
         android:icon="@drawable/ic_action_undo"
         android:orderInCategory="1"
-        android:showAsAction="ifRoom"
-        android:title="Undo"
-        android:titleCondensed="Undo"/>
+        android:showAsAction="always|withText"
+        android:title="Undo"/>
     <item
         android:id="@+id/redo"
         android:icon="@drawable/ic_action_redo"
         android:orderInCategory="2"
-        android:showAsAction="ifRoom"
-        android:title="Redo"
-        android:titleCondensed="Redo"/>
+        android:showAsAction="always|withText"
+        android:title="Redo"/>
     <item
         android:id="@+id/complete"
         android:icon="@drawable/ic_action_complete"
         android:orderInCategory="3"
         android:showAsAction="ifRoom"
         android:title="Complete"
-        android:titleCondensed="Complete"
         android:visible="false"/>
     <item
         android:id="@+id/gestures"
@@ -28,7 +25,6 @@
         android:orderInCategory="4"
         android:showAsAction="ifRoom"
         android:title="Gestures"
-        android:titleCondensed="Gestures"
         android:visible="false"/>
     <item
         android:id="@+id/save_history"

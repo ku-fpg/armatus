@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.kufpg.armatus.StandardActivity;
+import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
 import com.kufpg.armatus.console.ConsoleActivity.ConsoleEntryAdder;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
@@ -496,7 +496,7 @@ public class CommandDispatcher {
 		@Override
 		protected void run(String... args){
 			String packageName = "jackpal.androidterm";
-			boolean installed = StandardActivity.appInstalledOrNot(mConsole, packageName);  
+			boolean installed = BaseActivity.appInstalledOrNot(mConsole, packageName);  
 			if (installed) {
 				Intent i = new Intent("jackpal.androidterm.RUN_SCRIPT");
 				i.addCategory(Intent.CATEGORY_DEFAULT);
@@ -544,7 +544,7 @@ public class CommandDispatcher {
 				+ " " + varargsToString(args);
 		//mConsole.addConsoleEntry(commandString);
 		ConsoleEntryAdder edit = mConsole.new ConsoleEntryAdder(commandString);
-		StandardActivity.getEditManager().applyEdit(edit);
+		BaseActivity.getEditManager().applyEdit(edit);
 		mConsole.addCommandEntry(command.getCommandName());
 
 		if (command.hasLowerArgBound()) {

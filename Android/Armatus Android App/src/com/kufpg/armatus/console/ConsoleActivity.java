@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.kufpg.armatus.R;
-import com.kufpg.armatus.StandardActivity;
+import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -42,7 +42,6 @@ import android.view.ContextMenu;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -62,7 +61,7 @@ import android.widget.TextView;
  * Activity that displays an interactive, feature-rich
  * (at least it will be some day) HERMIT console.
  */
-public class ConsoleActivity extends StandardActivity {
+public class ConsoleActivity extends BaseActivity {
 
 	public static final String DRAG_LAYOUT = "drag_layout";
 	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
@@ -275,7 +274,7 @@ public class ConsoleActivity extends StandardActivity {
 		YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
-				StandardActivity.getEditManager().discardAllEdits();
+				BaseActivity.getEditManager().discardAllEdits();
 				exit();
 			}
 		};
@@ -294,8 +293,7 @@ public class ConsoleActivity extends StandardActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.default_action_bar, menu);
+		super.onCreateOptionsMenu(menu);
 
 		menu.findItem(R.id.gestures).setVisible(true);
 		menu.findItem(R.id.complete).setVisible(true);

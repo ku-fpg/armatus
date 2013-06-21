@@ -24,10 +24,10 @@ import android.preference.PreferenceFragment;
 
 public class PrefsActivity extends PreferenceActivity {
 
-	public static String HISTORY_SOURCE_KEY = StandardActivity.HISTORY_SOURCE_KEY;
-	public static String HISTORY_DIR_KEY = StandardActivity.HISTORY_DIR_KEY;
-	public static String EDIT_MODE_KEY = StandardActivity.EDIT_MODE_KEY;
-	public static String RESTORE_DEFAULTS_KEY = StandardActivity.RESTORE_DEFAULTS_KEY;
+	public static String HISTORY_SOURCE_KEY = BaseActivity.HISTORY_SOURCE_KEY;
+	public static String HISTORY_DIR_KEY = BaseActivity.HISTORY_DIR_KEY;
+	public static String EDIT_MODE_KEY = BaseActivity.EDIT_MODE_KEY;
+	public static String RESTORE_DEFAULTS_KEY = BaseActivity.RESTORE_DEFAULTS_KEY;
 	private static Activity mActivity;
 	private static SharedPreferences mPrefs;
 	private static Editor mEditor;
@@ -58,7 +58,7 @@ public class PrefsActivity extends PreferenceActivity {
 			mEditModePref = (ListPreference) findPreference(EDIT_MODE_KEY);
 			mRestoreDefaultsPref = findPreference(RESTORE_DEFAULTS_KEY);
 
-			mStaticPrefDefaults = StandardActivity.getStaticPrefDefaults();
+			mStaticPrefDefaults = BaseActivity.getStaticPrefDefaults();
 			updatePrefSummaries();
 
 			mHistorySourcePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {

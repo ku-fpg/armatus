@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.kufpg.armatus.edits.EditManager;
+import com.kufpg.armatus.edits.OnEditListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -21,7 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class StandardActivity extends Activity {
+public class BaseActivity extends Activity {
 
 	public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() + "/data/armatus/";
 	public static String HISTORY_SOURCE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY;
@@ -30,6 +31,7 @@ public class StandardActivity extends Activity {
 	public static SharedPreferences mPrefs;
 	public static Editor mEditor;
 	public static EditManager mEditManager = new EditManager();
+	public static MenuItem mUndoIcon, mRedoIcon;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +58,21 @@ public class StandardActivity extends Activity {
 			}
 		}
 		mEditor.commit();
+		mEditManager.setOnEditListener(new OnEditListener() {
+			@Override
+			public void onEditFinish() {
+				updateIconTitles();
+			}
+		});
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.default_action_bar, menu);
+		mUndoIcon = menu.findItem(R.id.undo);
+		mRedoIcon = menu.findItem(R.id.redo);
+		updateIconTitles();
 		return true;
 	}
 
@@ -71,11 +82,13 @@ public class StandardActivity extends Activity {
 		case R.id.undo:
 			if (mEditManager.canUndo()) {
 				mEditManager.undo();
+				updateIconTitles();
 			}
 			return true;
 		case R.id.redo:
 			if (mEditManager.canRedo()) {
 				mEditManager.redo();
+				updateIconTitles();
 			}
 			return true;
 		case R.id.menu_settings:
@@ -117,6 +130,11 @@ public class StandardActivity extends Activity {
 
 	public static Editor getPrefsEditor() {
 		return mEditor;
+	}
+
+	public static void updateIconTitles() {
+		mUndoIcon.setTitleCondensed(String.valueOf(mEditManager.getRemainingUndosCount()));
+		mRedoIcon.setTitleCondensed(String.valueOf(mEditManager.getRemainingRedosCount()));
 	}
 
 	static Map<String, Object> getStaticPrefDefaults() {
