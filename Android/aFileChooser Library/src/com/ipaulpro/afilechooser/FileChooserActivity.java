@@ -68,10 +68,7 @@ OnBackStackChangedListener {
 		mFragmentManager.addOnBackStackChangedListener(this);
 
 		if (savedInstanceState == null) {
-			mPath = getIntent().getStringExtra("com.ipaulpro.afilechooser.OpenDir");
-			if (mPath == null) {
-				mPath = EXTERNAL_BASE_PATH;
-			}
+			mPath = EXTERNAL_BASE_PATH;
 			addFragment(mPath);
 		} else {
 			mPath = savedInstanceState.getString(PATH);
@@ -170,6 +167,17 @@ OnBackStackChangedListener {
 			}
 		} else {
 			Toast.makeText(FileChooserActivity.this, R.string.error_selecting_file, Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	protected void onDirectorySelected(File dir) {
+		if (dir != null) {
+			mPath = dir.getAbsolutePath();
+			if (dir.isFile()) {
+				mPath = dir.getParent();
+			} else {
+				finishWithResult(dir);
+			}
 		}
 	}
 

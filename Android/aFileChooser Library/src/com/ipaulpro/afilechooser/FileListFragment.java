@@ -24,7 +24,12 @@ import android.os.Environment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 /**
@@ -36,9 +41,11 @@ import android.widget.ListView;
  * 
  */
 public class FileListFragment extends ListFragment implements
-		LoaderManager.LoaderCallbacks<List<File>> {
+LoaderManager.LoaderCallbacks<List<File>> {
 
 	private static final int LOADER_ID = 0;
+	private static final int ID_SELECT = 42;
+	private static final int ID_GO_INTO = 43;
 
 	private FileListAdapter mAdapter;
 	private String mPath;
@@ -75,8 +82,63 @@ public class FileListFragment extends ListFragment implements
 		setListShown(false);
 
 		getLoaderManager().initLoader(LOADER_ID, null, this);
-		
+
+		/*getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				openContextMenu(view);
+				return false;
+			}
+		});*/
+		registerForContextMenu(getListView());
+
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+		File file = null;
+		String type = "";
+		FileListAdapter adapter = (FileListAdapter) getListView().getAdapter();
+		if (adapter != null) {
+			file = (File) adapter.getItem(info.position);
+		}
+		if (file.isDirectory()) {
+			type = "directory";
+		} else {
+			type = "file";
+		}
+		menu.setHeaderTitle("Choose action for this " + type + ":");
+		menu.add(Menu.NONE, ID_SELECT, 0, "Select this " + type);
+		if (file.isDirectory()) {
+			menu.add(Menu.NONE, ID_GO_INTO, 1, "Go into this " + type);
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		FileListAdapter adapter = (FileListAdapter) getListView().getAdapter();
+		File file = null;
+		if (adapter != null) {
+			file = (File) adapter.getItem(info.position);
+			mPath = file.getAbsolutePath();
+		}
+		switch (item.getItemId()) {
+		case ID_SELECT:
+			if (file.isDirectory()) {
+				((FileChooserActivity) getActivity()).onDirectorySelected(file);
+			} else {
+				((FileChooserActivity) getActivity()).onFileSelected(file);
+			}
+			return true;
+		case ID_GO_INTO:
+			((FileChooserActivity) getActivity()).onFileSelected(file);
+			return true;
+		}
+		return super.onContextItemSelected(item);
 	}
 
 	@Override

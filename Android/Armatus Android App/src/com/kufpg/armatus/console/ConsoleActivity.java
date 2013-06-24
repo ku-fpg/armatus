@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
@@ -30,11 +29,9 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -75,9 +72,8 @@ public class ConsoleActivity extends BaseActivity {
 	public static final String WORD_COMPLETION_TAG = "wordcomplete";
 	public static final String CONSOLE_TAG = "console";
 	public static final String COMMANDS_TAG = "commands";
-	public static final String HISTORY_FILENAME = "history.txt";
-	private static final int LOAD_CODE = 4836;
-	private static final int SAVE_CODE = 6384;
+	public static final String SESSION_HISTORY_FILENAME = "/history.txt";
+	public static final String UNDO_HISTORY_FILENAME = "/undo.txt";
 
 	private ListView mConsoleListView, mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
@@ -332,23 +328,18 @@ public class ConsoleActivity extends BaseActivity {
 					mHistory.put(CONSOLE_TAG, consoleHistory);
 					mHistory.put(COMMANDS_TAG, commandHistory);
 
+					String path = "";
 					if (getPrefs().getBoolean(HISTORY_SOURCE_KEY, true)) {
-						String path = getPrefs().getString(HISTORY_DIR_KEY, null);
-						File file = new File(path);
-						if (file.isFile()) {
-							path = file.getParent();
-							getPrefsEditor().putString(HISTORY_DIR_KEY, path);
-						} else if (!file.exists()) {
-							showToast("Error: saved history location doesn't exist");
-						}
-						Intent target = FileUtils.createGetContentIntent(FileUtils.MIME_TYPE_TEXT, path);
-						Intent intent = Intent.createChooser(target, "Save history with...");
-						startActivityForResult(intent, SAVE_CODE);
+						path = getPrefs().getString(HISTORY_DIR_KEY, null);
 					} else {
-						Intent intent = new Intent();
-						Uri.Builder builder = new Uri.Builder();
-						intent.setData(builder.path(CACHE_DIR + HISTORY_FILENAME).build());
-						onActivityResult(SAVE_CODE, RESULT_OK, intent);
+						path = CACHE_DIR;
+					}
+					final File file = new File(path + SESSION_HISTORY_FILENAME);
+					if (file.exists()) {
+						JsonUtils.saveJsonFile(mHistory, file.getAbsolutePath());
+						showToast("Save complete!");
+					} else {
+						showToast("Error: file not found");
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -357,99 +348,56 @@ public class ConsoleActivity extends BaseActivity {
 			return true;
 		case R.id.load_history:
 			if (mInputEnabled) {
+				String path = "";
 				if (getPrefs().getBoolean(HISTORY_SOURCE_KEY, true)) {
-					String path = getPrefs().getString(HISTORY_DIR_KEY, null);
-					File file = new File(path);
-					if (file.isFile()) {
-						path = file.getParent();
-						getPrefsEditor().putString(HISTORY_DIR_KEY, path);
-					} else if (!file.exists()) {
-						showToast("Error: saved history location doesn't exist");
-					}
-					Intent target = FileUtils.createGetContentIntent(FileUtils.MIME_TYPE_TEXT, path);
-					Intent intent = Intent.createChooser(target, "Load history with...");
-					startActivityForResult(intent, LOAD_CODE);
+					path = getPrefs().getString(HISTORY_DIR_KEY, null);
 				} else {
-					Intent intent = new Intent();
-					Uri.Builder builder = new Uri.Builder();
-					intent.setData(builder.path(CACHE_DIR + HISTORY_FILENAME).build());
-					onActivityResult(LOAD_CODE, RESULT_OK, intent);
+					path = CACHE_DIR;
+				}
+
+				final File file = new File (path + SESSION_HISTORY_FILENAME);
+				if (file.exists()) {
+					JSONObject history = null;
+					try {
+						history = JsonUtils.openJsonFile(file.getAbsolutePath());
+
+						JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
+						mConsoleEntries.clear();
+						for (int i = 0; i < consoleHistory.length(); i++) {
+							JSONObject jsonEntry = consoleHistory.getJSONObject(i);
+							int num = jsonEntry.getInt("num");
+							String contents = jsonEntry.getString("contents");
+							ConsoleEntry entry = new ConsoleEntry(num, contents);
+							mConsoleEntries.add(entry);
+						}
+						mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+						mConsoleListView.setAdapter(mConsoleAdapter);
+						updateConsoleEntries();
+
+						JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
+						mCommandHistoryEntries.clear();
+						for (int i = 0; i < commandHistory.length(); i++) {
+							mCommandHistoryEntries.add(commandHistory.getString(i));
+						}
+						mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
+						mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
+						updateCommandHistoryEntries();
+
+						mInputEditText.requestFocus();
+						showToast("Loading complete!");
+					} catch (JSONException e) {
+						showToast("Error: invalid JSON");
+					} catch (FileNotFoundException e) {
+						showToast("Error: file not found"); //Should never happen
+					}
+				} else {
+					showToast("Error: file not found");
 				}
 			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-		case LOAD_CODE:
-			if (resultCode == RESULT_OK) {
-				if (data != null) {
-					final Uri uri = data.getData();
-					final File file = FileUtils.getFile(uri);
-					if (file != null) {
-						if (file.exists()) {
-							JSONObject history = null;
-							try {
-								history = JsonUtils.openJsonFile(file.getAbsolutePath());
-
-								JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
-								mConsoleEntries.clear();
-								for (int i = 0; i < consoleHistory.length(); i++) {
-									JSONObject jsonEntry = consoleHistory.getJSONObject(i);
-									int num = jsonEntry.getInt("num");
-									String contents = jsonEntry.getString("contents");
-									ConsoleEntry entry = new ConsoleEntry(num, contents);
-									mConsoleEntries.add(entry);
-								}
-								mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
-								mConsoleListView.setAdapter(mConsoleAdapter);
-								updateConsoleEntries();
-
-								JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
-								mCommandHistoryEntries.clear();
-								for (int i = 0; i < commandHistory.length(); i++) {
-									mCommandHistoryEntries.add(commandHistory.getString(i));
-								}
-								mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
-								mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-								updateCommandHistoryEntries();
-
-								mInputEditText.requestFocus();
-								showToast("Loading complete!");
-								getPrefsEditor().putString(HISTORY_DIR_KEY, file.getParent());
-							} catch (JSONException e) {
-								showToast("Error: invalid JSON");
-							} catch (FileNotFoundException e) {
-								showToast("Error: file not found"); //Should never happen
-							}
-						} else {
-							showToast("Error: file not found");
-						}
-					}
-				}
-			}
-			break;
-		case SAVE_CODE:
-			if (resultCode == RESULT_OK) {		
-				if (data != null) {
-					final Uri uri = data.getData();
-					final File file = FileUtils.getFile(uri);
-					if (file != null) {
-						JsonUtils.saveJsonFile(mHistory, file.getAbsolutePath());
-						getPrefsEditor().putString(HISTORY_DIR_KEY, file.getParent());
-						showToast("Save complete!");
-					} else {
-						showToast("Error: file not found");
-					}
-				}
-			} 
-			break;
-		}
-		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override

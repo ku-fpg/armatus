@@ -9,9 +9,8 @@
             android:summaryOn="Specify location manually"
             android:title="Saved history source" />
 
-        <EditTextPreference
+        <Preference
             android:dependency="pref_history_source"
-            android:dialogTitle="Enter the new saved history directory:"
             android:key="@string/pref_history_dir"
             android:title="Edit saved history directory" />
 
