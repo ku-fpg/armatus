@@ -1,8 +1,6 @@
 package com.kufpg.armatus.edits;
 
-import java.io.Serializable;
-
-public interface Edit extends Serializable {
+public interface Edit {
 
 	void applyEdit();
 	boolean isSignificant();

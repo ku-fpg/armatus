@@ -49,5 +49,9 @@ public class ConsoleEntry implements Serializable {
 	public boolean isWaiting() {
 		return mIsWaiting;
 	}
+	
+	public void appendContents(String newContents) {
+		mContents += "\n" + newContents;
+	}
 
 }

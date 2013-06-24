@@ -471,9 +471,8 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	private void addConsoleEntry(String contents) {
-		ConsoleEntry ce = new ConsoleEntry(mConsoleEntries.size(), contents);
-		mConsoleEntries.add(ce);
+	private void addConsoleEntry(ConsoleEntry entry) {
+		mConsoleEntries.add(entry);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
@@ -485,27 +484,21 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public void appendConsoleEntry(String newContents) {
-		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
-		boolean waiting = mConsoleEntries.get(mConsoleEntries.size() - 1).isWaiting();
-		contents += "\n" + newContents;
-		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		ConsoleEntry ce = new ConsoleEntry(mConsoleEntries.size() - 1, contents, waiting);
-		mConsoleEntries.add(ce);
+		mConsoleEntries.get(mConsoleEntries.size() - 1).appendContents(newContents);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
 	public class ConsoleEntryAdder implements Edit {
-		private static final long serialVersionUID = -5433642814170050087L;
-		private String mContents;
+		private ConsoleEntry mEntry;
 
 		public ConsoleEntryAdder(String contents) {
-			mContents = contents;
+			mEntry = new ConsoleEntry(mConsoleEntries.size(), contents);
 		}
 
 		@Override
 		public void applyEdit() {
-			addConsoleEntry(mContents);
+			addConsoleEntry(mEntry);
 		}
 
 		@Override
@@ -515,7 +508,7 @@ public class ConsoleActivity extends BaseActivity {
 
 		@Override
 		public void redo() {
-			addConsoleEntry(mContents);
+			addConsoleEntry(mEntry);
 		}
 
 		@Override

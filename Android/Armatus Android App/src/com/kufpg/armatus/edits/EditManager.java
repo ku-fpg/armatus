@@ -1,10 +1,6 @@
 package com.kufpg.armatus.edits;
 
-import java.io.Serializable;
-
-public class EditManager implements Serializable {
-
-	private static final long serialVersionUID = -601384729330799461L;
+public class EditManager {
 	private static final int DEFAULT_EDIT_LIMIT = 100;
 	private static final int MIN_EDIT_LIMIT = 2;
 	private static final int NO_EDITS_INDEX = -99; //Don't make this -1, it'll create bugs
