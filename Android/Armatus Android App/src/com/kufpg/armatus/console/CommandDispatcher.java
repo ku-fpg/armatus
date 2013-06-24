@@ -544,7 +544,7 @@ public class CommandDispatcher {
 				+ " " + varargsToString(args);
 		//mConsole.addConsoleEntry(commandString);
 		ConsoleEntryAdder edit = mConsole.new ConsoleEntryAdder(commandString);
-		BaseActivity.getEditManager().applyEdit(edit);
+		mConsole.getEditManager().applyEdit(edit);
 		mConsole.addCommandEntry(command.getCommandName());
 
 		if (command.hasLowerArgBound()) {

@@ -72,13 +72,10 @@ public class DragIcon extends ImageView {
 			return false;
 		}
 		groupName = groupName.replaceAll("[/ ]", "_").toLowerCase(Locale.US);
+		
 		String pathCommand = new String(commandName);
-		if (commandName.equals("<+")) {
-			pathCommand = "translaterewrite";
-		} else if (commandName.equals(">>>")) {
-			pathCommand = "rewrites";
-		} else if (commandName.equals(">+>")) {
-			pathCommand = "rewritesonefail";
+		if (command.getCommandAlias() != null) {
+			pathCommand = command.getCommandAlias();
 		}
 		String path = "command_" + groupName + "_" + pathCommand.replace("-", "").toLowerCase(Locale.US);
 		int resid = context.getResources().getIdentifier(path, "drawable", BaseActivity.PACKAGE_NAME);

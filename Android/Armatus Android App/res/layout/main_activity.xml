@@ -25,7 +25,7 @@
         android:textColor="#000000"
         tools:context=".MainActivity" />
 
-    <Button
+    <com.kufpg.armatus.util.StickyButton
         android:id="@+id/lock_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

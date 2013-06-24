@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
+import com.kufpg.armatus.console.EditManager.Edit;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -19,7 +20,6 @@ import com.kufpg.armatus.dialog.WordCompletionDialog;
 import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
-import com.kufpg.armatus.edits.Edit;
 import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.JsonUtils;
 import com.slidingmenu.lib.SlidingMenu;
@@ -270,7 +270,7 @@ public class ConsoleActivity extends BaseActivity {
 		YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
-				BaseActivity.getEditManager().discardAllEdits();
+				getEditManager().discardAllEdits();
 				exit();
 			}
 		};

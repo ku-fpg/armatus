@@ -1,4 +1,6 @@
-package com.kufpg.armatus.edits;
+package com.kufpg.armatus.console;
+
+import java.util.ArrayList;
 
 public class EditManager {
 	private static final int DEFAULT_EDIT_LIMIT = 100;
@@ -6,7 +8,7 @@ public class EditManager {
 	private static final int NO_EDITS_INDEX = -99; //Don't make this -1, it'll create bugs
 
 	private OnEditListener mListener;
-	private EditList mEdits = new EditList();
+	private ArrayList<Edit> mEdits = new ArrayList<Edit>();
 	private int mCurEditIndex = NO_EDITS_INDEX;
 	private int mEditLimit = DEFAULT_EDIT_LIMIT;
 
@@ -24,7 +26,7 @@ public class EditManager {
 			mCurEditIndex--;
 		}
 		if (canRedo()) {
-			mEdits.removeRange(mCurEditIndex + 1, mEdits.size());
+			mEdits.subList(mCurEditIndex + 1, mEdits.size()).clear();
 		}
 		mEdits.add(edit);
 		if (!canUndo()) {
@@ -131,4 +133,16 @@ public class EditManager {
 			throw new UnsupportedOperationException("No edits are available to undo.");
 		}
 	}
+	
+	public interface Edit {
+		void applyEdit();
+		boolean isSignificant();
+		void redo();
+		void undo();
+	}
+	
+	public interface OnEditListener {
+		void onEditFinish();
+	}
+
 }

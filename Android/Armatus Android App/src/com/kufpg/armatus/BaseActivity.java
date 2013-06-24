@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.kufpg.armatus.edits.EditManager;
-import com.kufpg.armatus.edits.OnEditListener;
+import com.kufpg.armatus.console.EditManager;
+import com.kufpg.armatus.console.EditManager.OnEditListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -124,7 +124,7 @@ public class BaseActivity extends Activity {
 		return mPrefs;
 	}
 
-	public static EditManager getEditManager() {
+	public EditManager getEditManager() {
 		return mEditManager;
 	}
 
@@ -139,6 +139,12 @@ public class BaseActivity extends Activity {
 
 	static Map<String, Object> getStaticPrefDefaults() {
 		return mStaticPrefDefaults;
+	}
+
+	public enum EditMode {
+		READ,
+		WRITE,
+		ARITHMETIC
 	}
 
 }
