@@ -100,18 +100,20 @@ public class BaseActivity extends Activity {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		((BaseApplication) getApplication()).detach(this);
+		((BaseApplication<BaseActivity>) getApplication()).detach(this);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 
-		((BaseApplication) getApplication()).attach(this);
+		((BaseApplication<BaseActivity>) getApplication()).attach(this);
 	}
 	
 	public boolean canRedo() {

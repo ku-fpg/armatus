@@ -9,20 +9,20 @@ import java.util.Map.Entry;
 import android.app.Activity;
 import android.app.Application;
 
-public class BaseApplication extends Application {
+public class BaseApplication<A extends Activity> extends Application {
 	/**
 	 * Maps between an activity class name and the list of currently running
 	 * AsyncTasks that were spawned while it was active.
 	 */
-	private Map<String, List<AsyncActivityTask<?,?,?>>> mActivityTaskMap;
+	private Map<String, List<AsyncActivityTask<A,?,?,?>>> mActivityTaskMap;
 
 	public BaseApplication() {
-		mActivityTaskMap = new HashMap<String, List<AsyncActivityTask<?,?,?>>>();
+		mActivityTaskMap = new HashMap<String, List<AsyncActivityTask<A,?,?,?>>>();
 	}
 
-	public void removeActivityTask(AsyncActivityTask<?,?,?> task) {
-		for (Entry<String, List<AsyncActivityTask<?,?,?>>> entry : mActivityTaskMap.entrySet()) {
-			List<AsyncActivityTask<?,?,?>> tasks = entry.getValue();
+	public void removeActivityTask(AsyncActivityTask<A,?,?,?> task) {
+		for (Entry<String, List<AsyncActivityTask<A,?,?,?>>> entry : mActivityTaskMap.entrySet()) {
+			List<AsyncActivityTask<A,?,?,?>> tasks = entry.getValue();
 			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i) == task) {
 					tasks.remove(i);
@@ -37,30 +37,30 @@ public class BaseApplication extends Application {
 		}
 	}
 
-	public void addActivityTask(Activity activity, AsyncActivityTask<?,?,?> task) {
+	public void addActivityTask(A activity, AsyncActivityTask<A,?,?,?> task) {
 		String key = activity.getClass().getCanonicalName();
-		List<AsyncActivityTask<?,?,?>> tasks = mActivityTaskMap.get(key);
+		List<AsyncActivityTask<A,?,?,?>> tasks = mActivityTaskMap.get(key);
 		if (tasks == null) {
-			tasks = new ArrayList<AsyncActivityTask<?,?,?>>();
+			tasks = new ArrayList<AsyncActivityTask<A,?,?,?>>();
 			mActivityTaskMap.put(key, tasks);
 		}
 
 		tasks.add(task);
 	}
 
-	public void detach(Activity activity) {
-		List<AsyncActivityTask<?,?,?>> tasks = mActivityTaskMap.get(activity.getClass().getCanonicalName());
+	public void detach(A activity) {
+		List<AsyncActivityTask<A,?,?,?>> tasks = mActivityTaskMap.get(activity.getClass().getCanonicalName());
 		if (tasks != null) {
-			for (AsyncActivityTask<?,?,?> task : tasks) {
+			for (AsyncActivityTask<A,?,?,?> task : tasks) {
 				task.setActivity(null);
 			}
 		}
 	}
 
-	public void attach(Activity activity) {
-		List<AsyncActivityTask<?,?,?>> tasks = mActivityTaskMap.get(activity.getClass().getCanonicalName());
+	public void attach(A activity) {
+		List<AsyncActivityTask<A,?,?,?>> tasks = mActivityTaskMap.get(activity.getClass().getCanonicalName());
 		if (tasks != null) {
-			for (AsyncActivityTask<?,?,?> task : tasks) {
+			for (AsyncActivityTask<A,?,?,?> task : tasks) {
 				task.setActivity(activity);
 			}
 		}

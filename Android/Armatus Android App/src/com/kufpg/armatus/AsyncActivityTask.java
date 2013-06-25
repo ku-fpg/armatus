@@ -3,21 +3,27 @@ package com.kufpg.armatus;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-public abstract class AsyncActivityTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
-	private BaseApplication mApp;
-	private Activity mActivity;
+public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+	private BaseApplication<A> mApp;
+	private A mActivity, mInterruptedActivity;
 
-	public AsyncActivityTask(Activity activity) {
+	@SuppressWarnings("unchecked")
+	public AsyncActivityTask(A activity) {
 		mActivity = activity;
-		mApp = (BaseApplication) mActivity.getApplication();
+		mInterruptedActivity = activity;
+		mApp = (BaseApplication<A>) mActivity.getApplication();
 	}
 	
-	public Activity getActivity() {
-		return mActivity;
+	public A getActivity() {
+		if (mActivity != null) {
+			return mActivity;
+		} else {
+			return mInterruptedActivity;
+		}
 	}
 	
 
-	public void setActivity(Activity activity) {
+	public void setActivity(A activity) {
 		mActivity = activity;
 		if (mActivity == null) {
 			onActivityDetached();
