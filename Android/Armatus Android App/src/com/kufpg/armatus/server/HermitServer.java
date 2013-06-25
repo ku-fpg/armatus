@@ -24,10 +24,10 @@ import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.kufpg.armatus.BaseAsyncTask;
+import com.kufpg.armatus.AsyncActivityTask;
 import com.kufpg.armatus.console.ConsoleActivity;
 
-public class HermitServer extends BaseAsyncTask<JSONObject, String, String> {
+public class HermitServer extends AsyncActivityTask<JSONObject, String, String> {
 	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 	private static final String SERVER_URL_POST = "http://posttestserver.com/post.php?dump&html&dir=armatus&status_code=202";
 
@@ -42,21 +42,27 @@ public class HermitServer extends BaseAsyncTask<JSONObject, String, String> {
 	protected void onPreExecute() {
 		super.onPreExecute();
 
-		mConsole.updateProgressSpinner(true);
-		mConsole.disableInput();
+		getConsole().updateProgressSpinner(true);
+		getConsole().disableInput();
 	}
 
 	//WARNING: Do not use mConsole in doInBackground!
 	@Override
 	protected String doInBackground(JSONObject... params) {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		return httpGet();
 		//return httpPost();
 	}
 
 	@Override
 	protected void onProgressUpdate(String... progress) {
-		if (mConsole != null) {
-			mConsole.appendConsoleEntry(progress[0]);
+		if (getConsole() != null) {
+			getConsole().appendConsoleEntry(progress[0]);
 		}
 	}
 
@@ -64,13 +70,13 @@ public class HermitServer extends BaseAsyncTask<JSONObject, String, String> {
 	protected void onPostExecute(final String response) {
 		super.onPostExecute(response);
 
-		if (mConsole != null) {
+		if (getConsole() != null) {
 			if (response != null) {
-				mConsole.appendConsoleEntry(response);
-				mConsole.enableInput();
-				mConsole.updateProgressSpinner(false);
+				getConsole().appendConsoleEntry(response);
+				getConsole().enableInput();
+				getConsole().updateProgressSpinner(false);
 			} else {
-				mConsole.appendConsoleEntry("Error: server request failed to complete.");
+				getConsole().appendConsoleEntry("Error: server request failed to complete.");
 			}
 		}
 	}
@@ -79,8 +85,16 @@ public class HermitServer extends BaseAsyncTask<JSONObject, String, String> {
 	protected void onCancelled() {
 		super.onCancelled();
 
-		if (mConsole != null) {
-			mConsole.appendConsoleEntry("Error: server request cancelled.");
+		if (getConsole() != null) {
+			getConsole().appendConsoleEntry("Error: server request cancelled.");
+		}
+	}
+	
+	private ConsoleActivity getConsole() {
+		if (getActivity() != null) {
+			return (ConsoleActivity) getActivity();
+		} else {
+			return mConsole;
 		}
 	}
 

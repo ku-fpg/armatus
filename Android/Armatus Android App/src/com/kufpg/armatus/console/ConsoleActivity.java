@@ -41,6 +41,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -125,6 +126,13 @@ public class ConsoleActivity extends BaseActivity {
 					((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
 					.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 				}
+			}
+		});
+		mBackground.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				mInputEditText.performLongClick();
+				return false;
 			}
 		});
 
@@ -440,12 +448,12 @@ public class ConsoleActivity extends BaseActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
 	public boolean canRedo() {
 		return super.canRedo() && mInputEnabled;
 	}
-	
+
 	@Override
 	public boolean canUndo() {
 		return super.canUndo() && mInputEnabled;

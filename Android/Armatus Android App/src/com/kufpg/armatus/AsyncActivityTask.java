@@ -3,14 +3,19 @@ package com.kufpg.armatus;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-public abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+public abstract class AsyncActivityTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 	private BaseApplication mApp;
 	private Activity mActivity;
 
-	public BaseAsyncTask(Activity activity) {
+	public AsyncActivityTask(Activity activity) {
 		mActivity = activity;
 		mApp = (BaseApplication) mActivity.getApplication();
 	}
+	
+	public Activity getActivity() {
+		return mActivity;
+	}
+	
 
 	public void setActivity(Activity activity) {
 		mActivity = activity;
