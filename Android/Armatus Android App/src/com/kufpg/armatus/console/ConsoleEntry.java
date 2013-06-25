@@ -50,6 +50,10 @@ public class ConsoleEntry implements Serializable {
 		return mIsWaiting;
 	}
 	
+	public void setWaiting(boolean waiting) {
+		mIsWaiting = waiting;
+	}
+	
 	public void appendContents(String newContents) {
 		mContents += "\n" + newContents;
 	}

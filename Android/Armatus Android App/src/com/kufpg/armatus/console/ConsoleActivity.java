@@ -20,7 +20,6 @@ import com.kufpg.armatus.dialog.WordCompletionDialog;
 import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
-import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.JsonUtils;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -90,7 +89,6 @@ public class ConsoleActivity extends BaseActivity {
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
-	private HermitServer mServer;
 	private String mTempCommand;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
@@ -231,10 +229,6 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putSerializable("consoleEntries", mConsoleEntries);
 		outState.putSerializable("commandEntries", mCommandHistoryEntries);
-		if (mServer != null) {
-			mServer.detach();
-		}
-		outState.putSerializable("server", mServer);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -256,11 +250,6 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
 		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
 		updateCommandHistoryEntries();
-
-		mServer = (HermitServer) state.getSerializable("server");
-		if (mServer != null) {
-			mServer.attach(this);
-		}
 	}
 
 	@Override
@@ -271,20 +260,10 @@ public class ConsoleActivity extends BaseActivity {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
 				getEditManager().discardAllEdits();
-				exit();
+				finish();
 			}
 		};
 		exitDialog.show(getFragmentManager(), "exit");
-	}
-
-	@Override
-	public void onRestart() {
-		/* Prevents HermitServer from throwing a NullPointerException
-		 * (since ConsoleActivity doesn't get serialized) */
-		if (mServer != null) {
-			mServer.attach(this);
-		}
-		super.onRestart();
 	}
 
 	@Override
@@ -461,6 +440,16 @@ public class ConsoleActivity extends BaseActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+	
+	@Override
+	public boolean canRedo() {
+		return super.canRedo() && mInputEnabled;
+	}
+	
+	@Override
+	public boolean canUndo() {
+		return super.canUndo() && mInputEnabled;
+	}
 
 	public void addCommandEntry(String commandName) {
 		if ((mCommandHistoryEntries.size() == 0
@@ -533,16 +522,6 @@ public class ConsoleActivity extends BaseActivity {
 		mInputEnabled = true;
 	}
 
-	/**
-	 * Exits the console activity.
-	 */
-	public void exit() {
-		if (mServer != null) {
-			mServer.cancel(true);
-		}
-		finish();
-	}
-
 	public int getNumEntries() {
 		return mConsoleEntries.size();
 	}
@@ -558,10 +537,6 @@ public class ConsoleActivity extends BaseActivity {
 	public void setInputText(String text) {
 		mInputEditText.setText(text);
 		mInputEditText.setSelection(mInputEditText.getText().length());
-	}
-
-	public void setServer(HermitServer server) {
-		mServer = server;
 	}
 
 	/**
@@ -597,10 +572,7 @@ public class ConsoleActivity extends BaseActivity {
 	 * doing asynchronous tasks (such as HermitServer requests).
 	 */
 	public void updateProgressSpinner(boolean shown) {
-		String contents = mConsoleEntries.get(mConsoleEntries.size() - 1).getContents();
-		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		ConsoleEntry ce = new ConsoleEntry(mConsoleEntries.size() - 1, contents, shown);
-		mConsoleEntries.add(ce);
+		mConsoleEntries.get(mConsoleEntries.size() - 1).setWaiting(shown);
 		updateConsoleEntries();
 		scrollToBottom();
 	}

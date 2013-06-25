@@ -2,14 +2,11 @@ package com.kufpg.armatus.server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import android.os.AsyncTask;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -27,66 +24,67 @@ import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.kufpg.armatus.BaseAsyncTask;
 import com.kufpg.armatus.console.ConsoleActivity;
 
-public class HermitServer extends AsyncTask<JSONObject, String, String> implements Serializable {
+public class HermitServer extends BaseAsyncTask<JSONObject, String, String> {
+	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
+	private static final String SERVER_URL_POST = "http://posttestserver.com/post.php?dump&html&dir=armatus&status_code=202";
 
-	private static final long serialVersionUID = -1927958718472477046L;
 	private ConsoleActivity mConsole;
-	private boolean mDone = false;
-	private String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
-	private String SERVER_URL_POST = "http://posttestserver.com/post.php?dump&html&dir=armatus&status_code=202";
 
 	public HermitServer(ConsoleActivity console) {
+		super(console);
 		mConsole = console;
+	}
+
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+
 		mConsole.updateProgressSpinner(true);
 		mConsole.disableInput();
-		mConsole.setServer(this);
 	}
 
 	//WARNING: Do not use mConsole in doInBackground!
 	@Override
 	protected String doInBackground(JSONObject... params) {
-		return httpGet(this);
-		//return httpPost(this);
+		return httpGet();
+		//return httpPost();
 	}
-	
+
 	@Override
 	protected void onProgressUpdate(String... progress) {
-		mConsole.appendConsoleEntry(progress[0]);
+		if (mConsole != null) {
+			mConsole.appendConsoleEntry(progress[0]);
+		}
 	}
 
 	@Override
 	protected void onPostExecute(final String response) {
-		if (response != null) {
-			mConsole.appendConsoleEntry(response);
-		} else {
-			mConsole.appendConsoleEntry("Error: server request failed to complete.");
+		super.onPostExecute(response);
+
+		if (mConsole != null) {
+			if (response != null) {
+				mConsole.appendConsoleEntry(response);
+				mConsole.enableInput();
+				mConsole.updateProgressSpinner(false);
+			} else {
+				mConsole.appendConsoleEntry("Error: server request failed to complete.");
+			}
 		}
-		mConsole.enableInput();
-		mConsole.updateProgressSpinner(false);
-		mConsole.setServer(null);
-		detach();
 	}
-	
+
 	@Override
 	protected void onCancelled() {
-		mConsole.appendConsoleEntry("Error: server request cancelled.");
+		super.onCancelled();
+
+		if (mConsole != null) {
+			mConsole.appendConsoleEntry("Error: server request cancelled.");
+		}
 	}
 
-	public void attach(ConsoleActivity console) {
-		mConsole = console;
-	}
-
-	public void detach() {
-		mConsole = null;
-	}
-
-	public boolean isDone() {
-		return mDone;
-	}
-
-	private String httpGet(HermitServer server) {
+	private String httpGet() {
 		HttpResponse httpResponse = null;
 		HttpClient client = null;
 		String jsonResponse, jsonText = null;
@@ -98,16 +96,16 @@ public class HermitServer extends AsyncTask<JSONObject, String, String> implemen
 			client = new DefaultHttpClient(httpParams);
 			HttpGet request = new HttpGet(SERVER_URL_GET);
 			if (!isCancelled()) {
-				server.publishProgress("Attempting server connection...");
+				publishProgress("Attempting server connection...");
 				httpResponse = client.execute(request);
 			}
-			server.publishProgress("Reading in JSON...");
+			publishProgress("Reading in JSON...");
 			InputStream jsonIS = httpResponse.getEntity().getContent();
 			Scanner jsonScanner = new Scanner(jsonIS).useDelimiter("\\A");
 			jsonResponse = jsonScanner.hasNext() ? jsonScanner.next() : "";
 			jsonScanner.close();
 			if (!isCancelled()) {
-				server.publishProgress("Parsing JSON...");
+				publishProgress("Parsing JSON...");
 				JSONObject json = new JSONObject(jsonResponse);
 				jsonText = json.toString();
 			}
@@ -127,11 +125,10 @@ public class HermitServer extends AsyncTask<JSONObject, String, String> implemen
 			client.getConnectionManager().shutdown();
 		}
 
-		mDone = true;
 		return jsonText;
 	}
 
-	private String httpPost(HermitServer server) {
+	private String httpPost() {
 		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost(SERVER_URL_POST);
 
@@ -141,25 +138,24 @@ public class HermitServer extends AsyncTask<JSONObject, String, String> implemen
 			nameValuePairs.add(new BasicNameValuePair("super", "awesome"));
 
 			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-//			HttpResponse response = client.execute(post);
+			//			HttpResponse response = client.execute(post);
 			if (!isCancelled()) {
 				client.execute(post);
 			}
-			
+
 			/* Only use these lines if you want to read the server response */
-//			BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-//
-//			String line = "";
-//			while ((line = rd.readLine()) != null) {
-//				System.out.println(line);
-//				if (line.startsWith("Auth=")) {
-//					String key = line.substring(5);
-//					// Do something with the key
-//				}
-//
-//			}
-			
-			mDone = true;
+			//			BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			//
+			//			String line = "";
+			//			while ((line = rd.readLine()) != null) {
+			//				System.out.println(line);
+			//				if (line.startsWith("Auth=")) {
+			//					String key = line.substring(5);
+			//					// Do something with the key
+			//				}
+			//
+			//			}
+
 			return "Success!";
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

@@ -80,13 +80,13 @@ public class BaseActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.undo:
-			if (mEditManager.canUndo()) {
+			if (canUndo()) {
 				mEditManager.undo();
 				updateIconTitles();
 			}
 			return true;
 		case R.id.redo:
-			if (mEditManager.canRedo()) {
+			if (canRedo()) {
 				mEditManager.redo();
 				updateIconTitles();
 			}
@@ -98,6 +98,28 @@ public class BaseActivity extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		((BaseApplication) getApplication()).detach(this);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+
+		((BaseApplication) getApplication()).attach(this);
+	}
+	
+	public boolean canRedo() {
+		return mEditManager.canRedo();
+	}
+	
+	public boolean canUndo() {
+		return mEditManager.canUndo();
 	}
 
 	public void showToast(String message) {

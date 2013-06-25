@@ -457,7 +457,7 @@ public class CommandDispatcher {
 	private static Command exit = new Command("exit", "Miscellaneous", 0, false) {
 		@Override
 		protected void run(String... args) {
-			mConsole.exit();
+			mConsole.finish();
 		}
 	};
 	private static Command serverTest = new Command("server-test", "Miscellaneous", 0, false) {
