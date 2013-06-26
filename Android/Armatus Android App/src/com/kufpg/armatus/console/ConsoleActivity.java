@@ -475,9 +475,11 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	private void removeConsoleEntry() {
-		mConsoleEntries.remove(mConsoleEntries.size() - 1);
-		updateConsoleEntries();
-		scrollToBottom();
+		if (!mConsoleEntries.isEmpty()) {
+			mConsoleEntries.remove(mConsoleEntries.size() - 1);
+			updateConsoleEntries();
+			scrollToBottom();
+		}
 	}
 
 	public void appendConsoleEntry(String newContents) {

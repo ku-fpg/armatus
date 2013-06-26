@@ -1,39 +1,31 @@
 package com.kufpg.armatus.console;
 
-import java.util.ArrayList;
+import java.util.Stack;
 
 public class EditManager {
 	private static final int DEFAULT_EDIT_LIMIT = 100;
 	private static final int MIN_EDIT_LIMIT = 2;
-	private static final int NO_EDITS_INDEX = -99; //Don't make this -1, it'll create bugs
 
 	private OnEditListener mListener;
-	private ArrayList<Edit> mEdits = new ArrayList<Edit>();
-	private int mCurEditIndex = NO_EDITS_INDEX;
 	private int mEditLimit = DEFAULT_EDIT_LIMIT;
+	private Stack<Edit> mUndoStack = new Stack<Edit>();
+	private Stack<Edit> mRedoStack = new Stack<Edit>();
 
-	public EditManager() {
-		mEdits.ensureCapacity(DEFAULT_EDIT_LIMIT);
-	}
+	public EditManager() {}
 
 	public EditManager(int limit) {
+		this();
 		setLimit(limit);
 	}
 
 	public synchronized void applyEdit(Edit edit) {
-		if (mCurEditIndex == mEditLimit - 1) {
-			mEdits.remove(0);
-			mCurEditIndex--;
+		if (mUndoStack.size() == mEditLimit) {
+			mUndoStack.remove(0);
 		}
 		if (canRedo()) {
-			mEdits.subList(mCurEditIndex + 1, mEdits.size()).clear();
+			mRedoStack.clear();
 		}
-		mEdits.add(edit);
-		if (!canUndo()) {
-			mCurEditIndex = 0;
-		} else {
-			mCurEditIndex++;
-		}
+		mUndoStack.push(edit);
 		edit.applyEdit();
 		if (mListener != null) {
 			mListener.onEditFinish();
@@ -41,17 +33,16 @@ public class EditManager {
 	}
 
 	public synchronized boolean canRedo() {
-		return (!canUndo() && mEdits.size() > 0) ||
-				(canUndo() && mCurEditIndex != mEdits.size() - 1);
+		return !mRedoStack.isEmpty();
 	}
 
 	public synchronized boolean canUndo() {
-		return mCurEditIndex != NO_EDITS_INDEX;
+		return !mUndoStack.isEmpty();
 	}
 
 	public synchronized void discardAllEdits() {
-		mEdits.clear();
-		mCurEditIndex = NO_EDITS_INDEX;
+		mUndoStack.clear();
+		mRedoStack.clear();
 		if (mListener != null) {
 			mListener.onEditFinish();
 		}
@@ -60,43 +51,28 @@ public class EditManager {
 	public synchronized int getLimit() {
 		return mEditLimit;
 	}
-	
+
 	public synchronized int getRemainingRedosCount() {
-		if (canRedo()) {
-			if (!canUndo()) {
-				return mEdits.size();
-			} else {
-				return mEdits.size() - mCurEditIndex - 1;
-			}
-		} else {
-			return 0;
-		}
+		return mRedoStack.size();
 	}
-	
+
 	public synchronized int getRemainingUndosCount() {
-		if (canUndo()) {
-			return mCurEditIndex + 1;
-		} else {
-			return 0;
-		}
+		return mUndoStack.size();
 	}
 
 	public synchronized boolean isSignificant() {
 		if (canUndo()) {
-			return mEdits.get(mCurEditIndex).isSignificant();
+			return mUndoStack.peek().isSignificant();
 		} else {
-			throw new UnsupportedOperationException("Cannot determine edit significance without at least one edit.");
+			throw new UnsupportedOperationException("Cannot determine significance without at least one edit to undo.");
 		}
 	}
 
 	public synchronized void redo() {
 		if (canRedo()) {
-			if (!canUndo()) {
-				mCurEditIndex = 0;
-			} else {
-				mCurEditIndex++;
-			}
-			mEdits.get(mCurEditIndex).redo();
+			Edit edit = mRedoStack.pop();
+			edit.redo();
+			mUndoStack.push(edit);
 			if (mListener != null) {
 				mListener.onEditFinish();
 			}
@@ -108,24 +84,20 @@ public class EditManager {
 	public synchronized void setLimit(int editLimit) {
 		if (editLimit >= MIN_EDIT_LIMIT) {
 			mEditLimit = editLimit;
-			mEdits.ensureCapacity(mEditLimit);
 		} else {
 			throw new IllegalArgumentException("Edit limit must be at least " + MIN_EDIT_LIMIT + ".");
 		}
 	}
-	
+
 	public synchronized void setOnEditListener(OnEditListener listener) {
 		mListener = listener;
 	}
 
 	public synchronized void undo() {
 		if (canUndo()) {
-			mEdits.get(mCurEditIndex).undo();
-			if (mCurEditIndex == 0) {
-				mCurEditIndex = NO_EDITS_INDEX;
-			} else {
-				mCurEditIndex--;
-			}
+			Edit edit = mUndoStack.pop();
+			edit.undo();
+			mRedoStack.push(edit);
 			if (mListener != null) {
 				mListener.onEditFinish();
 			}
@@ -133,14 +105,14 @@ public class EditManager {
 			throw new UnsupportedOperationException("No edits are available to undo.");
 		}
 	}
-	
+
 	public interface Edit {
 		void applyEdit();
 		boolean isSignificant();
 		void redo();
 		void undo();
 	}
-	
+
 	public interface OnEditListener {
 		void onEditFinish();
 	}

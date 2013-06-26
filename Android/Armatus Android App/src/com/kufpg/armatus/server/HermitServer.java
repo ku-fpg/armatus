@@ -62,13 +62,13 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 		super.onPostExecute(response);
 
 		if (getActivity() != null) {
-			if (response != null) {
-				getActivity().appendConsoleEntry(response);
-				getActivity().enableInput();
-				getActivity().updateProgressSpinner(false);
-			} else {
-				getActivity().appendConsoleEntry("Error: server request failed to complete.");
+			String message = response;
+			if (response == null) {
+				message = "Error: server request failed to complete.";
 			}
+			getActivity().appendConsoleEntry(message);
+			getActivity().enableInput();
+			getActivity().updateProgressSpinner(false);
 		}
 	}
 
