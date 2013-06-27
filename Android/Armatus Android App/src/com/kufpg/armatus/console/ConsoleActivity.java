@@ -2,17 +2,21 @@ package com.kufpg.armatus.console;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.kufpg.armatus.EditManager.Edit;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
-import com.kufpg.armatus.console.EditManager.Edit;
+import com.kufpg.armatus.console.ConsoleEdits.ConsoleEntryAdder;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -53,6 +57,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 /**
  * Activity that displays an interactive, feature-rich
@@ -61,10 +66,7 @@ import android.widget.TextView;
 public class ConsoleActivity extends BaseActivity {
 
 	public static final String DRAG_LAYOUT = "drag_layout";
-	public static final String TYPEFACE = "fonts/DroidSansMonoDotted.ttf";
-	public static final String WHITESPACE = "\\s+";
 	public static final int DEFAULT_FONT_SIZE = 15;
-	public static final int PADDING = 5;
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
 	public static final int ENTRY_COMMAND_HISTORY_LIMIT = 200;
 	public static final String SELECTION_TAG = "selection";
@@ -74,32 +76,37 @@ public class ConsoleActivity extends BaseActivity {
 	public static final String COMMANDS_TAG = "commands";
 	public static final String SESSION_HISTORY_FILENAME = "/history.txt";
 	public static final String UNDO_HISTORY_FILENAME = "/undo.txt";
+	public static Typeface TYPEFACE;
+	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
 	private ListView mConsoleListView, mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
 	private ConsoleEntryAdapter mConsoleAdapter;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
-	private ArrayList<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>(); 
-	private ArrayList<String> mCommandHistoryEntries = new ArrayList<String>();
-	private ArrayList<String> mCommandExpandableGroups = new ArrayList<String>();
-	private LinkedHashMap<String, ArrayList<String>> mCommandExpandableGroupMap = new LinkedHashMap<String, ArrayList<String>>();
+	private List<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>();
+	private List<String> mCommandHistoryEntries = new ArrayList<String>();
+	private List<String> mCommandExpandableGroups = new ArrayList<String>();
+	private Map<String, ArrayList<String>> mCommandExpandableGroupMap = new LinkedHashMap<String, ArrayList<String>>();
 	private View mInputView, mRootView, mBackground;
 	private TextView mInputNum;
 	private EditText mInputEditText;
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
+	private TextHighlighter mHighlighter;
 	private String mTempCommand;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible = true;
-	//private int mEntryCount = 0;
+	private boolean mFindTextEnabled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_activity);
+
+		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		//Ensures soft keyboard remains open
 		setSoftKeyboardVisibility(true);
@@ -137,6 +144,7 @@ public class ConsoleActivity extends BaseActivity {
 		});
 
 		mDispatcher = new CommandDispatcher(this);
+		mHighlighter = new TextHighlighter(this);
 		mConsoleListView = (ListView) findViewById(R.id.console_list_view);
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
@@ -182,9 +190,7 @@ public class ConsoleActivity extends BaseActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						//addConsoleEntry(mInputEditText.getText().toString());
-						ConsoleEntryAdder edit = new ConsoleEntryAdder(mInputEditText.getText().toString());
-						getEditManager().applyEdit(edit);
+						addConsoleEntry(mInputEditText.getText().toString());
 					}
 					mInputEditText.setText("");
 					return true;
@@ -207,10 +213,8 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
 
-		//Typeface tinkering
-		Typeface typeface = Typeface.createFromAsset(getAssets(), TYPEFACE);
-		mInputNum.setTypeface(typeface);
-		mInputEditText.setTypeface(typeface);
+		mInputNum.setTypeface(TYPEFACE);
+		mInputEditText.setTypeface(TYPEFACE);
 
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		refreshSlidingMenu();
@@ -235,8 +239,8 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putString("input", mInputEditText.getText().toString());
 		outState.putInt("cursorPos", mInputEditText.getSelectionStart());
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
-		outState.putSerializable("consoleEntries", mConsoleEntries);
-		outState.putSerializable("commandEntries", mCommandHistoryEntries);
+		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
+		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -249,15 +253,21 @@ public class ConsoleActivity extends BaseActivity {
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 		setSoftKeyboardVisibility(mSoftKeyboardVisible);
 
-		mConsoleEntries = (ArrayList<ConsoleEntry>) state.getSerializable("consoleEntries");
+		mConsoleEntries = (List<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		mConsoleListView.setAdapter(mConsoleAdapter);
 		updateConsoleEntries();
 
-		mCommandHistoryEntries = (ArrayList<String>) state.getSerializable("commandEntries");
+		mCommandHistoryEntries = (List<String>) state.getSerializable("commandEntries");
 		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
 		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
 		updateCommandHistoryEntries();
+
+		for (Edit edit : getEditManager()) {
+			if (edit instanceof ConsoleEdit) {
+				((ConsoleEdit) edit).attachConsole(this);
+			}
+		}
 	}
 
 	@Override
@@ -278,10 +288,29 @@ public class ConsoleActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
-		menu.findItem(R.id.gestures).setVisible(true);
-		menu.findItem(R.id.complete).setVisible(true);
-		menu.findItem(R.id.save_history).setVisible(true);
-		menu.findItem(R.id.load_history).setVisible(true);
+		menu.setGroupVisible(R.id.menu_icons_group, !mFindTextEnabled);
+		menu.setGroupVisible(R.id.history_group, true);
+		menu.findItem(R.id.find_text_option).setVisible(!mFindTextEnabled);
+		menu.setGroupVisible(R.id.find_text_group, mFindTextEnabled);
+
+		if (mFindTextEnabled) {
+			final EditText findTextBox = (EditText) menu.findItem(R.id.find_text_action).getActionView().findViewById(R.id.find_text_box);
+			findTextBox.requestFocus();
+			findTextBox.setOnEditorActionListener(new OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView v, int actionId,
+						KeyEvent event) {
+					if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
+						String contents = findTextBox.getText().toString();
+						mHighlighter.highlightText(contents);
+						return true;
+					}
+					return false;
+				}
+			});
+			findTextBox.setTypeface(TYPEFACE);
+		}
+
 		return true;
 	}
 
@@ -294,6 +323,16 @@ public class ConsoleActivity extends BaseActivity {
 			return true;
 		case R.id.complete:
 			attemptWordCompletion();
+			return true;
+		case R.id.find_text_option:
+			mFindTextEnabled = true;
+			invalidateOptionsMenu();
+			return true;
+		case R.id.find_text_cancel:
+			mFindTextEnabled = false;
+			mHighlighter.dehighlightText();
+			mInputEditText.requestFocus();
+			invalidateOptionsMenu();
 			return true;
 		case R.id.save_history:
 			if (mInputEnabled) {
@@ -316,7 +355,7 @@ public class ConsoleActivity extends BaseActivity {
 					mHistory.put(COMMANDS_TAG, commandHistory);
 
 					String path = "";
-					if (getPrefs().getBoolean(HISTORY_SOURCE_KEY, true)) {
+					if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
 						path = getPrefs().getString(HISTORY_DIR_KEY, null);
 					} else {
 						path = CACHE_DIR;
@@ -336,7 +375,7 @@ public class ConsoleActivity extends BaseActivity {
 		case R.id.load_history:
 			if (mInputEnabled) {
 				String path = "";
-				if (getPrefs().getBoolean(HISTORY_SOURCE_KEY, true)) {
+				if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
 					path = getPrefs().getString(HISTORY_DIR_KEY, null);
 				} else {
 					path = CACHE_DIR;
@@ -468,13 +507,18 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	private void addConsoleEntry(ConsoleEntry entry) {
+	public void addConsoleEntry(String contents) {
+		ConsoleEntryAdder edit = new ConsoleEntryAdder(this, contents);
+		getEditManager().applyEdit(edit);
+	}
+
+	void addConsoleEntry(ConsoleEntry entry) {
 		mConsoleEntries.add(entry);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
-	private void removeConsoleEntry() {
+	void removeConsoleEntry() {
 		if (!mConsoleEntries.isEmpty()) {
 			mConsoleEntries.remove(mConsoleEntries.size() - 1);
 			updateConsoleEntries();
@@ -486,34 +530,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleEntries.get(mConsoleEntries.size() - 1).appendContents(newContents);
 		updateConsoleEntries();
 		scrollToBottom();
-	}
-
-	public class ConsoleEntryAdder implements Edit {
-		private ConsoleEntry mEntry;
-
-		public ConsoleEntryAdder(String contents) {
-			mEntry = new ConsoleEntry(mConsoleEntries.size(), contents);
-		}
-
-		@Override
-		public void applyEdit() {
-			addConsoleEntry(mEntry);
-		}
-
-		@Override
-		public boolean isSignificant() {
-			return true;
-		}
-
-		@Override
-		public void redo() {
-			addConsoleEntry(mEntry);
-		}
-
-		@Override
-		public void undo() {
-			removeConsoleEntry();
-		}
 	}
 
 	/**
@@ -532,7 +548,7 @@ public class ConsoleActivity extends BaseActivity {
 		mInputEnabled = true;
 	}
 
-	public int getNumEntries() {
+	public int getEntryCount() {
 		return mConsoleEntries.size();
 	}
 
@@ -594,7 +610,7 @@ public class ConsoleActivity extends BaseActivity {
 			int id = ta.getResourceId(i, 0);
 			if (id > 0) {
 				String[] children = getResources().getStringArray(id);
-				for (int j = 1; j < children.length; j++) { //Don't include id
+				for (int j = 1; j < children.length; j++) { //Don't start at index 0; it's the id
 					if (CommandDispatcher.isAlias(children[j])) {
 						addCommandToExpandableMenu(parents[i], CommandDispatcher.unaliasCommand(children[j]));
 					} else {

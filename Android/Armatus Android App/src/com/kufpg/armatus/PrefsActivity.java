@@ -28,17 +28,20 @@ import android.widget.Toast;
 
 public class PrefsActivity extends PreferenceActivity {
 
-	private static final String HISTORY_SOURCE_KEY = BaseActivity.HISTORY_SOURCE_KEY;
+	private static final String HISTORY_USE_CACHE_KEY = BaseActivity.HISTORY_USE_CACHE_KEY;
 	private static final String HISTORY_DIR_KEY = BaseActivity.HISTORY_DIR_KEY;
 	private static final String EDIT_MODE_KEY = BaseActivity.EDIT_MODE_KEY;
 	private static final String RESTORE_DEFAULTS_KEY = BaseActivity.RESTORE_DEFAULTS_KEY;
+	private static final String APP_THEME_KEY = BaseActivity.APP_THEME_KEY;
 	private static final int DIR_CHANGE_CODE = 777;
-	
+	private static final String THEME_DARK = "THEME_DARK";
+	private static final String THEME_LIGHT = "THEME_LIGHT";
+
 	private static Activity mActivity;
 	private static SharedPreferences mPrefs;
 	private static Editor mEditor;
-	private static CheckBoxPreference mHistorySourcePref;
-	private static ListPreference mEditModePref;
+	private static CheckBoxPreference mHistoryUseCachePref;
+	private static ListPreference mEditModePref, mAppThemePref;
 	private static Preference mRestoreDefaultsPref, mHistoryDirPref;
 	private static Map<String, Object> mStaticPrefDefaults = new HashMap<String, Object>();
 
@@ -49,28 +52,31 @@ public class PrefsActivity extends PreferenceActivity {
 		mActivity = this;
 	}
 
-	public static class PrefsFragment extends PreferenceFragment {
+	public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preferences);
 
 			mPrefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+			mPrefs.registerOnSharedPreferenceChangeListener(this);
 			mEditor = mPrefs.edit();
 
-			mHistorySourcePref = (CheckBoxPreference) findPreference(HISTORY_SOURCE_KEY);
+			mHistoryUseCachePref = (CheckBoxPreference) findPreference(HISTORY_USE_CACHE_KEY);
 			mHistoryDirPref = findPreference(HISTORY_DIR_KEY);
 			mEditModePref = (ListPreference) findPreference(EDIT_MODE_KEY);
+			mAppThemePref = (ListPreference) findPreference(APP_THEME_KEY);
 			mRestoreDefaultsPref = findPreference(RESTORE_DEFAULTS_KEY);
 
 			mStaticPrefDefaults = BaseActivity.getStaticPrefDefaults();
-			updatePrefSummaries();
+			for (Entry<String, ?> entry : mPrefs.getAll().entrySet()) {
+				updatePrefSummary(entry.getKey());
+			}
 
-			mHistorySourcePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			mHistoryUseCachePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					mEditor.putBoolean(HISTORY_SOURCE_KEY, (Boolean) newValue).commit();
-					updatePrefSummaries();
+					mEditor.putBoolean(HISTORY_USE_CACHE_KEY, (Boolean) newValue).commit();
 					return true;
 				}
 			});
@@ -94,6 +100,14 @@ public class PrefsActivity extends PreferenceActivity {
 				}
 			});
 
+			mAppThemePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					mEditor.putString(APP_THEME_KEY, (String) newValue).commit();
+					return true;
+				}
+			});
+
 			mRestoreDefaultsPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
@@ -113,7 +127,12 @@ public class PrefsActivity extends PreferenceActivity {
 				}
 			});
 		}
-		
+
+		@Override
+		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+			updatePrefSummary(key);
+		}
+
 		@Override
 		public void onActivityResult(int requestCode, int resultCode, Intent data) {
 			switch (requestCode) {
@@ -130,7 +149,6 @@ public class PrefsActivity extends PreferenceActivity {
 							break;
 						}
 						mEditor.putString(HISTORY_DIR_KEY, dir).commit();
-						updatePrefSummaries();
 					}
 				}
 				break;
@@ -152,16 +170,24 @@ public class PrefsActivity extends PreferenceActivity {
 			}
 			return mEditor;
 		}
-		
+
 		private void showToast(String message) {
 			Toast.makeText(mActivity, message, Toast.LENGTH_SHORT).show();
 		}
 
-		private static void updatePrefSummaries() {
-			if (mPrefs.getBoolean(HISTORY_SOURCE_KEY, true)) {
-				mHistoryDirPref.setSummary(mPrefs.getString(HISTORY_DIR_KEY, null));
-			} else {
-				mHistoryDirPref.setSummary(null);
+		private static void updatePrefSummary(String key) {
+			if (key.equals(HISTORY_USE_CACHE_KEY)) {
+				if (mPrefs.getBoolean(HISTORY_USE_CACHE_KEY, true)) {
+					mHistoryDirPref.setSummary(mPrefs.getString(HISTORY_DIR_KEY, null));
+				} else {
+					mHistoryDirPref.setSummary(null);
+				}
+			} else if (key.equals(APP_THEME_KEY)) {
+				if (mPrefs.getString(APP_THEME_KEY, null).equals(THEME_DARK)) {
+					mAppThemePref.setSummary("Dark theme");
+				} else if (mPrefs.getString(APP_THEME_KEY, null).equals(THEME_LIGHT)) {
+					mAppThemePref.setSummary("Light theme");
+				}
 			}
 		}
 	}

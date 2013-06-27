@@ -6,7 +6,6 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
-
 /**
  * Colors ConsoleEntry text depending on its usage of Keywords.
  */

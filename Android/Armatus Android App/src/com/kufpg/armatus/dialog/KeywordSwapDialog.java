@@ -1,12 +1,15 @@
 package com.kufpg.armatus.dialog;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.ericharlow.dragndrop.DragListener;
 import com.ericharlow.dragndrop.DragNDropAdapter;
 import com.ericharlow.dragndrop.DragNDropListView;
 import com.ericharlow.dragndrop.DropListener;
+import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleActivity;
 
@@ -24,7 +27,7 @@ public class KeywordSwapDialog extends DialogFragment {
 
 	private int mEntryNum;
 	private String mEntryContents;
-	private ArrayList<String> mEntryWords;
+	private List<String> mEntryWords;
 	private DragNDropListView mKeywordListView;
 	private DragNDropAdapter mKeywordAdapter;
 	private Button mResetButton, mToastButton;
@@ -54,7 +57,7 @@ public class KeywordSwapDialog extends DialogFragment {
 		setCancelable(true);
 
 		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
-		mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(ConsoleActivity.WHITESPACE)));
+		mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(BaseActivity.WHITESPACE)));
 
 		mKeywordListView = (DragNDropListView) v.findViewById(R.id.keyword_swap_list);
 		mKeywordAdapter = new DragNDropAdapter(getActivity(), mEntryWords);
@@ -66,7 +69,7 @@ public class KeywordSwapDialog extends DialogFragment {
 		mResetButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(ConsoleActivity.WHITESPACE)));
+				mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(BaseActivity.WHITESPACE)));
 				mKeywordAdapter = new DragNDropAdapter(getActivity(), mEntryWords);
 				mKeywordListView.setAdapter(mKeywordAdapter);
 				mKeywordAdapter.notifyDataSetChanged();
@@ -101,7 +104,7 @@ public class KeywordSwapDialog extends DialogFragment {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putSerializable("entryWords", mEntryWords);
+		outState.putSerializable("entryWords", (Serializable) mEntryWords);
 		if (mKeywordListView != null) {
 			mKeywordListView.setDropListener(null);
 			mKeywordListView.cancelDrag();
@@ -115,7 +118,7 @@ public class KeywordSwapDialog extends DialogFragment {
 		super.onActivityCreated(savedInstanceState);
 		if (savedInstanceState != null) {
 			mKeywordListView.setDropListener(mDropListener);
-			mEntryWords = (ArrayList<String>) savedInstanceState.getSerializable("entryWords");
+			mEntryWords = (List<String>) savedInstanceState.getSerializable("entryWords");
 			mKeywordAdapter = new DragNDropAdapter(getActivity(), mEntryWords);
 			mKeywordListView.setAdapter(mKeywordAdapter);
 			mKeywordAdapter.notifyDataSetChanged();

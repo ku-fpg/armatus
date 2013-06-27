@@ -31,50 +31,28 @@
 
     <item
         android:id="@+id/find_text_option"
-        android:orderInCategory="93"
+        android:orderInCategory="96"
         android:showAsAction="never"
         android:title="Find text"
         android:visible="false"/>
-
-    <group
-        android:id="@+id/find_text_group"
-        android:visible="false" >
-        <item
-            android:id="@+id/find_text_action"
-            android:actionLayout="@layout/find_text"
-            android:orderInCategory="94"
-            android:showAsAction="always"/>
-        <item
-            android:id="@+id/find_text_next"
-            android:icon="@drawable/ic_find_text_next"
-            android:orderInCategory="95"
-            android:showAsAction="always"/>
-        <item
-            android:id="@+id/find_text_previous"
-            android:icon="@drawable/ic_find_text_previous"
-            android:orderInCategory="96"
-            android:showAsAction="always"/>
-        <item
-            android:id="@+id/find_text_cancel"
-            android:icon="@drawable/ic_cancel"
-            android:orderInCategory="97"
-            android:showAsAction="always"/>
-    </group>
-    <group android:id="@+id/history_group" >
-        <item
-            android:id="@+id/save_history"
-            android:orderInCategory="98"
-            android:showAsAction="never"
-            android:title="Save history"
-            android:visible="false"/>
-        <item
-            android:id="@+id/load_history"
-            android:orderInCategory="99"
-            android:showAsAction="never"
-            android:title="Load history"
-            android:visible="false"/>
-    </group>
-
+    <item
+        android:id="@+id/find_text_action"
+        android:actionLayout="@layout/find_text"
+        android:orderInCategory="97"
+        android:showAsAction="always"
+        android:visible="false"/>
+    <item
+        android:id="@+id/save_history"
+        android:orderInCategory="98"
+        android:showAsAction="never"
+        android:title="Save history"
+        android:visible="false"/>
+    <item
+        android:id="@+id/load_history"
+        android:orderInCategory="99"
+        android:showAsAction="never"
+        android:title="Load history"
+        android:visible="false"/>
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"

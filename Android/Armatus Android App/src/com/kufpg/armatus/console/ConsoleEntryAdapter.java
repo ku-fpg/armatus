@@ -6,7 +6,6 @@ import com.kufpg.armatus.R;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 
-import android.graphics.Typeface;
 import android.view.ActionMode;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -35,7 +34,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private ConsoleActivity mConsole;
 	private ListView mListView;
 	private List<ConsoleEntry> mEntries;
-	private Typeface mTypeface;
 	private ConsoleEntryHolder mHolder;
 	private ActionMode mActionMode;
 	private int mCheckedPos = -1;
@@ -45,8 +43,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		mConsole = console;
 		mListView = mConsole.getListView();
 		mEntries = entries;
-		mTypeface = Typeface.createFromAsset(mConsole.getResources().getAssets(),
-				ConsoleActivity.TYPEFACE);
 	}
 
 	@Override
@@ -65,8 +61,8 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		}
 
 		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
-		mHolder.num.setTypeface(mTypeface);
-		mHolder.contents.setTypeface(mTypeface);
+		mHolder.num.setTypeface(ConsoleActivity.TYPEFACE);
+		mHolder.contents.setTypeface(ConsoleActivity.TYPEFACE);
 		PrettyPrinter.setPrettyText(mHolder.contents, mEntries.get(position).getContents());
 
 		if (!mEntries.get(position).isWaiting()) {

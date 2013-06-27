@@ -10,5 +10,14 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    
+    <string-array name="app_theme_entries">
+        <item>Dark theme</item>
+        <item>Light theme</item>
+    </string-array>
+    <string-array name="app_theme_values">
+        <item>THEME_DARK</item>
+        <item>THEME_LIGHT</item>
+    </string-array>
 
 </resources>

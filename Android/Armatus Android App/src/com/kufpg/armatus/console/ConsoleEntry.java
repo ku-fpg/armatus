@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kufpg.armatus.BaseActivity;
 
 /**
  * Class containing values that are binded to Views in ConsoleEntryAdapter.
@@ -13,14 +14,14 @@ public class ConsoleEntry implements Serializable {
 	private static final long serialVersionUID = -1808578272659814103L;
 	private int mNum;
 	private String mContents = "";
-	private final ArrayList<String> mKeywords = new ArrayList<String>();
+	private final List<String> mKeywords = new ArrayList<String>();
 	private boolean mIsWaiting = false;
 
 	public ConsoleEntry(int entryNum, String contents) {
 		mNum = entryNum;
 		if (contents != null) {
 			mContents = contents;
-			String[] inputArr = contents.split(ConsoleActivity.WHITESPACE);
+			String[] inputArr = contents.split(BaseActivity.WHITESPACE);
 			for (String word : inputArr) {
 				if (CommandDispatcher.isKeyword(word)) {
 					mKeywords.add(word);

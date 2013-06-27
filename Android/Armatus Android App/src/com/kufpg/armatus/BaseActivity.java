@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.kufpg.armatus.console.EditManager;
-import com.kufpg.armatus.console.EditManager.OnEditListener;
+import com.kufpg.armatus.EditManager.OnEditListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -25,13 +24,15 @@ import android.widget.Toast;
 public class BaseActivity extends Activity {
 
 	public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() + "/data/armatus";
-	public static String HISTORY_SOURCE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY;
+	public static final String WHITESPACE = "\\s+";
+	public static String HISTORY_USE_CACHE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY, APP_THEME_KEY;
 	public static String PACKAGE_NAME;
+	
+	private static SharedPreferences mPrefs;
+	private static Editor mEditor;
+	private static EditManager mEditManager = new EditManager();
+	private static MenuItem mUndoIcon, mRedoIcon;
 	private static Map<String, Object> mStaticPrefDefaults = new HashMap<String, Object>();
-	public static SharedPreferences mPrefs;
-	public static Editor mEditor;
-	public static EditManager mEditManager = new EditManager();
-	public static MenuItem mUndoIcon, mRedoIcon;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +43,11 @@ public class BaseActivity extends Activity {
 		PACKAGE_NAME = getApplicationContext().getPackageName();
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		mEditor = mPrefs.edit();
-		HISTORY_SOURCE_KEY = getResources().getString(R.string.pref_history_source);
+		HISTORY_USE_CACHE_KEY = getResources().getString(R.string.pref_history_use_cache);
 		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
 		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
 		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
+		APP_THEME_KEY = getResources().getString(R.string.pref_app_theme);
 
 		mStaticPrefDefaults.put(HISTORY_DIR_KEY, CACHE_DIR);
 
@@ -115,11 +117,11 @@ public class BaseActivity extends Activity {
 
 		((BaseApplication<BaseActivity>) getApplication()).attach(this);
 	}
-	
+
 	public boolean canRedo() {
 		return mEditManager.canRedo();
 	}
-	
+
 	public boolean canUndo() {
 		return mEditManager.canUndo();
 	}
@@ -148,7 +150,7 @@ public class BaseActivity extends Activity {
 		return mPrefs;
 	}
 
-	public EditManager getEditManager() {
+	protected EditManager getEditManager() {
 		return mEditManager;
 	}
 

@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
-import com.kufpg.armatus.console.ConsoleActivity.ConsoleEntryAdder;
+import com.kufpg.armatus.console.ConsoleEdits.ConsoleEntryAdder;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.NetworkUtils;
@@ -542,9 +542,7 @@ public class CommandDispatcher {
 	private void runOnConsole(Command command, String... args) {
 		String commandString = command.getCommandName()
 				+ " " + varargsToString(args);
-		//mConsole.addConsoleEntry(commandString);
-		ConsoleEntryAdder edit = mConsole.new ConsoleEntryAdder(commandString);
-		mConsole.getEditManager().applyEdit(edit);
+		mConsole.addConsoleEntry(commandString);
 		mConsole.addCommandEntry(command.getCommandName());
 
 		if (command.hasLowerArgBound()) {
