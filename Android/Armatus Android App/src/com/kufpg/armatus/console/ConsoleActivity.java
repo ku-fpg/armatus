@@ -295,7 +295,8 @@ public class ConsoleActivity extends BaseActivity {
 		//getActionBar().setDisplayUseLogoEnabled(!mFindTextEnabled);
 
 		if (mFindTextEnabled) {
-			final EditText findTextBox = (EditText) menu.findItem(R.id.find_text_action).getActionView().findViewById(R.id.find_text_box);
+			final EditText findTextBox = (EditText) menu.findItem(R.id.find_text_action)
+					.getActionView().findViewById(R.id.find_text_box);
 			findTextBox.requestFocus();
 			findTextBox.setOnEditorActionListener(new OnEditorActionListener() {
 				@Override

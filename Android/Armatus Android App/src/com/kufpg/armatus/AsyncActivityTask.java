@@ -39,16 +39,16 @@ public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Re
 
 	@Override
 	protected void onPreExecute() {
-		mApp.addActivityTask(mActivity, this);
+		mApp.addActivityTask(getActivity(), this);
 	}
 
 	@Override
 	protected void onPostExecute(Result result) {
-		mApp.removeActivityTask(this);
+		mApp.removeActivityTask(getActivity(), this);
 	}
 
 	@Override
 	protected void onCancelled() {
-		mApp.removeActivityTask(this);
+		mApp.removeActivityTask(getActivity(), this);
 	}
 }

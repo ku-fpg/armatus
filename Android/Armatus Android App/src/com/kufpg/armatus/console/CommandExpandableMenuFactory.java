@@ -14,20 +14,17 @@ public class CommandExpandableMenuFactory {
 
 	private static List<String> GROUP_LIST;
 	private static ListMultimap<String, String> GROUP_TO_COMMAND_MAP;
-	private static boolean mInitialized = false;
 
 	public static List<String> getGroupList(Context context) {
-		if (!mInitialized) {
+		if (GROUP_LIST == null) {
 			loadExpandableMenuData(context);
-			mInitialized = true;
 		}
 		return GROUP_LIST;
 	}
 
 	public static ListMultimap<String, String> getGroupMap(Context context) {
-		if (!mInitialized) {
+		if (GROUP_TO_COMMAND_MAP == null) {
 			loadExpandableMenuData(context);
-			mInitialized = true;
 		}
 		return GROUP_TO_COMMAND_MAP;
 	}
@@ -42,7 +39,7 @@ public class CommandExpandableMenuFactory {
 			if (id > 0) {
 				String groupName = parents[i];
 				groupListBuilder.add(groupName);
-				
+
 				String[] children = context.getResources().getStringArray(id);
 				for (int j = 1; j < children.length; j++) { //Don't start at index 0; it's the id
 					String commandName = children[j];

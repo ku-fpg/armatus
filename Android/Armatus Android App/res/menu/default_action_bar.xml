@@ -3,26 +3,26 @@
     <group android:id="@+id/menu_icons_group" >
         <item
             android:id="@+id/undo"
-            android:icon="@drawable/ic_action_undo"
+            android:icon="?attr/actionUndo"
             android:orderInCategory="1"
             android:showAsAction="always|withText"
             android:title="Undo"/>
         <item
             android:id="@+id/redo"
-            android:icon="@drawable/ic_action_redo"
+            android:icon="?attr/actionRedo"
             android:orderInCategory="2"
             android:showAsAction="always|withText"
             android:title="Redo"/>
         <item
             android:id="@+id/complete"
-            android:icon="@drawable/ic_action_complete"
+            android:icon="?attr/actionComplete"
             android:orderInCategory="3"
             android:showAsAction="ifRoom"
             android:title="Complete"
             android:visible="false"/>
         <item
             android:id="@+id/gestures"
-            android:icon="@drawable/ic_action_gestures"
+            android:icon="?attr/actionGestures"
             android:orderInCategory="4"
             android:showAsAction="ifRoom"
             android:title="Gestures"
@@ -46,17 +46,17 @@
             android:showAsAction="always"/>
         <item
             android:id="@+id/find_text_next"
-            android:icon="@drawable/ic_find_text_next"
+            android:icon="?attr/actionFindNext"
             android:orderInCategory="95"
             android:showAsAction="always"/>
         <item
             android:id="@+id/find_text_previous"
-            android:icon="@drawable/ic_find_text_previous"
+            android:icon="?attr/actionFindPrevious"
             android:orderInCategory="96"
             android:showAsAction="always"/>
         <item
             android:id="@+id/find_text_cancel"
-            android:icon="@drawable/ic_cancel"
+            android:icon="?attr/actionCancel"
             android:orderInCategory="97"
             android:showAsAction="always"/>
     </group>

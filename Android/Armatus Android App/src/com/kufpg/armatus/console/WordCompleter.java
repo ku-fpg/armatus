@@ -21,11 +21,7 @@ public class WordCompleter implements Serializable {
 	public WordCompleter(ConsoleActivity console, Collection<String> commandList) {
 		mConsole = console;
 		ImmutableSortedSet.Builder<String> dictBuilder = ImmutableSortedSet.naturalOrder();
-		for (String command : commandList) {
-			dictBuilder.add(command);
-		}
-		COMMAND_DICTIONARY = dictBuilder.build();
-		mFilteredDictionary = new TreeSet<String>(COMMAND_DICTIONARY);
+		COMMAND_DICTIONARY = dictBuilder.addAll(commandList).build();
 		resetFilter("");
 	}
 

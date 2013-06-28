@@ -43,7 +43,7 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 		getActivity().disableInput();
 	}
 
-	//WARNING: Do not use mConsole in doInBackground!
+	//WARNING: Do not use getActivity() in doInBackground!
 	@Override
 	protected String doInBackground(JSONObject... params) {
 		return httpGet();

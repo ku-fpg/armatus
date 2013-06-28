@@ -27,14 +27,14 @@ import android.widget.Toast;
 
 public class PrefsActivity extends PreferenceActivity {
 
+	public static final String THEME_DARK = "THEME_DARK";
+	public static final String THEME_LIGHT = "THEME_LIGHT";
 	private static final String HISTORY_USE_CACHE_KEY = BaseActivity.HISTORY_USE_CACHE_KEY;
 	private static final String HISTORY_DIR_KEY = BaseActivity.HISTORY_DIR_KEY;
 	private static final String EDIT_MODE_KEY = BaseActivity.EDIT_MODE_KEY;
 	private static final String RESTORE_DEFAULTS_KEY = BaseActivity.RESTORE_DEFAULTS_KEY;
 	private static final String APP_THEME_KEY = BaseActivity.APP_THEME_KEY;
 	private static final int DIR_CHANGE_CODE = 777;
-	private static final String THEME_DARK = "THEME_DARK";
-	private static final String THEME_LIGHT = "THEME_LIGHT";
 	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;
 
 	private static Activity mActivity;
@@ -46,9 +46,11 @@ public class PrefsActivity extends PreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		setTheme(BaseActivity.getThemePrefId());
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
 		mActivity = this;
+		
+		super.onCreate(savedInstanceState);
 	}
 
 	public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -103,6 +105,7 @@ public class PrefsActivity extends PreferenceActivity {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
 					mEditor.putString(APP_THEME_KEY, (String) newValue).commit();
+					mActivity.recreate();
 					return true;
 				}
 			});

@@ -28,22 +28,19 @@ public class BaseActivity extends Activity {
 	public static String HISTORY_USE_CACHE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY, APP_THEME_KEY;
 	public static String PACKAGE_NAME;
 	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;
-	
+
 	private static SharedPreferences mPrefs;
 	private static Editor mEditor;
 	private static EditManager mEditManager = new EditManager();
 	private static MenuItem mUndoIcon, mRedoIcon;
+	private static int mThemeId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		ActionBar actionBar = getActionBar();
-		actionBar.show();
-
 		PACKAGE_NAME = getApplicationContext().getPackageName();
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		mEditor = mPrefs.edit();
-		
+
 		HISTORY_USE_CACHE_KEY = getResources().getString(R.string.pref_history_use_cache);
 		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
 		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
@@ -66,6 +63,13 @@ public class BaseActivity extends Activity {
 				updateIconTitles();
 			}
 		});
+
+		mThemeId = getThemePrefId();
+		setTheme(mThemeId);
+
+		super.onCreate(savedInstanceState);
+		ActionBar actionBar = getActionBar();
+		actionBar.show();
 	}
 
 	@Override
@@ -102,11 +106,18 @@ public class BaseActivity extends Activity {
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		if (mThemeId != getThemePrefId()) {
+			recreate();
+		}
+		super.onResume();
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-
 		((BaseApplication<BaseActivity>) getApplication()).detach(this);
 	}
 
@@ -114,7 +125,6 @@ public class BaseActivity extends Activity {
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-
 		((BaseApplication<BaseActivity>) getApplication()).attach(this);
 	}
 
@@ -158,6 +168,15 @@ public class BaseActivity extends Activity {
 		return mEditor;
 	}
 
+	public static int getThemePrefId() {
+		String theme = mPrefs.getString(APP_THEME_KEY, null);
+		if (theme.equals(PrefsActivity.THEME_LIGHT)) {
+			return R.style.ThemeLight;
+		} else {
+			return R.style.ThemeDark;
+		}
+	}
+
 	public static void updateIconTitles() {
 		mUndoIcon.setTitleCondensed(String.valueOf(mEditManager.getRemainingUndosCount()));
 		mRedoIcon.setTitleCondensed(String.valueOf(mEditManager.getRemainingRedosCount()));
@@ -166,7 +185,7 @@ public class BaseActivity extends Activity {
 	static Map<String, Object> getStaticPrefDefaults() {
 		return STATIC_PREF_DEFAULTS_MAP;
 	}
-	
+
 	private static Map<String, Object> mapStaticPrefDefaults() {
 		ImmutableMap.Builder<String, Object> prefBuilder = ImmutableMap.builder();
 		return prefBuilder.put(HISTORY_DIR_KEY, CACHE_DIR).build();

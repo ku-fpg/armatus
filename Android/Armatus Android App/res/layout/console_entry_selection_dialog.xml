@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/entry_padding"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/codeColor"
         android:textIsSelectable="true"
         android:typeface="monospace" />
 

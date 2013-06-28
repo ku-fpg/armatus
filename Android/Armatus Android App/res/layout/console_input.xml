@@ -15,7 +15,7 @@
         android:layout_gravity="top"
         android:background="@null"
         android:singleLine="true"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/codeColor"
         android:textCursorDrawable="@null"
         android:textIsSelectable="false"
         android:textSize="15sp"
@@ -31,7 +31,7 @@
         android:imeOptions="actionGo"
         android:inputType="textNoSuggestions|textMultiLine"
         android:singleLine="false"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/codeColor"
         android:textCursorDrawable="@null"
         android:textSize="15sp"
         android:typeface="monospace" />
