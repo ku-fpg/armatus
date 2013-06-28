@@ -21,7 +21,7 @@ public class TextHighlighter {
 	}
 
 	public void highlightText(String word) {
-		dehighlightText();
+		unhighlightText();
 		if (!word.isEmpty()) {
 			for (int i = 0; i < mConsole.getEntryCount(); i++) {
 				TextView tv = (TextView) mConsole.getListView().getChildAt(i)
@@ -39,7 +39,7 @@ public class TextHighlighter {
 		}
 	}
 
-	public void dehighlightText() {
+	public void unhighlightText() {
 		for (int i = 0; i < mConsole.getEntryCount(); i++) {
 			TextView tv = (TextView) mConsole.getListView().getChildAt(i)
 					.findViewById(R.id.console_entry_contents);

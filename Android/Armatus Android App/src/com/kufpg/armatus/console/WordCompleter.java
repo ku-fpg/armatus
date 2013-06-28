@@ -8,18 +8,24 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.google.common.collect.ImmutableSortedSet;
+
 public class WordCompleter implements Serializable {
 
 	private static final long serialVersionUID = 6187148466800719497L;
+	private final SortedSet<String> COMMAND_DICTIONARY;
 	private transient ConsoleActivity mConsole;
 	private String mPrevPartialWord;
-	private SortedSet<String> mCommandDictionary = new TreeSet<String>(), mFilteredDictionary;
+	private SortedSet<String> mFilteredDictionary;
 
-	public WordCompleter(ConsoleActivity console, Collection<? extends List<String>> commandLists) {
+	public WordCompleter(ConsoleActivity console, Collection<String> commandList) {
 		mConsole = console;
-		for (List<String> commands : commandLists) {
-			mCommandDictionary.addAll(commands);
+		ImmutableSortedSet.Builder<String> dictBuilder = ImmutableSortedSet.naturalOrder();
+		for (String command : commandList) {
+			dictBuilder.add(command);
 		}
+		COMMAND_DICTIONARY = dictBuilder.build();
+		mFilteredDictionary = new TreeSet<String>(COMMAND_DICTIONARY);
 		resetFilter("");
 	}
 
@@ -37,7 +43,7 @@ public class WordCompleter implements Serializable {
 			}
 		} else if (curPartialWord.length() < mPrevPartialWord.length()) {
 			if (mPrevPartialWord.startsWith(curPartialWord)) {
-				for (String word : mCommandDictionary) {
+				for (String word : COMMAND_DICTIONARY) {
 					if (word.startsWith(curPartialWord)) {
 						mFilteredDictionary.add(word);
 					}
@@ -69,7 +75,7 @@ public class WordCompleter implements Serializable {
 	}
 
 	private void resetFilter(String curPartialWord) {
-		mFilteredDictionary = new TreeSet<String>(mCommandDictionary);
+		mFilteredDictionary = new TreeSet<String>(COMMAND_DICTIONARY);
 		mPrevPartialWord = "";
 		filterDictionary(curPartialWord);
 	}

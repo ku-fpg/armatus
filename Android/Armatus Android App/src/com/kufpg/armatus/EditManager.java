@@ -1,12 +1,12 @@
 package com.kufpg.armatus;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
-
-import com.kufpg.armatus.EditManager.Edit;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.kufpg.armatus.EditManager.Edit;
 
 public class EditManager implements Iterable<Edit> {
 	private static final int DEFAULT_EDIT_LIMIT = 100;
@@ -16,8 +16,11 @@ public class EditManager implements Iterable<Edit> {
 	private int mEditLimit = DEFAULT_EDIT_LIMIT;
 	private Stack<Edit> mUndoStack = new Stack<Edit>();
 	private Stack<Edit> mRedoStack = new Stack<Edit>();
+	private List<Edit> mRedoStackReverse;
 
-	public EditManager() {}
+	public EditManager() {
+		mRedoStackReverse = Lists.reverse(mRedoStack);
+	}
 
 	public EditManager(int limit) {
 		this();
@@ -125,7 +128,7 @@ public class EditManager implements Iterable<Edit> {
 
 	@Override
 	public Iterator<Edit> iterator() {
-		return Iterators.concat(mUndoStack.iterator(), Lists.reverse(mRedoStack).iterator());
+		return Iterators.concat(mUndoStack.iterator(), mRedoStackReverse.iterator());
 	}
 
 }

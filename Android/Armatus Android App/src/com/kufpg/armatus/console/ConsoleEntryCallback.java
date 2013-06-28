@@ -33,7 +33,7 @@ public class ConsoleEntryCallback implements Callback {
 			ClipData copiedText = ClipData.newPlainText("copiedText", mEntryContents);
 			clipboard.setPrimaryClip(copiedText);
 			mConsole.showToast("Entry copied to clipboard!");
-			mode.finish(); // Action picked, so close the CAB
+			mode.finish(); // Action picked, so close the contextual action bar
 			return true;
 		case R.id.select:
 			mConsole.showEntryDialog(mEntryNum, mEntryContents, ConsoleActivity.SELECTION_TAG);

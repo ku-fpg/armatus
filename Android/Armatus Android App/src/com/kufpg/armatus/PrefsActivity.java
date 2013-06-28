@@ -1,7 +1,6 @@
 package com.kufpg.armatus;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -36,6 +35,7 @@ public class PrefsActivity extends PreferenceActivity {
 	private static final int DIR_CHANGE_CODE = 777;
 	private static final String THEME_DARK = "THEME_DARK";
 	private static final String THEME_LIGHT = "THEME_LIGHT";
+	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;
 
 	private static Activity mActivity;
 	private static SharedPreferences mPrefs;
@@ -43,7 +43,6 @@ public class PrefsActivity extends PreferenceActivity {
 	private static CheckBoxPreference mHistoryUseCachePref;
 	private static ListPreference mEditModePref, mAppThemePref;
 	private static Preference mRestoreDefaultsPref, mHistoryDirPref;
-	private static Map<String, Object> mStaticPrefDefaults = new HashMap<String, Object>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,7 @@ public class PrefsActivity extends PreferenceActivity {
 			mAppThemePref = (ListPreference) findPreference(APP_THEME_KEY);
 			mRestoreDefaultsPref = findPreference(RESTORE_DEFAULTS_KEY);
 
-			mStaticPrefDefaults = BaseActivity.getStaticPrefDefaults();
+			STATIC_PREF_DEFAULTS_MAP = BaseActivity.getStaticPrefDefaults();
 			for (Entry<String, ?> entry : mPrefs.getAll().entrySet()) {
 				updatePrefSummary(entry.getKey());
 			}
@@ -163,7 +162,7 @@ public class PrefsActivity extends PreferenceActivity {
 		}
 
 		private static Editor setStaticPrefValues() {
-			for (Entry<String, Object> entry : mStaticPrefDefaults.entrySet()) {
+			for (Entry<String, Object> entry : STATIC_PREF_DEFAULTS_MAP.entrySet()) {
 				if (entry.getValue() instanceof String) {
 					mEditor.putString(entry.getKey(), (String) entry.getValue());
 				}

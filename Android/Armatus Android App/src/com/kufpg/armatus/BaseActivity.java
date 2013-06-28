@@ -1,9 +1,9 @@
 package com.kufpg.armatus;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.collect.ImmutableMap;
 import com.kufpg.armatus.EditManager.OnEditListener;
 
 import android.app.ActionBar;
@@ -27,12 +27,12 @@ public class BaseActivity extends Activity {
 	public static final String WHITESPACE = "\\s+";
 	public static String HISTORY_USE_CACHE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY, APP_THEME_KEY;
 	public static String PACKAGE_NAME;
+	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;
 	
 	private static SharedPreferences mPrefs;
 	private static Editor mEditor;
 	private static EditManager mEditManager = new EditManager();
 	private static MenuItem mUndoIcon, mRedoIcon;
-	private static Map<String, Object> mStaticPrefDefaults = new HashMap<String, Object>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +43,16 @@ public class BaseActivity extends Activity {
 		PACKAGE_NAME = getApplicationContext().getPackageName();
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		mEditor = mPrefs.edit();
+		
 		HISTORY_USE_CACHE_KEY = getResources().getString(R.string.pref_history_use_cache);
 		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
 		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
 		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
 		APP_THEME_KEY = getResources().getString(R.string.pref_app_theme);
-
-		mStaticPrefDefaults.put(HISTORY_DIR_KEY, CACHE_DIR);
+		STATIC_PREF_DEFAULTS_MAP = mapStaticPrefDefaults();
 
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
-		for (Entry<String, Object> entry : mStaticPrefDefaults.entrySet()) {
+		for (Entry<String, Object> entry : STATIC_PREF_DEFAULTS_MAP.entrySet()) {
 			if (entry.getValue() instanceof String) {
 				if (mPrefs.getString(entry.getKey(), null) == null) {
 					mEditor.putString(entry.getKey(), (String) entry.getValue());
@@ -164,7 +164,12 @@ public class BaseActivity extends Activity {
 	}
 
 	static Map<String, Object> getStaticPrefDefaults() {
-		return mStaticPrefDefaults;
+		return STATIC_PREF_DEFAULTS_MAP;
+	}
+	
+	private static Map<String, Object> mapStaticPrefDefaults() {
+		ImmutableMap.Builder<String, Object> prefBuilder = ImmutableMap.builder();
+		return prefBuilder.put(HISTORY_DIR_KEY, CACHE_DIR).build();
 	}
 
 	public enum EditMode {

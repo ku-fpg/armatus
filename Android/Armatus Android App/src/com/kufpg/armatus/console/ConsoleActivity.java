@@ -5,14 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.collect.ListMultimap;
 import com.kufpg.armatus.EditManager.Edit;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
@@ -33,7 +32,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -86,8 +84,6 @@ public class ConsoleActivity extends BaseActivity {
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
 	private List<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<String> mCommandHistoryEntries = new ArrayList<String>();
-	private List<String> mCommandExpandableGroups = new ArrayList<String>();
-	private Map<String, ArrayList<String>> mCommandExpandableGroupMap = new LinkedHashMap<String, ArrayList<String>>();
 	private View mInputView, mRootView, mBackground;
 	private TextView mInputNum;
 	private EditText mInputEditText;
@@ -224,12 +220,13 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
 		updateCommandHistoryEntries();
 
-		loadExpandableMenuData();
-		mCompleter = new WordCompleter(this, mCommandExpandableGroupMap.values());
+		List<String> expandableGroupList = CommandExpandableMenuFactory.getGroupList(this);
+		ListMultimap<String, String> expandableGroupMap = CommandExpandableMenuFactory.getGroupMap(this);
+		mCompleter = new WordCompleter(this, expandableGroupMap.values());
 
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
-				(this, mCommandExpandableGroups, mCommandExpandableGroupMap);
+				(this, expandableGroupList, expandableGroupMap);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 	}
 
@@ -239,6 +236,7 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putString("input", mInputEditText.getText().toString());
 		outState.putInt("cursorPos", mInputEditText.getSelectionStart());
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
+		outState.putBoolean("findTextEnabled", mFindTextEnabled);
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
 	}
@@ -252,6 +250,7 @@ public class ConsoleActivity extends BaseActivity {
 		mInputEditText.requestFocus();
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 		setSoftKeyboardVisibility(mSoftKeyboardVisible);
+		mFindTextEnabled = state.getBoolean("findTextEnabled");
 
 		mConsoleEntries = (List<ConsoleEntry>) state.getSerializable("consoleEntries");
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
@@ -292,6 +291,8 @@ public class ConsoleActivity extends BaseActivity {
 		menu.setGroupVisible(R.id.history_group, true);
 		menu.findItem(R.id.find_text_option).setVisible(!mFindTextEnabled);
 		menu.setGroupVisible(R.id.find_text_group, mFindTextEnabled);
+		//getActionBar().setDisplayShowTitleEnabled(!mFindTextEnabled);
+		//getActionBar().setDisplayUseLogoEnabled(!mFindTextEnabled);
 
 		if (mFindTextEnabled) {
 			final EditText findTextBox = (EditText) menu.findItem(R.id.find_text_action).getActionView().findViewById(R.id.find_text_box);
@@ -330,7 +331,7 @@ public class ConsoleActivity extends BaseActivity {
 			return true;
 		case R.id.find_text_cancel:
 			mFindTextEnabled = false;
-			mHighlighter.dehighlightText();
+			mHighlighter.unhighlightText();
 			mInputEditText.requestFocus();
 			invalidateOptionsMenu();
 			return true;
@@ -601,44 +602,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleEntries.get(mConsoleEntries.size() - 1).setWaiting(shown);
 		updateConsoleEntries();
 		scrollToBottom();
-	}
-
-	private void loadExpandableMenuData() {
-		TypedArray ta = getResources().obtainTypedArray(R.array.command_group_arrays);
-		for (int i = 0; i < ta.length(); i++) {
-			String[] parents = getResources().getStringArray(R.array.command_groups);
-			int id = ta.getResourceId(i, 0);
-			if (id > 0) {
-				String[] children = getResources().getStringArray(id);
-				for (int j = 1; j < children.length; j++) { //Don't start at index 0; it's the id
-					if (CommandDispatcher.isAlias(children[j])) {
-						addCommandToExpandableMenu(parents[i], CommandDispatcher.unaliasCommand(children[j]));
-					} else {
-						addCommandToExpandableMenu(parents[i], children[j]);
-					}
-				}
-			}
-		}
-
-		ta.recycle();
-	}
-
-	private int addCommandToExpandableMenu(String groupName, String commandName) {
-		int groupPosition = 0;
-
-		//check the hash map if the group already exists
-		ArrayList<String> commandNames = mCommandExpandableGroupMap.get(groupName); 
-		//add the group if doesn't exists
-		if(commandNames == null) {
-			commandNames = new ArrayList<String>();
-			mCommandExpandableGroupMap.put(groupName, commandNames);
-			mCommandExpandableGroups.add(groupName);
-		}
-		commandNames.add(commandName);
-
-		//find the group position inside the list
-		groupPosition = mCommandExpandableGroups.indexOf(groupName);
-		return groupPosition;
 	}
 
 	private void attemptWordCompletion() {
