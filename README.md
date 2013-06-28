@@ -21,6 +21,8 @@ Software used
 -----
 —<a href="http://www.cosmix.org/software/">Droid Sans Mono</a> (w/ dotted zero) copyright Ascender Corp. under the Apache License, modified by <a href="http://www.cosmix.org">cosmix.org</a>
 
+—<a href="http://code.google.com/p/guava-libraries/">Guava</a> by Google under the Apache License 2.0
+
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
 
 —<a href="https://github.com/ericharlow/TICEWidgets">DragNDropList</a> by <a href="https://github.com/ericharlow">Eric Harlow</a> under the Apache License 2.0
