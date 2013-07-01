@@ -3,8 +3,28 @@ package com.kufpg.armatus;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+/**
+ * An AsyncTask whose execution is intimately connected with an Activity. Unlike
+ * a regular AsyncTask, an AsyncActivityTask can safely interact with its associated
+ * Activity in the UI thread methods (onPreExecute(), onCancelled(), onProgressUpdate(Progress...),
+ * and onPostExecute(Result)), even after Activity rotation or standby.
+ * @param <A> The Activity class this task is associated with.
+ * @param <Params> The Object that this task takes as input when calling execute(Params...).
+ * @param <Progress> The Object that this task uses to determine execution progress.
+ * @param <Result> The Object that this task returns when execution is completed.
+ */
 public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+	/**
+	 * A reference to the app's Application, which manages the connection between
+	 * this task and its associated Activity.
+	 */
 	private BaseApplication<A> mApp;
+	/**
+	 * References this task's associated Activity. DO NOT access this reference
+	 * directly, since there is a chance that it could be set to null due to Activity
+	 * rotation or standby. Instead, use getActivity() every time that you want to
+	 * use the Activity to ensure that the correct reference is returned.
+	 */
 	private A mActivity, mInterruptedActivity;
 
 	@SuppressWarnings("unchecked")
@@ -13,7 +33,13 @@ public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Re
 		mInterruptedActivity = activity;
 		mApp = (BaseApplication<A>) mActivity.getApplication();
 	}
-	
+
+	/**
+	 * Instead of accessing the connected Activity directly, use this method to
+	 * ensure that the returned Activity will always be safe to use, regardless
+	 * of Activity rotation or standby.
+	 * @return The associated Activity.
+	 */
 	public A getActivity() {
 		if (mActivity != null) {
 			return mActivity;
@@ -21,8 +47,12 @@ public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Re
 			return mInterruptedActivity;
 		}
 	}
-	
 
+	/**
+	 * Use this method to reestablish a connection to this task's Activity after
+	 * rotation or standby.
+	 * @param activity The Activity to reconnect to.
+	 */
 	public void setActivity(A activity) {
 		mActivity = activity;
 		if (mActivity == null) {
@@ -33,22 +63,32 @@ public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Re
 		}
 	}
 
+	/**
+	 * Called when this task's Application restores the references between the
+	 * task and its associated Activity. This is usually called when rotation
+	 * completes or when the Activity comes back into focus after standby.
+	 */
 	protected void onActivityAttached() {}
 
+	/**
+	 * Called when this task's Application sets the references between the task
+	 * and its associated Activity to null. This is usually called immediately before
+	 * the Activity is rotated or put into standby.
+	 */
 	protected void onActivityDetached() {}
 
 	@Override
 	protected void onPreExecute() {
-		mApp.addActivityTask(getActivity(), this);
+		mApp.addTask(getActivity(), this);
 	}
 
 	@Override
 	protected void onPostExecute(Result result) {
-		mApp.removeActivityTask(getActivity(), this);
+		mApp.removeTask(getActivity(), this);
 	}
 
 	@Override
 	protected void onCancelled() {
-		mApp.removeActivityTask(getActivity(), this);
+		mApp.removeTask(getActivity(), this);
 	}
 }

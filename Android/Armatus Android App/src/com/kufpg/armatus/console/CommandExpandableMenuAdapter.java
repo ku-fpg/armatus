@@ -20,7 +20,8 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	private List<String> mGroupList;
 	private ListMultimap<String, String> mGroupMap;
 
-	public CommandExpandableMenuAdapter(Context context, List<String> groupList, ListMultimap<String, String> groupMap) {
+	public CommandExpandableMenuAdapter(Context context, List<String> groupList,
+			ListMultimap<String, String> groupMap) {
 		mContext = context;
 		mGroupList = groupList;
 		mGroupMap = groupMap;
@@ -38,18 +39,21 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, 
+	public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
 			View view, ViewGroup parent) {
-
 		String commandName = getChild(groupPosition, childPosition);
+		CommandExpandableMenuItem item;
 		if (view == null) {
 			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			view = inflater.inflate(R.layout.command_expandable_child, null);
+			item = new CommandExpandableMenuItem();
+			item.icon = (DragIcon) view.findViewById(R.id.drag_icon);
+			view.setTag(item);
+		} else {
+			item = (CommandExpandableMenuItem) view.getTag();
 		}
 
-		DragIcon dragIcon = (DragIcon) view.findViewById(R.id.drag_icon);
-		dragIcon.setCommandName(commandName);
-		
+		item.icon.setCommandName(commandName);
 		return view;
 	}
 
@@ -75,23 +79,26 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getGroupView(int groupPosition, boolean isLastChild, View view,
-			ViewGroup parent) {
-
+	public View getGroupView(int groupPosition, boolean isLastChild, View view, ViewGroup parent) {
 		String groupName = getGroup(groupPosition);
+		CommandExpandableMenuHeader header;
 		if (view == null) {
 			LayoutInflater inf = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			view = inf.inflate(R.layout.command_expandable_group, null);
+			header = new CommandExpandableMenuHeader();
+			header.title = (TextView) view.findViewById(R.id.group_heading);
+			header.groupColor = (View) view.findViewById(R.id.group_color);
+			view.setTag(header);
+		} else {
+			header = (CommandExpandableMenuHeader) view.getTag();
 		}
 
-		TextView heading = (TextView) view.findViewById(R.id.group_heading);
-		heading.setText(groupName);
-		View groupColor = (View) view.findViewById(R.id.group_color);
+		header.title.setText(groupName);
 		String colorHex = CommandDispatcher.getGroupColor(groupName);
 		if (colorHex == null) {
 			colorHex = PrettyPrinter.GRAY;
 		}
-		groupColor.setBackgroundColor(Color.parseColor(colorHex));
+		header.groupColor.setBackgroundColor(Color.parseColor(colorHex));
 
 		return view;
 	}
@@ -104,6 +111,15 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	@Override
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
 		return true;
+	}
+
+	static class CommandExpandableMenuHeader {
+		TextView title;
+		View groupColor;
+	}
+
+	static class CommandExpandableMenuItem {
+		DragIcon icon;
 	}
 
 }

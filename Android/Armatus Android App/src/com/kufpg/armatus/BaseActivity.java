@@ -106,11 +106,13 @@ public class BaseActivity extends Activity {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onResume() {
 		if (mThemeId != getThemePrefId()) {
 			recreate();
 		}
+		((BaseApplication<BaseActivity>) getApplication()).attach(this);
 		super.onResume();
 	}
 
@@ -121,12 +123,12 @@ public class BaseActivity extends Activity {
 		((BaseApplication<BaseActivity>) getApplication()).detach(this);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		((BaseApplication<BaseActivity>) getApplication()).attach(this);
-	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//		super.onRestoreInstanceState(savedInstanceState);
+//		((BaseApplication<BaseActivity>) getApplication()).attach(this);
+//	}
 
 	public boolean canRedo() {
 		return mEditManager.canRedo();
