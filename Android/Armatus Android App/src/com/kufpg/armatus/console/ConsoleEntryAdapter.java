@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
@@ -48,6 +49,79 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private CharSequence mConstraint;
 	private int mFilterMatches = 0;
 	private int mCheckedPos = -1;
+
+	private OnClickListener mOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			int clickedPos = mListView.getPositionForView(v);
+			if (mCheckedPos != clickedPos) {
+				selectEntry(clickedPos);
+				mCheckedPos = mListView.getCheckedItemPosition();
+			} else {
+				hideActionBar();
+			}
+			notifyDataSetChanged();
+		}
+	};
+
+	private OnLongClickListener mOnLongClickListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+			mConsole.openContextMenu(v);
+			return true;
+		}
+	};
+
+	private OnTouchListener mOnTouchListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			int mTouchedPos = mListView.getPositionForView(v);
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				if (mTouchedPos != mCheckedPos
+						|| mCheckedPos == -1) {
+					v.setBackgroundResource(HIGHLIGHTED);
+				} else {
+					v.setBackgroundResource(HIGHLIGHTED_SELECTED);
+				}
+			} else if (event.getAction() == MotionEvent.ACTION_UP
+					|| event.getAction() == MotionEvent.ACTION_OUTSIDE
+					|| event.getAction() == MotionEvent.ACTION_CANCEL) {
+				if (mTouchedPos != mCheckedPos) {
+					v.setBackgroundResource(TRANSPARENT);
+				} else {
+					v.setBackgroundResource(SELECTED);
+				}
+			}
+			return false;
+		}
+	};
+
+	private OnDragListener mOnDragListener = new DragSinkListener() {
+		@Override
+		public void onDragEntered(View dragView, View dragSink, DragEvent event) {
+			dragSink.setBackgroundResource(HIGHLIGHTED);
+		}
+
+		@Override
+		public void onDragExited(View dragView, View dragSink, DragEvent event) {
+			dragSink.setBackgroundResource(TRANSPARENT);
+		}
+
+		@Override
+		public void onDragEnded(View dragView, View dragSink, DragEvent event) {
+			dragSink.setBackgroundResource(TRANSPARENT);
+		}
+
+		@Override
+		public void onDragDropped(View dragView, View dragSink, DragEvent event) {
+			int pos = mListView.getPositionForView(dragSink);
+			List<String> keywords = getItem(pos).getKeywords();
+			if (!keywords.isEmpty()) {
+				mConsole.setTempCommand(((DragIcon) dragView).getCommandName());
+				mConsole.openContextMenu(dragSink);
+			}
+		}
+	};
 
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
@@ -116,78 +190,10 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			holder.loader.setVisibility(View.VISIBLE);
 		}
 
-		final int thepos = position;
-
-		convertView.setOnDragListener(new DragSinkListener() {
-			@Override
-			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
-				dragSink.setBackgroundResource(HIGHLIGHTED);
-			}
-
-			@Override
-			public void onDragExited(View dragView, View dragSink, DragEvent event) {
-				dragSink.setBackgroundResource(TRANSPARENT);
-			}
-
-			@Override
-			public void onDragEnded(View dragView, View dragSink, DragEvent event) {
-				dragSink.setBackgroundResource(TRANSPARENT);
-			}
-
-			@Override
-			public void onDragDropped(View dragView, View dragSink, DragEvent event) {
-				List<String> keywords = getItem(thepos).getKeywords();
-				if (!keywords.isEmpty()) {
-					mConsole.setTempCommand(((DragIcon) dragView).getCommandName());
-					mConsole.openContextMenu(dragSink);
-				}
-			}
-		});
-		convertView.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				if (!getItem(thepos).getContents().isEmpty()) {
-					mConsole.openContextMenu(v);
-				}
-				return true;
-			}
-		});
-		convertView.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				int mTouchedPos = mListView.getPositionForView(v);
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					if (mTouchedPos != mCheckedPos
-							|| mCheckedPos == -1) {
-						v.setBackgroundResource(HIGHLIGHTED);
-					} else {
-						v.setBackgroundResource(HIGHLIGHTED_SELECTED);
-					}
-				} else if (event.getAction() == MotionEvent.ACTION_UP
-						|| event.getAction() == MotionEvent.ACTION_OUTSIDE
-						|| event.getAction() == MotionEvent.ACTION_CANCEL) {
-					if (mTouchedPos != mCheckedPos) {
-						v.setBackgroundResource(TRANSPARENT);
-					} else {
-						v.setBackgroundResource(SELECTED);
-					}
-				}
-				return false;
-			}
-		});
-		convertView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				int clickedPos = mListView.getPositionForView(v);
-				if (mCheckedPos != clickedPos) {
-					selectEntry(clickedPos);
-					mCheckedPos = mListView.getCheckedItemPosition();
-				} else {
-					hideActionBar();
-				}
-				notifyDataSetChanged();
-			}
-		});
+		convertView.setOnDragListener(mOnDragListener);
+		convertView.setOnLongClickListener(mOnLongClickListener);
+		convertView.setOnTouchListener(mOnTouchListener);
+		convertView.setOnClickListener(mOnClickListener);
 
 		return convertView;
 	}
@@ -263,11 +269,11 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		public RelativeLayout loader;
 		public String prevConstraint;
 	}
-	
+
 	public int getFilterMatches() {
 		return mFilterMatches;
 	}
-	
+
 	public boolean isFiltering() {
 		return mConstraint != null;
 	}
