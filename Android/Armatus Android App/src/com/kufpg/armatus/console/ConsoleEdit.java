@@ -11,7 +11,9 @@ public class ConsoleEdit implements Edit {
 	}
 
 	@Override
-	public void applyEdit() {}
+	public void applyEdit() {
+		redo();
+	}
 	
 	public void attachConsole(ConsoleActivity console) {
 		mConsole = console;

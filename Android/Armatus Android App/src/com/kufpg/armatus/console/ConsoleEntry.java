@@ -34,7 +34,11 @@ public class ConsoleEntry implements Serializable {
 		this(entryNum, contents);
 		mIsWaiting = isWaiting;
 	}
-	
+
+	public ConsoleEntry(ConsoleEntry entry) {
+		this(entry.getNum(), entry.getContents(), entry.isWaiting());
+	}
+
 	public int getNum() {
 		return mNum;
 	}

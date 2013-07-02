@@ -15,6 +15,7 @@ import com.google.common.collect.ListMultimap;
 import com.kufpg.armatus.EditManager.Edit;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
+import com.kufpg.armatus.console.ConsoleEdits.ConsoleClearer;
 import com.kufpg.armatus.console.ConsoleEdits.ConsoleEntryAdder;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
@@ -53,6 +54,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.Filter.FilterListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -82,20 +84,21 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleEntryAdapter mConsoleAdapter;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
-	private List<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>();
+	private List<ConsoleEntry> mFilteredConsoleEntries = new ArrayList<ConsoleEntry>();
+	private List<ConsoleEntry> mOriginalConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<String> mCommandHistoryEntries = new ArrayList<String>();
 	private View mInputView, mRootView, mBackground;
-	private TextView mInputNum;
-	private EditText mInputEditText;
+	private TextView mConsoleInputNum;
+	private EditText mConsoleInput, mFilterInput;
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
-	private TextHighlighter mHighlighter;
-	private String mTempCommand;
+	private String mTempCommand, mTempFilterInput;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible = true;
 	private boolean mFindTextEnabled = false;
+	private boolean mTempIsFiltering = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -134,21 +137,20 @@ public class ConsoleActivity extends BaseActivity {
 		mBackground.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				mInputEditText.performLongClick();
+				mConsoleInput.performLongClick();
 				return false;
 			}
 		});
 
 		mDispatcher = new CommandDispatcher(this);
-		mHighlighter = new TextHighlighter(this);
 		mConsoleListView = (ListView) findViewById(R.id.console_list_view);
-		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries);
 		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
 		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
-		mInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
-		mInputEditText = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
-		mInputEditText.addTextChangedListener(new TextWatcher() {
+		mConsoleInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
+		mConsoleInput = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
+		mConsoleInput.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {}
 			@Override
@@ -157,7 +159,8 @@ public class ConsoleActivity extends BaseActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
-				String input = mInputEditText.getText().toString().trim();
+				mConsoleAdapter.hideActionBar();
+				String input = mConsoleInput.getText().toString().trim();
 				if (input.split(WHITESPACE).length <= 1) {
 					mCompleter.filterDictionary(input);
 				}
@@ -170,13 +173,13 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		});
 		//Processes user input (and runs command, if input is a command) when Enter is pressed
-		mInputEditText.setOnKeyListener(new OnKeyListener() {
+		mConsoleInput.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP
 						&& mInputEnabled) {
-					String[] inputs = mInputEditText.getText().
+					String[] inputs = mConsoleInput.getText().
 							toString().trim().split(WHITESPACE);
 					if (CommandDispatcher.isCommand(inputs[0])) {
 						if (inputs.length == 1) {
@@ -186,31 +189,31 @@ public class ConsoleActivity extends BaseActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						addConsoleEntry(mInputEditText.getText().toString());
+						addConsoleEntry(mConsoleInput.getText().toString());
 					}
-					mInputEditText.setText("");
+					mConsoleInput.setText("");
 					return true;
 				} else if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP
 						&& !mInputEnabled) {
-					mInputEditText.setText("");
+					mConsoleInput.setText("");
 				}
 				return false;
 			}
 		});
-		mInputEditText.setOnDragListener(new DragSinkListener() {
+		mConsoleInput.setOnDragListener(new DragSinkListener() {
 			@Override
 			public void onDragStarted(View dragView, View dragSink, DragEvent event) {
 				getSlidingMenu().showContent();
 			}
 		});
-		mInputEditText.requestFocus();
+		mConsoleInput.requestFocus();
 		mConsoleListView.addFooterView(mInputView, null, false);
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
 
-		mInputNum.setTypeface(TYPEFACE);
-		mInputEditText.setTypeface(TYPEFACE);
+		mConsoleInputNum.setTypeface(TYPEFACE);
+		mConsoleInput.setTypeface(TYPEFACE);
 
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		refreshSlidingMenu();
@@ -233,11 +236,16 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString("input", mInputEditText.getText().toString());
-		outState.putInt("cursorPos", mInputEditText.getSelectionStart());
+		outState.putString("consoleInput", mConsoleInput.getText().toString());
+		outState.putInt("consoleInputCursor", mConsoleInput.getSelectionStart());
+		if (mFilterInput != null) {
+			outState.putString("filterInput", mFilterInput.getText().toString());
+		}
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putBoolean("findTextEnabled", mFindTextEnabled);
-		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
+		outState.putBoolean("isFiltering", mConsoleAdapter.isFiltering());
+		outState.putSerializable("filteredConsoleEntries", (Serializable) mFilteredConsoleEntries);
+		outState.putSerializable("originalConsoleEntries", (Serializable) mOriginalConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
 	}
 
@@ -245,15 +253,21 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	protected void onRestoreInstanceState(Bundle state) {
 		super.onRestoreInstanceState(state);
-		mInputEditText.setText(state.getString("input"));
-		mInputEditText.setSelection(state.getInt("cursorPos"));
-		mInputEditText.requestFocus();
+		mConsoleInput.setText(state.getString("consoleInput"));
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 		setSoftKeyboardVisibility(mSoftKeyboardVisible);
 		mFindTextEnabled = state.getBoolean("findTextEnabled");
+		if (mFindTextEnabled) {
+			mTempFilterInput = state.getString("filterInput");
+			mTempIsFiltering = state.getBoolean("isFiltering");
+		} else {
+			mConsoleInput.setSelection(state.getInt("consoleCursorPos"));
+			mConsoleInput.requestFocus();
+		}
 
-		mConsoleEntries = (List<ConsoleEntry>) state.getSerializable("consoleEntries");
-		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+		mFilteredConsoleEntries = (List<ConsoleEntry>) state.getSerializable("filteredConsoleEntries");
+		mOriginalConsoleEntries = (List<ConsoleEntry>) state.getSerializable("originalConsoleEntries");
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries, mOriginalConsoleEntries);
 		mConsoleListView.setAdapter(mConsoleAdapter);
 		updateConsoleEntries();
 
@@ -291,26 +305,42 @@ public class ConsoleActivity extends BaseActivity {
 		menu.setGroupVisible(R.id.history_group, true);
 		menu.findItem(R.id.find_text_option).setVisible(!mFindTextEnabled);
 		menu.setGroupVisible(R.id.find_text_group, mFindTextEnabled);
-		//getActionBar().setDisplayShowTitleEnabled(!mFindTextEnabled);
-		//getActionBar().setDisplayUseLogoEnabled(!mFindTextEnabled);
 
 		if (mFindTextEnabled) {
-			final EditText findTextBox = (EditText) menu.findItem(R.id.find_text_action)
-					.getActionView().findViewById(R.id.find_text_box);
-			findTextBox.requestFocus();
-			findTextBox.setOnEditorActionListener(new OnEditorActionListener() {
+			View actionView = menu.findItem(R.id.find_text_action).getActionView();
+			mFilterInput = (EditText) actionView.findViewById(R.id.find_text_box);
+			final TextView filterMatches = (TextView) actionView.findViewById(R.id.find_text_matches);
+			final FilterListener listener = new FilterListener() {
+				@Override
+				public void onFilterComplete(int count) {
+					String caption = mConsoleAdapter.getFilterMatches() + " match";
+					filterMatches.setText(caption + (caption.startsWith("1") ? "" : "es"));
+				}
+			};
+			
+			if (mTempFilterInput != null) {
+				mFilterInput.setText(mTempFilterInput);
+				mFilterInput.setSelection(mFilterInput.length());
+				if (mTempIsFiltering) {
+					mTempIsFiltering = false;
+					mConsoleAdapter.getFilter().filter(mTempFilterInput, listener);
+				}
+			}
+			
+			mFilterInput.requestFocus();
+			mFilterInput.setOnEditorActionListener(new OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView v, int actionId,
 						KeyEvent event) {
 					if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-						String contents = findTextBox.getText().toString();
-						mHighlighter.highlightText(contents);
+						CharSequence contents = mFilterInput.getText();
+						mConsoleAdapter.getFilter().filter(contents, listener);
 						return true;
 					}
 					return false;
 				}
 			});
-			findTextBox.setTypeface(TYPEFACE);
+			mFilterInput.setTypeface(TYPEFACE);
 		}
 
 		return true;
@@ -332,15 +362,15 @@ public class ConsoleActivity extends BaseActivity {
 			return true;
 		case R.id.find_text_cancel:
 			mFindTextEnabled = false;
-			mHighlighter.unhighlightText();
-			mInputEditText.requestFocus();
+			mConsoleAdapter.getFilter().filter(null);
+			mConsoleInput.requestFocus();
 			invalidateOptionsMenu();
 			return true;
 		case R.id.save_history:
 			if (mInputEnabled) {
 				try {
 					JSONArray consoleHistory = new JSONArray();
-					for (ConsoleEntry entry : mConsoleEntries) {
+					for (ConsoleEntry entry : mOriginalConsoleEntries) {
 						JSONObject entryJson = new JSONObject();
 						entryJson.put("num", entry.getNum());
 						entryJson.put("contents", entry.getContents());
@@ -390,15 +420,16 @@ public class ConsoleActivity extends BaseActivity {
 						history = JsonUtils.openJsonFile(file.getAbsolutePath());
 
 						JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
-						mConsoleEntries.clear();
+						mFilteredConsoleEntries.clear();
 						for (int i = 0; i < consoleHistory.length(); i++) {
 							JSONObject jsonEntry = consoleHistory.getJSONObject(i);
 							int num = jsonEntry.getInt("num");
 							String contents = jsonEntry.getString("contents");
 							ConsoleEntry entry = new ConsoleEntry(num, contents);
-							mConsoleEntries.add(entry);
+							mFilteredConsoleEntries.add(entry);
 						}
-						mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+						mOriginalConsoleEntries = new ArrayList<ConsoleEntry>(mFilteredConsoleEntries);
+						mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries);
 						mConsoleListView.setAdapter(mConsoleAdapter);
 						updateConsoleEntries();
 
@@ -411,7 +442,7 @@ public class ConsoleActivity extends BaseActivity {
 						mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
 						updateCommandHistoryEntries();
 
-						mInputEditText.requestFocus();
+						mConsoleInput.requestFocus();
 						showToast("Loading complete!");
 					} catch (JSONException e) {
 						showToast("Error: invalid JSON");
@@ -431,8 +462,8 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
-				!mConsoleEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
+		if (info.position != mFilteredConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
+				!mFilteredConsoleEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
 
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
@@ -443,7 +474,7 @@ public class ConsoleActivity extends BaseActivity {
 			}
 
 			int order = 1;
-			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
+			for (String keyword : mFilteredConsoleEntries.get(info.position).getKeywords()) {
 				menu.add(0, v.getId(), order, keyword);
 				order++;
 			}
@@ -458,17 +489,17 @@ public class ConsoleActivity extends BaseActivity {
 				if (mInputEnabled) {
 					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
 				} else {
-					mInputEditText.setText(mTempCommand + " " + keywordNStr);
+					mConsoleInput.setText(mTempCommand + " " + keywordNStr);
 				}
 			} else { //If long-click command is run
 				if (mInputEnabled) {
 					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
 				} else {
-					mInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
+					mConsoleInput.setText(CommandDispatcher.getKeyword(keywordNStr)
 							.getCommand().getCommandName() + " " + keywordNStr);
 				}
 			}
-			mInputEditText.requestFocus(); //Prevents ListView from stealing focus
+			mConsoleInput.requestFocus(); //Prevents ListView from stealing focus
 		}
 		mTempCommand = null;
 		return super.onContextItemSelected(item);
@@ -515,30 +546,39 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	void addConsoleEntry(ConsoleEntry entry) {
-		mConsoleEntries.add(entry);
+		mFilteredConsoleEntries.add(entry);
+		mOriginalConsoleEntries.add(new ConsoleEntry(entry));
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
 	void removeConsoleEntry() {
-		if (!mConsoleEntries.isEmpty()) {
-			mConsoleEntries.remove(mConsoleEntries.size() - 1);
+		if (!mFilteredConsoleEntries.isEmpty()) {
+			mFilteredConsoleEntries.remove(mFilteredConsoleEntries.size() - 1);
+			mOriginalConsoleEntries.remove(getEntryCount() - 1);
 			updateConsoleEntries();
 			scrollToBottom();
 		}
 	}
 
 	public void appendConsoleEntry(String newContents) {
-		mConsoleEntries.get(mConsoleEntries.size() - 1).appendContents(newContents);
+		mFilteredConsoleEntries.get(mFilteredConsoleEntries.size() - 1).appendContents(newContents);
+		mOriginalConsoleEntries.get(getEntryCount() - 1).appendContents(newContents);
 		updateConsoleEntries();
 		scrollToBottom();
+	}
+	
+	public void clear() {
+		ConsoleClearer clear = new ConsoleClearer(this, mOriginalConsoleEntries);
+		getEditManager().applyEdit(clear);
 	}
 
 	/**
 	 * Removes all console entries and resets the entry count.
 	 */
-	public void clear() {
-		mConsoleEntries.clear();
+	void clearConsole() {
+		mFilteredConsoleEntries.clear();
+		mOriginalConsoleEntries.clear();
 		updateConsoleEntries();
 	}
 
@@ -551,7 +591,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public int getEntryCount() {
-		return mConsoleEntries.size();
+		return mOriginalConsoleEntries.size();
 	}
 
 	public ListView getListView() {
@@ -562,9 +602,13 @@ public class ConsoleActivity extends BaseActivity {
 		return mSlidingMenu;
 	}
 
+	public void setInputEnabled(boolean enabled) {
+		mInputEnabled = enabled;
+	}
+
 	public void setInputText(String text) {
-		mInputEditText.setText(text);
-		mInputEditText.setSelection(mInputEditText.getText().length());
+		mConsoleInput.setText(text);
+		mConsoleInput.setSelection(mConsoleInput.getText().length());
 	}
 
 	/**
@@ -600,13 +644,13 @@ public class ConsoleActivity extends BaseActivity {
 	 * doing asynchronous tasks (such as HermitServer requests).
 	 */
 	public void updateProgressSpinner(boolean shown) {
-		mConsoleEntries.get(mConsoleEntries.size() - 1).setWaiting(shown);
+		mFilteredConsoleEntries.get(mFilteredConsoleEntries.size() - 1).setWaiting(shown);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
 	private void attemptWordCompletion() {
-		String input = mInputEditText.getText().toString().trim();
+		String input = mConsoleInput.getText().toString().trim();
 		if (input.split(WHITESPACE).length <= 1) {
 			String completion = mCompleter.completeWord(input);
 			if (completion != null) {
@@ -655,9 +699,18 @@ public class ConsoleActivity extends BaseActivity {
 	 * Refreshes the console entries, removing excessive entries from the top if ENTRY_LIMIT is exceeded.
 	 */
 	private void updateConsoleEntries() {
-		if (mConsoleEntries.size() > ENTRY_CONSOLE_LIMIT) {
-			mConsoleEntries.remove(0);
+		if (mFilteredConsoleEntries.size() > ENTRY_CONSOLE_LIMIT) {
+			mFilteredConsoleEntries.remove(0);
+			mOriginalConsoleEntries.remove(0);
 		}
+		mConsoleAdapter.notifyDataSetChanged();
+		updateEntryCount();
+	}
+	
+	void updateConsoleEntries(List<ConsoleEntry> newEntries) {
+		mFilteredConsoleEntries.clear();
+		mFilteredConsoleEntries.addAll(newEntries);
+		mOriginalConsoleEntries = new ArrayList<ConsoleEntry>(mFilteredConsoleEntries);
 		mConsoleAdapter.notifyDataSetChanged();
 		updateEntryCount();
 	}
@@ -670,7 +723,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	private void updateEntryCount() {
-		mInputNum.setText("hermit<" + mConsoleEntries.size() + "> ");
+		mConsoleInputNum.setText("hermit<" + getEntryCount() + "> ");
 	}
 
 }

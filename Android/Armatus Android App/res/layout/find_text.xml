@@ -21,4 +21,12 @@
         android:inputType="text"
         android:width="150dp" />
 
+    <TextView
+        android:id="@+id/find_text_matches"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="0 matches"
+        android:textAppearance="@android:style/TextAppearance.Small" />
+
 </LinearLayout>

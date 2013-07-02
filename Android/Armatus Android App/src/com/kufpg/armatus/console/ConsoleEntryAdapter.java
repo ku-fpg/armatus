@@ -1,11 +1,18 @@
 package com.kufpg.armatus.console;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.drag.DragSinkListener;
 
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.CharacterStyle;
 import android.view.ActionMode;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -16,6 +23,7 @@ import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,9 +41,12 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 
 	private ConsoleActivity mConsole;
 	private ListView mListView;
-	private List<ConsoleEntry> mEntries;
-	private ConsoleEntryHolder mHolder;
+	private List<ConsoleEntry> mEntries, mOriginalEntries;
 	private ActionMode mActionMode;
+	private Filter mFilter;
+	private Object mLock = new Object();
+	private CharSequence mConstraint;
+	private int mFilterMatches = 0;
 	private int mCheckedPos = -1;
 
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
@@ -45,35 +56,69 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		mEntries = entries;
 	}
 
+	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries, List<ConsoleEntry> originals) {
+		this(console, entries);
+		mOriginalEntries = originals;
+	}
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View entryView = convertView;
-		if (entryView == null) { //If this is a new ConsoleEntry
+		ConsoleEntryHolder holder;
+		if (convertView == null) { //If this is a new ConsoleEntry
 			LayoutInflater inflater = mConsole.getLayoutInflater();
-			entryView = inflater.inflate(R.layout.console_entry, parent, false);
-			mHolder = new ConsoleEntryHolder();
-			mHolder.num = (TextView) entryView.findViewById(R.id.console_entry_num);
-			mHolder.contents = (TextView) entryView.findViewById(R.id.console_entry_contents);
-			mHolder.loader = (RelativeLayout) entryView.findViewById(R.id.console_loading);
-			entryView.setTag(mHolder);
+			convertView = inflater.inflate(R.layout.console_entry, parent, false);
+			holder = new ConsoleEntryHolder();
+			holder.layout = (RelativeLayout) convertView.findViewById(R.id.console_entry_layout);
+			holder.num = (TextView) convertView.findViewById(R.id.console_entry_num);
+			holder.contents = (TextView) convertView.findViewById(R.id.console_entry_contents);
+			holder.loader = (RelativeLayout) convertView.findViewById(R.id.console_loading);
+			convertView.setTag(holder);
 		} else {
-			mHolder = (ConsoleEntryHolder) entryView.getTag();
+			holder = (ConsoleEntryHolder) convertView.getTag();
 		}
 
-		mHolder.num.setText("hermit<" + mEntries.get(position).getNum() + "> ");
-		mHolder.num.setTypeface(ConsoleActivity.TYPEFACE);
-		mHolder.contents.setTypeface(ConsoleActivity.TYPEFACE);
-		PrettyPrinter.setPrettyText(mHolder.contents, mEntries.get(position).getContents());
-
-		if (!mEntries.get(position).isWaiting()) {
-			mHolder.loader.setVisibility(View.GONE);
+		if (mListView.getCheckedItemPosition() == position) {
+			holder.layout.setBackgroundResource(SELECTED);
 		} else {
-			mHolder.loader.setVisibility(View.VISIBLE);
+			holder.layout.setBackgroundResource(TRANSPARENT);
+		}
+		holder.num.setText("hermit<" + getItem(position).getNum() + "> ");
+		holder.num.setTypeface(ConsoleActivity.TYPEFACE);
+		holder.contents.setTypeface(ConsoleActivity.TYPEFACE);
+		PrettyPrinter.setPrettyText(holder.contents, getItem(position).getContents());
+
+		if (mConstraint != null) {
+			String constraint = mConstraint.toString();
+			if (!constraint.equalsIgnoreCase(holder.prevConstraint)) {
+				removeHighlight(holder.contents);
+				if (!constraint.isEmpty()) {
+					CharSequence contentText = holder.contents.getText();
+					List<Integer> matches = getMatchIndexes(constraint,	contentText.toString());
+					if (matches != null) {
+						Spannable contents = new SpannableString(contentText);
+						for (int index : matches) {
+							CharacterStyle highlight = new BackgroundColorSpan(Color.DKGRAY);
+							contents.setSpan(highlight, index, index + constraint.length(), 0);
+						}
+						holder.contents.setText(contents);
+					}
+				}
+				holder.prevConstraint = constraint;
+			}
+		} else {
+			holder.prevConstraint = null;
+			removeHighlight(holder.contents);
+		}
+
+		if (!getItem(position).isWaiting()) {
+			holder.loader.setVisibility(View.GONE);
+		} else {
+			holder.loader.setVisibility(View.VISIBLE);
 		}
 
 		final int thepos = position;
 
-		entryView.setOnDragListener(new DragSinkListener() {
+		convertView.setOnDragListener(new DragSinkListener() {
 			@Override
 			public void onDragEntered(View dragView, View dragSink, DragEvent event) {
 				dragSink.setBackgroundResource(HIGHLIGHTED);
@@ -91,23 +136,23 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 
 			@Override
 			public void onDragDropped(View dragView, View dragSink, DragEvent event) {
-				List<String> keywords = mEntries.get(thepos).getKeywords();
+				List<String> keywords = getItem(thepos).getKeywords();
 				if (!keywords.isEmpty()) {
 					mConsole.setTempCommand(((DragIcon) dragView).getCommandName());
 					mConsole.openContextMenu(dragSink);
 				}
 			}
 		});
-		entryView.setOnLongClickListener(new OnLongClickListener() {
+		convertView.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				if (!mEntries.get(thepos).getContents().isEmpty()) {
+				if (!getItem(thepos).getContents().isEmpty()) {
 					mConsole.openContextMenu(v);
 				}
 				return true;
 			}
 		});
-		entryView.setOnTouchListener(new OnTouchListener() {
+		convertView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				int mTouchedPos = mListView.getPositionForView(v);
@@ -130,23 +175,81 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 				return false;
 			}
 		});
-		entryView.setOnClickListener(new OnClickListener() {
+		convertView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				int clickedPos = mListView.getPositionForView(v);
 				if (mCheckedPos != clickedPos) {
-					if (mCheckedPos != -1) {
-						mListView.getChildAt(mCheckedPos).setBackgroundResource(TRANSPARENT);
-					}
 					selectEntry(clickedPos);
 					mCheckedPos = mListView.getCheckedItemPosition();
 				} else {
 					hideActionBar();
 				}
+				notifyDataSetChanged();
 			}
 		});
 
-		return entryView;
+		return convertView;
+	}
+
+	@Override
+	public Filter getFilter() {
+		if (mFilter == null) {
+			mFilter = new Filter() {
+				@Override
+				protected FilterResults performFiltering(CharSequence constraint) {
+					mConsole.setInputEnabled(false);
+					mConstraint = constraint;
+					FilterResults results = new FilterResults();
+
+					if (mOriginalEntries == null) {
+						synchronized (mLock) {
+							mOriginalEntries = new ArrayList<ConsoleEntry>(mEntries);
+						}
+					}
+
+					if (constraint == null) {
+						List<ConsoleEntry> list;
+						synchronized (mLock) {
+							list = new ArrayList<ConsoleEntry>(mOriginalEntries);
+						}
+						results.values = list;
+						results.count = list.size();
+						mOriginalEntries = null;
+						mConsole.setInputEnabled(true);
+					} else {
+						String prefixString = constraint.toString().toLowerCase(Locale.US);
+						List<ConsoleEntry> entries;
+						synchronized (mLock) {
+							entries = new ArrayList<ConsoleEntry>(mOriginalEntries);
+						}
+
+						final List<ConsoleEntry> newEntries = new ArrayList<ConsoleEntry>();
+						for (final ConsoleEntry entry : entries) {
+							final String contents = entry.getContents().toLowerCase(Locale.US);
+							if (contents.contains(prefixString)) {
+								newEntries.add(entry);
+							}
+						}
+						results.values = newEntries;
+						mFilterMatches = newEntries.size();
+					}
+
+					return results;
+				}
+
+				@SuppressWarnings("unchecked")
+				@Override
+				protected void publishResults(CharSequence constraint, FilterResults results) {
+					mEntries.clear();
+					for (ConsoleEntry entry : (List<ConsoleEntry>) results.values) {
+						mEntries.add(entry);
+					}
+					notifyDataSetChanged();
+				}
+			};
+		}
+		return mFilter;
 	}
 
 	/**
@@ -154,22 +257,52 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	 * This is supposed to improve performance, if StackOverflow is to be believed.
 	 */
 	static class ConsoleEntryHolder {
+		public RelativeLayout layout;
 		public TextView num;
 		public TextView contents;
 		public RelativeLayout loader;
+		public String prevConstraint;
+	}
+	
+	public int getFilterMatches() {
+		return mFilterMatches;
+	}
+	
+	public boolean isFiltering() {
+		return mConstraint != null;
 	}
 
-	public int getCheckedPos() {
-		return mCheckedPos;
+	private static List<Integer> getMatchIndexes(String match, String word) {
+		String m = match.toLowerCase(Locale.US);
+		String w = word.toLowerCase(Locale.US);
+		List<Integer> matches = new ArrayList<Integer>();
+		for (int i = w.indexOf(m); i >= 0; i = w.indexOf(m, i+1)) {
+			matches.add(i);
+		}
+		if (!matches.isEmpty()) {
+			return matches;
+		} else {
+			return null;
+		}
+	}
+
+	private void removeHighlight(TextView tv) {
+		Spannable noHighlight = new SpannableString(tv.getText());
+		CharacterStyle[] spans = noHighlight.getSpans(0, noHighlight.length(), BackgroundColorSpan.class);
+		if (spans.length > 0) {
+			for (CharacterStyle span : spans) {
+				noHighlight.removeSpan(span);
+			}
+			tv.setText(noHighlight);
+		}
 	}
 
 	/**
 	 * Sets an entry's value as checked and highlights it.
 	 * @param pos The position of the entry to select.
 	 */
-	public void selectEntry(int pos) {
+	void selectEntry(int pos) {
 		mListView.setItemChecked(pos, true);
-		mListView.getChildAt(pos).setBackgroundResource(SELECTED);
 		showActionBar(pos);
 	}
 
@@ -178,9 +311,8 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	 * Calling hideActionBar() will call this method.
 	 * @param pos The position of the entry to deselect.
 	 */
-	public void deselectEntry() {
+	void deselectEntry() {
 		if (mCheckedPos != -1) {
-			mListView.getChildAt(mCheckedPos).setBackgroundResource(TRANSPARENT);
 			mListView.setItemChecked(mCheckedPos, false);
 			mCheckedPos = -1;
 		}
@@ -190,12 +322,12 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	 * Note: this gets called in selectEntry()
 	 * @param checkedPos
 	 */
-	private void showActionBar(int checkedPos) {
+	void showActionBar(int checkedPos) {
 		mActionMode = mConsole.startActionMode(new ConsoleEntryCallback(mConsole, this,
 				getItem(checkedPos).getNum(), getItem(checkedPos).getContents()));
 	}
 
-	private void hideActionBar() {
+	void hideActionBar() {
 		if (mActionMode != null) {
 			mActionMode.finish();
 			mActionMode = null;
