@@ -52,7 +52,7 @@ public class WordCompletionDialog extends DialogFragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				((ConsoleActivity) getActivity()).setInputText(((TextView) view).getText().toString() + " ");
-				((ConsoleActivity) getActivity()).setSoftKeyboardVisibility(true);
+				((ConsoleActivity) getActivity()).setSoftKeyboardVisible(true);
 				dismiss();
 			}
 		});

@@ -4,7 +4,7 @@
     android:background="?attr/consoleBackgroundColor"
     android:orientation="vertical" >
 
-    <ListView
+    <com.kufpg.armatus.console.ConsoleListView
         android:id="@+id/console_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

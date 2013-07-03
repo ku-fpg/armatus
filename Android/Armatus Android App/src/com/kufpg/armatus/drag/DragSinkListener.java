@@ -9,50 +9,54 @@ import android.view.View.OnDragListener;
  * near, inside, or outside of it.
  */
 public class DragSinkListener implements OnDragListener {
-	
+
 	/**
-	 * Occurs when dragView begins a DragEvent.
-	 * @param dragView The View being dragged.
-	 * @param dragSink The View listening to dragView.
+	 * Occurs when dragSource begins a DragEvent.
+	 * @param dragSource The View being dragged.
+	 * @param dragSink The View listening to dragSource.
+	 * @param event dragSource's DragEvent.
 	 */
-	public void onDragStarted(View dragView, View dragSink, DragEvent event) {}
-	
+	public void onDragStarted(View dragSource, View dragSink, DragEvent event) {}
+
 	/**
-	 * Occurs when dragView is within the boundaries of dragSink.
-	 * @param dragView The View being dragged.
-	 * @param dragSink The View listening to dragView.
+	 * Occurs when dragSource is within the boundaries of dragSink.
+	 * @param dragSource The View being dragged.
+	 * @param dragSink The View listening to dragSource.
+	 * @param event dragSource's DragEvent.
 	 */
-	public void onDragEntered(View dragView, View dragSink, DragEvent event) {}
-	
+	public void onDragEntered(View dragSource, View dragSink, DragEvent event) {}
+
 	/**
-	 * Occurs when dragView is within the boundaries of dragSink and is brought close
-	 * to one of the boundaries.
-	 * @param dragView The View being dragged.
-	 * @param dragSink The View listening to dragView.
-	 * @param event dragView's DragEvent.
+	 * Occurs when dragSource is within the boundaries of dragSink.
+	 * @param dragSource The View being dragged.
+	 * @param dragSink The View listening to dragSource.
+	 * @param event dragSource's DragEvent.
 	 */
-	public void onDragNearBoundary(View dragView, View dragSink, DragEvent event) {}
-	
+	public void onDragWithinBounds(View dragSource, View dragSink, DragEvent event) {}
+
 	/**
-	 * Occurs when dragView is brought outside the boundaries of dragSink.
-	 * @param dragView The View being dragged.
-	 * @param dragSink The View listening to dragView.
+	 * Occurs when dragSource is brought outside the boundaries of dragSink.
+	 * @param dragSource The View being dragged.
+	 * @param dragSink The View listening to dragSource.
+	 * @param event dragSource's DragEvent.
 	 */
-	public void onDragExited(View dragView, View dragSink, DragEvent event) {}
-	
+	public void onDragExited(View dragSource, View dragSink, DragEvent event) {}
+
 	/**
-	 * Occurs when dragView's DragEvent ends within the boundaries of dragSink.
-	 * @param dragView The View being dragged.
-	 * @param dragSink The View listening to dragView.
+	 * Occurs when dragSource's DragEvent ends within the boundaries of dragSink.
+	 * @param dragSource The View being dragged.
+	 * @param dragSink The View listening to dragSource.
+	 * @param event dragSource's DragEvent.
 	 */
-	public void onDragDropped(View dragView, View dragSink, DragEvent event) {}
-	
+	public void onDragDropped(View dragSource, View dragSink, DragEvent event) {}
+
 	/**
-	 * Occurs when dragView's DragEvent ends, regardless of location.
-	 * @param dragView The View being dragged.
-	 * @param dragSink The View listening to dragView.
+	 * Occurs when dragSource's DragEvent ends, regardless of location.
+	 * @param dragSource The View being dragged.
+	 * @param dragSink The View listening to dragSource.
+	 * @param event dragSource's DragEvent.
 	 */
-	public void onDragEnded(View dragView, View dragSink, DragEvent event) {}
+	public void onDragEnded(View dragSource, View dragSink, DragEvent event) {}
 
 	@Override
 	public boolean onDrag(View v, DragEvent event) {
@@ -66,7 +70,7 @@ public class DragSinkListener implements OnDragListener {
 			break;
 		}
 		case DragEvent.ACTION_DRAG_LOCATION: {
-			onDragNearBoundary((View) event.getLocalState(), v, event);
+			onDragWithinBounds((View) event.getLocalState(), v, event);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_EXITED: {
@@ -74,15 +78,16 @@ public class DragSinkListener implements OnDragListener {
 			break;
 		}
 		case DragEvent.ACTION_DROP: {
-			View dragView = (View) event.getLocalState();
-			onDragDropped(dragView, v, event);
-			dragView.setVisibility(View.VISIBLE);
+			View dragSource = (View) event.getLocalState();
+			onDragDropped(dragSource, v, event);
+			dragSource.setVisibility(View.VISIBLE);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_ENDED: {
-			View dragView = (View) event.getLocalState();
-			onDragEnded(dragView, v, event);
-			dragView.setVisibility(View.VISIBLE);
+			View dragSource = (View) event.getLocalState();
+			onDragEnded(dragSource, v, event);
+			dragSource.setVisibility(View.VISIBLE);
+			break;
 		}
 		default:
 			break;

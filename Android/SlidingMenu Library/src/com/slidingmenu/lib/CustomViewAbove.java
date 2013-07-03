@@ -633,6 +633,9 @@ public class CustomViewAbove extends ViewGroup {
 			if (activePointerId == INVALID_POINTER)
 				break;
 			final int pointerIndex = getPointerIndex(ev, activePointerId);
+			if (pointerIndex == INVALID_POINTER) {
+				break;
+			}
 			final float x = MotionEventCompat.getX(ev, pointerIndex);
 			final float dx = x - mLastMotionX;
 			final float xDiff = Math.abs(dx);

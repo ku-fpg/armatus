@@ -13,15 +13,10 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
-import android.view.ActionMode;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
-import android.view.View.OnLongClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
@@ -35,92 +30,30 @@ import android.widget.TextView;
  * (except for the footer).
  */
 public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
-	public static final int HIGHLIGHTED = R.drawable.console_entry_highlighted;
-	public static final int SELECTED = android.R.color.holo_blue_light;
-	public static final int HIGHLIGHTED_SELECTED = R.drawable.console_entry_highlighted_selected;
-	public static final int TRANSPARENT = android.R.color.transparent;
-
 	private ConsoleActivity mConsole;
 	private ListView mListView;
 	private List<ConsoleEntry> mEntries, mOriginalEntries;
-	private ActionMode mActionMode;
 	private Filter mFilter;
 	private Object mLock = new Object();
 	private CharSequence mConstraint;
 	private int mFilterMatches = 0;
-	private int mCheckedPos = -1;
-
-	private OnClickListener mOnClickListener = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			int clickedPos = mListView.getPositionForView(v);
-			if (mCheckedPos != clickedPos) {
-				selectEntry(clickedPos);
-				mCheckedPos = mListView.getCheckedItemPosition();
-			} else {
-				hideActionBar();
-			}
-			notifyDataSetChanged();
-		}
-	};
-
-	private OnLongClickListener mOnLongClickListener = new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View v) {
-			mConsole.openContextMenu(v);
-			return true;
-		}
-	};
-
-	private OnTouchListener mOnTouchListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			int mTouchedPos = mListView.getPositionForView(v);
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				if (mTouchedPos != mCheckedPos
-						|| mCheckedPos == -1) {
-					v.setBackgroundResource(HIGHLIGHTED);
-				} else {
-					v.setBackgroundResource(HIGHLIGHTED_SELECTED);
-				}
-			} else if (event.getAction() == MotionEvent.ACTION_UP
-					|| event.getAction() == MotionEvent.ACTION_OUTSIDE
-					|| event.getAction() == MotionEvent.ACTION_CANCEL) {
-				if (mTouchedPos != mCheckedPos) {
-					v.setBackgroundResource(TRANSPARENT);
-				} else {
-					v.setBackgroundResource(SELECTED);
-				}
-			}
-			return false;
-		}
-	};
 
 	private OnDragListener mOnDragListener = new DragSinkListener() {
 		@Override
-		public void onDragEntered(View dragView, View dragSink, DragEvent event) {
-			dragSink.setBackgroundResource(HIGHLIGHTED);
-		}
-
-		@Override
-		public void onDragExited(View dragView, View dragSink, DragEvent event) {
-			dragSink.setBackgroundResource(TRANSPARENT);
-		}
-
-		@Override
-		public void onDragEnded(View dragView, View dragSink, DragEvent event) {
-			dragSink.setBackgroundResource(TRANSPARENT);
-		}
-
-		@Override
-		public void onDragDropped(View dragView, View dragSink, DragEvent event) {
+		public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
 			int pos = mListView.getPositionForView(dragSink);
 			List<String> keywords = getItem(pos).getKeywords();
 			if (!keywords.isEmpty()) {
-				mConsole.setTempCommand(((DragIcon) dragView).getCommandName());
+				mConsole.setTempCommand(((DragIcon) dragSource).getCommandName());
 				mConsole.openContextMenu(dragSink);
 			}
 		}
+
+//		@Override
+//		public void onDragWithinBounds(View dragSource, View dragSink, DragEvent event) {
+//			Log.d("TESTTEST", String.valueOf(mListView.getChildAt(0).equals(dragSink) || mListView.getChildAt
+//					(mListView.getLastVisiblePosition() - mListView.getFirstVisiblePosition() - 1).equals(dragSink)));
+//		}
 	};
 
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
@@ -151,11 +84,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			holder = (ConsoleEntryHolder) convertView.getTag();
 		}
 
-		if (mListView.getCheckedItemPosition() == position) {
-			holder.layout.setBackgroundResource(SELECTED);
-		} else {
-			holder.layout.setBackgroundResource(TRANSPARENT);
-		}
 		holder.num.setText("hermit<" + getItem(position).getNum() + "> ");
 		holder.num.setTypeface(ConsoleActivity.TYPEFACE);
 		holder.contents.setTypeface(ConsoleActivity.TYPEFACE);
@@ -191,9 +119,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		}
 
 		convertView.setOnDragListener(mOnDragListener);
-		convertView.setOnLongClickListener(mOnLongClickListener);
-		convertView.setOnTouchListener(mOnTouchListener);
-		convertView.setOnClickListener(mOnClickListener);
 
 		return convertView;
 	}
@@ -300,43 +225,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 				noHighlight.removeSpan(span);
 			}
 			tv.setText(noHighlight);
-		}
-	}
-
-	/**
-	 * Sets an entry's value as checked and highlights it.
-	 * @param pos The position of the entry to select.
-	 */
-	void selectEntry(int pos) {
-		mListView.setItemChecked(pos, true);
-		showActionBar(pos);
-	}
-
-	/**
-	 * Removes an entry's checked value and restores the default background color.
-	 * Calling hideActionBar() will call this method.
-	 * @param pos The position of the entry to deselect.
-	 */
-	void deselectEntry() {
-		if (mCheckedPos != -1) {
-			mListView.setItemChecked(mCheckedPos, false);
-			mCheckedPos = -1;
-		}
-	}
-
-	/**
-	 * Note: this gets called in selectEntry()
-	 * @param checkedPos
-	 */
-	void showActionBar(int checkedPos) {
-		mActionMode = mConsole.startActionMode(new ConsoleEntryCallback(mConsole, this,
-				getItem(checkedPos).getNum(), getItem(checkedPos).getContents()));
-	}
-
-	void hideActionBar() {
-		if (mActionMode != null) {
-			mActionMode.finish();
-			mActionMode = null;
 		}
 	}
 

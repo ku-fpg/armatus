@@ -37,6 +37,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.DragEvent;
 import android.view.KeyEvent;
@@ -93,6 +94,8 @@ public class ConsoleActivity extends BaseActivity {
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
+	private ActionMode mActionMode;
+	private ConsoleEntryCallback mCallback;
 	private String mTempCommand, mTempFilterInput;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
@@ -108,7 +111,7 @@ public class ConsoleActivity extends BaseActivity {
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		//Ensures soft keyboard remains open
-		setSoftKeyboardVisibility(true);
+		setSoftKeyboardVisible(true);
 		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
@@ -143,7 +146,7 @@ public class ConsoleActivity extends BaseActivity {
 		});
 
 		mDispatcher = new CommandDispatcher(this);
-		mConsoleListView = (ListView) findViewById(R.id.console_list_view);
+		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries);
 		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
 		registerForContextMenu(mConsoleListView);
@@ -159,7 +162,7 @@ public class ConsoleActivity extends BaseActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
-				mConsoleAdapter.hideActionBar();
+				setContextualActionBarVisible(false);
 				String input = mConsoleInput.getText().toString().trim();
 				if (input.split(WHITESPACE).length <= 1) {
 					mCompleter.filterDictionary(input);
@@ -203,7 +206,7 @@ public class ConsoleActivity extends BaseActivity {
 		});
 		mConsoleInput.setOnDragListener(new DragSinkListener() {
 			@Override
-			public void onDragStarted(View dragView, View dragSink, DragEvent event) {
+			public void onDragStarted(View dragSource, View dragSink, DragEvent event) {
 				getSlidingMenu().showContent();
 			}
 		});
@@ -231,6 +234,8 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
 				(this, expandableGroupList, expandableGroupMap);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
+
+		mCallback = new ConsoleEntryCallback(this);
 	}
 
 	@Override
@@ -255,7 +260,7 @@ public class ConsoleActivity extends BaseActivity {
 		super.onRestoreInstanceState(state);
 		mConsoleInput.setText(state.getString("consoleInput"));
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
-		setSoftKeyboardVisibility(mSoftKeyboardVisible);
+		setSoftKeyboardVisible(mSoftKeyboardVisible);
 		mFindTextEnabled = state.getBoolean("findTextEnabled");
 		if (mFindTextEnabled) {
 			mTempFilterInput = state.getString("filterInput");
@@ -317,7 +322,7 @@ public class ConsoleActivity extends BaseActivity {
 					filterMatches.setText(caption + (caption.startsWith("1") ? "" : "es"));
 				}
 			};
-			
+
 			if (mTempFilterInput != null) {
 				mFilterInput.setText(mTempFilterInput);
 				mFilterInput.setSelection(mFilterInput.length());
@@ -326,7 +331,7 @@ public class ConsoleActivity extends BaseActivity {
 					mConsoleAdapter.getFilter().filter(mTempFilterInput, listener);
 				}
 			}
-			
+
 			mFilterInput.requestFocus();
 			mFilterInput.setOnEditorActionListener(new OnEditorActionListener() {
 				@Override
@@ -567,7 +572,7 @@ public class ConsoleActivity extends BaseActivity {
 		updateConsoleEntries();
 		scrollToBottom();
 	}
-	
+
 	public void clear() {
 		ConsoleClearer clear = new ConsoleClearer(this, mOriginalConsoleEntries);
 		getEditManager().applyEdit(clear);
@@ -618,6 +623,14 @@ public class ConsoleActivity extends BaseActivity {
 	 */
 	public void setTempCommand(String commandName) {
 		mTempCommand = commandName;
+	}
+
+	public void setContextualActionBarVisible(boolean visible) {
+		if (visible && !mCallback.isVisible()) {
+			mActionMode = startActionMode(mCallback);
+		} else if (!visible && mCallback.isVisible()) {
+			mActionMode.finish();
+		}
 	}
 
 	public void showEntryDialog(int entryNum, String entryContents, String tag) {
@@ -685,10 +698,10 @@ public class ConsoleActivity extends BaseActivity {
 
 	/**
 	 * Shows or hides the soft keyboard.
-	 * @param visibility Set to true to show soft keyboard, false to hide.
+	 * @param visible Set to true to show soft keyboard, false to hide.
 	 */
-	public void setSoftKeyboardVisibility(boolean visibility) {
-		if (visibility) {
+	public void setSoftKeyboardVisible(boolean visible) {
+		if (visible) {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		} else {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -706,7 +719,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleAdapter.notifyDataSetChanged();
 		updateEntryCount();
 	}
-	
+
 	void updateConsoleEntries(List<ConsoleEntry> newEntries) {
 		mFilteredConsoleEntries.clear();
 		mFilteredConsoleEntries.addAll(newEntries);
