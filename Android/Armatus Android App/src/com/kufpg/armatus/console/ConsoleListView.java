@@ -1,7 +1,9 @@
 package com.kufpg.armatus.console;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -53,6 +55,13 @@ public class ConsoleListView extends ListView implements OnItemClickListener, On
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 		mLongClicking = true;
 		return false;
+	}
+
+	public void stopScroll() {
+		MotionEvent cancel = MotionEvent.obtain(SystemClock.uptimeMillis(),
+				SystemClock.uptimeMillis(),	MotionEvent.ACTION_CANCEL, 0, 0, 0);
+		dispatchTouchEvent(cancel);
+		cancel.recycle();
 	}
 
 	void setPrevCheckedPos(int pos) {

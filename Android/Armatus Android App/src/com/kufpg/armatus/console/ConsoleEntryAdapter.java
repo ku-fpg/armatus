@@ -48,12 +48,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 				mConsole.openContextMenu(dragSink);
 			}
 		}
-
-//		@Override
-//		public void onDragWithinBounds(View dragSource, View dragSink, DragEvent event) {
-//			Log.d("TESTTEST", String.valueOf(mListView.getChildAt(0).equals(dragSink) || mListView.getChildAt
-//					(mListView.getLastVisiblePosition() - mListView.getFirstVisiblePosition() - 1).equals(dragSink)));
-//		}
 	};
 
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {

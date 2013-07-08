@@ -78,15 +78,11 @@ public class DragSinkListener implements OnDragListener {
 			break;
 		}
 		case DragEvent.ACTION_DROP: {
-			View dragSource = (View) event.getLocalState();
-			onDragDropped(dragSource, v, event);
-			dragSource.setVisibility(View.VISIBLE);
+			onDragDropped((View) event.getLocalState(), v, event);
 			break;
 		}
 		case DragEvent.ACTION_DRAG_ENDED: {
-			View dragSource = (View) event.getLocalState();
-			onDragEnded(dragSource, v, event);
-			dragSource.setVisibility(View.VISIBLE);
+			onDragEnded((View) event.getLocalState(), v, event);
 			break;
 		}
 		default:

@@ -79,8 +79,10 @@ public class ConsoleActivity extends BaseActivity {
 	public static final String UNDO_HISTORY_FILENAME = "/undo.txt";
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
+	private static final int TIME_PER_ENTRY = 200;
 
-	private ListView mConsoleListView, mCommandHistoryListView;
+	private ConsoleListView mConsoleListView;
+	private ListView mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
 	private ConsoleEntryAdapter mConsoleAdapter;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
@@ -88,7 +90,7 @@ public class ConsoleActivity extends BaseActivity {
 	private List<ConsoleEntry> mFilteredConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<ConsoleEntry> mOriginalConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<String> mCommandHistoryEntries = new ArrayList<String>();
-	private View mInputView, mRootView, mBackground;
+	private View mInputView, mRootView, mBackground, mListTop, mListBottom;
 	private TextView mConsoleInputNum;
 	private EditText mConsoleInput, mFilterInput;
 	private SlidingMenu mSlidingMenu;
@@ -204,16 +206,58 @@ public class ConsoleActivity extends BaseActivity {
 				return false;
 			}
 		});
-		mConsoleInput.setOnDragListener(new DragSinkListener() {
-			@Override
-			public void onDragStarted(View dragSource, View dragSink, DragEvent event) {
-				getSlidingMenu().showContent();
-			}
-		});
 		mConsoleInput.requestFocus();
 		mConsoleListView.addFooterView(mInputView, null, false);
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
+
+		mListTop = (View) findViewById(R.id.console_list_view_top);
+		mListBottom = (View) findViewById(R.id.console_list_view_bottom);
+		mListTop.setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
+				mConsoleListView.stopScroll();
+			}
+
+			@Override
+			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
+				mConsoleListView.stopScroll();
+			}
+
+			@Override
+			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
+				int viewsAbove = mConsoleListView.getFirstVisiblePosition();
+				mConsoleListView.smoothScrollToPositionFromTop(0, 0, viewsAbove * TIME_PER_ENTRY);
+			}
+
+			@Override
+			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
+				mConsoleListView.stopScroll();
+			}
+		});
+		mListBottom.setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
+				mConsoleListView.stopScroll();
+			}
+
+			@Override
+			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
+				mConsoleListView.stopScroll();
+			}
+
+			@Override
+			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
+				int totalViews = mFilteredConsoleEntries.size();
+				int viewsBelow = totalViews - mConsoleListView.getLastVisiblePosition();
+				mConsoleListView.smoothScrollToPositionFromTop(totalViews, 0, viewsBelow * TIME_PER_ENTRY);
+			}
+
+			@Override
+			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
+				mConsoleListView.stopScroll();
+			}
+		});
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
 		mConsoleInput.setTypeface(TYPEFACE);
@@ -234,6 +278,22 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
 				(this, expandableGroupList, expandableGroupMap);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
+		mCommandExpandableMenuView.setOnDragListener(new DragSinkListener() {
+			@Override
+			public void onDragStarted(View dragSource, View dragSink, DragEvent event) {
+				getSlidingMenu().showContent();
+			}
+
+			@Override
+			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
+				dragSource.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
+				dragSource.setVisibility(View.VISIBLE);
+			}	
+		});
 
 		mCallback = new ConsoleEntryCallback(this);
 	}

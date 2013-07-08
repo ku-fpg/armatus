@@ -15,6 +15,20 @@
         android:splitMotionEvents="false" />
 
     <View
+        android:id="@+id/console_list_view_top"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_alignTop="@+id/console_list_view"
+        android:background="@android:color/transparent" />
+
+    <View
+        android:id="@+id/console_list_view_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_alignBottom="@+id/console_list_view"
+        android:background="@android:color/transparent" />
+
+    <View
         android:id="@+id/console_empty_space"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

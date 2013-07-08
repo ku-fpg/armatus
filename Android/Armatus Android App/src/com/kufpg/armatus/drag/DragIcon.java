@@ -6,14 +6,17 @@ import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.CommandDispatcher;
 import com.kufpg.armatus.console.CommandDispatcher.Command;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.ImageView;
 
 /**
  * A draggable image that represents a Command that can be run on console entry Keywords.
  */
-public class DragIcon extends ImageView {
+public class DragIcon extends ImageView implements OnLongClickListener {
 	private String mCommandName, mCommandImagePath;
 
 	public DragIcon(Context context) {
@@ -26,7 +29,16 @@ public class DragIcon extends ImageView {
 
 	public DragIcon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		setOnLongClickListener(new DragViewClickListener());
+		setOnLongClickListener(this);
+	}
+	
+	@Override
+	public boolean onLongClick(View v) {
+		ClipData dragData = ClipData.newPlainText("", "");
+		DragShadowBuilder builder = new DragShadowBuilder(v);
+		v.startDrag(dragData, builder, v, 0);
+		v.setVisibility(View.INVISIBLE);
+		return true;
 	}
 
 	public String getCommandName() {
