@@ -6,7 +6,6 @@ import java.util.Locale;
 
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.drag.DragIcon;
-import com.kufpg.armatus.drag.DragSinkListener;
 
 import android.graphics.Color;
 import android.text.Spannable;
@@ -37,16 +36,20 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private Object mLock = new Object();
 	private CharSequence mConstraint;
 	private int mFilterMatches = 0;
-
-	private OnDragListener mOnDragListener = new DragSinkListener() {
+	
+	private OnDragListener mOnDragListener = new OnDragListener() {
 		@Override
-		public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-			int pos = mListView.getPositionForView(dragSink);
-			List<String> keywords = getItem(pos).getKeywords();
-			if (!keywords.isEmpty()) {
-				mConsole.setTempCommand(((DragIcon) dragSource).getCommandName());
-				mConsole.openContextMenu(dragSink);
+		public boolean onDrag(View v, DragEvent event) {
+			if (event.getAction() == DragEvent.ACTION_DROP) {
+				int pos = mListView.getPositionForView(v);
+				List<String> keywords = getItem(pos).getKeywords();
+				if (!keywords.isEmpty()) {
+					DragIcon icon = (DragIcon) event.getLocalState();
+					mConsole.setTempCommand(icon.getCommandName());
+					mConsole.openContextMenu(v);
+				}
 			}
+			return true;
 		}
 	};
 

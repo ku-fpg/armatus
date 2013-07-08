@@ -23,7 +23,6 @@ import com.kufpg.armatus.dialog.KeywordSwapDialog;
 import com.kufpg.armatus.dialog.WordCompletionDialog;
 import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
-import com.kufpg.armatus.drag.DragSinkListener;
 import com.kufpg.armatus.util.JsonUtils;
 import com.slidingmenu.lib.SlidingMenu;
 
@@ -45,6 +44,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -213,51 +213,80 @@ public class ConsoleActivity extends BaseActivity {
 
 		mListTop = (View) findViewById(R.id.console_list_view_top);
 		mListBottom = (View) findViewById(R.id.console_list_view_bottom);
-		mListTop.setOnDragListener(new DragSinkListener() {
+		//		mListTop.setOnDragListener(new DragSinkListener() {
+		//			@Override
+		//			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
+		//				mConsoleListView.stopScroll();
+		//			}
+		//
+		//			@Override
+		//			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
+		//				mConsoleListView.stopScroll();
+		//			}
+		//
+		//			@Override
+		//			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
+		//				int viewsAbove = mConsoleListView.getFirstVisiblePosition();
+		//				mConsoleListView.smoothScrollToPositionFromTop(0, 0, viewsAbove * TIME_PER_ENTRY);
+		//			}
+		//
+		//			@Override
+		//			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
+		//				mConsoleListView.stopScroll();
+		//			}
+		//		});
+		mListTop.setOnDragListener(new OnListEdgeDragListener() {
 			@Override
-			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-				mConsoleListView.stopScroll();
+			public boolean onDrag(View v, DragEvent event) {
+				switch (event.getAction()) {
+				case DragEvent.ACTION_DRAG_ENTERED:
+					int viewsAbove = mConsoleListView.getFirstVisiblePosition();
+					mConsoleListView.smoothScrollToPositionFromTop(0, 0, viewsAbove * TIME_PER_ENTRY);
+					return true;
+				default:
+					return super.onDrag(v, event);
+				}
 			}
 
-			@Override
-			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
-				mConsoleListView.stopScroll();
-			}
-
-			@Override
-			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
-				int viewsAbove = mConsoleListView.getFirstVisiblePosition();
-				mConsoleListView.smoothScrollToPositionFromTop(0, 0, viewsAbove * TIME_PER_ENTRY);
-			}
-
-			@Override
-			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
-				mConsoleListView.stopScroll();
-			}
 		});
-		mListBottom.setOnDragListener(new DragSinkListener() {
+		mListBottom.setOnDragListener(new OnListEdgeDragListener() {
 			@Override
-			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-				mConsoleListView.stopScroll();
+			public boolean onDrag(View v, DragEvent event) {
+				switch (event.getAction()) {
+				case DragEvent.ACTION_DRAG_ENTERED:
+					int totalViews = mFilteredConsoleEntries.size();
+					int viewsBelow = totalViews - mConsoleListView.getLastVisiblePosition();
+					mConsoleListView.smoothScrollToPositionFromTop(totalViews, 0, viewsBelow * TIME_PER_ENTRY);
+					return true;
+				default:
+					return super.onDrag(v, event);
+				}
 			}
 
-			@Override
-			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
-				mConsoleListView.stopScroll();
-			}
-
-			@Override
-			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
-				int totalViews = mFilteredConsoleEntries.size();
-				int viewsBelow = totalViews - mConsoleListView.getLastVisiblePosition();
-				mConsoleListView.smoothScrollToPositionFromTop(totalViews, 0, viewsBelow * TIME_PER_ENTRY);
-			}
-
-			@Override
-			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
-				mConsoleListView.stopScroll();
-			}
 		});
+		//		mListBottom.setOnDragListener(new DragSinkListener() {
+		//			@Override
+		//			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
+		//				mConsoleListView.stopScroll();
+		//			}
+		//
+		//			@Override
+		//			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
+		//				mConsoleListView.stopScroll();
+		//			}
+		//
+		//			@Override
+		//			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
+		//				int totalViews = mFilteredConsoleEntries.size();
+		//				int viewsBelow = totalViews - mConsoleListView.getLastVisiblePosition();
+		//				mConsoleListView.smoothScrollToPositionFromTop(totalViews, 0, viewsBelow * TIME_PER_ENTRY);
+		//			}
+		//
+		//			@Override
+		//			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
+		//				mConsoleListView.stopScroll();
+		//			}
+		//		});
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
 		mConsoleInput.setTypeface(TYPEFACE);
@@ -278,21 +307,38 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
 				(this, expandableGroupList, expandableGroupMap);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
-		mCommandExpandableMenuView.setOnDragListener(new DragSinkListener() {
+		//		mCommandExpandableMenuView.setOnDragListener(new DragSinkListener() {
+		//			@Override
+		//			public void onDragStarted(View dragSource, View dragSink, DragEvent event) {
+		//				getSlidingMenu().showContent();
+		//			}
+		//
+		//			@Override
+		//			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
+		//				dragSource.setVisibility(View.VISIBLE);
+		//			}
+		//
+		//			@Override
+		//			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
+		//				dragSource.setVisibility(View.VISIBLE);
+		//			}	
+		//		});
+		mCommandExpandableMenuView.setOnDragListener(new OnDragListener() {
 			@Override
-			public void onDragStarted(View dragSource, View dragSink, DragEvent event) {
-				getSlidingMenu().showContent();
+			public boolean onDrag(View v, DragEvent event) {
+				switch (event.getAction()) {
+				case DragEvent.ACTION_DRAG_STARTED:
+					getSlidingMenu().showContent();
+					return true;
+				case DragEvent.ACTION_DROP:
+				case DragEvent.ACTION_DRAG_ENDED:
+					View dragSource = (View) event.getLocalState();
+					dragSource.setVisibility(View.VISIBLE);
+					return true;
+				default:
+					return false;
+				}
 			}
-
-			@Override
-			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-				dragSource.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
-				dragSource.setVisibility(View.VISIBLE);
-			}	
 		});
 
 		mCallback = new ConsoleEntryCallback(this);
@@ -797,6 +843,20 @@ public class ConsoleActivity extends BaseActivity {
 
 	private void updateEntryCount() {
 		mConsoleInputNum.setText("hermit<" + getEntryCount() + "> ");
+	}
+
+	private class OnListEdgeDragListener implements OnDragListener {
+		@Override
+		public boolean onDrag(View v, DragEvent event) {
+			switch (event.getAction()) {
+			case DragEvent.ACTION_DROP:
+			case DragEvent.ACTION_DRAG_ENDED:
+			case DragEvent.ACTION_DRAG_EXITED:
+				mConsoleListView.stopScroll();
+				break;
+			}
+			return true;
+		}
 	}
 
 }
