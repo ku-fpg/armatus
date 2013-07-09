@@ -10,7 +10,6 @@ import android.view.ActionMode.Callback;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 
 public class ConsoleEntryCallback implements Callback {
 	private ConsoleActivity mConsole;
@@ -58,7 +57,6 @@ public class ConsoleEntryCallback implements Callback {
 		mListView.clearChoices();
 		mListView.requestLayout();
 		mIsVisible = false;
-		mListView.setPrevCheckedPos(AdapterView.INVALID_POSITION);
 	}
 
 	@Override

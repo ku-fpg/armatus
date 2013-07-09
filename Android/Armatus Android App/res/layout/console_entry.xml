@@ -3,7 +3,7 @@
     android:id="@+id/console_entry_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/console_entry_selector"
+    android:background="?attr/consoleListSelector"
     android:orientation="vertical"
     android:paddingBottom="@dimen/entry_padding"
     android:paddingLeft="@dimen/entry_padding"

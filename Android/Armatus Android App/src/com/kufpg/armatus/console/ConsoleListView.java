@@ -7,12 +7,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
-public class ConsoleListView extends ListView implements OnItemClickListener, OnItemLongClickListener {
+public class ConsoleListView extends ListView implements OnItemClickListener {
 	private ConsoleActivity mConsole;
-	private boolean mLongClicking = false;
 	private int mPrevCheckedPos = INVALID_POSITION;
 
 	public ConsoleListView(Context context) {
@@ -33,28 +31,19 @@ public class ConsoleListView extends ListView implements OnItemClickListener, On
 	private void init(Context context) {
 		mConsole = (ConsoleActivity) context;
 		setOnItemClickListener(this);
-		setOnItemLongClickListener(this);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		if (mLongClicking) {
-			mLongClicking = false;
-			setItemChecked(mPrevCheckedPos, true);
-		} else {
-			boolean showActionBar = true;
-			if (mPrevCheckedPos == getCheckedItemPosition()) {
-				showActionBar = false;
-			}
-			mConsole.setContextualActionBarVisible(showActionBar);
-			mPrevCheckedPos = getCheckedItemPosition();
+		boolean showActionBar = true;
+		if (mPrevCheckedPos == getCheckedItemPosition()) {
+			showActionBar = false;
 		}
-	}
-
-	@Override
-	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		mLongClicking = true;
-		return false;
+		mConsole.setContextualActionBarVisible(showActionBar);
+		mPrevCheckedPos = getCheckedItemPosition();
+		if (!showActionBar) {
+			mPrevCheckedPos = INVALID_POSITION;
+		}
 	}
 
 	public void stopScroll() {
@@ -62,10 +51,6 @@ public class ConsoleListView extends ListView implements OnItemClickListener, On
 				SystemClock.uptimeMillis(),	MotionEvent.ACTION_CANCEL, 0, 0, 0);
 		dispatchTouchEvent(cancel);
 		cancel.recycle();
-	}
-
-	void setPrevCheckedPos(int pos) {
-		mPrevCheckedPos = pos;
 	}
 
 }

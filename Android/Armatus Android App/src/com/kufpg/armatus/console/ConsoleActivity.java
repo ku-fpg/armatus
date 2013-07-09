@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import com.google.common.collect.ListMultimap;
 import com.kufpg.armatus.EditManager.Edit;
+import com.kufpg.armatus.MainActivity;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.ConsoleEdits.ConsoleClearer;
@@ -31,6 +32,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -150,7 +152,6 @@ public class ConsoleActivity extends BaseActivity {
 		mDispatcher = new CommandDispatcher(this);
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries);
-		//TODO: Make mListView scroll when CommandIcons are dragged near boundaries
 		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
@@ -213,28 +214,6 @@ public class ConsoleActivity extends BaseActivity {
 
 		mListTop = (View) findViewById(R.id.console_list_view_top);
 		mListBottom = (View) findViewById(R.id.console_list_view_bottom);
-		//		mListTop.setOnDragListener(new DragSinkListener() {
-		//			@Override
-		//			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-		//				mConsoleListView.stopScroll();
-		//			}
-		//
-		//			@Override
-		//			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
-		//				mConsoleListView.stopScroll();
-		//			}
-		//
-		//			@Override
-		//			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
-		//				int viewsAbove = mConsoleListView.getFirstVisiblePosition();
-		//				mConsoleListView.smoothScrollToPositionFromTop(0, 0, viewsAbove * TIME_PER_ENTRY);
-		//			}
-		//
-		//			@Override
-		//			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
-		//				mConsoleListView.stopScroll();
-		//			}
-		//		});
 		mListTop.setOnDragListener(new OnListEdgeDragListener() {
 			@Override
 			public boolean onDrag(View v, DragEvent event) {
@@ -264,29 +243,6 @@ public class ConsoleActivity extends BaseActivity {
 			}
 
 		});
-		//		mListBottom.setOnDragListener(new DragSinkListener() {
-		//			@Override
-		//			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-		//				mConsoleListView.stopScroll();
-		//			}
-		//
-		//			@Override
-		//			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
-		//				mConsoleListView.stopScroll();
-		//			}
-		//
-		//			@Override
-		//			public void onDragEntered(View dragSource, View dragSink, DragEvent event) {
-		//				int totalViews = mFilteredConsoleEntries.size();
-		//				int viewsBelow = totalViews - mConsoleListView.getLastVisiblePosition();
-		//				mConsoleListView.smoothScrollToPositionFromTop(totalViews, 0, viewsBelow * TIME_PER_ENTRY);
-		//			}
-		//
-		//			@Override
-		//			public void onDragExited(View dragSource, View dragSink, DragEvent event) {
-		//				mConsoleListView.stopScroll();
-		//			}
-		//		});
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
 		mConsoleInput.setTypeface(TYPEFACE);
@@ -307,22 +263,6 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
 				(this, expandableGroupList, expandableGroupMap);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
-		//		mCommandExpandableMenuView.setOnDragListener(new DragSinkListener() {
-		//			@Override
-		//			public void onDragStarted(View dragSource, View dragSink, DragEvent event) {
-		//				getSlidingMenu().showContent();
-		//			}
-		//
-		//			@Override
-		//			public void onDragDropped(View dragSource, View dragSink, DragEvent event) {
-		//				dragSource.setVisibility(View.VISIBLE);
-		//			}
-		//
-		//			@Override
-		//			public void onDragEnded(View dragSource, View dragSink, DragEvent event) {
-		//				dragSource.setVisibility(View.VISIBLE);
-		//			}	
-		//		});
 		mCommandExpandableMenuView.setOnDragListener(new OnDragListener() {
 			@Override
 			public boolean onDrag(View v, DragEvent event) {
@@ -402,7 +342,9 @@ public class ConsoleActivity extends BaseActivity {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
 				getEditManager().discardAllEdits();
-				finish();
+				Intent intent = new Intent(ConsoleActivity.this, MainActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
 			}
 		};
 		exitDialog.show(getFragmentManager(), "exit");
