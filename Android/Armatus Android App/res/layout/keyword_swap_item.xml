@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:id="@+id/keyword_swap_item_layout"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:weightSum="1" >
 
     <ImageView
-        android:id="@+id/drag_indicator"
+        android:id="@+id/keyword_swap_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/icmpmove" >
+        android:src="@drawable/keyword_swap_text" >
     </ImageView>
 
     <TextView
-        android:id="@+id/drag_item_text"
-        android:layout_width="wrap_content"
+        android:id="@+id/keyword_swap_text"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical" >
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1" >
     </TextView>
 
 </LinearLayout>
