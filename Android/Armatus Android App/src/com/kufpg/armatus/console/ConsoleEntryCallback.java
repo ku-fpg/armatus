@@ -54,8 +54,7 @@ public class ConsoleEntryCallback implements Callback {
 
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
-		mListView.clearChoices();
-		mListView.requestLayout();
+		mListView.resetCheckedPos();
 		mIsVisible = false;
 	}
 

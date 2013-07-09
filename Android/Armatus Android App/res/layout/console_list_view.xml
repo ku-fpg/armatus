@@ -4,16 +4,23 @@
     android:background="?attr/consoleBackgroundColor"
     android:orientation="vertical" >
 
-    <com.kufpg.armatus.console.ConsoleListView
-        android:id="@+id/console_list_view"
+    <com.kufpg.armatus.drag.ListViewDragEdges
+        android:id="@+id/console_list_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:choiceMode="singleChoice"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:paddingTop="@dimen/entry_padding"
-        android:splitMotionEvents="false" />
+        android:layout_height="wrap_content" >
 
+        <com.kufpg.armatus.console.ConsoleListView
+            android:id="@+id/console_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="singleChoice"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:paddingTop="@dimen/entry_padding"
+            android:splitMotionEvents="false" />
+    </com.kufpg.armatus.drag.ListViewDragEdges>
+
+    <!--
     <View
         android:id="@+id/console_list_view_top"
         android:layout_width="match_parent"
@@ -27,11 +34,13 @@
         android:layout_height="12dp"
         android:layout_alignBottom="@+id/console_list_view"
         android:background="@android:color/transparent" />
+    -->
 
     <View
         android:id="@+id/console_empty_space"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/console_list_view" />
+        android:layout_below="@+id/console_list_wrapper" />
+    <!-- android:layout_below="@+id/console_list_view" /> -->
 
 </RelativeLayout>

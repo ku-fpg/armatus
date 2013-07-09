@@ -81,7 +81,6 @@ public class ConsoleActivity extends BaseActivity {
 	public static final String UNDO_HISTORY_FILENAME = "/undo.txt";
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
-	private static final int TIME_PER_ENTRY = 200;
 
 	private ConsoleListView mConsoleListView;
 	private ListView mCommandHistoryListView;
@@ -92,7 +91,7 @@ public class ConsoleActivity extends BaseActivity {
 	private List<ConsoleEntry> mFilteredConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<ConsoleEntry> mOriginalConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<String> mCommandHistoryEntries = new ArrayList<String>();
-	private View mInputView, mRootView, mBackground, mListTop, mListBottom;
+	private View mInputView, mRootView, mBackground;
 	private TextView mConsoleInputNum;
 	private EditText mConsoleInput, mFilterInput;
 	private SlidingMenu mSlidingMenu;
@@ -211,38 +210,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleListView.addFooterView(mInputView, null, false);
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
-
-		mListTop = (View) findViewById(R.id.console_list_view_top);
-		mListBottom = (View) findViewById(R.id.console_list_view_bottom);
-		mListTop.setOnDragListener(new OnListEdgeDragListener() {
-			@Override
-			public boolean onDrag(View v, DragEvent event) {
-				switch (event.getAction()) {
-				case DragEvent.ACTION_DRAG_ENTERED:
-					int viewsAbove = mConsoleListView.getFirstVisiblePosition();
-					mConsoleListView.smoothScrollToPositionFromTop(0, 0, viewsAbove * TIME_PER_ENTRY);
-					return true;
-				default:
-					return super.onDrag(v, event);
-				}
-			}
-
-		});
-		mListBottom.setOnDragListener(new OnListEdgeDragListener() {
-			@Override
-			public boolean onDrag(View v, DragEvent event) {
-				switch (event.getAction()) {
-				case DragEvent.ACTION_DRAG_ENTERED:
-					int totalViews = mFilteredConsoleEntries.size();
-					int viewsBelow = totalViews - mConsoleListView.getLastVisiblePosition();
-					mConsoleListView.smoothScrollToPositionFromTop(totalViews, 0, viewsBelow * TIME_PER_ENTRY);
-					return true;
-				default:
-					return super.onDrag(v, event);
-				}
-			}
-
-		});
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
 		mConsoleInput.setTypeface(TYPEFACE);
@@ -785,20 +752,6 @@ public class ConsoleActivity extends BaseActivity {
 
 	private void updateEntryCount() {
 		mConsoleInputNum.setText("hermit<" + getEntryCount() + "> ");
-	}
-
-	private class OnListEdgeDragListener implements OnDragListener {
-		@Override
-		public boolean onDrag(View v, DragEvent event) {
-			switch (event.getAction()) {
-			case DragEvent.ACTION_DROP:
-			case DragEvent.ACTION_DRAG_ENDED:
-			case DragEvent.ACTION_DRAG_EXITED:
-				mConsoleListView.stopScroll();
-				break;
-			}
-			return true;
-		}
 	}
 
 }

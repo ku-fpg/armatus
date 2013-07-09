@@ -178,8 +178,8 @@ public class KeywordSwapDialog extends DialogFragment {
 	};
 
 	private boolean canBeSwapped(int pos1, int pos2) {
-		if ((pos1 == 0 && pos2 == mKeywordListView.getChildCount() - 1) ||
-				(pos2 == 0 && pos1 == mKeywordListView.getChildCount() - 1)) {
+		if ((pos1 == 0 && pos2 == mKeywordAdapter.getCount() - 1) ||
+				(pos2 == 0 && pos1 == mKeywordAdapter.getCount() - 1)) {
 			return true;
 		} else {
 			return false;

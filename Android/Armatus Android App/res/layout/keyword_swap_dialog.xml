@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1" >
 
     <com.ericharlow.dragndrop.DragNDropListView
         android:id="@+id/keyword_swap_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dip"
+        android:layout_weight="1" />
 
-    <Button
-        android:id="@+id/keyword_swap_reset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Reset" />
+    <RelativeLayout
+        android:id="@+id/keyword_swap_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-    <Button
-        android:id="@+id/keyword_swap_toast"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/keyword_swap_reset"
-        android:text="Toast" />
+        <Button
+            android:id="@+id/keyword_swap_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/keyword_swap_toast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/keyword_swap_reset"
+            android:text="Toast" />
+    </RelativeLayout>
+
+</LinearLayout>

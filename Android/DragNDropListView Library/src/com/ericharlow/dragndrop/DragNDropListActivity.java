@@ -136,8 +136,9 @@ public class DragNDropListActivity extends ListActivity {
 	};
 
 	private boolean canBeSwapped(int pos1, int pos2) {
-		if ((pos1 == 0 && pos2 == getListView().getChildCount() - 1) ||
-				(pos2 == 0 && pos1 == getListView().getChildCount() - 1)) {
+		int childCount = getListView().getAdapter().getCount();
+		if ((pos1 == 0 && pos2 == childCount - 1) ||
+				(pos2 == 0 && pos1 == childCount - 1)) {
 			return true;
 		} else {
 			return false;
