@@ -25,8 +25,6 @@ Software used
 
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
 
-—<a href="https://github.com/ericharlow/TICEWidgets">DragNDropList</a> by <a href="https://github.com/ericharlow">Eric Harlow</a> under the Apache License 2.0
-
 —<a href="http://code.google.com/p/tree-view-list-android/">tree-view-list-android</a> by <a href="http://code.google.com/u/109485687940011053436/">Jarek Potiuk</a> under the New BSD License
 
 —<a href="https://github.com/iPaulPro/aFileChooser">aFileChooser</a> by <a href="https://github.com/iPaulPro">Paul "iPaulPro" Burke</a> under the Apache License 2.0
