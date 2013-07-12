@@ -95,7 +95,7 @@ public class ConsoleActivity extends BaseActivity {
 	private List<String> mCommandHistoryEntries = new ArrayList<String>();
 	private View mInputView, mRootView, mBackground;
 	private TextView mConsoleInputNum, mFilterMatches;
-	private EditText mConsoleInput, mSearchInput;
+	private EditText mConsoleInputView, mSearchInputView;
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
@@ -144,7 +144,7 @@ public class ConsoleActivity extends BaseActivity {
 		mBackground.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				mConsoleInput.performLongClick();
+				mConsoleInputView.performLongClick();
 				return false;
 			}
 		});
@@ -155,8 +155,8 @@ public class ConsoleActivity extends BaseActivity {
 		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
-		mConsoleInput = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
-		mConsoleInput.addTextChangedListener(new TextWatcher() {
+		mConsoleInputView = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
+		mConsoleInputView.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {}
 			@Override
@@ -166,7 +166,10 @@ public class ConsoleActivity extends BaseActivity {
 				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
 				setContextualActionBarVisible(false);
-				String input = mConsoleInput.getText().toString().trim();
+				if (mSearchEnabled) {
+					executeSearch(null, SearchAction.END, null);
+				}
+				String input = mConsoleInputView.getText().toString().trim();
 				if (input.split(WHITESPACE).length <= 1) {
 					mCompleter.filterDictionary(input);
 				}
@@ -179,13 +182,13 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		});
 		//Processes user input (and runs command, if input is a command) when Enter is pressed
-		mConsoleInput.setOnKeyListener(new OnKeyListener() {
+		mConsoleInputView.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP
 						&& mInputEnabled) {
-					String[] inputs = mConsoleInput.getText().
+					String[] inputs = mConsoleInputView.getText().
 							toString().trim().split(WHITESPACE);
 					if (CommandDispatcher.isCommand(inputs[0])) {
 						if (inputs.length == 1) {
@@ -195,26 +198,26 @@ public class ConsoleActivity extends BaseActivity {
 									(inputs, 1, inputs.length));
 						}
 					} else {
-						addConsoleEntry(mConsoleInput.getText().toString());
+						addConsoleEntry(mConsoleInputView.getText().toString());
 					}
-					mConsoleInput.setText("");
+					mConsoleInputView.setText("");
 					return true;
 				} else if (keyCode == KeyEvent.KEYCODE_ENTER
 						&& event.getAction() == KeyEvent.ACTION_UP
 						&& !mInputEnabled) {
-					mConsoleInput.setText("");
+					mConsoleInputView.setText("");
 				}
 				return false;
 			}
 		});
-		mConsoleInput.requestFocus();
+		mConsoleInputView.requestFocus();
 		mConsoleListView.addFooterView(mInputView, null, false);
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
 		mSearcher = new ConsoleSearcher(mConsoleAdapter);
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
-		mConsoleInput.setTypeface(TYPEFACE);
+		mConsoleInputView.setTypeface(TYPEFACE);
 
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		refreshSlidingMenu();
@@ -256,11 +259,11 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString("consoleInput", mConsoleInput.getText().toString());
+		outState.putString("consoleInput", mConsoleInputView.getText().toString());
 		outState.putParcelable("consoleSearcher", mSearcher);
-		outState.putInt("consoleInputCursor", mConsoleInput.getSelectionStart());
-		if (mSearchInput != null) {
-			outState.putString("searchInput", mSearchInput.getText().toString());
+		outState.putInt("consoleInputCursor", mConsoleInputView.getSelectionStart());
+		if (mSearchInputView != null) {
+			outState.putString("searchInput", mSearchInputView.getText().toString());
 			outState.putString("prevSearchCriterion", mPrevSearchCriterion);
 		}
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
@@ -273,7 +276,7 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	protected void onRestoreInstanceState(Bundle state) {
 		super.onRestoreInstanceState(state);
-		mConsoleInput.setText(state.getString("consoleInput"));
+		mConsoleInputView.setText(state.getString("consoleInput"));
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 		setSoftKeyboardVisible(mSoftKeyboardVisible);
 		mSearchEnabled = state.getBoolean("findTextEnabled");
@@ -281,8 +284,8 @@ public class ConsoleActivity extends BaseActivity {
 			mTempSearchInput = state.getString("searchInput");
 			mPrevSearchCriterion = state.getString("prevSearchCriterion");
 		} else {
-			mConsoleInput.setSelection(state.getInt("consoleCursorPos"));
-			mConsoleInput.requestFocus();
+			mConsoleInputView.setSelection(state.getInt("consoleCursorPos"));
+			mConsoleInputView.requestFocus();
 		}
 
 		mConsoleEntries = (List<ConsoleEntry>) state.getSerializable("consoleEntries");
@@ -336,26 +339,29 @@ public class ConsoleActivity extends BaseActivity {
 
 		if (mSearchEnabled) {
 			View actionView = menu.findItem(R.id.find_text_action).getActionView();
-			mSearchInput = (EditText) actionView.findViewById(R.id.find_text_box);
+			mSearchInputView = (EditText) actionView.findViewById(R.id.find_text_box);
 			mFilterMatches = (TextView) actionView.findViewById(R.id.find_text_matches);
 
 			if (mTempSearchInput != null) {
-				mSearchInput.setText(mTempSearchInput);
-				mSearchInput.setSelection(mSearchInput.length());
+				mSearchInputView.setText(mTempSearchInput);
+				mSearchInputView.setSelection(mSearchInputView.length());
 				setTextSearchCaption();
 			}
-
-			mSearchInput.requestFocus();
-			mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
+			
+			if (mPrevSearchCriterion != null) {
+				executeSearch(null, SearchAction.RESUME, null);
+			}
+			
+			mSearchInputView.setOnEditorActionListener(new OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView v, int actionId,
 						KeyEvent event) {
 					if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-						String searchCriterion = mSearchInput.getText().toString();
+						String searchCriterion = mSearchInputView.getText().toString();
 						if (!searchCriterion.equalsIgnoreCase(mPrevSearchCriterion)) {
-							beginTextSearch(searchCriterion);
+							executeSearch(searchCriterion, SearchAction.BEGIN, null);
 						} else {
-							continueTextSearch(Direction.NEXT);
+							executeSearch(null, SearchAction.CONTINUE, Direction.NEXT);
 						}
 						mPrevSearchCriterion = searchCriterion;
 						return true;
@@ -363,7 +369,8 @@ public class ConsoleActivity extends BaseActivity {
 					return false;
 				}
 			});
-			mSearchInput.setTypeface(TYPEFACE);
+			mSearchInputView.setTypeface(TYPEFACE);
+			mSearchInputView.requestFocus();
 		}
 
 		return true;
@@ -384,17 +391,14 @@ public class ConsoleActivity extends BaseActivity {
 			invalidateOptionsMenu();
 			return true;
 		case R.id.find_text_next:
-			continueTextSearch(Direction.NEXT);
+			executeSearch(null, SearchAction.CONTINUE, Direction.NEXT);
 			return true;
 		case R.id.find_text_previous:
-			continueTextSearch(Direction.PREVIOUS);
+			executeSearch(null, SearchAction.CONTINUE, Direction.PREVIOUS);
 			return true;
 		case R.id.find_text_cancel:
-			mSearchEnabled = false;
-			mPrevSearchCriterion = null;
-			mSearcher.endSearch();
-			mConsoleInput.requestFocus();
-			invalidateOptionsMenu();
+			executeSearch(null, SearchAction.END, null);
+			mConsoleInputView.requestFocus();
 			return true;
 		case R.id.save_history:
 			if (mInputEnabled) {
@@ -476,7 +480,7 @@ public class ConsoleActivity extends BaseActivity {
 								mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
 								updateCommandHistoryEntries();
 
-								mConsoleInput.requestFocus();
+								mConsoleInputView.requestFocus();
 								showToast("Loading complete!");
 							} catch (JSONException e) {
 								showToast("Error: invalid JSON");
@@ -526,17 +530,17 @@ public class ConsoleActivity extends BaseActivity {
 				if (mInputEnabled) {
 					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
 				} else {
-					mConsoleInput.setText(mTempCommand + " " + keywordNStr);
+					mConsoleInputView.setText(mTempCommand + " " + keywordNStr);
 				}
 			} else { //If long-click command is run
 				if (mInputEnabled) {
 					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
 				} else {
-					mConsoleInput.setText(CommandDispatcher.getKeyword(keywordNStr)
+					mConsoleInputView.setText(CommandDispatcher.getKeyword(keywordNStr)
 							.getCommand().getCommandName() + " " + keywordNStr);
 				}
 			}
-			mConsoleInput.requestFocus(); //Prevents ListView from stealing focus
+			mConsoleInputView.requestFocus(); //Prevents ListView from stealing focus
 		}
 		mTempCommand = null;
 		return super.onContextItemSelected(item);
@@ -640,8 +644,8 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public void setInputText(String text) {
-		mConsoleInput.setText(text);
-		mConsoleInput.setSelection(mConsoleInput.getText().length());
+		mConsoleInputView.setText(text);
+		mConsoleInputView.setSelection(mConsoleInputView.getText().length());
 	}
 
 	/**
@@ -691,7 +695,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	private void attemptWordCompletion() {
-		String input = mConsoleInput.getText().toString().trim();
+		String input = mConsoleInputView.getText().toString().trim();
 		if (input.split(WHITESPACE).length <= 1) {
 			String completion = mCompleter.completeWord(input);
 			if (completion != null) {
@@ -699,25 +703,31 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		}
 	}
-
-	private void beginTextSearch(String criterion) {
+	
+	private void executeSearch(String criterion, SearchAction action, Direction direction) {
 		if (mInputEnabled) {
 			setInputEnabled(false);
-			MatchParams params = mSearcher.beginSearch(criterion);
-			if (params != null && !mConsoleListView.isEntryVisible(params.getListIndex())) {
-				mConsoleListView.smoothScrollToPositionFromTop(params.getListIndex(), 0, SCROLL_DURATION);
+			MatchParams params = null;
+			switch (action) {
+			case BEGIN:
+				params = mSearcher.beginSearch(criterion);
+				break;
+			case CONTINUE:
+				params = mSearcher.continueSearch(direction);
+			case RESUME:
+				params = mSearcher.getSelectedMatch();
+				break;
+			case END:
+				mSearchEnabled = false;
+				mPrevSearchCriterion = null;
+				mSearcher.endSearch();
+				invalidateOptionsMenu();
+				setInputEnabled(true);
+				return;
 			}
-			setTextSearchCaption();
-			setInputEnabled(true);
-		}
-	}
-
-	private void continueTextSearch(Direction direction) {
-		if (mInputEnabled) {
-			setInputEnabled(false);
-			MatchParams params = mSearcher.continueSearch(direction);
 			if (params != null && !mConsoleListView.isEntryVisible(params.getListIndex())) {
-				mConsoleListView.smoothScrollToPositionFromTop(params.getListIndex(), 0, SCROLL_DURATION);
+				mConsoleListView.smoothScrollToPositionFromTop(params.getListIndex(),
+						params.getTextViewOffset(), SCROLL_DURATION);
 			}
 			setTextSearchCaption();
 			setInputEnabled(true);
@@ -799,5 +809,7 @@ public class ConsoleActivity extends BaseActivity {
 	private void updateEntryCount() {
 		mConsoleInputNum.setText("hermit<" + getEntryCount() + "> ");
 	}
+	
+	private enum SearchAction { BEGIN, CONTINUE, RESUME, END };
 
 }

@@ -3,7 +3,6 @@ package com.kufpg.armatus.console;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 import com.kufpg.armatus.drag.DragIcon;
@@ -30,6 +29,7 @@ import android.widget.TextView;
  * (except for the footer).
  */
 public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
+	private static final CharacterStyle BLACK_TEXT = new ForegroundColorSpan(Color.BLACK);
 	private ConsoleActivity mConsole;
 	private ListView mListView;
 	private ConsoleSearcher mSearcher;
@@ -86,12 +86,11 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 					Spannable contents = new SpannableString(holder.contents.getText());
 					Collection<Integer> offsets = mSearcher.getMatchOffsets(entryContents);
 					for (int offset : offsets) {
-						CharacterStyle highlight, blackText;
+						CharacterStyle highlight;
 						MatchParams params = mSearcher.getSelectedMatch();
 						if (position == params.getListIndex() && offset == params.getTextViewOffset()) {
 							highlight = new BackgroundColorSpan(Color.YELLOW);
-							blackText = new ForegroundColorSpan(Color.BLACK);
-							setSpans(contents, offset, offset + criterion.length(), highlight, blackText);
+							setSpans(contents, offset, offset + criterion.length(), highlight, BLACK_TEXT);
 						} else {
 							highlight = new BackgroundColorSpan(Color.DKGRAY);
 							contents.setSpan(highlight, offset, offset + criterion.length(), 0);
@@ -121,21 +120,16 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 
 	private void removeHighlight(TextView tv) {
 		Spannable noHighlight = new SpannableString(tv.getText());
-		List<Class<? extends CharacterStyle>> spanClasses = Lists.newArrayList();
-		spanClasses.add(BackgroundColorSpan.class);
-		spanClasses.add(ForegroundColorSpan.class);
-		for (Class<? extends CharacterStyle> spanClass : spanClasses) {
-			CharacterStyle[] spans = noHighlight.getSpans(0, noHighlight.length(), spanClass);
-			if (spans.length > 0) {
-				for (CharacterStyle span : spans) {
-					noHighlight.removeSpan(span);
-				}
+		CharacterStyle[] backgroundSpans = noHighlight.getSpans(0, noHighlight.length(), BackgroundColorSpan.class);
+		if (backgroundSpans.length > 0) {
+			for (CharacterStyle span : backgroundSpans) {
+				noHighlight.removeSpan(span);
 			}
-			tv.setText(noHighlight);
 		}
+		noHighlight.removeSpan(BLACK_TEXT);
 		tv.setText(noHighlight);
 	}
-	
+
 	private void setSpans(Spannable spannable, int start, int end, CharacterStyle... spans) {
 		for (CharacterStyle span : spans) {
 			spannable.setSpan(span, start, end, 0);

@@ -61,11 +61,7 @@ public class ConsoleSearcher implements Parcelable {
 			}
 		}
 		mAdapter.notifyDataSetChanged();
-		if (mMatchCount > 0) {
-			return mSelectedMatch;
-		} else {
-			return null;
-		}
+		return mSelectedMatch;
 	}
 
 	public synchronized MatchParams continueSearch(Direction direction) {
