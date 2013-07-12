@@ -42,11 +42,11 @@ public class EditManager implements Iterable<Edit> {
 	}
 
 	public synchronized boolean canRedo() {
-		return !mRedoStack.isEmpty();
+		return !mRedoStack.empty();
 	}
 
 	public synchronized boolean canUndo() {
-		return !mUndoStack.isEmpty();
+		return !mUndoStack.empty();
 	}
 
 	public synchronized void discardAllEdits() {

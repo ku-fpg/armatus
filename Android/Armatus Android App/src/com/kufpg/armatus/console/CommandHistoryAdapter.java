@@ -36,7 +36,7 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 		return entryView;
 	}
 	
-	static class CommandEntryHolder {
+	private static class CommandEntryHolder {
 		public DragIcon icon;
 	}
 

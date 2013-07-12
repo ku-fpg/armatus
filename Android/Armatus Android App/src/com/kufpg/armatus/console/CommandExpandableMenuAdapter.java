@@ -113,12 +113,12 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		return true;
 	}
 
-	static class CommandExpandableMenuHeader {
+	private static class CommandExpandableMenuHeader {
 		TextView title;
 		View groupColor;
 	}
 
-	static class CommandExpandableMenuItem {
+	private static class CommandExpandableMenuItem {
 		DragIcon icon;
 	}
 

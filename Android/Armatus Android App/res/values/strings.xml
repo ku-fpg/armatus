@@ -14,6 +14,8 @@
     <string name="terminal_not_installed_message">To use the terminal, you must install the Android Terminal Emulator app. Afterwards, you must reinstall Armatus. Would you like to install ATE from the Play store now?</string>
     <string name="console_exit_title">Are you sure you want to exit?</string>
     <string name="console_exit_message">All unsaved progress will be lost. Do you still want to exit the console?</string>
+    <string name="console_load_history_title">Are you sure you want to load session history?</string>
+    <string name="console_load_history_message">All unsaved progress will be lost. Do you still want to load session history?</string>
     <string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
     <string name="swap">swap</string>
     <string name="pref_history_use_cache">pref_history_use_cache</string>

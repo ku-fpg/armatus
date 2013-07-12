@@ -45,6 +45,16 @@
             android:orderInCategory="94"
             android:showAsAction="always"/>
         <item
+            android:id="@+id/find_text_next"
+            android:icon="?attr/actionFindNext"
+            android:orderInCategory="95"
+            android:showAsAction="always"/>
+        <item
+            android:id="@+id/find_text_previous"
+            android:icon="?attr/actionFindPrevious"
+            android:orderInCategory="96"
+            android:showAsAction="always"/>
+        <item
             android:id="@+id/find_text_cancel"
             android:icon="?attr/actionCancel"
             android:orderInCategory="97"

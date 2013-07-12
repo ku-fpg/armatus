@@ -18,6 +18,8 @@ import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.ConsoleEdits.ConsoleClearer;
 import com.kufpg.armatus.console.ConsoleEdits.ConsoleEntryAdder;
+import com.kufpg.armatus.console.ConsoleSearcher.Direction;
+import com.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
 import com.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -57,7 +59,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.Filter.FilterListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -72,6 +73,7 @@ public class ConsoleActivity extends BaseActivity {
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
 	public static final int ENTRY_COMMAND_HISTORY_LIMIT = 200;
+	private static final int SCROLL_DURATION = 500;
 	public static final String SELECTION_TAG = "selection";
 	public static final String KEYWORD_SWAP_TAG = "keywordswap";
 	public static final String WORD_COMPLETION_TAG = "wordcomplete";
@@ -86,25 +88,24 @@ public class ConsoleActivity extends BaseActivity {
 	private ListView mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
 	private ConsoleEntryAdapter mConsoleAdapter;
+	private ConsoleSearcher mSearcher;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
-	private List<ConsoleEntry> mFilteredConsoleEntries = new ArrayList<ConsoleEntry>();
-	private List<ConsoleEntry> mOriginalConsoleEntries = new ArrayList<ConsoleEntry>();
+	private List<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>();
 	private List<String> mCommandHistoryEntries = new ArrayList<String>();
 	private View mInputView, mRootView, mBackground;
-	private TextView mConsoleInputNum;
-	private EditText mConsoleInput, mFilterInput;
+	private TextView mConsoleInputNum, mFilterMatches;
+	private EditText mConsoleInput, mSearchInput;
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
 	private ActionMode mActionMode;
 	private ConsoleEntryCallback mCallback;
-	private String mTempCommand, mTempFilterInput;
+	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible = true;
-	private boolean mFindTextEnabled = false;
-	private boolean mTempIsFiltering = false;
+	private boolean mSearchEnabled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -150,7 +151,7 @@ public class ConsoleActivity extends BaseActivity {
 
 		mDispatcher = new CommandDispatcher(this);
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
-		mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries);
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		registerForContextMenu(mConsoleListView);
 		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
@@ -210,6 +211,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleListView.addFooterView(mInputView, null, false);
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
 		updateConsoleEntries();
+		mSearcher = new ConsoleSearcher(mConsoleAdapter);
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
 		mConsoleInput.setTypeface(TYPEFACE);
@@ -255,15 +257,15 @@ public class ConsoleActivity extends BaseActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putString("consoleInput", mConsoleInput.getText().toString());
+		outState.putParcelable("consoleSearcher", mSearcher);
 		outState.putInt("consoleInputCursor", mConsoleInput.getSelectionStart());
-		if (mFilterInput != null) {
-			outState.putString("filterInput", mFilterInput.getText().toString());
+		if (mSearchInput != null) {
+			outState.putString("searchInput", mSearchInput.getText().toString());
+			outState.putString("prevSearchCriterion", mPrevSearchCriterion);
 		}
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
-		outState.putBoolean("findTextEnabled", mFindTextEnabled);
-		outState.putBoolean("isFiltering", mConsoleAdapter.isFiltering());
-		outState.putSerializable("filteredConsoleEntries", (Serializable) mFilteredConsoleEntries);
-		outState.putSerializable("originalConsoleEntries", (Serializable) mOriginalConsoleEntries);
+		outState.putBoolean("findTextEnabled", mSearchEnabled);
+		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
 	}
 
@@ -274,19 +276,20 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInput.setText(state.getString("consoleInput"));
 		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
 		setSoftKeyboardVisible(mSoftKeyboardVisible);
-		mFindTextEnabled = state.getBoolean("findTextEnabled");
-		if (mFindTextEnabled) {
-			mTempFilterInput = state.getString("filterInput");
-			mTempIsFiltering = state.getBoolean("isFiltering");
+		mSearchEnabled = state.getBoolean("findTextEnabled");
+		if (mSearchEnabled) {
+			mTempSearchInput = state.getString("searchInput");
+			mPrevSearchCriterion = state.getString("prevSearchCriterion");
 		} else {
 			mConsoleInput.setSelection(state.getInt("consoleCursorPos"));
 			mConsoleInput.requestFocus();
 		}
 
-		mFilteredConsoleEntries = (List<ConsoleEntry>) state.getSerializable("filteredConsoleEntries");
-		mOriginalConsoleEntries = (List<ConsoleEntry>) state.getSerializable("originalConsoleEntries");
-		mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries, mOriginalConsoleEntries);
+		mConsoleEntries = (List<ConsoleEntry>) state.getSerializable("consoleEntries");
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		mConsoleListView.setAdapter(mConsoleAdapter);
+		mSearcher = state.getParcelable("consoleSearcher");
+		mSearcher.attachAdapter(mConsoleAdapter);
 		updateConsoleEntries();
 
 		mCommandHistoryEntries = (List<String>) state.getSerializable("commandEntries");
@@ -321,46 +324,46 @@ public class ConsoleActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
-		menu.setGroupVisible(R.id.menu_icons_group, !mFindTextEnabled);
+		menu.setGroupVisible(R.id.menu_icons_group, !mSearchEnabled);
 		menu.setGroupVisible(R.id.history_group, true);
-		menu.findItem(R.id.find_text_option).setVisible(!mFindTextEnabled);
-		menu.setGroupVisible(R.id.find_text_group, mFindTextEnabled);
+		menu.findItem(R.id.find_text_option).setVisible(!mSearchEnabled);
+		menu.setGroupVisible(R.id.find_text_group, mSearchEnabled);
 
-		if (mFindTextEnabled) {
+		boolean isShown =  !mSearchEnabled || (getResources().getConfiguration().orientation
+				== Configuration.ORIENTATION_LANDSCAPE);
+		getActionBar().setDisplayShowHomeEnabled(isShown);
+		getActionBar().setDisplayShowTitleEnabled(isShown);
+
+		if (mSearchEnabled) {
 			View actionView = menu.findItem(R.id.find_text_action).getActionView();
-			mFilterInput = (EditText) actionView.findViewById(R.id.find_text_box);
-			final TextView filterMatches = (TextView) actionView.findViewById(R.id.find_text_matches);
-			final FilterListener listener = new FilterListener() {
-				@Override
-				public void onFilterComplete(int count) {
-					String caption = mConsoleAdapter.getFilterMatches() + " match";
-					filterMatches.setText(caption + (caption.startsWith("1") ? "" : "es"));
-				}
-			};
+			mSearchInput = (EditText) actionView.findViewById(R.id.find_text_box);
+			mFilterMatches = (TextView) actionView.findViewById(R.id.find_text_matches);
 
-			if (mTempFilterInput != null) {
-				mFilterInput.setText(mTempFilterInput);
-				mFilterInput.setSelection(mFilterInput.length());
-				if (mTempIsFiltering) {
-					mTempIsFiltering = false;
-					mConsoleAdapter.getFilter().filter(mTempFilterInput, listener);
-				}
+			if (mTempSearchInput != null) {
+				mSearchInput.setText(mTempSearchInput);
+				mSearchInput.setSelection(mSearchInput.length());
+				setTextSearchCaption();
 			}
 
-			mFilterInput.requestFocus();
-			mFilterInput.setOnEditorActionListener(new OnEditorActionListener() {
+			mSearchInput.requestFocus();
+			mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
 				@Override
 				public boolean onEditorAction(TextView v, int actionId,
 						KeyEvent event) {
 					if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-						CharSequence contents = mFilterInput.getText();
-						mConsoleAdapter.getFilter().filter(contents, listener);
+						String searchCriterion = mSearchInput.getText().toString();
+						if (!searchCriterion.equalsIgnoreCase(mPrevSearchCriterion)) {
+							beginTextSearch(searchCriterion);
+						} else {
+							continueTextSearch(Direction.NEXT);
+						}
+						mPrevSearchCriterion = searchCriterion;
 						return true;
 					}
 					return false;
 				}
 			});
-			mFilterInput.setTypeface(TYPEFACE);
+			mSearchInput.setTypeface(TYPEFACE);
 		}
 
 		return true;
@@ -377,12 +380,19 @@ public class ConsoleActivity extends BaseActivity {
 			attemptWordCompletion();
 			return true;
 		case R.id.find_text_option:
-			mFindTextEnabled = true;
+			mSearchEnabled = true;
 			invalidateOptionsMenu();
 			return true;
+		case R.id.find_text_next:
+			continueTextSearch(Direction.NEXT);
+			return true;
+		case R.id.find_text_previous:
+			continueTextSearch(Direction.PREVIOUS);
+			return true;
 		case R.id.find_text_cancel:
-			mFindTextEnabled = false;
-			mConsoleAdapter.getFilter().filter(null);
+			mSearchEnabled = false;
+			mPrevSearchCriterion = null;
+			mSearcher.endSearch();
 			mConsoleInput.requestFocus();
 			invalidateOptionsMenu();
 			return true;
@@ -390,7 +400,7 @@ public class ConsoleActivity extends BaseActivity {
 			if (mInputEnabled) {
 				try {
 					JSONArray consoleHistory = new JSONArray();
-					for (ConsoleEntry entry : mOriginalConsoleEntries) {
+					for (ConsoleEntry entry : mConsoleEntries) {
 						JSONObject entryJson = new JSONObject();
 						entryJson.put("num", entry.getNum());
 						entryJson.put("contents", entry.getContents());
@@ -426,52 +436,59 @@ public class ConsoleActivity extends BaseActivity {
 			return true;
 		case R.id.load_history:
 			if (mInputEnabled) {
-				String path = "";
-				if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
-					path = getPrefs().getString(HISTORY_DIR_KEY, null);
-				} else {
-					path = CACHE_DIR;
-				}
-
-				final File file = new File (path + SESSION_HISTORY_FILENAME);
-				if (file.exists()) {
-					JSONObject history = null;
-					try {
-						history = JsonUtils.openJsonFile(file.getAbsolutePath());
-
-						JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
-						mFilteredConsoleEntries.clear();
-						for (int i = 0; i < consoleHistory.length(); i++) {
-							JSONObject jsonEntry = consoleHistory.getJSONObject(i);
-							int num = jsonEntry.getInt("num");
-							String contents = jsonEntry.getString("contents");
-							ConsoleEntry entry = new ConsoleEntry(num, contents);
-							mFilteredConsoleEntries.add(entry);
+				String title = getResources().getString(R.string.console_load_history_title);
+				String message = getResources().getString(R.string.console_load_history_message);
+				YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
+					@Override
+					protected void yes(DialogInterface dialog, int whichButton) {
+						String path = "";
+						if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
+							path = getPrefs().getString(HISTORY_DIR_KEY, null);
+						} else {
+							path = CACHE_DIR;
 						}
-						mOriginalConsoleEntries = new ArrayList<ConsoleEntry>(mFilteredConsoleEntries);
-						mConsoleAdapter = new ConsoleEntryAdapter(this, mFilteredConsoleEntries);
-						mConsoleListView.setAdapter(mConsoleAdapter);
-						updateConsoleEntries();
 
-						JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
-						mCommandHistoryEntries.clear();
-						for (int i = 0; i < commandHistory.length(); i++) {
-							mCommandHistoryEntries.add(commandHistory.getString(i));
+						final File file = new File (path + SESSION_HISTORY_FILENAME);
+						if (file.exists()) {
+							JSONObject history = null;
+							try {
+								history = JsonUtils.openJsonFile(file.getAbsolutePath());
+
+								JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
+								mConsoleEntries.clear();
+								for (int i = 0; i < consoleHistory.length(); i++) {
+									JSONObject jsonEntry = consoleHistory.getJSONObject(i);
+									int num = jsonEntry.getInt("num");
+									String contents = jsonEntry.getString("contents");
+									ConsoleEntry entry = new ConsoleEntry(num, contents);
+									mConsoleEntries.add(entry);
+								}
+								mConsoleAdapter = new ConsoleEntryAdapter(ConsoleActivity.this, mConsoleEntries);
+								mConsoleListView.setAdapter(mConsoleAdapter);
+								updateConsoleEntries();
+
+								JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
+								mCommandHistoryEntries.clear();
+								for (int i = 0; i < commandHistory.length(); i++) {
+									mCommandHistoryEntries.add(commandHistory.getString(i));
+								}
+								mCommandHistoryAdapter = new CommandHistoryAdapter(ConsoleActivity.this, mCommandHistoryEntries);
+								mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
+								updateCommandHistoryEntries();
+
+								mConsoleInput.requestFocus();
+								showToast("Loading complete!");
+							} catch (JSONException e) {
+								showToast("Error: invalid JSON");
+							} catch (FileNotFoundException e) {
+								showToast("Error: file not found"); //Should never happen
+							}
+						} else {
+							showToast("Error: file not found");
 						}
-						mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
-						mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-						updateCommandHistoryEntries();
-
-						mConsoleInput.requestFocus();
-						showToast("Loading complete!");
-					} catch (JSONException e) {
-						showToast("Error: invalid JSON");
-					} catch (FileNotFoundException e) {
-						showToast("Error: file not found"); //Should never happen
 					}
-				} else {
-					showToast("Error: file not found");
-				}
+				};
+				exitDialog.show(getFragmentManager(), "load");
 			}
 			return true;
 		default:
@@ -482,8 +499,8 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		if (info.position != mFilteredConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
-				!mFilteredConsoleEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
+		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
+				!mConsoleEntries.get(info.position).getContents().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
 
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
@@ -494,7 +511,7 @@ public class ConsoleActivity extends BaseActivity {
 			}
 
 			int order = 1;
-			for (String keyword : mFilteredConsoleEntries.get(info.position).getKeywords()) {
+			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
 				menu.add(0, v.getId(), order, keyword);
 				order++;
 			}
@@ -566,30 +583,27 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	void addConsoleEntry(ConsoleEntry entry) {
-		mFilteredConsoleEntries.add(entry);
-		mOriginalConsoleEntries.add(new ConsoleEntry(entry));
+		mConsoleEntries.add(entry);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
 	void removeConsoleEntry() {
-		if (!mFilteredConsoleEntries.isEmpty()) {
-			mFilteredConsoleEntries.remove(mFilteredConsoleEntries.size() - 1);
-			mOriginalConsoleEntries.remove(getEntryCount() - 1);
+		if (!mConsoleEntries.isEmpty()) {
+			mConsoleEntries.remove(getEntryCount() - 1);
 			updateConsoleEntries();
 			scrollToBottom();
 		}
 	}
 
 	public void appendConsoleEntry(String newContents) {
-		mFilteredConsoleEntries.get(mFilteredConsoleEntries.size() - 1).appendContents(newContents);
-		mOriginalConsoleEntries.get(getEntryCount() - 1).appendContents(newContents);
+		mConsoleEntries.get(getEntryCount() - 1).appendContents(newContents);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
 	public void clear() {
-		ConsoleClearer clear = new ConsoleClearer(this, mOriginalConsoleEntries);
+		ConsoleClearer clear = new ConsoleClearer(this, mConsoleEntries);
 		getEditManager().applyEdit(clear);
 	}
 
@@ -597,8 +611,7 @@ public class ConsoleActivity extends BaseActivity {
 	 * Removes all console entries and resets the entry count.
 	 */
 	void clearConsole() {
-		mFilteredConsoleEntries.clear();
-		mOriginalConsoleEntries.clear();
+		mConsoleEntries.clear();
 		updateConsoleEntries();
 	}
 
@@ -611,7 +624,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public int getEntryCount() {
-		return mOriginalConsoleEntries.size();
+		return mConsoleEntries.size();
 	}
 
 	public ListView getListView() {
@@ -672,7 +685,7 @@ public class ConsoleActivity extends BaseActivity {
 	 * doing asynchronous tasks (such as HermitServer requests).
 	 */
 	public void updateProgressSpinner(boolean shown) {
-		mFilteredConsoleEntries.get(mFilteredConsoleEntries.size() - 1).setWaiting(shown);
+		mConsoleEntries.get(mConsoleEntries.size() - 1).setWaiting(shown);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
@@ -684,6 +697,30 @@ public class ConsoleActivity extends BaseActivity {
 			if (completion != null) {
 				setInputText(completion);
 			}
+		}
+	}
+
+	private void beginTextSearch(String criterion) {
+		if (mInputEnabled) {
+			setInputEnabled(false);
+			MatchParams params = mSearcher.beginSearch(criterion);
+			if (params != null && !mConsoleListView.isEntryVisible(params.getListIndex())) {
+				mConsoleListView.smoothScrollToPositionFromTop(params.getListIndex(), 0, SCROLL_DURATION);
+			}
+			setTextSearchCaption();
+			setInputEnabled(true);
+		}
+	}
+
+	private void continueTextSearch(Direction direction) {
+		if (mInputEnabled) {
+			setInputEnabled(false);
+			MatchParams params = mSearcher.continueSearch(direction);
+			if (params != null && !mConsoleListView.isEntryVisible(params.getListIndex())) {
+				mConsoleListView.smoothScrollToPositionFromTop(params.getListIndex(), 0, SCROLL_DURATION);
+			}
+			setTextSearchCaption();
+			setInputEnabled(true);
 		}
 	}
 
@@ -723,22 +760,31 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
+	private void setTextSearchCaption() {
+		int matches = mSearcher.getMatchesCount();
+		String caption;
+		if (matches > 0) {
+			caption = mSearcher.getSelectedMatchPosition() + "/" + matches;
+		} else {
+			caption = "0";
+		}
+		mFilterMatches.setText(caption + " match" + (caption.endsWith("1") ? "" : "es"));
+	}
+
 	/**
 	 * Refreshes the console entries, removing excessive entries from the top if ENTRY_LIMIT is exceeded.
 	 */
 	private void updateConsoleEntries() {
-		if (mFilteredConsoleEntries.size() > ENTRY_CONSOLE_LIMIT) {
-			mFilteredConsoleEntries.remove(0);
-			mOriginalConsoleEntries.remove(0);
+		if (mConsoleEntries.size() > ENTRY_CONSOLE_LIMIT) {
+			mConsoleEntries.remove(0);
 		}
 		mConsoleAdapter.notifyDataSetChanged();
 		updateEntryCount();
 	}
 
 	void updateConsoleEntries(List<ConsoleEntry> newEntries) {
-		mFilteredConsoleEntries.clear();
-		mFilteredConsoleEntries.addAll(newEntries);
-		mOriginalConsoleEntries = new ArrayList<ConsoleEntry>(mFilteredConsoleEntries);
+		mConsoleEntries.clear();
+		mConsoleEntries.addAll(newEntries);
 		mConsoleAdapter.notifyDataSetChanged();
 		updateEntryCount();
 	}

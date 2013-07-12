@@ -15,7 +15,7 @@ public class ConsoleEdit implements Edit {
 		redo();
 	}
 	
-	public void attachConsole(ConsoleActivity console) {
+	void attachConsole(ConsoleActivity console) {
 		mConsole = console;
 	}
 	

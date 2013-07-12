@@ -44,6 +44,10 @@ public class ConsoleListView extends ListView implements OnItemClickListener {
 		}
 	}
 	
+	public boolean isEntryVisible(int entryIndex) {
+		return getFirstVisiblePosition() <= entryIndex && entryIndex <= getLastVisiblePosition();
+	}
+	
 	public void resetCheckedPos() {
 		clearChoices();
 		requestLayout();

@@ -129,12 +129,6 @@ public class KeywordSwapAdapter extends ArrayAdapter<String> {
 		return convertView;
 	}
 
-	static class KeywordViewHolder {
-		public LinearLayout layout;
-		public ImageView icon;
-		public TextView text;
-	}
-
 	public boolean canBeDragged(int index) {
 		if (index == 0 || index == getCount() - 1) {
 			return true;
@@ -149,6 +143,12 @@ public class KeywordSwapAdapter extends ArrayAdapter<String> {
 		} else {
 			return false;
 		}
+	}
+	
+	private static class KeywordViewHolder {
+		public LinearLayout layout;
+		public ImageView icon;
+		public TextView text;
 	}
 
 }
