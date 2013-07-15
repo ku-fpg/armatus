@@ -12,8 +12,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.style.LeadingMarginSpan;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -111,9 +109,8 @@ public class MainActivity extends BaseActivity {
 		mIndentedCaption.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		int width = mIndentedCaption.getMeasuredWidth();
 		int padding = mIndentedCaption.getPaddingLeft();
-		Spannable spannable = new SpannableString(mIndentedEditText.getText());
-		spannable.setSpan(new LeadingMarginSpan.Standard(width - padding, 0), 0, mIndentedEditText.getText().length(), 0);
-		mIndentedEditText.setText(spannable);
+		mIndentedEditText.setTextSpan(new LeadingMarginSpan.Standard(width - padding, 0),
+				0, mIndentedEditText.getText().length(), 0);
 		mIndentedSubmitter.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

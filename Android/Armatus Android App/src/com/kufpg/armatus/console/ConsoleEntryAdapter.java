@@ -121,10 +121,8 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private void removeHighlight(TextView tv) {
 		Spannable noHighlight = new SpannableString(tv.getText());
 		CharacterStyle[] backgroundSpans = noHighlight.getSpans(0, noHighlight.length(), BackgroundColorSpan.class);
-		if (backgroundSpans.length > 0) {
-			for (CharacterStyle span : backgroundSpans) {
-				noHighlight.removeSpan(span);
-			}
+		for (CharacterStyle span : backgroundSpans) {
+			noHighlight.removeSpan(span);
 		}
 		noHighlight.removeSpan(BLACK_TEXT);
 		tv.setText(noHighlight);
