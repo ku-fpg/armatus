@@ -11,7 +11,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,7 +29,7 @@ public class BaseActivity extends Activity {
 	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;
 
 	private static SharedPreferences mPrefs;
-	private static Editor mEditor;
+	private static SharedPreferences.Editor mEditor;
 	private static EditManager mEditManager = new EditManager();
 	private static MenuItem mUndoIcon, mRedoIcon;
 	private static int mThemeId;
@@ -123,13 +122,6 @@ public class BaseActivity extends Activity {
 		((BaseApplication<BaseActivity>) getApplication()).detach(this);
 	}
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//		super.onRestoreInstanceState(savedInstanceState);
-//		((BaseApplication<BaseActivity>) getApplication()).attach(this);
-//	}
-
 	public boolean canRedo() {
 		return mEditManager.canRedo();
 	}
@@ -166,7 +158,7 @@ public class BaseActivity extends Activity {
 		return mEditManager;
 	}
 
-	public static Editor getPrefsEditor() {
+	public static SharedPreferences.Editor getPrefsEditor() {
 		return mEditor;
 	}
 

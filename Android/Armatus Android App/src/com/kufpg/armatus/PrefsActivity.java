@@ -12,7 +12,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -39,7 +38,7 @@ public class PrefsActivity extends PreferenceActivity {
 
 	private static Activity mActivity;
 	private static SharedPreferences mPrefs;
-	private static Editor mEditor;
+	private static SharedPreferences.Editor mEditor;
 	private static CheckBoxPreference mHistoryUseCachePref;
 	private static ListPreference mEditModePref, mAppThemePref;
 	private static Preference mRestoreDefaultsPref, mHistoryDirPref;
@@ -158,13 +157,13 @@ public class PrefsActivity extends PreferenceActivity {
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 
-		private static Editor restoreDefaultValues() {
+		private static SharedPreferences.Editor restoreDefaultValues() {
 			mEditor.clear();
 			PreferenceManager.setDefaultValues(mActivity, R.xml.preferences, true);
 			return setStaticPrefValues();
 		}
 
-		private static Editor setStaticPrefValues() {
+		private static SharedPreferences.Editor setStaticPrefValues() {
 			for (Entry<String, Object> entry : STATIC_PREF_DEFAULTS_MAP.entrySet()) {
 				if (entry.getValue() instanceof String) {
 					mEditor.putString(entry.getKey(), (String) entry.getValue());

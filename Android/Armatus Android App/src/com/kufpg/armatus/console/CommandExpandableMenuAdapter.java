@@ -2,11 +2,14 @@ package com.kufpg.armatus.console;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.drag.DragIcon;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,21 +18,20 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
-
+	private static List<String> GROUP_LIST;
+	private static ListMultimap<String, String> GROUP_TO_COMMAND_MAP;
 	private Context mContext;
-	private List<String> mGroupList;
-	private ListMultimap<String, String> mGroupMap;
 
-	public CommandExpandableMenuAdapter(Context context, List<String> groupList,
-			ListMultimap<String, String> groupMap) {
+	public CommandExpandableMenuAdapter(Context context) {
 		mContext = context;
-		mGroupList = groupList;
-		mGroupMap = groupMap;
+		if (GROUP_LIST == null || GROUP_TO_COMMAND_MAP == null) {
+			loadExpandableMenuData(mContext);
+		}
 	}
 
 	@Override
 	public String getChild(int groupPosition, int childPosition) {
-		List<String> commandNames = mGroupMap.get(getGroup(groupPosition));
+		List<String> commandNames = GROUP_TO_COMMAND_MAP.get(getGroup(groupPosition));
 		return commandNames.get(childPosition);
 	}
 
@@ -59,18 +61,18 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		List<String> commandNames = mGroupMap.get(getGroup(groupPosition));
+		List<String> commandNames = GROUP_TO_COMMAND_MAP.get(getGroup(groupPosition));
 		return commandNames.size();
 	}
 
 	@Override
 	public String getGroup(int groupPosition) {
-		return mGroupList.get(groupPosition);
+		return GROUP_LIST.get(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return mGroupList.size();
+		return GROUP_LIST.size();
 	}
 
 	@Override
@@ -120,6 +122,32 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	private static class CommandExpandableMenuItem {
 		DragIcon icon;
+	}
+
+	private static void loadExpandableMenuData(Context context) {
+		TypedArray ta = context.getResources().obtainTypedArray(R.array.command_group_arrays);
+		ImmutableList.Builder<String> groupListBuilder = ImmutableList.builder();
+		ImmutableListMultimap.Builder<String, String> groupMapBuilder = ImmutableListMultimap.builder();
+		for (int i = 0; i < ta.length(); i++) {
+			String[] parents = context.getResources().getStringArray(R.array.command_groups);
+			int id = ta.getResourceId(i, 0);
+			if (id > 0) {
+				String groupName = parents[i];
+				groupListBuilder.add(groupName);
+
+				String[] children = context.getResources().getStringArray(id);
+				for (int j = 1; j < children.length; j++) { //Don't start at index 0; it's the id
+				String commandName = children[j];
+				if (CommandDispatcher.isAlias(commandName)) {
+					commandName = CommandDispatcher.unaliasCommand(commandName);
+				}
+				groupMapBuilder.put(groupName, commandName);
+				}
+			}
+		}
+		GROUP_LIST = groupListBuilder.build();
+		GROUP_TO_COMMAND_MAP = groupMapBuilder.build();
+		ta.recycle();
 	}
 
 }

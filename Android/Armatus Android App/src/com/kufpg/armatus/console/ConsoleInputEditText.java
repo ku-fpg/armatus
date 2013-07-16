@@ -14,6 +14,8 @@ import android.view.KeyEvent;
 import android.widget.EditText;
 
 public class ConsoleInputEditText extends EditText implements TextWatcher {
+	private static final KeyEvent Q = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q);
+	private static final KeyEvent DEL = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL);
 	private int mChangedStartIndex, mChangedEndIndex;
 	private List<SpanParams> mIndentSpans = new ArrayList<SpanParams>();
 
@@ -78,8 +80,8 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 				 * newlines--until the text is changed via typing. Therefore, this will initiate
 				 * the typing on each newline to prevent weirdness. */
 				setSelection(mChangedStartIndex);
-				dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
-				dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+				dispatchKeyEvent(Q);
+				dispatchKeyEvent(DEL);
 				break;
 			}
 		}

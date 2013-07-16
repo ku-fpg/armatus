@@ -46,6 +46,7 @@ public class KeywordSwapDialog extends DialogFragment {
 		mEntryContents = getArguments().getString("entryContents");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -53,9 +54,13 @@ public class KeywordSwapDialog extends DialogFragment {
 		setCancelable(true);
 
 		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
-		mEntryWords = Lists.newArrayList(mEntryContents.split(BaseActivity.WHITESPACE));
 
 		mKeywordListView = (ListView) v.findViewById(R.id.keyword_swap_list);
+		if (savedInstanceState == null) {
+			mEntryWords = Lists.newArrayList(mEntryContents.split(BaseActivity.WHITESPACE));
+		} else {
+			mEntryWords = (List<String>) savedInstanceState.getSerializable("entryWords");
+		}
 		mKeywordAdapter = new KeywordSwapAdapter(getActivity(), mEntryWords);
 		mKeywordListView.setAdapter(mKeywordAdapter);
 
@@ -89,18 +94,6 @@ public class KeywordSwapDialog extends DialogFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putSerializable("entryWords", (Serializable) mEntryWords);
 		super.onSaveInstanceState(outState);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		if (savedInstanceState != null) {
-			mEntryWords = (List<String>) savedInstanceState.getSerializable("entryWords");
-			mKeywordAdapter = new KeywordSwapAdapter(getActivity(), mEntryWords);
-			mKeywordListView.setAdapter(mKeywordAdapter);
-			mKeywordAdapter.notifyDataSetChanged();
-		}
 	}
 
 }

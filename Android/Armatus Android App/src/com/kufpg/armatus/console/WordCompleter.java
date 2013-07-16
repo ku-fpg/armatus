@@ -2,15 +2,18 @@ package com.kufpg.armatus.console;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.google.common.collect.ImmutableSortedSet;
+import android.text.Editable;
+import android.text.TextWatcher;
 
-public class WordCompleter implements Serializable {
+import com.google.common.collect.ImmutableSortedSet;
+import com.kufpg.armatus.BaseActivity;
+
+public class WordCompleter implements Serializable, TextWatcher {
 
 	private static final long serialVersionUID = 6187148466800719497L;
 	private final SortedSet<String> COMMAND_DICTIONARY;
@@ -18,10 +21,10 @@ public class WordCompleter implements Serializable {
 	private String mPrevPartialWord;
 	private SortedSet<String> mFilteredDictionary;
 
-	public WordCompleter(ConsoleActivity console, Collection<String> commandList) {
+	public WordCompleter(ConsoleActivity console) {
 		mConsole = console;
 		ImmutableSortedSet.Builder<String> dictBuilder = ImmutableSortedSet.naturalOrder();
-		COMMAND_DICTIONARY = dictBuilder.addAll(commandList).build();
+		COMMAND_DICTIONARY = dictBuilder.addAll(CommandDispatcher.getCommandNames()).build();
 		resetFilter("");
 	}
 
@@ -74,6 +77,20 @@ public class WordCompleter implements Serializable {
 		mFilteredDictionary = new TreeSet<String>(COMMAND_DICTIONARY);
 		mPrevPartialWord = "";
 		filterDictionary(curPartialWord);
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		String input = s.toString().trim();
+		if (input.split(BaseActivity.WHITESPACE).length <= 1) {
+			filterDictionary(input);
+		}
 	}
 
 }

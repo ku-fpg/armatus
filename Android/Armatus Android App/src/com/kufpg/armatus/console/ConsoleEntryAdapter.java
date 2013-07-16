@@ -88,7 +88,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 					for (int offset : offsets) {
 						CharacterStyle highlight;
 						MatchParams params = mSearcher.getSelectedMatch();
-						if (position == params.getListIndex() && offset == params.getTextViewOffset()) {
+						if (position == params.listIndex && offset == params.textViewOffset) {
 							highlight = new BackgroundColorSpan(Color.YELLOW);
 							setSpans(contents, offset, offset + criterion.length(), highlight, BLACK_TEXT);
 						} else {

@@ -1,16 +1,14 @@
 package com.kufpg.armatus.console;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableMap;
 import com.kufpg.armatus.BaseActivity;
-import com.kufpg.armatus.console.CommandDispatcher.Command;
-import com.kufpg.armatus.console.ConsoleEdits.ConsoleEntryAdder;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.NetworkUtils;
@@ -586,6 +584,12 @@ public class CommandDispatcher {
 
 	public static Command getCommand(String commandName) {
 		return COMMAND_MAP.get(commandName);
+	}
+	
+	static SortedSet<String> getCommandNames() {
+		SortedSet<String> commandNames = new TreeSet<String>();
+		commandNames.addAll(COMMAND_MAP.keySet());
+		return commandNames;
 	}
 
 	public static String getGroupColor(String groupName) {

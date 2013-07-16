@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.common.collect.ListMultimap;
 import com.kufpg.armatus.EditManager.Edit;
 import com.kufpg.armatus.MainActivity;
 import com.kufpg.armatus.R;
@@ -91,9 +90,8 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleSearcher mSearcher;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
-	private List<ConsoleEntry> mConsoleEntries = new ArrayList<ConsoleEntry>();
-	private List<String> mCommandHistoryEntries = new ArrayList<String>();
-	private View mInputView, mRootView, mBackground;
+	private List<ConsoleEntry> mConsoleEntries;
+	private List<String> mCommandHistoryEntries;
 	private TextView mConsoleInputNum, mFilterMatches;
 	private EditText mConsoleInputView, mSearchInputView;
 	private SlidingMenu mSlidingMenu;
@@ -107,22 +105,59 @@ public class ConsoleActivity extends BaseActivity {
 	private boolean mSoftKeyboardVisible = true;
 	private boolean mSearchEnabled = false;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.console_activity);
+		setContentView(R.layout.console_sliding_menu_activity);
 
+		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
+		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
+		mCommandHistoryListView = (ListView)findViewById(R.id.History);
+		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
+		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+		final View backgroundView = (View) findViewById(R.id.console_empty_space);
+		final View consoleInputView = getLayoutInflater().inflate(R.layout.console_input, null);
+		mConsoleInputNum = (TextView) consoleInputView.findViewById(R.id.test_code_input_num);
+		mConsoleInputView = (EditText) consoleInputView.findViewById(R.id.test_code_input_edit_text);
+		mCallback = new ConsoleEntryCallback(this);
+		mCompleter = new WordCompleter(this);
+		mDispatcher = new CommandDispatcher(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
+		
+		if (savedInstanceState == null) {
+			setSoftKeyboardVisible(true);
+			mConsoleEntries = new ArrayList<ConsoleEntry>();
+			mCommandHistoryEntries = new ArrayList<String>();
+		} else {
+			mConsoleInputView.setText(savedInstanceState.getString("consoleInput"));
+			mSoftKeyboardVisible = savedInstanceState.getBoolean("softKeyboardVisibility");
+			setSoftKeyboardVisible(mSoftKeyboardVisible);
+			mSearchEnabled = savedInstanceState.getBoolean("findTextEnabled");
+			if (mSearchEnabled) {
+				mTempSearchInput = savedInstanceState.getString("searchInput");
+				mPrevSearchCriterion = savedInstanceState.getString("prevSearchCriterion");
+			} else {
+				mConsoleInputView.setSelection(savedInstanceState.getInt("consoleCursorPos"));
+				mConsoleInputView.requestFocus();
+			}
 
-		//Ensures soft keyboard remains open
-		setSoftKeyboardVisible(true);
-		mRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-		mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			mConsoleEntries = (List<ConsoleEntry>) savedInstanceState.getSerializable("consoleEntries");
+			mCommandHistoryEntries = (List<String>) savedInstanceState.getSerializable("commandEntries");
+
+			for (Edit edit : getEditManager()) {
+				if (edit instanceof ConsoleEdit) {
+					((ConsoleEdit) edit).attachConsole(this);
+				}
+			}
+		}
+
+		rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
 			//Detects whether soft keyboard is open or closed
 			public void onGlobalLayout() {
-				int rootHeight = mRootView.getRootView().getHeight();
-				int heightDiff = rootHeight - mRootView.getHeight();
+				int rootHeight = rootView.getRootView().getHeight();
+				int heightDiff = rootHeight - rootView.getHeight();
 				if (heightDiff > rootHeight/3) { //This works on Nexus 7s, at the very least
 					mSoftKeyboardVisible = true;
 				} else {
@@ -130,9 +165,8 @@ public class ConsoleActivity extends BaseActivity {
 				}
 			}
 		});
-
-		mBackground = (View) findViewById(R.id.console_empty_space);
-		mBackground.setOnClickListener(new OnClickListener() {
+		
+		backgroundView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (!mSoftKeyboardVisible) {
@@ -141,21 +175,56 @@ public class ConsoleActivity extends BaseActivity {
 				}
 			}
 		});
-		mBackground.setOnLongClickListener(new OnLongClickListener() {
+		backgroundView.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
 				mConsoleInputView.performLongClick();
 				return false;
 			}
 		});
-
-		mDispatcher = new CommandDispatcher(this);
-		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
-		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+		
 		registerForContextMenu(mConsoleListView);
-		mInputView = getLayoutInflater().inflate(R.layout.console_input, null);
-		mConsoleInputNum = (TextView) mInputView.findViewById(R.id.test_code_input_num);
-		mConsoleInputView = (EditText) mInputView.findViewById(R.id.test_code_input_edit_text);
+		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
+		mConsoleListView.addFooterView(consoleInputView, null, false);
+		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
+		updateConsoleEntries();
+		
+		if (savedInstanceState == null) {
+			mSearcher = new ConsoleSearcher(mConsoleAdapter);
+		} else {
+			mSearcher = savedInstanceState.getParcelable("consoleSearcher");
+			mSearcher.attachAdapter(mConsoleAdapter);
+		}
+		
+		refreshSlidingMenu();
+		
+		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
+		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
+		updateCommandHistoryEntries();
+		
+		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
+		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
+		mCommandExpandableMenuView.setOnDragListener(new OnDragListener() {
+			@Override
+			public boolean onDrag(View v, DragEvent event) {
+				switch (event.getAction()) {
+				case DragEvent.ACTION_DRAG_STARTED:
+					getSlidingMenu().showContent();
+					return true;
+				case DragEvent.ACTION_DROP:
+				case DragEvent.ACTION_DRAG_ENDED:
+					View dragSource = (View) event.getLocalState();
+					dragSource.setVisibility(View.VISIBLE);
+					return true;
+				default:
+					return false;
+				}
+			}
+		});
+
+		mConsoleInputNum.setTypeface(TYPEFACE);
+		mConsoleInputView.setTypeface(TYPEFACE);
+		mConsoleInputView.addTextChangedListener(mCompleter);
 		mConsoleInputView.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {}
@@ -168,10 +237,6 @@ public class ConsoleActivity extends BaseActivity {
 				setContextualActionBarVisible(false);
 				if (mSearchEnabled) {
 					executeSearch(null, SearchAction.END, null);
-				}
-				String input = mConsoleInputView.getText().toString().trim();
-				if (input.split(WHITESPACE).length <= 1) {
-					mCompleter.filterDictionary(input);
 				}
 				mConsoleListView.post(new Runnable() {
 					public void run() {
@@ -211,49 +276,6 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		});
 		mConsoleInputView.requestFocus();
-		mConsoleListView.addFooterView(mInputView, null, false);
-		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
-		updateConsoleEntries();
-		mSearcher = new ConsoleSearcher(mConsoleAdapter);
-
-		mConsoleInputNum.setTypeface(TYPEFACE);
-		mConsoleInputView.setTypeface(TYPEFACE);
-
-		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
-		refreshSlidingMenu();
-
-		mCommandHistoryListView = (ListView)findViewById(R.id.History);
-		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
-		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-		updateCommandHistoryEntries();
-
-		List<String> expandableGroupList = CommandExpandableMenuFactory.getGroupList(this);
-		ListMultimap<String, String> expandableGroupMap = CommandExpandableMenuFactory.getGroupMap(this);
-		mCompleter = new WordCompleter(this, expandableGroupMap.values());
-
-		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
-		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter
-				(this, expandableGroupList, expandableGroupMap);
-		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
-		mCommandExpandableMenuView.setOnDragListener(new OnDragListener() {
-			@Override
-			public boolean onDrag(View v, DragEvent event) {
-				switch (event.getAction()) {
-				case DragEvent.ACTION_DRAG_STARTED:
-					getSlidingMenu().showContent();
-					return true;
-				case DragEvent.ACTION_DROP:
-				case DragEvent.ACTION_DRAG_ENDED:
-					View dragSource = (View) event.getLocalState();
-					dragSource.setVisibility(View.VISIBLE);
-					return true;
-				default:
-					return false;
-				}
-			}
-		});
-
-		mCallback = new ConsoleEntryCallback(this);
 	}
 
 	@Override
@@ -270,41 +292,6 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void onRestoreInstanceState(Bundle state) {
-		super.onRestoreInstanceState(state);
-		mConsoleInputView.setText(state.getString("consoleInput"));
-		mSoftKeyboardVisible = state.getBoolean("softKeyboardVisibility");
-		setSoftKeyboardVisible(mSoftKeyboardVisible);
-		mSearchEnabled = state.getBoolean("findTextEnabled");
-		if (mSearchEnabled) {
-			mTempSearchInput = state.getString("searchInput");
-			mPrevSearchCriterion = state.getString("prevSearchCriterion");
-		} else {
-			mConsoleInputView.setSelection(state.getInt("consoleCursorPos"));
-			mConsoleInputView.requestFocus();
-		}
-
-		mConsoleEntries = (List<ConsoleEntry>) state.getSerializable("consoleEntries");
-		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
-		mConsoleListView.setAdapter(mConsoleAdapter);
-		mSearcher = state.getParcelable("consoleSearcher");
-		mSearcher.attachAdapter(mConsoleAdapter);
-		updateConsoleEntries();
-
-		mCommandHistoryEntries = (List<String>) state.getSerializable("commandEntries");
-		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
-		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-		updateCommandHistoryEntries();
-
-		for (Edit edit : getEditManager()) {
-			if (edit instanceof ConsoleEdit) {
-				((ConsoleEdit) edit).attachConsole(this);
-			}
-		}
 	}
 
 	@Override
@@ -725,9 +712,9 @@ public class ConsoleActivity extends BaseActivity {
 				setInputEnabled(true);
 				return;
 			}
-			if (params != null && !mConsoleListView.isEntryVisible(params.getListIndex())) {
-				mConsoleListView.smoothScrollToPositionFromTop(params.getListIndex(),
-						params.getTextViewOffset(), SCROLL_DURATION);
+			if (params != null && !mConsoleListView.isEntryVisible(params.listIndex)) {
+				mConsoleListView.smoothScrollToPositionFromTop(params.listIndex,
+						params.textViewOffset, SCROLL_DURATION);
 			}
 			setTextSearchCaption();
 			setInputEnabled(true);

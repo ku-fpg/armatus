@@ -198,25 +198,17 @@ public class ConsoleSearcher implements Parcelable {
 
 	public static class MatchParams implements Serializable {
 		private static final long serialVersionUID = 2976454656462329956L;
-		private final int mListIndex;
-		private final int mTextViewOffset;
+		public final int listIndex;
+		public final int textViewOffset;
 
 		public MatchParams(int listIndex, int textViewOffset) {
-			mListIndex = listIndex;
-			mTextViewOffset = textViewOffset;
+			this.listIndex = listIndex;
+			this.textViewOffset = textViewOffset;
 		}
 
 		public MatchParams(MatchParams params) {
-			mListIndex = params.getListIndex();
-			mTextViewOffset = params.getTextViewOffset();
-		}
-
-		public int getListIndex() {
-			return mListIndex;
-		}
-
-		public int getTextViewOffset() {
-			return mTextViewOffset;
+			listIndex = params.listIndex;
+			textViewOffset = params.textViewOffset;
 		}
 	}
 
