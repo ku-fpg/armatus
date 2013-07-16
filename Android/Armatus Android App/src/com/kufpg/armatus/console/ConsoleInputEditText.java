@@ -10,6 +10,7 @@ import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.LeadingMarginSpan;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.widget.EditText;
 
 public class ConsoleInputEditText extends EditText implements TextWatcher {
@@ -55,6 +56,8 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 
 	@Override
 	public void afterTextChanged(Editable s) {
+		int cursorPos = getSelectionStart();
+		
 		//Remove additional spans that might be introduced through pasting
 		for (LeadingMarginSpan span : s.getSpans(0, s.length(), LeadingMarginSpan.class)) {
 			s.removeSpan(span);
@@ -62,13 +65,26 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 		for (SpanParams param : mIndentSpans) {
 			s.setSpan(param.what, param.start, param.end, param.flags);
 		}
-		
-		//Prevent TextView's default word-wrapping behavior (wrap by character instead)
-		int index = s.subSequence(mChangedStartIndex, mChangedEndIndex).toString().indexOf(" ");
-		if (index != -1) {
-			index += mChangedStartIndex;
-			s.replace(index, index+1, "\u00A0");
+
+		removeTextChangedListener(this);
+		for (; mChangedStartIndex < mChangedEndIndex; mChangedStartIndex++) {
+			switch (s.charAt(mChangedStartIndex)) {
+			case ' ':
+				//Prevent TextView's default word-wrapping behavior (wrap by character instead)
+				s.replace(mChangedStartIndex, mChangedStartIndex+1, "\u00A0");
+				break;
+			case '\n':
+				/* A strange bug exists where pasting multiple lines will seemingly indent all
+				 * newlines--until the text is changed via typing. Therefore, this will initiate
+				 * the typing on each newline to prevent weirdness. */
+				setSelection(mChangedStartIndex);
+				dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q));
+				dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+				break;
+			}
 		}
+		addTextChangedListener(this);
+		setSelection(cursorPos);
 	}
 
 	@Override

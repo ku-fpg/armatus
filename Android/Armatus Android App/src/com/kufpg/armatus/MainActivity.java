@@ -103,7 +103,7 @@ public class MainActivity extends BaseActivity {
 		Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/DroidSansMonoDotted.ttf");
 		mIndentedCaption.setTypeface(typeface);
 		mIndentedEditText.setTypeface(typeface);
-		
+
 		final String caption = "hermit<0> ";
 		mIndentedCaption.setText(caption);
 		mIndentedCaption.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
