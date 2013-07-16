@@ -42,7 +42,7 @@ public class ConsoleSearcher implements Parcelable {
 		mSelectedMatch = null;
 		if (!mCriterion.isEmpty()) {
 			for (int index = 0; index < mAdapter.getCount(); index++) {
-				String entryContents = mAdapter.getItem(index).getContents().toLowerCase(Locale.US);
+				String entryContents = mAdapter.getItem(index).getFullContents().toLowerCase(Locale.US);
 				Collection<Integer> offsets = mSearchOffsetsMap.get(entryContents);
 				if (offsets.isEmpty() && !mSearchOffsetsMap.containsEntry(entryContents, NO_MATCH)) {
 					offsets = getMatchOffsets(mCriterion, entryContents);

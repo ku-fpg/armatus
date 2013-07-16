@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleActivity;
+import com.kufpg.armatus.util.StringUtils;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -57,7 +57,7 @@ public class KeywordSwapDialog extends DialogFragment {
 
 		mKeywordListView = (ListView) v.findViewById(R.id.keyword_swap_list);
 		if (savedInstanceState == null) {
-			mEntryWords = Lists.newArrayList(mEntryContents.split(BaseActivity.WHITESPACE));
+			mEntryWords = Lists.newArrayList(mEntryContents.split(StringUtils.WHITESPACE));
 		} else {
 			mEntryWords = (List<String>) savedInstanceState.getSerializable("entryWords");
 		}
@@ -68,7 +68,7 @@ public class KeywordSwapDialog extends DialogFragment {
 		mResetButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(BaseActivity.WHITESPACE)));
+				mEntryWords = new ArrayList<String>(Arrays.asList(mEntryContents.split(StringUtils.WHITESPACE)));
 				mKeywordAdapter = new KeywordSwapAdapter(getActivity(), mEntryWords);
 				mKeywordListView.setAdapter(mKeywordAdapter);
 				mKeywordAdapter.notifyDataSetChanged();

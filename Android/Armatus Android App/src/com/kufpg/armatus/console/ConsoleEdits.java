@@ -5,10 +5,10 @@ import java.util.List;
 
 public class ConsoleEdits {
 
-	public static class ConsoleEntryAdder extends ConsoleEdit {
+	public static class AddEntry extends ConsoleEdit {
 		private ConsoleEntry mEntry;
 
-		public ConsoleEntryAdder(ConsoleActivity console, String contents) {
+		public AddEntry(ConsoleActivity console, String contents) {
 			super(console);
 			mEntry = new ConsoleEntry(getConsole().getEntryCount(), contents);
 		}
@@ -24,10 +24,10 @@ public class ConsoleEdits {
 		}
 	}
 	
-	public static class ConsoleClearer extends ConsoleEdit {
+	public static class Clear extends ConsoleEdit {
 		private List<ConsoleEntry> mOriginalEntries;
 
-		public ConsoleClearer(ConsoleActivity console, List<ConsoleEntry> originalEntries) {
+		public Clear(ConsoleActivity console, List<ConsoleEntry> originalEntries) {
 			super(console);
 			mOriginalEntries = new ArrayList<ConsoleEntry>(originalEntries);
 		}

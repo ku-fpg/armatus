@@ -23,7 +23,6 @@ import android.widget.Toast;
 public class BaseActivity extends Activity {
 
 	public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() + "/data/armatus";
-	public static final String WHITESPACE = "\\s+";
 	public static String HISTORY_USE_CACHE_KEY, HISTORY_DIR_KEY, EDIT_MODE_KEY, RESTORE_DEFAULTS_KEY, APP_THEME_KEY;
 	public static String PACKAGE_NAME;
 	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;

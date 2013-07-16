@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/test_code_input_line"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,7 +12,6 @@
         android:id="@+id/test_code_input_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
         android:singleLine="true"
         android:textColor="?attr/codeColor"
         android:textCursorDrawable="@null"
@@ -20,12 +19,12 @@
         android:textSize="15sp"
         android:typeface="monospace" />
 
-    <com.kufpg.armatus.console.ActionEditText
+    <com.kufpg.armatus.console.ConsoleInputEditText
         android:id="@+id/test_code_input_edit_text"
-        android:layout_width="0dip"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
+        android:layout_alignLeft="@+id/test_code_input_num"
+        android:layout_alignTop="@+id/test_code_input_num"
         android:background="@null"
         android:imeOptions="actionGo"
         android:inputType="textNoSuggestions|textMultiLine"
@@ -35,4 +34,4 @@
         android:textSize="15sp"
         android:typeface="monospace" />
 
-</LinearLayout>
+</RelativeLayout>

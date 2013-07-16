@@ -10,22 +10,10 @@
     android:paddingRight="@dimen/entry_padding" >
 
     <TextView
-        android:id="@+id/console_entry_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:singleLine="true"
-        android:textColor="?attr/codeColor"
-        android:textIsSelectable="false"
-        android:textSize="15sp"
-        android:typeface="monospace" />
-
-    <TextView
         android:id="@+id/console_entry_contents"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_toRightOf="@id/console_entry_num"
         android:textColor="?attr/codeColor"
         android:textIsSelectable="false"
         android:textSize="15sp"

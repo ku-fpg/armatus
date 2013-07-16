@@ -1,6 +1,7 @@
 package com.kufpg.armatus.console;
 
 import com.kufpg.armatus.R;
+import com.kufpg.armatus.util.StringUtils;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -27,17 +28,18 @@ public class ConsoleEntryCallback implements Callback {
 		switch (item.getItemId()) {
 		case R.id.copy:
 			ClipboardManager clipboard = (ClipboardManager) mConsole.getSystemService(Context.CLIPBOARD_SERVICE); 
-			ClipData copiedText = ClipData.newPlainText("copiedText", entry.getContents());
+			ClipData copiedText = ClipData.newPlainText("copiedText",
+					StringUtils.removeCharWrap(entry.getFullContents()));
 			clipboard.setPrimaryClip(copiedText);
 			mConsole.showToast("Entry copied to clipboard!");
 			mode.finish(); // Action picked, so close the contextual action bar
 			return true;
 		case R.id.select:
-			mConsole.showEntryDialog(entry.getNum(), entry.getContents(), ConsoleActivity.SELECTION_TAG);
+			mConsole.showEntryDialog(entry.getNum(), entry.getFullContents(), ConsoleActivity.SELECTION_TAG);
 			mode.finish();
 			return true;
 		case R.id.swap:
-			mConsole.showEntryDialog(entry.getNum(), entry.getContents(), ConsoleActivity.KEYWORD_SWAP_TAG);
+			mConsole.showEntryDialog(entry.getNum(), entry.getShortContents(), ConsoleActivity.KEYWORD_SWAP_TAG);
 			mode.finish();
 			return true;
 		}

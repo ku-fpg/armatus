@@ -79,39 +79,6 @@
             android:layout_below="@+id/test_activity_button"
             android:text="Launch terminal emulator"
             android:textColor="@android:color/black" />
-
-        <RelativeLayout
-            android:id="@+id/indented_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/terminal_activity_button"
-            android:paddingLeft="5dp" >
-
-            <com.kufpg.armatus.console.ConsoleInputEditText
-                android:id="@+id/indented_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/indented_caption"
-                android:background="@android:color/black"
-                android:inputType="textNoSuggestions|textMultiLine"
-                android:textColor="@android:color/white"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/indented_caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="15sp" />
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/indented_submit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/indented_layout"
-            android:text="Submit"
-            android:textColor="@android:color/black" />
     </RelativeLayout>
 
 </ScrollView>

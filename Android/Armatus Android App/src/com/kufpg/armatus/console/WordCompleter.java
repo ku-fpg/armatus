@@ -11,7 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 import com.google.common.collect.ImmutableSortedSet;
-import com.kufpg.armatus.BaseActivity;
+import com.kufpg.armatus.util.StringUtils;
 
 public class WordCompleter implements Serializable, TextWatcher {
 
@@ -88,7 +88,7 @@ public class WordCompleter implements Serializable, TextWatcher {
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		String input = s.toString().trim();
-		if (input.split(BaseActivity.WHITESPACE).length <= 1) {
+		if (input.split(StringUtils.WHITESPACE).length <= 1) {
 			filterDictionary(input);
 		}
 	}

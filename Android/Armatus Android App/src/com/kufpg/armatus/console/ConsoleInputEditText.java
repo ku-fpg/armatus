@@ -11,6 +11,8 @@ import android.text.TextWatcher;
 import android.text.style.LeadingMarginSpan;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 
 public class ConsoleInputEditText extends EditText implements TextWatcher {
@@ -49,17 +51,17 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 		addTextChangedListener(this);
 	}
 
-	//	@Override
-	//	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-	//		InputConnection conn = super.onCreateInputConnection(outAttrs);
-	//		outAttrs.imeOptions &= ~EditorInfo.IME_FLAG_NO_ENTER_ACTION;
-	//		return conn;
-	//	}
+	@Override
+	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+		InputConnection conn = super.onCreateInputConnection(outAttrs);
+		outAttrs.imeOptions &= ~EditorInfo.IME_FLAG_NO_ENTER_ACTION;
+		return conn;
+	}
 
 	@Override
 	public void afterTextChanged(Editable s) {
 		int cursorPos = getSelectionStart();
-		
+
 		//Remove additional spans that might be introduced through pasting
 		for (LeadingMarginSpan span : s.getSpans(0, s.length(), LeadingMarginSpan.class)) {
 			s.removeSpan(span);

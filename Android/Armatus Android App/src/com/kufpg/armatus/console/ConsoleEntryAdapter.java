@@ -59,13 +59,12 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ConsoleEntryHolder holder;
-		String entryContents = getItem(position).getContents();
+		String entryContents = getItem(position).getFullContents();
 
 		if (convertView == null) { //If this is a new ConsoleEntry
 			LayoutInflater inflater = mConsole.getLayoutInflater();
 			convertView = inflater.inflate(R.layout.console_entry, parent, false);
 			holder = new ConsoleEntryHolder();
-			holder.num = (TextView) convertView.findViewById(R.id.console_entry_num);
 			holder.contents = (TextView) convertView.findViewById(R.id.console_entry_contents);
 			holder.loader = (RelativeLayout) convertView.findViewById(R.id.console_loading);
 			convertView.setTag(holder);
@@ -73,8 +72,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			holder = (ConsoleEntryHolder) convertView.getTag();
 		}
 
-		holder.num.setText("hermit<" + getItem(position).getNum() + "> ");
-		holder.num.setTypeface(ConsoleActivity.TYPEFACE);
 		holder.contents.setTypeface(ConsoleActivity.TYPEFACE);
 		PrettyPrinter.setPrettyText(holder.contents, entryContents);
 
@@ -135,7 +132,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	}
 
 	private static class ConsoleEntryHolder {
-		public TextView num;
 		public TextView contents;
 		public RelativeLayout loader;
 	}
