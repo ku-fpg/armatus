@@ -124,7 +124,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputNum = (TextView) consoleInputView.findViewById(R.id.test_code_input_num);
 		mConsoleInputView = (ConsoleInputEditText) consoleInputView.findViewById(R.id.test_code_input_edit_text);
 		mCallback = new ConsoleEntryCallback(this);
-		mCompleter = new WordCompleter(this);
 		mDispatcher = new CommandDispatcher(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 		
@@ -132,6 +131,7 @@ public class ConsoleActivity extends BaseActivity {
 			setSoftKeyboardVisible(true);
 			mConsoleEntries = new ArrayList<ConsoleEntry>();
 			mCommandHistoryEntries = new ArrayList<String>();
+			mCompleter = new WordCompleter(this);
 		} else {
 			mConsoleInputView.setText(savedInstanceState.getString("consoleInput"));
 			mSoftKeyboardVisible = savedInstanceState.getBoolean("softKeyboardVisibility");
@@ -147,6 +147,8 @@ public class ConsoleActivity extends BaseActivity {
 
 			mConsoleEntries = (List<ConsoleEntry>) savedInstanceState.getSerializable("consoleEntries");
 			mCommandHistoryEntries = (List<String>) savedInstanceState.getSerializable("commandEntries");
+			mCompleter = (WordCompleter) savedInstanceState.getParcelable("wordCompleter");
+			mCompleter.attachConsole(this);
 
 			for (Edit edit : getEditManager()) {
 				if (edit instanceof ConsoleEdit) {
@@ -298,6 +300,7 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
+		outState.putParcelable("wordCompleter", mCompleter);
 	}
 
 	@Override
@@ -671,7 +674,7 @@ public class ConsoleActivity extends BaseActivity {
 		} else if (tag == KEYWORD_SWAP_TAG) {
 			newFrag = KeywordSwapDialog.newInstance(entryNum, entryContents);
 		} else if (tag == WORD_COMPLETION_TAG) {
-			newFrag = WordCompletionDialog.newInstance(mCompleter);
+			newFrag = WordCompletionDialog.newInstance(mCompleter.getWordSuggestions());
 		}
 		ft.add(newFrag, tag);
 		ft.commit();

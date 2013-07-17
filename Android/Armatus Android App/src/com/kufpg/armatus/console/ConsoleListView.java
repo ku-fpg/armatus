@@ -1,6 +1,8 @@
 package com.kufpg.armatus.console;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,6 +46,29 @@ public class ConsoleListView extends ListView implements OnItemClickListener {
 		}
 	}
 	
+	@Override
+	public Parcelable onSaveInstanceState() {
+		Parcelable superState = super.onSaveInstanceState();
+		SavedState ss = new SavedState(superState);
+		ss.checkedPos = mPrevCheckedPos;
+		return ss;
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Parcelable state) {
+		if (!(state instanceof SavedState)) {
+			super.onRestoreInstanceState(state);
+		}
+		
+		SavedState ss = (SavedState) state;
+		super.onRestoreInstanceState(ss.getSuperState());
+		mPrevCheckedPos = ss.checkedPos;
+		setItemChecked(mPrevCheckedPos, true);
+		if (mPrevCheckedPos != INVALID_POSITION) {
+			mConsole.setContextualActionBarVisible(true);
+		}
+	}
+	
 	public boolean isEntryVisible(int entryIndex) {
 		return getFirstVisiblePosition() <= entryIndex && entryIndex <= getLastVisiblePosition();
 	}
@@ -52,6 +77,36 @@ public class ConsoleListView extends ListView implements OnItemClickListener {
 		clearChoices();
 		requestLayout();
 		mPrevCheckedPos = INVALID_POSITION;
+	}
+	
+	protected static class SavedState extends BaseSavedState {
+		int checkedPos;
+
+		SavedState(Parcelable superState) {
+			super(superState);
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			super.writeToParcel(dest, flags);
+			dest.writeInt(checkedPos);
+		}
+
+		public static final Parcelable.Creator<SavedState> CREATOR
+		= new Parcelable.Creator<SavedState>() {
+			public SavedState createFromParcel(Parcel in) {
+				return new SavedState(in);
+			}
+
+			public SavedState[] newArray(int size) {
+				return new SavedState[size];
+			}
+		};
+		
+		private SavedState(Parcel in) {
+			super(in);
+			checkedPos = in.readInt();
+		}
 	}
 
 }

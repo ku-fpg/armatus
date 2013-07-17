@@ -26,8 +26,8 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.main_activity);
 
 		mButtonsView = (TextView) findViewById(R.id.code_text_view);
-		setCodeText(mNumTextChanges, false);
 		mStickyButton = (StickyButton) findViewById(R.id.lock_button);
+		setCodeText(mNumTextChanges);
 		mUnstickButton = (Button) findViewById(R.id.unlock_button);
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
 			@Override
 			public void onStick(View v) {
 				mNumTextChanges++;
-				setCodeText(mNumTextChanges, true);
+				setCodeText(mNumTextChanges);
 			}
 		});
 
@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				mStickyButton.unstick();
-				setCodeText(mNumTextChanges, false);
+				setCodeText(mNumTextChanges);
 			}	
 		});
 
@@ -90,10 +90,23 @@ public class MainActivity extends BaseActivity {
 			}
 		});
 	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("numTextChanges", mNumTextChanges);
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		mNumTextChanges = savedInstanceState.getInt("numTextChanges");
+		setCodeText(mNumTextChanges);
+	}
 
-	private void setCodeText(int numTextChanges, boolean isLocked) {
+	private void setCodeText(int numTextChanges) {
 		mButtonsView.setText("Button pushed " + numTextChanges + " times. (Status: "
-				+ (isLocked ? "locked" : "unlocked") + ".)");
+				+ (mStickyButton.isStuck() ? "locked" : "unlocked") + ".)");
 	}
 
 }

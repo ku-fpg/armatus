@@ -3,16 +3,21 @@ package com.kufpg.armatus.dialog;
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleActivity;
 import com.kufpg.armatus.console.PrettyPrinter;
+import com.kufpg.armatus.util.StringUtils;
 
 import android.app.DialogFragment;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ClipboardManager.OnPrimaryClipChangedListener;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class ConsoleEntrySelectionDialog extends DialogFragment {
-
+public class ConsoleEntrySelectionDialog extends DialogFragment implements OnPrimaryClipChangedListener {
+	private ClipboardManager mClipboard;
 	private TextView mContentsView;
 	private int mEntryNum;
 	private String mEntryContents;
@@ -33,6 +38,7 @@ public class ConsoleEntrySelectionDialog extends DialogFragment {
 		super.onCreate(savedInstanceState);
 		mEntryNum = getArguments().getInt("entryNum");
 		mEntryContents = getArguments().getString("entryContents");
+		mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
 	}
 
 	@Override
@@ -48,6 +54,29 @@ public class ConsoleEntrySelectionDialog extends DialogFragment {
 		PrettyPrinter.setPrettyText(mContentsView, mEntryContents);
 		
 		return v;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		mClipboard.addPrimaryClipChangedListener(this);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		mClipboard.removePrimaryClipChangedListener(this);
+	}
+
+	@Override
+	public void onPrimaryClipChanged() {
+		if (mClipboard.hasPrimaryClip() && mClipboard.getPrimaryClipDescription().hasMimeType("text/plain")) {
+			mClipboard.removePrimaryClipChangedListener(this);
+			String contents = mClipboard.getPrimaryClip().getItemAt(0).getText().toString();
+			ClipData newCopy = ClipData.newPlainText("copiedText", StringUtils.removeCharWrap(contents));
+			mClipboard.setPrimaryClip(newCopy);
+			mClipboard.addPrimaryClipChangedListener(this);
+		}
 	}
 
 }
