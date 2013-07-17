@@ -26,8 +26,9 @@ import org.json.JSONObject;
 
 import com.kufpg.armatus.AsyncActivityTask;
 import com.kufpg.armatus.console.ConsoleActivity;
+import com.kufpg.armatus.server.HermitServer.ProgressInfo;
 
-public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject, String, String> {
+public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject, ProgressInfo, String> {
 	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 	private static final String SERVER_URL_POST = "http://posttestserver.com/post.php?dump&html&dir=armatus&status_code=202";
 
@@ -39,7 +40,7 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 	protected void onPreExecute() {
 		super.onPreExecute();
 
-		getActivity().updateProgressSpinner(true);
+		getActivity().setProgressBarVisibility(true);
 		getActivity().disableInput();
 	}
 
@@ -51,9 +52,14 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 	}
 
 	@Override
-	protected void onProgressUpdate(String... progress) {
+	protected void onProgressUpdate(ProgressInfo... progress) {
 		if (getActivity() != null) {
-			getActivity().appendConsoleEntry(progress[0]);
+			if (progress[0].percentDone != ProgressInfo.INDETERMINATE) {
+				getActivity().setProgress(progress[0].percentDone);
+			}
+			if (progress[0].feedback != null) {
+				getActivity().appendConsoleEntry(progress[0].feedback);
+			}
 		}
 	}
 
@@ -68,7 +74,7 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 			}
 			getActivity().appendConsoleEntry(message);
 			getActivity().enableInput();
-			getActivity().updateProgressSpinner(false);
+			getActivity().setProgress(ProgressInfo.DONE);
 		}
 	}
 
@@ -93,16 +99,16 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 			client = new DefaultHttpClient(httpParams);
 			HttpGet request = new HttpGet(SERVER_URL_GET);
 			if (!isCancelled()) {
-				publishProgress("Attempting server connection...");
+				publishProgress(new ProgressInfo("Attempting server connection...", 2500));
 				httpResponse = client.execute(request);
 			}
-			publishProgress("Reading in JSON...");
+			publishProgress(new ProgressInfo("Reading in JSON...", 5000));
 			InputStream jsonIS = httpResponse.getEntity().getContent();
 			Scanner jsonScanner = new Scanner(jsonIS).useDelimiter("\\A");
 			jsonResponse = jsonScanner.hasNext() ? jsonScanner.next() : "";
 			jsonScanner.close();
 			if (!isCancelled()) {
-				publishProgress("Parsing JSON...");
+				publishProgress(new ProgressInfo("Parsing JSON...", 7500));
 				JSONObject json = new JSONObject(jsonResponse);
 				jsonText = json.toString();
 			}
@@ -163,6 +169,32 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "IO error.";
+		}
+	}
+
+	protected static class ProgressInfo {
+		public static final int INDETERMINATE = -1;
+		public static final int DONE = 10000;
+
+		public String feedback;
+		/**
+		 * Note that the percentage is out of 10000.
+		 */
+		public int percentDone;
+
+		public ProgressInfo(String feedback) {
+			this.feedback = feedback;
+			this.percentDone = INDETERMINATE;
+		}
+
+		public ProgressInfo(String feedback, int percentDone) {
+			this.feedback = feedback;
+			this.percentDone = percentDone;
+		}
+
+		public ProgressInfo(int percentDone) {
+			this.feedback = null;
+			this.percentDone = percentDone;
 		}
 	}
 

@@ -1,51 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/console_entry_layout"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/console_entry_contents"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
     android:background="?attr/consoleListSelector"
-    android:orientation="vertical"
     android:paddingBottom="@dimen/entry_padding"
     android:paddingLeft="@dimen/entry_padding"
-    android:paddingRight="@dimen/entry_padding" >
-
-    <TextView
-        android:id="@+id/console_entry_contents"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textColor="?attr/codeColor"
-        android:textIsSelectable="false"
-        android:textSize="15sp"
-        android:typeface="monospace" />
-
-    <RelativeLayout
-        android:id="@+id/console_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/console_entry_contents"
-        android:layout_below="@+id/console_entry_contents"
-        android:background="@null" >
-
-        <TextView
-            android:id="@+id/console_loading_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:singleLine="true"
-            android:text="Loading..."
-            android:textColor="?attr/codeColor"
-            android:textSize="15sp"
-            android:typeface="monospace" >
-        </TextView>
-
-        <ProgressBar
-            android:id="@+id/console_loading_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/console_loading_caption"
-            android:layout_alignTop="@+id/console_loading_caption"
-            android:layout_toRightOf="@+id/console_loading_caption" />
-    </RelativeLayout>
-
-</RelativeLayout>
+    android:paddingRight="@dimen/entry_padding"
+    android:textColor="?attr/codeColor"
+    android:textIsSelectable="false"
+    android:textSize="15sp"
+    android:typeface="monospace" />

@@ -53,6 +53,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -111,6 +112,7 @@ public class ConsoleActivity extends BaseActivity {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		requestWindowFeature(Window.FEATURE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_sliding_menu_activity);
 
@@ -187,6 +189,23 @@ public class ConsoleActivity extends BaseActivity {
 				return false;
 			}
 		});
+		backgroundView.setOnDragListener(new OnDragListener() {
+			@Override
+			public boolean onDrag(View v, DragEvent event) {
+				switch (event.getAction()) {
+				case DragEvent.ACTION_DRAG_STARTED:
+					getSlidingMenu().showContent();
+					return true;
+				case DragEvent.ACTION_DROP:
+				case DragEvent.ACTION_DRAG_ENDED:
+					View dragSource = (View) event.getLocalState();
+					dragSource.setVisibility(View.VISIBLE);
+					return true;
+				default:
+					return false;
+				}
+			}
+		});
 		
 		registerForContextMenu(mConsoleListView);
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
@@ -209,23 +228,6 @@ public class ConsoleActivity extends BaseActivity {
 		
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
-		mCommandExpandableMenuView.setOnDragListener(new OnDragListener() {
-			@Override
-			public boolean onDrag(View v, DragEvent event) {
-				switch (event.getAction()) {
-				case DragEvent.ACTION_DRAG_STARTED:
-					getSlidingMenu().showContent();
-					return true;
-				case DragEvent.ACTION_DROP:
-				case DragEvent.ACTION_DRAG_ENDED:
-					View dragSource = (View) event.getLocalState();
-					dragSource.setVisibility(View.VISIBLE);
-					return true;
-				default:
-					return false;
-				}
-			}
-		});
 
 		mConsoleInputNum.setTypeface(TYPEFACE);
 		mConsoleInputNum.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
@@ -678,16 +680,6 @@ public class ConsoleActivity extends BaseActivity {
 		}
 		ft.add(newFrag, tag);
 		ft.commit();
-	}
-
-	/**
-	 * Appends a progress spinner below the most recent entry's contents. Ideal for
-	 * doing asynchronous tasks (such as HermitServer requests).
-	 */
-	public void updateProgressSpinner(boolean shown) {
-		mConsoleEntries.get(mConsoleEntries.size() - 1).setWaiting(shown);
-		updateConsoleEntries();
-		scrollToBottom();
 	}
 
 	private void attemptWordCompletion() {

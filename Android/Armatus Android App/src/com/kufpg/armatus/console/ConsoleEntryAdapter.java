@@ -20,7 +20,6 @@ import android.view.View.OnDragListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -33,7 +32,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private ConsoleActivity mConsole;
 	private ListView mListView;
 	private ConsoleSearcher mSearcher;
-
 	private OnDragListener mOnDragListener = new OnDragListener() {
 		@Override
 		public boolean onDrag(View v, DragEvent event) {
@@ -66,7 +64,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			convertView = inflater.inflate(R.layout.console_entry, parent, false);
 			holder = new ConsoleEntryHolder();
 			holder.contents = (TextView) convertView.findViewById(R.id.console_entry_contents);
-			holder.loader = (RelativeLayout) convertView.findViewById(R.id.console_loading);
 			convertView.setTag(holder);
 		} else {
 			holder = (ConsoleEntryHolder) convertView.getTag();
@@ -100,12 +97,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			}
 		}
 
-		if (!getItem(position).isWaiting()) {
-			holder.loader.setVisibility(View.GONE);
-		} else {
-			holder.loader.setVisibility(View.VISIBLE);
-		}
-
 		convertView.setOnDragListener(mOnDragListener);
 
 		return convertView;
@@ -133,7 +124,6 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 
 	private static class ConsoleEntryHolder {
 		public TextView contents;
-		public RelativeLayout loader;
 	}
 
 }
