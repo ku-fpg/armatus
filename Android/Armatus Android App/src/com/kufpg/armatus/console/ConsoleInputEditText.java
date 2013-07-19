@@ -1,12 +1,7 @@
 package com.kufpg.armatus.console;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.LeadingMarginSpan;
 import android.util.AttributeSet;
@@ -18,8 +13,8 @@ import android.widget.EditText;
 public class ConsoleInputEditText extends EditText implements TextWatcher {
 	private static final KeyEvent Q = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q);
 	private static final KeyEvent DEL = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL);
+	private LeadingMarginSpan.Standard mIndent;
 	private int mChangedStartIndex, mChangedEndIndex;
-	private List<SpanParams> mIndentSpans = new ArrayList<SpanParams>();
 
 	public ConsoleInputEditText(Context context) {
 		super(context);
@@ -37,18 +32,17 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 	}
 
 	private void init() {
+		mIndent = new LeadingMarginSpan.Standard(0, 0);
+		getText().setSpan(mIndent, 0, 0, 0);
 		addTextChangedListener(this);
 	}
-
-	public void setTextSpan(Object what, int start, int end, int flags) {
-		Spannable spannable = new SpannableString(getText());
-		removeTextChangedListener(this);
-		if (what instanceof LeadingMarginSpan) {
-			mIndentSpans.add(new SpanParams(what, start, end, flags));
+	
+	public void setIndent(int length) {
+		for (LeadingMarginSpan span : getText().getSpans(0, getText().length(), LeadingMarginSpan.class)) {
+			getText().removeSpan(span);
 		}
-		spannable.setSpan(what, start, end, flags);
-		setText(spannable);
-		addTextChangedListener(this);
+		mIndent = new LeadingMarginSpan.Standard(length, 0);
+		getText().setSpan(mIndent, 0, 0, 0);
 	}
 
 	@Override
@@ -62,15 +56,13 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 	public void afterTextChanged(Editable s) {
 		int cursorPos = getSelectionStart();
 
+		removeTextChangedListener(this);
 		//Remove additional spans that might be introduced through pasting
 		for (LeadingMarginSpan span : s.getSpans(0, s.length(), LeadingMarginSpan.class)) {
 			s.removeSpan(span);
 		}
-		for (SpanParams param : mIndentSpans) {
-			s.setSpan(param.what, param.start, param.end, param.flags);
-		}
-
-		removeTextChangedListener(this);
+		s.setSpan(mIndent, 0, 0, 0);
+		
 		for (; mChangedStartIndex < mChangedEndIndex; mChangedStartIndex++) {
 			switch (s.charAt(mChangedStartIndex)) {
 			case ' ':
@@ -99,17 +91,5 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-	private class SpanParams {
-		public final Object what;
-		public final int start, end, flags;
-
-		public SpanParams(Object what, int start, int end, int flags) {
-			this.what = what;
-			this.start = start;
-			this.end = end;
-			this.flags = flags;
-		}
-	}
 
 }

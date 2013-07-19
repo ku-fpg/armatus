@@ -12,7 +12,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class StickyButton extends Button implements OnClickListener {
-	private OnStickListener mOnStickListener;
+	private OnClickListener mOnClickListener;
 	private boolean mIsStuck = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
 	private final Condition mLockInEffect = mLock.newCondition();
@@ -33,12 +33,17 @@ public class StickyButton extends Button implements OnClickListener {
 	}
 
 	private void init() {
-		setOnClickListener(this);
+		super.setOnClickListener(this);
 	}
 
 	@Override
 	public final void onClick(View v) {
 		lock(true);
+	}
+	
+	@Override
+	public void setOnClickListener(OnClickListener listener) {
+		mOnClickListener = listener;
 	}
 
 	@Override
@@ -62,17 +67,9 @@ public class StickyButton extends Button implements OnClickListener {
 		}
 		
 	}
-
-	public void setOnStickListener(OnStickListener l) {
-		mOnStickListener = l;
-	}
 	
 	public boolean isStuck() {
 		return mIsStuck;
-	}
-	
-	public void stick() {
-		performClick();
 	}
 
 	public void unstick() {
@@ -100,17 +97,13 @@ public class StickyButton extends Button implements OnClickListener {
 			}
 			mIsStuck = true;
 			setEnabled(false);
-			if (callListener && mOnStickListener != null) {
-				mOnStickListener.onStick(this);
+			if (callListener && mOnClickListener != null) {
+				mOnClickListener.onClick(this);
 			}
 		} finally {
 			mLock.unlock();
 		}
 	}
-
-	public interface OnStickListener {
-		void onStick(View v);
-	};
 
 	protected static class SavedState extends BaseSavedState {
 		boolean isStuck;

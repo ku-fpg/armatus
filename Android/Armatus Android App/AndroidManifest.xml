@@ -31,7 +31,6 @@
             android:label="@string/title_preference_screen" />
         <activity
             android:name=".console.ConsoleActivity"
-            android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan" />
         <activity

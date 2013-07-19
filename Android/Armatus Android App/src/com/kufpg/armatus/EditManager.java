@@ -20,10 +20,11 @@ public class EditManager implements Iterable<Edit> {
 
 	public EditManager() {
 		mRedoStackReverse = Lists.reverse(mRedoStack);
+		setLimit(DEFAULT_EDIT_LIMIT);
 	}
 
 	public EditManager(int limit) {
-		this();
+		mRedoStackReverse = Lists.reverse(mRedoStack);
 		setLimit(limit);
 	}
 

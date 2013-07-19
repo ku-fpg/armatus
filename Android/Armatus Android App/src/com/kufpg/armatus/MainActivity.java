@@ -5,7 +5,6 @@ import pl.polidea.treeview.demo.TreeListViewDemo;
 import com.kufpg.armatus.console.ConsoleActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.util.StickyButton;
-import com.kufpg.armatus.util.StickyButton.OnStickListener;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,13 +32,15 @@ public class MainActivity extends BaseActivity {
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
+		
+		mStickyButton.setOnClickListener(new OnClickListener() {
 
-		mStickyButton.setOnStickListener(new OnStickListener() {
 			@Override
-			public void onStick(View v) {
+			public void onClick(View v) {
 				mNumTextChanges++;
 				setCodeText(mNumTextChanges);
 			}
+			
 		});
 
 		mUnstickButton.setOnClickListener(new OnClickListener() {

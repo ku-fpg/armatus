@@ -59,7 +59,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		ConsoleEntryHolder holder;
 		String entryContents = getItem(position).getFullContents();
 
-		if (convertView == null) { //If this is a new ConsoleEntry
+		if (convertView == null) {
 			LayoutInflater inflater = mConsole.getLayoutInflater();
 			convertView = inflater.inflate(R.layout.console_entry, parent, false);
 			holder = new ConsoleEntryHolder();

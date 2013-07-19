@@ -10,7 +10,7 @@ public class ConsoleEdits {
 
 		public AddEntry(ConsoleActivity console, String contents) {
 			super(console);
-			mEntry = new ConsoleEntry(getConsole().getEntryCount(), contents);
+			mEntry = new ConsoleEntry(getConsole().getInputNum(), contents);
 		}
 
 		@Override
@@ -26,9 +26,11 @@ public class ConsoleEdits {
 	
 	public static class Clear extends ConsoleEdit {
 		private List<ConsoleEntry> mOriginalEntries;
+		private int mInputNum;
 
-		public Clear(ConsoleActivity console, List<ConsoleEntry> originalEntries) {
+		public Clear(ConsoleActivity console, int inputNum, List<ConsoleEntry> originalEntries) {
 			super(console);
+			mInputNum = inputNum;
 			mOriginalEntries = new ArrayList<ConsoleEntry>(originalEntries);
 		}
 
@@ -39,7 +41,7 @@ public class ConsoleEdits {
 
 		@Override
 		public void undo() {
-			getConsole().updateConsoleEntries(mOriginalEntries);
+			getConsole().updateConsoleEntries(mInputNum, mOriginalEntries);
 		}
 		
 	}
