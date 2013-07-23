@@ -70,7 +70,9 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 		}
 
 		holder.contents.setTypeface(ConsoleActivity.TYPEFACE);
-		PrettyPrinter.setPrettyText(holder.contents, entryContents);
+		if (!entryContents.equals(holder.contents.toString())) {
+			PrettyPrinter.setPrettyText(holder.contents, entryContents);
+		}
 
 		if (mSearcher != null) {
 			String criterion = mSearcher.getCriterion();
