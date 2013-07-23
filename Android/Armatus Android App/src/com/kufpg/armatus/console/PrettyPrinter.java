@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -21,7 +20,6 @@ public class PrettyPrinter {
 	public static final String YELLOW = "#FDFD0D";
 
 	public static void setPrettyText(TextView tv, String text) {
-		Log.d("TESTTEST", "PrettyPrinting engage!");
 		String sentenceStr = text.trim();
 		String leadSpace = StringUtils.getLeadingWhitespace(text);
 		String trailSpace = StringUtils.getTrailingWhitespace(text);

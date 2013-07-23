@@ -73,18 +73,18 @@ import android.widget.TextView.OnEditorActionListener;
  */
 public class ConsoleActivity extends BaseActivity {
 
-	public static final String DRAG_LAYOUT = "drag_layout";
 	public static final int DEFAULT_FONT_SIZE = 15;
 	public static final int ENTRY_CONSOLE_LIMIT = 100;
 	public static final int ENTRY_COMMAND_HISTORY_LIMIT = 200;
+	private static final int LONG_CLICKED_GROUP = 42;
+	private static final int DRAGGED_GROUP = 43;
 	private static final int SCROLL_DURATION = 500;
-	public static final String SELECTION_TAG = "selection";
-	public static final String KEYWORD_SWAP_TAG = "keywordswap";
-	public static final String WORD_COMPLETION_TAG = "wordcomplete";
-	public static final String CONSOLE_TAG = "console";
-	public static final String COMMANDS_TAG = "commands";
-	public static final String SESSION_HISTORY_FILENAME = "/history.txt";
-	public static final String UNDO_HISTORY_FILENAME = "/undo.txt";
+	static final String SELECTION_TAG = "selection";
+	static final String KEYWORD_SWAP_TAG = "keywordswap";
+	static final String WORD_COMPLETION_TAG = "wordcomplete";
+	private static final String CONSOLE_HISTORY_TAG = "console";
+	private static final String COMMANDS_HISTORY_TAG = "commands";
+	private static final String SESSION_HISTORY_FILENAME = "/history.txt";
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
@@ -456,8 +456,8 @@ public class ConsoleActivity extends BaseActivity {
 					}
 
 					mHistory = new JSONObject();
-					mHistory.put(CONSOLE_TAG, consoleHistory);
-					mHistory.put(COMMANDS_TAG, commandHistory);
+					mHistory.put(CONSOLE_HISTORY_TAG, consoleHistory);
+					mHistory.put(COMMANDS_HISTORY_TAG, commandHistory);
 
 					String path = "";
 					if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
@@ -497,7 +497,7 @@ public class ConsoleActivity extends BaseActivity {
 							try {
 								history = JsonUtils.openJsonFile(file.getAbsolutePath());
 
-								JSONArray consoleHistory = history.getJSONArray(CONSOLE_TAG);
+								JSONArray consoleHistory = history.getJSONArray(CONSOLE_HISTORY_TAG);
 								mConsoleEntries.clear();
 								for (int i = 0; i < consoleHistory.length(); i++) {
 									JSONObject jsonEntry = consoleHistory.getJSONObject(i);
@@ -510,7 +510,7 @@ public class ConsoleActivity extends BaseActivity {
 								mConsoleListView.setAdapter(mConsoleAdapter);
 								updateConsoleEntries();
 
-								JSONArray commandHistory = history.getJSONArray(COMMANDS_TAG);
+								JSONArray commandHistory = history.getJSONArray(COMMANDS_HISTORY_TAG);
 								mCommandHistoryEntries.clear();
 								for (int i = 0; i < commandHistory.length(); i++) {
 									mCommandHistoryEntries.add(commandHistory.getString(i));
@@ -546,16 +546,19 @@ public class ConsoleActivity extends BaseActivity {
 				!mConsoleEntries.get(info.position).getShortContents().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
 
+			final int group;
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
-				menu.setHeaderTitle("Execute " + mTempCommand + " on...");
+				menu.setHeaderTitle("Entry " + info.position + ": Execute " + mTempCommand + " on...");
+				group = DRAGGED_GROUP;
 			} else { //If user long-clicked entry
-				menu.setHeaderTitle(R.string.context_menu_title);
-				menu.add(0, 42, 0, "Sample transformation (does nothing)");
+				menu.setHeaderTitle("Entry " + info.position + ": Commands found");
+				menu.add(Menu.NONE, Menu.NONE, 1, "Sample transformation (does nothing)");
+				group = LONG_CLICKED_GROUP;
 			}
 
-			int order = 1;
+			int order = 2;
 			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
-				menu.add(0, v.getId(), order, keyword);
+				menu.add(group, v.getId(), order, keyword);
 				order++;
 			}
 		}
@@ -565,13 +568,15 @@ public class ConsoleActivity extends BaseActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
 			String keywordNStr = item.getTitle().toString();
-			if (mTempCommand != null) { //If DragIcon command is run
+			switch (item.getGroupId()) {
+			case DRAGGED_GROUP:
 				if (mInputEnabled) {
 					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
 				} else {
-					mConsoleInputEditText.setText(mTempCommand + " " + keywordNStr);
+					mConsoleInputEditText.setText(mTempCommand + StringUtils.NBSP + keywordNStr);
 				}
-			} else { //If long-click command is run
+				break;
+			case LONG_CLICKED_GROUP:
 				if (mInputEnabled) {
 					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
 				} else {
@@ -581,7 +586,6 @@ public class ConsoleActivity extends BaseActivity {
 			}
 			mConsoleInputEditText.requestFocus(); //Prevents ListView from stealing focus
 		}
-		mTempCommand = null;
 		return super.onContextItemSelected(item);
 	}
 
