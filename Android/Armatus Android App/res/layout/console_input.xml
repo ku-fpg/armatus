@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/test_code_input_line"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:paddingBottom="@dimen/entry_padding"
     android:paddingLeft="@dimen/entry_padding"
     android:paddingRight="@dimen/entry_padding" >
 
     <TextView
-        android:id="@+id/test_code_input_num"
+        android:id="@+id/console_input_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
@@ -20,11 +18,11 @@
         android:typeface="monospace" />
 
     <com.kufpg.armatus.console.ConsoleInputEditText
-        android:id="@+id/test_code_input_edit_text"
+        android:id="@+id/console_input_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/test_code_input_num"
-        android:layout_alignTop="@+id/test_code_input_num"
+        android:layout_alignLeft="@+id/console_input_num"
+        android:layout_alignTop="@+id/console_input_num"
         android:background="@null"
         android:imeOptions="actionGo"
         android:inputType="textNoSuggestions|textMultiLine"

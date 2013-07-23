@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/console_list_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/consoleBackgroundColor"
@@ -7,12 +8,12 @@
     <com.kufpg.armatus.drag.ListViewDragEdges
         android:id="@+id/console_list_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent" >
 
         <com.kufpg.armatus.console.ConsoleListView
             android:id="@+id/console_list_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:choiceMode="singleChoice"
             android:divider="@null"
             android:dividerHeight="0dp"
@@ -23,7 +24,7 @@
     <View
         android:id="@+id/console_empty_space"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/console_list_wrapper" />
+        android:layout_height="0dip"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

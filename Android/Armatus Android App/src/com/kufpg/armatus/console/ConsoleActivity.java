@@ -50,6 +50,7 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
+import android.view.View.OnLayoutChangeListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -57,10 +58,12 @@ import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -85,6 +88,7 @@ public class ConsoleActivity extends BaseActivity {
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
+	private RelativeLayout mConsoleLayout, mConsoleInputLayout;
 	private ConsoleListView mConsoleListView;
 	private ListView mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
@@ -96,6 +100,7 @@ public class ConsoleActivity extends BaseActivity {
 	private List<String> mCommandHistoryEntries;
 	private TextView mConsoleInputNumView, mFilterMatches;
 	private ConsoleInputEditText mConsoleInputEditText;
+	private View mConsoleEmptySpace;
 	private EditText mSearchInputView;
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
@@ -108,6 +113,7 @@ public class ConsoleActivity extends BaseActivity {
 	private boolean mSoftKeyboardVisible = true;
 	private boolean mSearchEnabled = false;
 	private int mConsoleInputNum = 0;
+	private int mConsoleEntriesHeight, mConsoleInputHeight, mScreenHeight, mConsoleWidth;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -116,15 +122,16 @@ public class ConsoleActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_sliding_menu_activity);
 
+		mConsoleLayout = (RelativeLayout) findViewById(R.id.console_list_layout);
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		mCommandHistoryListView = (ListView)findViewById(R.id.History);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
+		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
 		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-		final View backgroundView = (View) findViewById(R.id.console_empty_space);
-		final View consoleInputView = getLayoutInflater().inflate(R.layout.console_input, null);
-		mConsoleInputNumView = (TextView) consoleInputView.findViewById(R.id.test_code_input_num);
-		mConsoleInputEditText = (ConsoleInputEditText) consoleInputView.findViewById(R.id.test_code_input_edit_text);
+		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
+		mConsoleInputNumView = (TextView) mConsoleInputLayout.findViewById(R.id.console_input_num);
+		mConsoleInputEditText = (ConsoleInputEditText) mConsoleInputLayout.findViewById(R.id.console_input_edit_text);
 		mCallback = new ConsoleEntryCallback(this);
 		mDispatcher = new CommandDispatcher(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
@@ -134,6 +141,8 @@ public class ConsoleActivity extends BaseActivity {
 			mConsoleEntries = new ArrayList<ConsoleEntry>();
 			mCommandHistoryEntries = new ArrayList<String>();
 			mCompleter = new WordCompleter(this);
+			mConsoleInputLayout.setLayoutParams(new AbsListView.LayoutParams(
+					AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
 			mConsoleInputEditText.requestFocus();
 		} else {
 			mConsoleInputEditText.setText(savedInstanceState.getString("consoleInput"));
@@ -160,6 +169,16 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		}
 
+		mConsoleLayout.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+			@Override
+			public void onLayoutChange(View v, int left, int top, int right,
+					int bottom, int oldLeft, int oldTop, int oldRight,
+					int oldBottom) {
+				mScreenHeight = mConsoleLayout.getMeasuredHeight();
+				resizeEmptySpace();
+			}
+		});
+
 		rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
 			//Detects whether soft keyboard is open or closed
@@ -174,7 +193,7 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		});
 
-		backgroundView.setOnClickListener(new OnClickListener() {
+		mConsoleEmptySpace.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (!mSoftKeyboardVisible) {
@@ -183,14 +202,14 @@ public class ConsoleActivity extends BaseActivity {
 				}
 			}
 		});
-		backgroundView.setOnLongClickListener(new OnLongClickListener() {
+		mConsoleEmptySpace.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
 				mConsoleInputEditText.performLongClick();
 				return false;
 			}
 		});
-		backgroundView.setOnDragListener(new OnDragListener() {
+		mConsoleEmptySpace.setOnDragListener(new OnDragListener() {
 			@Override
 			public boolean onDrag(View v, DragEvent event) {
 				switch (event.getAction()) {
@@ -210,9 +229,26 @@ public class ConsoleActivity extends BaseActivity {
 
 		registerForContextMenu(mConsoleListView);
 		mConsoleAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
-		mConsoleListView.addFooterView(consoleInputView, null, false);
+		mConsoleListView.addFooterView(mConsoleInputLayout);
 		mConsoleListView.setAdapter(mConsoleAdapter); //MUST be called after addFooterView()
-		updateConsoleEntries();
+		mConsoleListView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+			@Override
+			public void onLayoutChange(View v, int left, int top, int right,
+					int bottom, int oldLeft, int oldTop, int oldRight,
+					int oldBottom) {
+				mConsoleEntriesHeight = 0;
+				for (int i = 0; i < getEntryCount(); i++) {
+					View child = mConsoleListView.getAdapter().getView(i, null, mConsoleListView);
+					child.measure(MeasureSpec.makeMeasureSpec(mConsoleWidth, MeasureSpec.AT_MOST),
+							MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+					mConsoleEntriesHeight += child.getMeasuredHeight();
+					if (mConsoleEntriesHeight >= mScreenHeight) {
+						break;
+					}
+				}
+				resizeEmptySpace();
+			}
+		});
 
 		if (savedInstanceState == null) {
 			mSearcher = new ConsoleSearcher(mConsoleAdapter);
@@ -221,11 +257,8 @@ public class ConsoleActivity extends BaseActivity {
 			mSearcher.attachAdapter(mConsoleAdapter);
 		}
 
-		refreshSlidingMenu();
-
 		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
 		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-		updateCommandHistoryEntries();
 
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
@@ -279,13 +312,27 @@ public class ConsoleActivity extends BaseActivity {
 				return false;
 			}
 		});
+		mConsoleInputLayout.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+			@Override
+			public void onLayoutChange(View v, int left, int top, int right,
+					int bottom, int oldLeft, int oldTop, int oldRight,
+					int oldBottom) {
+				mConsoleInputHeight = mConsoleInputLayout.getMeasuredHeight();
+				mConsoleWidth = mConsoleInputLayout.getMeasuredWidth();
+				resizeEmptySpace();
+			}
+		});
+
+		updateConsoleEntries();
+		updateCommandHistoryEntries();
+		refreshSlidingMenu();
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString("consoleInput", mConsoleInputEditText.getText().toString());
 		outState.putInt("consoleInputNum", mConsoleInputNum);
+		outState.putString("consoleInput", mConsoleInputEditText.getText().toString());
 		outState.putParcelable("consoleSearcher", mSearcher);
 		outState.putInt("consoleInputCursor", mConsoleInputEditText.getSelectionStart());
 		if (mSearchInputView != null) {
@@ -628,7 +675,7 @@ public class ConsoleActivity extends BaseActivity {
 	public int getEntryCount() {
 		return mConsoleEntries.size();
 	}
-	
+
 	/**
 	 * @return the entry number for the console input field.
 	 */
@@ -741,6 +788,16 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
+	synchronized void resizeEmptySpace() {
+		mConsoleEmptySpace.post(new Runnable() {
+			@Override
+			public void run() {
+				mConsoleEmptySpace.getLayoutParams().height = mScreenHeight - mConsoleEntriesHeight - mConsoleInputHeight;
+				mConsoleEmptySpace.requestLayout();
+			}
+		});
+	}
+
 	/**
 	 * Show the entry at the bottom of the console ListView.
 	 */
@@ -785,6 +842,8 @@ public class ConsoleActivity extends BaseActivity {
 		}
 		mConsoleAdapter.notifyDataSetChanged();
 		updateInput();
+
+		resizeEmptySpace();
 	}
 
 	void updateConsoleEntries(int inputNum, List<ConsoleEntry> newEntries) {
