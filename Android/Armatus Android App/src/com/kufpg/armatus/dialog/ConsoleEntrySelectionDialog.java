@@ -1,7 +1,10 @@
 package com.kufpg.armatus.dialog;
 
+import java.util.List;
+
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleActivity;
+import com.kufpg.armatus.console.ConsoleEntry;
 import com.kufpg.armatus.console.PrettyPrinter;
 import com.kufpg.armatus.util.StringUtils;
 
@@ -19,25 +22,34 @@ import android.widget.TextView;
 public class ConsoleEntrySelectionDialog extends DialogFragment implements OnPrimaryClipChangedListener {
 	private ClipboardManager mClipboard;
 	private TextView mContentsView;
-	private int mEntryNum;
-	private String mEntryContents;
-	
-	public static ConsoleEntrySelectionDialog newInstance(int entryNum, String entryContents) {
+	private int mFirstEntryNum;
+	private String mContents;
+
+	public static ConsoleEntrySelectionDialog newInstance(List<ConsoleEntry> entries) {
 		ConsoleEntrySelectionDialog cesd = new ConsoleEntrySelectionDialog();
-		
+
 		Bundle args = new Bundle();
-		args.putInt("entryNum", entryNum);
-		args.putString("entryContents", entryContents);
+		if (entries.size() == 1) {
+			args.putInt("firstEntryNum", entries.get(0).getNum());
+		} else {
+			args.putInt("firstEntryNum", -1);
+		}
+		StringBuilder contentsBuilder = new StringBuilder();
+		for (ConsoleEntry entry : entries) {
+			contentsBuilder.append(entry.getFullContents()).append('\n');
+		}
+		contentsBuilder.deleteCharAt(contentsBuilder.length() - 1); //Remove final newline
+		args.putString("contents", contentsBuilder.toString());
 		cesd.setArguments(args);
-		
+
 		return cesd;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mEntryNum = getArguments().getInt("entryNum");
-		mEntryContents = getArguments().getString("entryContents");
+		mFirstEntryNum = getArguments().getInt("firstEntryNum");
+		mContents = getArguments().getString("contents");
 		mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
 	}
 
@@ -47,21 +59,24 @@ public class ConsoleEntrySelectionDialog extends DialogFragment implements OnPri
 		View v = inflater.inflate(R.layout.console_entry_selection_dialog, container, false);
 		setCancelable(true);
 
-		getDialog().setTitle("Entry number " + String.valueOf(mEntryNum));
+		if (mFirstEntryNum > -1) { //If there is only one entry
+			getDialog().setTitle("Entry number " + mFirstEntryNum);
+		} else {
+			getDialog().setTitle("Selected entries");
+		}
 		mContentsView = (TextView) v.findViewById(R.id.console_entry_selection_dialog_contents);
-		mContentsView.setCursorVisible(true);
 		mContentsView.setTypeface(ConsoleActivity.TYPEFACE);
-		PrettyPrinter.setPrettyText(mContentsView, mEntryContents);
-		
+		PrettyPrinter.setPrettyText(mContentsView, mContents);
+
 		return v;
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		mClipboard.addPrimaryClipChangedListener(this);
 	}
-	
+
 	@Override
 	public void onPause() {
 		super.onPause();

@@ -66,7 +66,7 @@ public class WordCompleter implements Parcelable, TextWatcher {
 		if (mFilteredDictionary.size() == 1) {
 			return mFilteredDictionary.first() + " ";
 		} else if (mFilteredDictionary.size() > 1) {
-			mConsole.showEntryDialog(-1, null, ConsoleActivity.WORD_COMPLETION_TAG);
+			mConsole.showWordCompletionDialog(getWordSuggestions());
 		}
 		return null;
 	}

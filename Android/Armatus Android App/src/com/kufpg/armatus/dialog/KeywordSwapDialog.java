@@ -79,11 +79,11 @@ public class KeywordSwapDialog extends DialogFragment {
 		mToastButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String message = "";
+				StringBuilder builder = new StringBuilder();
 				for (String word : mEntryWords) {
-					message += word + " ";
+					builder.append(word).append(" ");
 				}
-				((ConsoleActivity) getActivity()).showToast(message.trim());
+				((ConsoleActivity) getActivity()).showToast(builder.toString().trim());
 			}
 		});
 

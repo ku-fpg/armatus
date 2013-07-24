@@ -40,7 +40,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.DragEvent;
 import android.view.KeyEvent;
@@ -79,9 +78,9 @@ public class ConsoleActivity extends BaseActivity {
 	private static final int LONG_CLICKED_GROUP = 42;
 	private static final int DRAGGED_GROUP = 43;
 	private static final int SCROLL_DURATION = 500;
-	static final String SELECTION_TAG = "selection";
-	static final String KEYWORD_SWAP_TAG = "keywordswap";
-	static final String WORD_COMPLETION_TAG = "wordcomplete";
+	private static final String SELECTION_TAG = "selection";
+	private static final String KEYWORD_SWAP_TAG = "keywordswap";
+	private static final String WORD_COMPLETION_TAG = "wordcomplete";
 	private static final String CONSOLE_HISTORY_TAG = "console";
 	private static final String COMMANDS_HISTORY_TAG = "commands";
 	private static final String SESSION_HISTORY_FILENAME = "/history.txt";
@@ -105,8 +104,6 @@ public class ConsoleActivity extends BaseActivity {
 	private SlidingMenu mSlidingMenu;
 	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
-	private ActionMode mActionMode;
-	private ConsoleEntryCallback mCallback;
 	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
@@ -132,7 +129,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNumView = (TextView) mConsoleInputLayout.findViewById(R.id.console_input_num);
 		mConsoleInputEditText = (ConsoleInputEditText) mConsoleInputLayout.findViewById(R.id.console_input_edit_text);
-		mCallback = new ConsoleEntryCallback(this);
 		mDispatcher = new CommandDispatcher(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
@@ -275,7 +271,7 @@ public class ConsoleActivity extends BaseActivity {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				//Closes SlidingMenu and scroll to bottom if user begins typing
 				mSlidingMenu.showContent();
-				setContextualActionBarVisible(false);
+				mConsoleListView.setActionModeVisible(false);
 				if (mSearchEnabled) {
 					executeSearch(null, SearchAction.END, null);
 				}
@@ -712,31 +708,27 @@ public class ConsoleActivity extends BaseActivity {
 	public void setTempCommand(String commandName) {
 		mTempCommand = commandName;
 	}
-
-	public void setContextualActionBarVisible(boolean visible) {
-		if (visible && !mCallback.isVisible()) {
-			mActionMode = startActionMode(mCallback);
-		} else if (!visible && mCallback.isVisible()) {
-			mActionMode.finish();
-		}
+	
+	public void showEntrySelectionDialog(List<ConsoleEntry> entries) {
+		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
 	}
-
-	public void showEntryDialog(int entryNum, String entryContents, String tag) {
+	
+	public void showKeywordSwapDialog(int entryNum, String entryContents) {
+		showDialog(KeywordSwapDialog.newInstance(entryNum, entryContents), KEYWORD_SWAP_TAG);
+	}
+	
+	public void showWordCompletionDialog(List<String> suggestions) {
+		showDialog(WordCompletionDialog.newInstance(mCompleter.getWordSuggestions()), WORD_COMPLETION_TAG);
+	}
+	
+	private void showDialog(DialogFragment fragment, String tag) {
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		Fragment prev = getFragmentManager().findFragmentByTag("selecDialog");
+		Fragment prev = getFragmentManager().findFragmentByTag(tag);
 		if (prev != null) {
 			ft.remove(prev);
 		}
 		ft.addToBackStack(null);
-		DialogFragment newFrag = null;
-		if (tag == SELECTION_TAG) {
-			newFrag = ConsoleEntrySelectionDialog.newInstance(entryNum, entryContents);
-		} else if (tag == KEYWORD_SWAP_TAG) {
-			newFrag = KeywordSwapDialog.newInstance(entryNum, entryContents);
-		} else if (tag == WORD_COMPLETION_TAG) {
-			newFrag = WordCompletionDialog.newInstance(mCompleter.getWordSuggestions());
-		}
-		ft.add(newFrag, tag);
+		ft.add(fragment, tag);
 		ft.commit();
 	}
 

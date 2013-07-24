@@ -605,12 +605,11 @@ public class CommandDispatcher {
 	}
 
 	private static String varargsToString(String... varargs) {
-		String newString = "";
+		StringBuilder builder = new StringBuilder();
 		for(String string : varargs) {
-			newString += string + " ";
+			builder.append(string).append(" ");
 		}
-		newString.trim();
-		return newString;
+		return builder.toString().trim();
 	}
 
 	private static Map<String, Command> mapCommands() {
