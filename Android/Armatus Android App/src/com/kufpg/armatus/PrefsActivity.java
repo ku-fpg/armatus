@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -48,18 +49,23 @@ public class PrefsActivity extends PreferenceActivity {
 		setTheme(BaseActivity.getThemePrefId());
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
 		mActivity = this;
-		
+
 		super.onCreate(savedInstanceState);
 	}
 
-	public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+	public static class PrefsFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preferences);
 
 			mPrefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
-			mPrefs.registerOnSharedPreferenceChangeListener(this);
+			mPrefs.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+				@Override
+				public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+					updatePrefSummary(key);
+				}
+			});
 			mEditor = mPrefs.edit();
 
 			mHistoryUseCachePref = (CheckBoxPreference) findPreference(HISTORY_USE_CACHE_KEY);
@@ -127,11 +133,6 @@ public class PrefsActivity extends PreferenceActivity {
 					return true;
 				}
 			});
-		}
-
-		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			updatePrefSummary(key);
 		}
 
 		@Override

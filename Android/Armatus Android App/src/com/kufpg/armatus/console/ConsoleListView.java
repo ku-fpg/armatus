@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public class ConsoleListView extends ListView /*implements OnItemClickListener*/ {
+public class ConsoleListView extends ListView {
 	private ConsoleActivity mConsole;
 	private ActionMode mActionMode;
 	private ActionModeCallback mCallback;

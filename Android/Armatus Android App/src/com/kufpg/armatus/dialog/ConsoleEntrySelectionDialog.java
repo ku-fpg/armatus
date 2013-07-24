@@ -19,9 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class ConsoleEntrySelectionDialog extends DialogFragment implements OnPrimaryClipChangedListener {
+public class ConsoleEntrySelectionDialog extends DialogFragment {
 	private ClipboardManager mClipboard;
 	private TextView mContentsView;
+	private OnPrimaryClipChangedListener mClipboardUnwrapper;
 	private int mFirstEntryNum;
 	private String mContents;
 
@@ -51,6 +52,18 @@ public class ConsoleEntrySelectionDialog extends DialogFragment implements OnPri
 		mFirstEntryNum = getArguments().getInt("firstEntryNum");
 		mContents = getArguments().getString("contents");
 		mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+		mClipboardUnwrapper = new OnPrimaryClipChangedListener() {
+			@Override
+			public void onPrimaryClipChanged() {
+				if (mClipboard.hasPrimaryClip() && mClipboard.getPrimaryClipDescription().hasMimeType("text/plain")) {
+					mClipboard.removePrimaryClipChangedListener(this);
+					String contents = mClipboard.getPrimaryClip().getItemAt(0).getText().toString();
+					ClipData newCopy = ClipData.newPlainText("copiedText", StringUtils.removeCharWrap(contents));
+					mClipboard.setPrimaryClip(newCopy);
+					mClipboard.addPrimaryClipChangedListener(this);
+				}
+			}
+		};
 	}
 
 	@Override
@@ -74,24 +87,13 @@ public class ConsoleEntrySelectionDialog extends DialogFragment implements OnPri
 	@Override
 	public void onResume() {
 		super.onResume();
-		mClipboard.addPrimaryClipChangedListener(this);
+		mClipboard.addPrimaryClipChangedListener(mClipboardUnwrapper);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		mClipboard.removePrimaryClipChangedListener(this);
-	}
-
-	@Override
-	public void onPrimaryClipChanged() {
-		if (mClipboard.hasPrimaryClip() && mClipboard.getPrimaryClipDescription().hasMimeType("text/plain")) {
-			mClipboard.removePrimaryClipChangedListener(this);
-			String contents = mClipboard.getPrimaryClip().getItemAt(0).getText().toString();
-			ClipData newCopy = ClipData.newPlainText("copiedText", StringUtils.removeCharWrap(contents));
-			mClipboard.setPrimaryClip(newCopy);
-			mClipboard.addPrimaryClipChangedListener(this);
-		}
+		mClipboard.removePrimaryClipChangedListener(mClipboardUnwrapper);
 	}
 
 }

@@ -10,7 +10,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 
-public class ConsoleInputEditText extends EditText implements TextWatcher {
+public class ConsoleInputEditText extends EditText {
 	private static final KeyEvent Q = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_Q);
 	private static final KeyEvent DEL = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL);
 	private LeadingMarginSpan.Standard mIndent;
@@ -34,7 +34,47 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 	private void init() {
 		mIndent = new LeadingMarginSpan.Standard(0, 0);
 		getText().setSpan(mIndent, 0, 0, 0);
-		addTextChangedListener(this);
+		addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable s) {
+				int cursorPos = getSelectionStart();
+
+				removeTextChangedListener(this);
+				//Remove additional spans that might be introduced through pasting
+				for (LeadingMarginSpan span : s.getSpans(0, s.length(), LeadingMarginSpan.class)) {
+					s.removeSpan(span);
+				}
+				s.setSpan(mIndent, 0, 0, 0);
+				
+				for (; mChangedStartIndex < mChangedEndIndex; mChangedStartIndex++) {
+					switch (s.charAt(mChangedStartIndex)) {
+					case ' ':
+						//Prevent TextView's default word-wrapping behavior (wrap by character instead)
+						s.replace(mChangedStartIndex, mChangedStartIndex+1, "\u00A0");
+						break;
+					case '\n':
+						/* A strange bug exists where pasting multiple lines will seemingly indent all
+						 * newlines--until the text is changed via typing. Therefore, this will initiate
+						 * the typing on each newline to prevent weirdness. */
+						setSelection(mChangedStartIndex);
+						dispatchKeyEvent(Q);
+						dispatchKeyEvent(DEL);
+						break;
+					}
+				}
+				addTextChangedListener(this);
+				setSelection(cursorPos);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				mChangedStartIndex = start;
+				mChangedEndIndex = start + after;
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+		});
 	}
 	
 	public void setIndent(int length) {
@@ -51,45 +91,5 @@ public class ConsoleInputEditText extends EditText implements TextWatcher {
 		outAttrs.imeOptions &= ~EditorInfo.IME_FLAG_NO_ENTER_ACTION;
 		return conn;
 	}
-
-	@Override
-	public void afterTextChanged(Editable s) {
-		int cursorPos = getSelectionStart();
-
-		removeTextChangedListener(this);
-		//Remove additional spans that might be introduced through pasting
-		for (LeadingMarginSpan span : s.getSpans(0, s.length(), LeadingMarginSpan.class)) {
-			s.removeSpan(span);
-		}
-		s.setSpan(mIndent, 0, 0, 0);
-		
-		for (; mChangedStartIndex < mChangedEndIndex; mChangedStartIndex++) {
-			switch (s.charAt(mChangedStartIndex)) {
-			case ' ':
-				//Prevent TextView's default word-wrapping behavior (wrap by character instead)
-				s.replace(mChangedStartIndex, mChangedStartIndex+1, "\u00A0");
-				break;
-			case '\n':
-				/* A strange bug exists where pasting multiple lines will seemingly indent all
-				 * newlines--until the text is changed via typing. Therefore, this will initiate
-				 * the typing on each newline to prevent weirdness. */
-				setSelection(mChangedStartIndex);
-				dispatchKeyEvent(Q);
-				dispatchKeyEvent(DEL);
-				break;
-			}
-		}
-		addTextChangedListener(this);
-		setSelection(cursorPos);
-	}
-
-	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-		mChangedStartIndex = start;
-		mChangedEndIndex = start + after;
-	}
-
-	@Override
-	public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
 }

@@ -8,10 +8,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class StickyButton extends Button implements OnClickListener {
+public class StickyButton extends Button {
 	private OnClickListener mOnClickListener;
 	private boolean mIsStuck = false;
 	private final ReentrantLock mLock = new ReentrantLock(true);
@@ -33,12 +32,12 @@ public class StickyButton extends Button implements OnClickListener {
 	}
 
 	private void init() {
-		super.setOnClickListener(this);
-	}
-
-	@Override
-	public final void onClick(View v) {
-		lock(true);
+		super.setOnClickListener(new OnClickListener() {
+			@Override
+			public final void onClick(View v) {
+				lock(true);
+			}
+		});
 	}
 	
 	@Override
