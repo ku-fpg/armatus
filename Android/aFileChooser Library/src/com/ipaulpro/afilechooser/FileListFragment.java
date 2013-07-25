@@ -26,6 +26,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -40,8 +41,7 @@ import android.widget.ListView;
  * @author paulburke (ipaulpro)
  * 
  */
-public class FileListFragment extends ListFragment implements
-LoaderManager.LoaderCallbacks<List<File>> {
+public class FileListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<File>> {
 
 	private static final int LOADER_ID = 0;
 	private static final int ID_SELECT = 42;
@@ -78,21 +78,32 @@ LoaderManager.LoaderCallbacks<List<File>> {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		setEmptyText(getString(R.string.empty_directory));
+		setHasOptionsMenu(true);
 		setListAdapter(mAdapter);
 		setListShown(false);
-
 		getLoaderManager().initLoader(LOADER_ID, null, this);
-
-		/*getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-				openContextMenu(view);
-				return false;
-			}
-		});*/
 		registerForContextMenu(getListView());
 
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.action_bar, menu);
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.go_to_parent) {
+			File file = new File(mPath);
+			String fileParent = file.getParent();
+			if (fileParent != null) {
+				((FileChooserActivity) getActivity()).onFileSelected(new File(fileParent));
+			}
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

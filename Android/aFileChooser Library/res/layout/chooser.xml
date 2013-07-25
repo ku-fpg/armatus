@@ -22,7 +22,7 @@
         android:id="@+id/explorer_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginRight="@dimen/list_padding"
-        android:layout_marginLeft="@dimen/list_padding" />
+        android:layout_marginLeft="@dimen/list_padding"
+        android:layout_marginRight="@dimen/list_padding" />
 
 </LinearLayout>

@@ -169,7 +169,7 @@ OnBackStackChangedListener {
 			Toast.makeText(FileChooserActivity.this, R.string.error_selecting_file, Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	protected void onDirectorySelected(File dir) {
 		if (dir != null) {
 			mPath = dir.getAbsolutePath();

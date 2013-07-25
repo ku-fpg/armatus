@@ -1,4 +1,4 @@
-package com.slidingmenu.lib;
+package com.jeremyfeinstein.slidingmenu.lib;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,17 +7,18 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.slidingmenu.lib.SlidingMenu.CanvasTransformer;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
 
 public class CustomViewBehind extends ViewGroup {
 
 	private static final String TAG = "CustomViewBehind";
-
+	private static final boolean DEBUG = false;
 	private static final int MARGIN_THRESHOLD = 48; // dips
 	private int mTouchMode = SlidingMenu.TOUCHMODE_MARGIN;
 
@@ -51,6 +52,14 @@ public class CustomViewBehind extends ViewGroup {
 	public void setWidthOffset(int i) {
 		mWidthOffset = i;
 		requestLayout();
+	}
+	
+	public void setMarginThreshold(int marginThreshold) {
+		mMarginThreshold = marginThreshold;
+	}
+	
+	public int getMarginThreshold() {
+		return mMarginThreshold;
 	}
 
 	public int getBehindWidth() {
@@ -223,8 +232,8 @@ public class CustomViewBehind extends ViewGroup {
 						(x-getBehindWidth())*mScrollScale), y);				
 			}
 		}
-		/*if (vis == View.INVISIBLE)
-			Log.v(TAG, "behind INVISIBLE");*/
+		if (vis == View.INVISIBLE)
+			if (DEBUG) Log.v(TAG, "behind INVISIBLE");
 		setVisibility(vis);
 	}
 
@@ -371,11 +380,11 @@ public class CustomViewBehind extends ViewGroup {
 		}
 		canvas.drawRect(left, 0, right, getHeight(), mFadePaint);
 	}
-
+	
 	private boolean mSelectorEnabled = true;
 	private Bitmap mSelectorDrawable;
 	private View mSelectedView;
-
+	
 	public void drawSelector(View content, Canvas canvas, float openPercent) {
 		if (!mSelectorEnabled) return;
 		if (mSelectorDrawable != null && mSelectedView != null) {
@@ -399,7 +408,7 @@ public class CustomViewBehind extends ViewGroup {
 			}
 		}
 	}
-
+	
 	public void setSelectorEnabled(boolean b) {
 		mSelectorEnabled = b;
 	}

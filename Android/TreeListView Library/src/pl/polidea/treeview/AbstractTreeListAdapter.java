@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,7 +25,8 @@ import android.widget.ListAdapter;
  */
 public abstract class AbstractTreeListAdapter<T> extends BaseAdapter implements
 ListAdapter {
-	//private static final String TAG = AbstractTreeListAdapter.class.getSimpleName();
+	private static final String TAG = AbstractTreeListAdapter.class.getSimpleName();
+	private static final boolean DEBUG = false;
 	private final TreeStateManager<T> mTreeStateManager;
 	private final int mNumberOfLevels;
 	private final LayoutInflater mLayoutInflater;
@@ -158,17 +160,18 @@ ListAdapter {
 	@Override
 	public final View getView(final int position, final View convertView,
 			final ViewGroup parent) {
-		/*Log.d(TAG, "Creating a view based on " + convertView
-                + " with position " + position);*/
+		if (DEBUG)
+			Log.d(TAG, "Creating a view based on " + convertView
+					+ " with position " + position);
 		final TreeNodeInfo<T> nodeInfo = getTreeNodeInfo(position);
 		if (convertView == null) {
-			//Log.d(TAG, "Creating the view a new");
+			if (DEBUG) Log.d(TAG, "Creating the view a new");
 			final LinearLayout layout = (LinearLayout) mLayoutInflater.inflate(
 					getTreeListItemWrapperId(), null);
 			return populateTreeItem(layout, getNewChildView(nodeInfo),
 					nodeInfo, true);
 		} else {
-			//Log.d(TAG, "Reusing the view");
+			if (DEBUG) Log.d(TAG, "Reusing the view");
 			final LinearLayout linear = (LinearLayout) convertView;
 			final FrameLayout frameLayout = (FrameLayout) linear
 					.findViewById(R.id.treeview_list_item_frame);

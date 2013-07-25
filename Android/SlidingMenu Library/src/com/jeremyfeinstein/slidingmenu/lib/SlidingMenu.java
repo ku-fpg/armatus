@@ -1,4 +1,4 @@
-package com.slidingmenu.lib;
+package com.jeremyfeinstein.slidingmenu.lib;
 
 import java.lang.reflect.Method;
 
@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,11 +27,12 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.slidingmenu.lib.CustomViewAbove.OnPageChangeListener;
+import com.jeremyfeinstein.slidingmenu.lib.CustomViewAbove.OnPageChangeListener;
 
 public class SlidingMenu extends RelativeLayout {
 
-	//private static final String TAG = "SlidingMenu";
+	private static final String TAG = "SlidingMenu";
+	private static final boolean DEBUG = false;
 
 	public static final int SLIDING_WINDOW = 0;
 	public static final int SLIDING_CONTENT = 1;
@@ -68,6 +70,8 @@ public class SlidingMenu extends RelativeLayout {
 	private CustomViewBehind mViewBehind;
 
 	private OnOpenListener mOpenListener;
+
+	private OnOpenListener mSecondaryOpenListner;
 
 	private OnCloseListener mCloseListener;
 
@@ -176,7 +180,7 @@ public class SlidingMenu extends RelativeLayout {
 	 */
 	public SlidingMenu(Activity activity, int slideStyle) {
 		this(activity, null);
-		attachToActivity(activity, slideStyle);
+		this.attachToActivity(activity, slideStyle);
 	}
 
 	/**
@@ -211,6 +215,7 @@ public class SlidingMenu extends RelativeLayout {
 		mViewAbove.setOnPageChangeListener(new OnPageChangeListener() {
 			public static final int POSITION_OPEN = 0;
 			public static final int POSITION_CLOSE = 1;
+			public static final int POSITION_SECONDARY_OPEN = 2;
 
 			public void onPageScrolled(int position, float positionOffset,
 					int positionOffsetPixels) { }
@@ -220,6 +225,8 @@ public class SlidingMenu extends RelativeLayout {
 					mOpenListener.onOpen();
 				} else if (position == POSITION_CLOSE && mCloseListener != null) {
 					mCloseListener.onClose();
+				} else if (position == POSITION_SECONDARY_OPEN && mSecondaryOpenListner != null ) {
+					mSecondaryOpenListner.onOpen();
 				}
 			}
 		});
@@ -407,7 +414,6 @@ public class SlidingMenu extends RelativeLayout {
 	 */
 	public void setSecondaryMenu(View v) {
 		mViewBehind.setSecondaryContent(v);
-		//		mViewBehind.invalidate();
 	}
 
 	/**
@@ -438,8 +444,8 @@ public class SlidingMenu extends RelativeLayout {
 	}
 
 	/**
-	 * Sets which side the SlidingMenu should appear on.
-	 * @param mode must be either SlidingMenu.LEFT or SlidingMenu.RIGHT
+	 * Sets which side(s) the SlidingMenu should appear on.
+	 * @param mode must be SlidingMenu.LEFT, SlidingMenu.RIGHT, or SlidingMenu.LEFT_RIGHT
 	 */
 	public void setMode(int mode) {
 		if (mode != LEFT && mode != RIGHT && mode != LEFT_RIGHT) {
@@ -466,10 +472,8 @@ public class SlidingMenu extends RelativeLayout {
 			setSlidingEnabled(false);
 			mViewAbove.setCustomViewBehind(null);
 			mViewAbove.setCurrentItem(1);
-			//			mViewBehind.setCurrentItem(0);	
 		} else {
 			mViewAbove.setCurrentItem(1);
-			//			mViewBehind.setCurrentItem(1);
 			mViewAbove.setCustomViewBehind(mViewBehind);
 			setSlidingEnabled(true);
 		}
@@ -578,11 +582,6 @@ public class SlidingMenu extends RelativeLayout {
 	 * @param i The margin, in pixels, on the right of the screen that the behind view scrolls to.
 	 */
 	public void setBehindOffset(int i) {
-		//		RelativeLayout.LayoutParams params = ((RelativeLayout.LayoutParams)mViewBehind.getLayoutParams());
-		//		int bottom = params.bottomMargin;
-		//		int top = params.topMargin;
-		//		int left = params.leftMargin;
-		//		params.setMargins(left, top, i, bottom);
 		mViewBehind.setWidthOffset(i);
 	}
 
@@ -657,6 +656,22 @@ public class SlidingMenu extends RelativeLayout {
 	 */
 	public float getBehindScrollScale() {
 		return mViewBehind.getScrollScale();
+	}
+
+	/**
+	 * Gets the touch mode margin threshold
+	 * @return the touch mode margin threshold
+	 */
+	public int getTouchmodeMarginThreshold() {
+		return mViewBehind.getMarginThreshold();
+	}
+
+	/**
+	 * Set the touch mode margin threshold
+	 * @param touchmodeMarginThreshold
+	 */
+	public void setTouchmodeMarginThreshold(int touchmodeMarginThreshold) {
+		mViewBehind.setMarginThreshold(touchmodeMarginThreshold);
 	}
 
 	/**
@@ -861,17 +876,26 @@ public class SlidingMenu extends RelativeLayout {
 	 * @param listener the new OnOpenListener
 	 */
 	public void setOnOpenListener(OnOpenListener listener) {
-		//mViewAbove.setOnOpenListener(listener);
 		mOpenListener = listener;
 	}
 
+
 	/**
-	 * Sets the OnCloseListener. {@link OnCloseListener#onClose() OnCloseListener.onClose()} will be called when the SlidingMenu is closed
+	 * Sets the OnOpenListner for secondary menu  {@link OnOpenListener#onOpen() OnOpenListener.onOpen()} will be called when the secondary SlidingMenu is opened
+	 * 
+	 * @param listener the new OnOpenListener
+	 */
+
+	public void setSecondaryOnOpenListner(OnOpenListener listener) {
+		mSecondaryOpenListner = listener;
+	}
+
+	/**
+	 * Sets the OnCloseListener. {@link OnCloseListener#onClose() OnCloseListener.onClose()} will be called when any one of the SlidingMenu is closed
 	 *
 	 * @param listener the new setOnCloseListener
 	 */
 	public void setOnCloseListener(OnCloseListener listener) {
-		//mViewAbove.setOnCloseListener(listener);
 		mCloseListener = listener;
 	}
 
@@ -963,7 +987,7 @@ public class SlidingMenu extends RelativeLayout {
 		int topPadding = insets.top;
 		int bottomPadding = insets.bottom;
 		if (!mActionbarOverlay) {
-			//Log.v(TAG, "setting padding!");
+			if (DEBUG) Log.v(TAG, "setting padding!");
 			setPadding(leftPadding, topPadding, rightPadding, bottomPadding);
 		}
 		return true;
@@ -981,7 +1005,7 @@ public class SlidingMenu extends RelativeLayout {
 		if (layerType != getContent().getLayerType()) {
 			mHandler.post(new Runnable() {
 				public void run() {
-					//Log.v(TAG, "changing layerType. hardware? " + (layerType == View.LAYER_TYPE_HARDWARE));
+					if (DEBUG) Log.v(TAG, "changing layerType. hardware? " + (layerType == View.LAYER_TYPE_HARDWARE));
 					getContent().setLayerType(layerType, null);
 					getMenu().setLayerType(layerType, null);
 					if (getSecondaryMenu() != null) {

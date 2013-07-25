@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.kufpg.armatus.EditManager.Edit;
 import com.kufpg.armatus.MainActivity;
 import com.kufpg.armatus.R;
@@ -27,7 +28,6 @@ import com.kufpg.armatus.dialog.YesOrNoDialog;
 import com.kufpg.armatus.drag.DragIcon;
 import com.kufpg.armatus.util.JsonUtils;
 import com.kufpg.armatus.util.StringUtils;
-import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -195,6 +195,7 @@ public class ConsoleActivity extends BaseActivity {
 				if (!mSoftKeyboardVisible) {
 					((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
 					.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+					mConsoleInputEditText.requestFocus();
 				}
 			}
 		});

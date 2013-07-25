@@ -58,21 +58,6 @@ public class FileUtils {
 	public static final String MIME_TYPE_APP = "application/*";
 
 	/**
-	 * Whether the filename is a video file.
-	 * 
-	 * @param filename
-	 * @return
-	 *//*
-	public static boolean isVideo(String filename) {
-		String mimeType = getMimeType(filename);
-		if (mimeType != null && mimeType.startsWith("video/")) {
-			return true;
-		} else {
-			return false;
-		}
-	}*/
-
-	/**
 	 * Whether the URI is a local one.
 	 * 
 	 * @param uri
@@ -354,7 +339,7 @@ public class FileUtils {
 		if(DEBUG) Log.d(TAG, "Attempting to get thumbnail");
 
 		if (isMediaUri(uri)) {
-			Log.e(TAG, "You can only retrieve thumbnails for images and videos.");
+			if (DEBUG) Log.e(TAG, "You can only retrieve thumbnails for images and videos.");
 			return null;
 		}
 

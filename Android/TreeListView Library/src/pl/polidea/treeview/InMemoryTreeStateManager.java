@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import android.database.DataSetObserver;
+import android.util.Log;
 
 /**
  * In-memory manager of tree state.
@@ -18,7 +19,8 @@ import android.database.DataSetObserver;
  *            type of identifier
  */
 public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
-	//private static final String TAG = InMemoryTreeStateManager.class.getSimpleName();
+	private static final String TAG = InMemoryTreeStateManager.class.getSimpleName();
+	private static final boolean DEBUG = false;
 	private static final long serialVersionUID = 1L;
 	private final Map<T, InMemoryTreeNode<T>> mAllNodes = new HashMap<T, InMemoryTreeNode<T>>();
 	private final InMemoryTreeNode<T> mTopSentinel = new InMemoryTreeNode<T>(
@@ -198,7 +200,7 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
 
 	@Override
 	public synchronized void expandDirectChildren(final T id) {
-		//Log.d(TAG, "Expanding direct children of " + id);
+		if (DEBUG) Log.d(TAG, "Expanding direct children of " + id);
 		if (mCollapsible) {
 			final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
 			setChildrenVisibility(node, true, false);
@@ -208,7 +210,7 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
 
 	@Override
 	public synchronized void expandEverythingBelow(final T id) {
-		//Log.d(TAG, "Expanding all children below " + id);
+		if (DEBUG) Log.d(TAG, "Expanding all children below " + id);
 		if (mCollapsible) {
 			final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
 			setChildrenVisibility(node, true, true);
