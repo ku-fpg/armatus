@@ -122,7 +122,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleLayout = (RelativeLayout) findViewById(R.id.console_list_layout);
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
-		mCommandHistoryListView = (ListView)findViewById(R.id.History);
+		mCommandHistoryListView = (ListView) findViewById(R.id.command_history_list);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
 		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
 		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);

@@ -36,7 +36,6 @@ public class WordCompletionDialog extends DialogFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mWords = (List<String>) getArguments().getSerializable("words");
-
 	}
 
 	@SuppressWarnings("unchecked")

@@ -32,26 +32,27 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private ConsoleActivity mConsole;
 	private ListView mListView;
 	private ConsoleSearcher mSearcher;
-	private OnDragListener mOnDragListener = new OnDragListener() {
-		@Override
-		public boolean onDrag(View v, DragEvent event) {
-			if (event.getAction() == DragEvent.ACTION_DROP) {
-				int pos = mListView.getPositionForView(v);
-				List<String> keywords = getItem(pos).getKeywords();
-				if (!keywords.isEmpty()) {
-					DragIcon icon = (DragIcon) event.getLocalState();
-					mConsole.setTempCommand(icon.getCommandName());
-					mConsole.openContextMenu(v);
-				}
-			}
-			return true;
-		}
-	};
+	private OnDragListener mOnDragListener;
 
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
 		mConsole = console;
 		mListView = mConsole.getListView();
+		mOnDragListener = new OnDragListener() {
+			@Override
+			public boolean onDrag(View v, DragEvent event) {
+				if (event.getAction() == DragEvent.ACTION_DROP) {
+					int pos = mListView.getPositionForView(v);
+					List<String> keywords = getItem(pos).getKeywords();
+					if (!keywords.isEmpty()) {
+						DragIcon icon = (DragIcon) event.getLocalState();
+						mConsole.setTempCommand(icon.getCommandName());
+						mConsole.openContextMenu(v);
+					}
+				}
+				return true;
+			}
+		};
 	}
 
 	@Override

@@ -169,7 +169,9 @@ public class ConsoleListView extends ListView {
 			case R.id.swap:
 				if (mPrevCheckedStates.size() == 1) {
 					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
-					mConsole.showKeywordSwapDialog(entry.getNum(), entry.getShortContents());
+					if (entry.getShortContents().split(StringUtils.WHITESPACE).length > 1) {
+						mConsole.showKeywordSwapDialog(entry.getNum(), entry.getShortContents());
+					}
 					mode.finish();
 				}
 				return true;

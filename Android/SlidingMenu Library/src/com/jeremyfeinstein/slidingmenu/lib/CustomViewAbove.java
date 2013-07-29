@@ -751,7 +751,7 @@ public class CustomViewAbove extends ViewGroup {
 	private void determineDrag(MotionEvent ev) {
 		final int activePointerId = mActivePointerId;
 		final int pointerIndex = getPointerIndex(ev, activePointerId);
-		if (activePointerId == INVALID_POINTER)
+		if (activePointerId == INVALID_POINTER || pointerIndex == INVALID_POINTER)
 			return;
 		final float x = MotionEventCompat.getX(ev, pointerIndex);
 		final float dx = x - mLastMotionX;
