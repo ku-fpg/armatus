@@ -2,7 +2,8 @@ package pl.polidea.treeview.demo;
 
 import java.util.Set;
 
-import pl.polidea.treeview.R;
+import com.kufpg.armatus.R;
+
 import pl.polidea.treeview.TreeNodeInfo;
 import pl.polidea.treeview.TreeStateManager;
 import android.graphics.Color;

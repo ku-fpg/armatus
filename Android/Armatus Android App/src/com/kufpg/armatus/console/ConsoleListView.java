@@ -129,7 +129,7 @@ public class ConsoleListView extends ListView {
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.contextual_action_bar, menu);
+			inflater.inflate(R.menu.console_list_view_action_mode, menu);
 			mode.setTitle("Select entries");
 			mSwapItem = menu.findItem(R.id.swap);
 			return true;

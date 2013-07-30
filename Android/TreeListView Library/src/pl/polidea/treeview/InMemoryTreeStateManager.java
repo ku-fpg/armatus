@@ -193,41 +193,37 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
 
 	public synchronized void setCollapsible(boolean collapsible) {
 		if (!collapsible) {
-			expandEverythingBelow(null);
+			expandChildren(null, true);
 		}
 		mCollapsible = collapsible;
 	}
 
 	@Override
-	public synchronized void expandDirectChildren(final T id) {
-		if (DEBUG) Log.d(TAG, "Expanding direct children of " + id);
-		if (mCollapsible) {
-			final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
-			setChildrenVisibility(node, true, false);
-			internalDataSetChanged();
-		}
-	}
-
-	@Override
-	public synchronized void expandEverythingBelow(final T id) {
-		if (DEBUG) Log.d(TAG, "Expanding all children below " + id);
-		if (mCollapsible) {
-			final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
-			setChildrenVisibility(node, true, true);
-			internalDataSetChanged();
-		}
-	}
-
-	@Override
-	public synchronized void collapseChildren(final T id) {
+	public synchronized void expandChildren(final T id, boolean recursive) {
+		if (DEBUG) Log.d(TAG, "Expanding " + (recursive ? "all children below " : "direct children of ") + id);
 		if (mCollapsible) {
 			final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
 			if (node == mTopSentinel) {
 				for (final InMemoryTreeNode<T> n : mTopSentinel.getChildren()) {
-					setChildrenVisibility(n, false, false);
+					setChildrenVisibility(n, true, recursive);
+				}
+			}
+			setChildrenVisibility(node, true, recursive);
+			internalDataSetChanged();
+		}
+	}
+
+	@Override
+	public synchronized void collapseChildren(final T id, boolean recursive) {
+		if (DEBUG) Log.d(TAG, "Collapsing " + (recursive ? "all children below " : "direct children of ") + id);
+		if (mCollapsible) {
+			final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
+			if (node == mTopSentinel) {
+				for (final InMemoryTreeNode<T> n : mTopSentinel.getChildren()) {
+					setChildrenVisibility(n, false, recursive);
 				}
 			} else {
-				setChildrenVisibility(node, false, false);
+				setChildrenVisibility(node, false, recursive);
 			}
 			internalDataSetChanged();
 		}

@@ -73,7 +73,7 @@ public class BaseActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.default_action_bar, menu);
+		inflater.inflate(R.menu.console_list_view_menu, menu);
 		mUndoIcon = menu.findItem(R.id.undo);
 		mRedoIcon = menu.findItem(R.id.redo);
 		updateIconTitles();

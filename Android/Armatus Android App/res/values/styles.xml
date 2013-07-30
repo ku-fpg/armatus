@@ -12,8 +12,13 @@
         <item name="actionSwap">@drawable/ic_action_swap_dark</item>
         <item name="actionUndo">@drawable/ic_action_undo_dark</item>
         <item name="codeColor">@android:color/white</item>
+        <item name="commandExpandableMenuGroupBackground">@color/command_expandable_menu_background_dark</item>
         <item name="consoleBackgroundColor">@android:color/black</item>
         <item name="consoleListSelector">@drawable/console_list_selector_dark</item>
+        <item name="expanderClose">@drawable/expander_close_holo_dark</item>
+        <item name="expanderGroup">@drawable/expander_group_holo_dark</item>
+        <item name="expanderOpen">@drawable/expander_open_holo_dark</item>
+        <item name="treeListSelector">@drawable/list_selector_holo_dark</item>
         <item name="android:actionBarStyle">@style/ThemeDark.ActionBar</item>
     </style>
 
@@ -29,8 +34,13 @@
         <item name="actionSwap">@drawable/ic_action_swap_light</item>
         <item name="actionUndo">@drawable/ic_action_undo_light</item>
         <item name="codeColor">@android:color/black</item>
+        <item name="commandExpandableMenuGroupBackground">@color/command_expandable_menu_background_light</item>
         <item name="consoleBackgroundColor">@android:color/white</item>
         <item name="consoleListSelector">@drawable/console_list_selector_light</item>
+        <item name="expanderClose">@drawable/expander_close_holo_light</item>
+        <item name="expanderGroup">@drawable/expander_group_holo_light</item>
+        <item name="expanderOpen">@drawable/expander_open_holo_light</item>
+        <item name="treeListSelector">@drawable/list_selector_holo_light</item>
     </style>
 
     <style name="ThemeDark.ActionBar" parent="android:Widget.Holo.ActionBar">

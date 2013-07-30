@@ -1,8 +1,10 @@
 package com.kufpg.armatus.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.provider.Settings;
 
 public class NetworkUtils {
@@ -11,9 +13,16 @@ public class NetworkUtils {
 
 	private NetworkUtils() {}
 	
+	@SuppressLint({ "NewApi", "InlinedApi" })
+	@SuppressWarnings("deprecation")
 	public static boolean isAirplaneModeOn(Context context) {
-		return Settings.System.getInt(context.getContentResolver(),
-				Settings.System.AIRPLANE_MODE_ON, 0) != 0;
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+	        return Settings.System.getInt(context.getContentResolver(), 
+	                Settings.System.AIRPLANE_MODE_ON, 0) != 0;          
+	    } else {
+	        return Settings.Global.getInt(context.getContentResolver(), 
+	                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+	    }
 	}
 
 	public static boolean isWifiConnected(Context context) {

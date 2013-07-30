@@ -13,8 +13,13 @@
         <attr name="actionSwap" format="reference" />
         <attr name="actionUndo" format="reference" />
         <attr name="codeColor" format="reference" />
+        <attr name="commandExpandableMenuGroupBackground" format="reference" />
         <attr name="consoleBackgroundColor" format="reference" />
         <attr name="consoleListSelector" format="reference" />
+        <attr name="expanderClose" format="reference" />
+        <attr name="expanderGroup" format="reference" />
+        <attr name="expanderOpen" format="reference" />
+        <attr name="treeListSelector" format="reference" />
     </declare-styleable>
 
 </resources>

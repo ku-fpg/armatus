@@ -4,6 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:divider="@null"
-    android:groupIndicator="@drawable/console_expandable_arrow"
+    android:groupIndicator="?attr/expanderGroup"
     android:indicatorLeft="0dp"
     android:indicatorRight="40dp" />

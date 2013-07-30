@@ -4,14 +4,16 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.kufpg.armatus.BaseActivity;
+import com.kufpg.armatus.R;
+
 import pl.polidea.treeview.InMemoryTreeStateManager;
-import pl.polidea.treeview.R;
 import pl.polidea.treeview.TreeBuilder;
 import pl.polidea.treeview.TreeNodeInfo;
 import pl.polidea.treeview.TreeStateManager;
 import pl.polidea.treeview.TreeListView;
-import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -24,11 +26,12 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
  * Demo activity showing how the tree view can be used.
  * 
  */
-public class TreeListViewDemo extends Activity {
-	private enum TreeType implements Serializable { SIMPLE,	FANCY };
+public class TreeListViewDemo extends BaseActivity {
+	private static final String TAG = TreeListViewDemo.class.getSimpleName();
+	private static final boolean DEBUG = false;
 
+	private enum TreeType implements Serializable { SIMPLE,	FANCY };
 	private final Set<Long> mSelected = new HashSet<Long>();
-	//private static final String TAG = TreeListViewDemo.class.getSimpleName();
 	private TreeListView mTreeView;
 	private static final int[] DEMO_NODES = new int[] { 0, 0, 1, 1, 1, 2, 2, 1,
 		1, 2, 1, 0, 0, 0, 1, 2, 3, 2, 0, 0, 1, 2, 0, 1, 2, 0, 1 };
@@ -37,7 +40,7 @@ public class TreeListViewDemo extends Activity {
 	private FancyColouredVariousSizesAdapter mFancyAdapter;
 	private SimpleStandardAdapter mSimpleAdapter;
 	private TreeType mTreeType;
-	private boolean mCollapsible;
+	private boolean mCollapsible, mRecursive;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -51,17 +54,19 @@ public class TreeListViewDemo extends Activity {
 			for (int i = 0; i < DEMO_NODES.length; i++) {
 				treeBuilder.sequentiallyAddNextNode((long) i, DEMO_NODES[i]);
 			}
-			//Log.d(TAG, mManager.toString());
+			if (DEBUG) Log.d(TAG, mManager.toString());
 			newTreeType = TreeType.SIMPLE;
 			newCollapsible = false;
+			mRecursive = false;
 		} else {
 			mManager = (TreeStateManager<Long>) savedInstanceState
 					.getSerializable("treeManager");
 			newTreeType = (TreeType) savedInstanceState
 					.getSerializable("treeType");
 			newCollapsible = savedInstanceState.getBoolean("collapsible");
+			mRecursive = savedInstanceState.getBoolean("recursive");
 		}
-		setContentView(R.layout.main_demo);
+		setContentView(R.layout.tree_list_view_demo);
 		mTreeView = (TreeListView) findViewById(R.id.mainTreeView);
 		mFancyAdapter = new FancyColouredVariousSizesAdapter(this, mSelected,
 				mManager, LEVEL_NUMBER);
@@ -102,42 +107,42 @@ public class TreeListViewDemo extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		final MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main_menu, menu);
+		inflater.inflate(R.menu.tree_list_view_menu, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu) {
-		final MenuItem collapsibleMenu = menu
-				.findItem(R.id.collapsible_menu_item);
-		if (mCollapsible) {
-			collapsibleMenu.setTitle(R.string.collapsible_menu_disable);
-			collapsibleMenu.setTitleCondensed(getResources().getString(
-					R.string.collapsible_condensed_disable));
-		} else {
-			collapsibleMenu.setTitle(R.string.collapsible_menu_enable);
-			collapsibleMenu.setTitleCondensed(getResources().getString(
-					R.string.collapsible_condensed_enable));
-		}
+		menu.findItem(R.id.expand_all_menu_item).setVisible(mCollapsible);
+		menu.findItem(R.id.collapse_all_menu_item).setVisible(mCollapsible);
+		menu.findItem(R.id.recursive_menu_item).setVisible(mCollapsible);
 		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
-		if (item.getItemId() == R.id.simple_menu_item) {
+		switch (item.getItemId()) {
+		case R.id.simple_menu_item:
 			setTreeAdapter(TreeType.SIMPLE);
-		} else if (item.getItemId() == R.id.fancy_menu_item) {
+			return true;
+		case R.id.fancy_menu_item:
 			setTreeAdapter(TreeType.FANCY);
-		} else if (item.getItemId() == R.id.collapsible_menu_item) {
+			return true;
+		case R.id.expand_all_menu_item:
+			mManager.expandChildren(null, mRecursive);
+			return true;
+		case R.id.collapse_all_menu_item:
+			mManager.collapseChildren(null, mRecursive);
+			return true;
+		case R.id.collapsible_menu_item:
 			setCollapsible(!mCollapsible);
-		} else if (item.getItemId() == R.id.expand_all_menu_item) {
-			mManager.expandEverythingBelow(null);
-		} else if (item.getItemId() == R.id.collapse_all_menu_item) {
-			mManager.collapseChildren(null);
-		} else {
-			return false;
+			item.setChecked(mCollapsible);
+			return true;
+		case R.id.recursive_menu_item:
+			mRecursive = !mRecursive;
+			item.setChecked(mRecursive);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -147,18 +152,20 @@ public class TreeListViewDemo extends Activity {
 		final long id = adapterInfo.id;
 		final TreeNodeInfo<Long> info = mManager.getNodeInfo(id);
 		final MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.context_menu, menu);
-		if (info.isWithChildren()) {
+		menuInflater.inflate(R.menu.tree_list_view_context_menu, menu);
+		if (info.isWithChildren() && mCollapsible) {
 			if (info.isExpanded()) {
 				menu.findItem(R.id.context_menu_expand_item).setVisible(false);
 				menu.findItem(R.id.context_menu_expand_all).setVisible(false);
 			} else {
-				menu.findItem(R.id.context_menu_collapse).setVisible(false);
+				menu.findItem(R.id.context_menu_collapse_item).setVisible(false);
+				menu.findItem(R.id.context_menu_collapse_all).setVisible(false);
 			}
 		} else {
 			menu.findItem(R.id.context_menu_expand_item).setVisible(false);
 			menu.findItem(R.id.context_menu_expand_all).setVisible(false);
-			menu.findItem(R.id.context_menu_collapse).setVisible(false);
+			menu.findItem(R.id.context_menu_collapse_item).setVisible(false);
+			menu.findItem(R.id.context_menu_collapse_all).setVisible(false);
 		}
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
@@ -168,20 +175,23 @@ public class TreeListViewDemo extends Activity {
 		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		final long id = info.id;
-		if (item.getItemId() == R.id.context_menu_collapse) {
-			mManager.collapseChildren(id);
+		switch (item.getItemId()) {
+		case R.id.context_menu_expand_item:
+			mManager.expandChildren(id, false);
 			return true;
-		} else if (item.getItemId() == R.id.context_menu_expand_all) {
-			mManager.expandEverythingBelow(id);
+		case R.id.context_menu_expand_all:
+			mManager.expandChildren(id, true);
 			return true;
-		} else if (item.getItemId() == R.id.context_menu_expand_item) {
-			mManager.expandDirectChildren(id);
+		case R.id.context_menu_collapse_item:
+			mManager.collapseChildren(id, false);
 			return true;
-		} else if (item.getItemId() == R.id.context_menu_delete) {
+		case R.id.context_menu_collapse_all:
+			mManager.collapseChildren(id, true);
+			return true;
+		case R.id.context_menu_delete:
 			mManager.removeNodeRecursively(id);
 			return true;
-		} else {
-			return super.onContextItemSelected(item);
 		}
+		return super.onContextItemSelected(item);
 	}
 }

@@ -94,7 +94,7 @@ public interface TreeStateManager<T> extends Serializable {
 	 *            removed.
 	 */
 	void removeNodeRecursively(T id);
-	
+
 	/**
 	 * 
 	 * @param collapsible
@@ -102,32 +102,28 @@ public interface TreeStateManager<T> extends Serializable {
 	void setCollapsible(boolean collapsible);
 
 	/**
-	 * Expands all children of the node.
-	 * 
-	 * @param id
-	 *            node which children should be expanded. cannot be null (top
-	 *            nodes are always expanded!).
-	 */
-	void expandDirectChildren(T id);
-
-	/**
-	 * Expands everything below the node specified. Might be null - then expands
-	 * all.
+	 * Expands children.
 	 * 
 	 * @param id
 	 *            node which children should be expanded or null if all nodes
 	 *            are to be expanded.
+	 * @param recursive
+	 *            expands all descendants if true. If false, expands only the
+	 *            children of the node specified by id.
 	 */
-	void expandEverythingBelow(T id);
+	void expandChildren(T id, boolean recursive);
 
 	/**
-	 * Collapse children.
+	 * Collapses children.
 	 * 
 	 * @param id
 	 *            id collapses everything below node specified. If null,
 	 *            collapses everything but top-level nodes.
+	 * @param recursive
+	 *            collapses all descendants if true. If false, collapses
+	 *            only the children of the node specified by id.
 	 */
-	void collapseChildren(T id);
+	void collapseChildren(T id, boolean recursive);
 
 	/**
 	 * Returns next sibling of the node (or null if no further sibling).
@@ -146,7 +142,7 @@ public interface TreeStateManager<T> extends Serializable {
 	 * @return the sibling (or null if no previous)
 	 */
 	T getPreviousSibling(T id);
-	
+
 	/**
 	 * Checks if tree nodes can be collapsed.
 	 * @return true if nodes can be collapsed.

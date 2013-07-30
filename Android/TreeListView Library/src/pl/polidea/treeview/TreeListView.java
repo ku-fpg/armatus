@@ -57,13 +57,18 @@ public class TreeListView extends ListView {
 	private void parseAttributes(final Context context, final AttributeSet attrs) {
 		final TypedArray a = context.obtainStyledAttributes(attrs,
 				R.styleable.TreeListView);
-		mExpandedDrawable = a.getDrawable(R.styleable.TreeListView_src_expanded);
+		int expandedRes = a.getResourceId(R.styleable.TreeListView_src_expanded, -1);
+		if (expandedRes != -1) {
+			mExpandedDrawable = getResources().getDrawable(expandedRes);
+		}
 		if (mExpandedDrawable == null) {
 			mExpandedDrawable = context.getResources().getDrawable(
 					DEFAULT_EXPANDED_RESOURCE);
 		}
-		mCollapsedDrawable = a
-				.getDrawable(R.styleable.TreeListView_src_collapsed);
+		int collapsedRes = a.getResourceId(R.styleable.TreeListView_src_collapsed, -1);
+		if (collapsedRes != -1) {
+			mCollapsedDrawable = getResources().getDrawable(collapsedRes);
+		}
 		if (mCollapsedDrawable == null) {
 			mCollapsedDrawable = context.getResources().getDrawable(
 					DEFAULT_COLLAPSED_RESOURCE);

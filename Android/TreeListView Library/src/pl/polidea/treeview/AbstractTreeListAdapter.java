@@ -23,8 +23,7 @@ import android.widget.ListAdapter;
  * @param <T>
  *            class for ID of the tree
  */
-public abstract class AbstractTreeListAdapter<T> extends BaseAdapter implements
-ListAdapter {
+public abstract class AbstractTreeListAdapter<T> extends BaseAdapter implements ListAdapter {
 	private static final String TAG = AbstractTreeListAdapter.class.getSimpleName();
 	private static final boolean DEBUG = false;
 	private final TreeStateManager<T> mTreeStateManager;
@@ -65,9 +64,9 @@ ListAdapter {
 			return;
 		}
 		if (info.isExpanded()) {
-			mTreeStateManager.collapseChildren(id);
+			mTreeStateManager.collapseChildren(id, false);
 		} else {
-			mTreeStateManager.expandDirectChildren(id);
+			mTreeStateManager.expandChildren(id, false);
 		}
 	}
 
@@ -174,7 +173,7 @@ ListAdapter {
 			if (DEBUG) Log.d(TAG, "Reusing the view");
 			final LinearLayout linear = (LinearLayout) convertView;
 			final FrameLayout frameLayout = (FrameLayout) linear
-					.findViewById(R.id.treeview_list_item_frame);
+					.findViewById(R.id.tree_list_view_item_frame);
 			final View childView = frameLayout.getChildAt(0);
 			updateView(childView, nodeInfo);
 			return populateTreeItem(linear, childView, nodeInfo, false);
@@ -234,11 +233,11 @@ ListAdapter {
 		final LinearLayout.LayoutParams indicatorLayoutParams = new LinearLayout.LayoutParams(
 				calculateIndentation(nodeInfo), LayoutParams.MATCH_PARENT);
 		final LinearLayout indicatorLayout = (LinearLayout) layout
-				.findViewById(R.id.treeview_list_item_image_layout);
+				.findViewById(R.id.tree_list_view_image_layout);
 		indicatorLayout.setGravity(mIndicatorGravity);
 		indicatorLayout.setLayoutParams(indicatorLayoutParams);
 		final ImageView image = (ImageView) layout
-				.findViewById(R.id.treeview_list_item_image);
+				.findViewById(R.id.tree_list_view_item_image);
 		image.setImageDrawable(getDrawable(nodeInfo));
 		image.setBackground(getDrawableOrDefaultBackground(mIndicatorBackgroundDrawable));
 		image.setScaleType(ScaleType.CENTER);
@@ -250,7 +249,7 @@ ListAdapter {
 		}
 		layout.setTag(nodeInfo.getId());
 		final FrameLayout frameLayout = (FrameLayout) layout
-				.findViewById(R.id.treeview_list_item_frame);
+				.findViewById(R.id.tree_list_view_item_frame);
 		final FrameLayout.LayoutParams childParams = new FrameLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		if (newChildView) {

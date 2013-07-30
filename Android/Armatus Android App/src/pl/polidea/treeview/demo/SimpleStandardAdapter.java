@@ -3,8 +3,9 @@ package pl.polidea.treeview.demo;
 import java.util.Arrays;
 import java.util.Set;
 
+import com.kufpg.armatus.R;
+
 import pl.polidea.treeview.AbstractTreeListAdapter;
-import pl.polidea.treeview.R;
 import pl.polidea.treeview.TreeNodeInfo;
 import pl.polidea.treeview.TreeStateManager;
 import android.view.View;
@@ -58,7 +59,7 @@ class SimpleStandardAdapter extends AbstractTreeListAdapter<Long> {
 	@Override
 	public View getNewChildView(final TreeNodeInfo<Long> treeNodeInfo) {
 		final LinearLayout viewLayout = (LinearLayout) getActivity()
-				.getLayoutInflater().inflate(R.layout.demo_list_item, null);
+				.getLayoutInflater().inflate(R.layout.tree_list_view_demo_item, null);
 		return updateView(viewLayout, treeNodeInfo);
 	}
 

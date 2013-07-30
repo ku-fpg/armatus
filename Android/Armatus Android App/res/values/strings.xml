@@ -1,5 +1,8 @@
 <resources>
 
+    <color name="command_expandable_menu_background_dark">#242424</color>
+    <color name="command_expandable_menu_background_light">#f2f2f2</color>
+
     <string name="app_name">Armatus</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>

@@ -5,7 +5,6 @@
         android:id="@+id/simple_menu_item"
         android:alphabeticShortcut="s"
         android:enabled="true"
-        android:numericShortcut="1"
         android:title="@string/simple_menu_name"
         android:titleCondensed="@string/simple_menu_condensed"
         android:visible="true">
@@ -14,7 +13,6 @@
         android:id="@+id/fancy_menu_item"
         android:alphabeticShortcut="f"
         android:enabled="true"
-        android:numericShortcut="2"
         android:title="@string/fancy_menu_name"
         android:titleCondensed="@string/fancy_menu_condensed"
         android:visible="true">
@@ -23,7 +21,6 @@
         android:id="@+id/expand_all_menu_item"
         android:alphabeticShortcut="e"
         android:enabled="true"
-        android:numericShortcut="3"
         android:title="@string/expand_all_menu"
         android:titleCondensed="@string/expand_all_condensed"
         android:visible="true">
@@ -32,20 +29,28 @@
         android:id="@+id/collapse_all_menu_item"
         android:alphabeticShortcut="c"
         android:enabled="true"
-        android:numericShortcut="4"
         android:title="@string/collapse_all_menu"
-        android:titleCondensed="@string/collapse_all_condesed"
+        android:titleCondensed="@string/collapse_all_condensed"
         android:visible="true">
     </item>
     <item
         android:id="@+id/collapsible_menu_item"
         android:alphabeticShortcut="c"
         android:checkable="true"
-        android:checked="true"
+        android:checked="false"
         android:enabled="true"
-        android:numericShortcut="5"
-        android:title="@string/collapsible_menu_disable"
-        android:titleCondensed="@string/collapsible_condensed_disable"
+        android:title="@string/collapsible_menu"
+        android:titleCondensed="@string/collapsible_condensed"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/recursive_menu_item"
+        android:alphabeticShortcut="r"
+        android:checkable="true"
+        android:checked="false"
+        android:enabled="true"
+        android:title="@string/recursive_menu"
+        android:titleCondensed="@string/recursive_condensed"
         android:visible="true">
     </item>
 
