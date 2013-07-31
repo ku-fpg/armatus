@@ -18,7 +18,7 @@ public class ConsoleEntry implements Serializable {
 	public ConsoleEntry(int entryNum, String contents) {
 		mNum = entryNum;
 		if (contents != null) {
-			mShortContents = StringUtils.applyCharWrap(contents);
+			mShortContents = StringUtils.withCharWrap(contents);
 			String[] inputArr = contents.split(StringUtils.WHITESPACE);
 			for (String word : inputArr) {
 				if (CommandDispatcher.isKeyword(word)) {

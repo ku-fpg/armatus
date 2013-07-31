@@ -12,6 +12,7 @@ import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
 import com.kufpg.armatus.util.NetworkUtils;
+import com.kufpg.armatus.util.StringUtils;
 
 import android.content.Intent;
 import android.util.Log;
@@ -539,7 +540,7 @@ public class CommandDispatcher {
 
 	private void runOnConsole(Command command, String... args) {
 		String commandString = command.getCommandName()
-				+ " " + varargsToString(args);
+				+ StringUtils.NBSP + varargsToString(args);
 		mConsole.addConsoleEntry(commandString);
 		mConsole.addCommandEntry(command.getCommandName());
 

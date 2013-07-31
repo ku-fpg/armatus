@@ -9,7 +9,7 @@ import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
 /**
- * Colors ConsoleEntry text depending on its usage of Keywords.
+ * Colors text depending on its usage of {@link CommandDispatcher.Keyword Keywords}.
  */
 public class PrettyPrinter {
 	public static final String RED = "#CC060B";
@@ -19,6 +19,12 @@ public class PrettyPrinter {
 	public static final String PURPLE = "#7300FB";
 	public static final String YELLOW = "#FDFD0D";
 
+	/**
+	 * Sets the text in a {@link TextView} to a string whose {@link
+	 * CommandDispatcher.Keyword Keywords} have been colored appropriately.
+	 * @param tv The <code>TextView</code> whose text should be set.
+	 * @param text The string to use as the text.
+	 */
 	public static void setPrettyText(TextView tv, String text) {
 		String sentenceStr = text.trim();
 		String leadSpace = StringUtils.getLeadingWhitespace(text);

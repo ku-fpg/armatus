@@ -9,8 +9,18 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Utility class containing methods useful for JSON I/O.
+ */
 public class JsonUtils {
 
+	private JsonUtils() {}
+	
+	/**
+	 * Saves a {@link JSONObject} to disk.
+	 * @param obj The <code>JSONObject</code> to save.
+	 * @param path The string representation of the file path to save to.
+	 */
 	public static void saveJsonFile(JSONObject obj, String path) {
 		try {
 			File file = new File(path);
@@ -24,10 +34,24 @@ public class JsonUtils {
 		}
 	}
 
+	/**
+	 * Returns a {@link JSONObject} read from a saved file.
+	 * @param path The string representation of the file path from which to open the
+	 * <code>JSONObject</code> file.
+	 * @return The <code>JSONObject</code> from the saved file.
+	 * @throws FileNotFoundException If <code>path</code> does not exist.
+	 * @throws JSONException if the <code>JSONObject</code> in the saved file is invalid.
+	 */
 	public static JSONObject openJsonFile(String path) throws FileNotFoundException, JSONException {
 		return new JSONObject(openTextFile(path)); 
 	}
 
+	/**
+	 * Returns a string representation of the contents of a saved file.
+	 * @param path The string representation of the file path to open.
+	 * @return The contents of the saved file.
+	 * @throws FileNotFoundException if <code>path</code> does not exist.
+	 */
 	public static String openTextFile(String path) throws FileNotFoundException {
 		BufferedReader br = null;
 		try {

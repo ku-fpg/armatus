@@ -25,21 +25,81 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.widget.Toast;
 
+/**
+ * The {@link Activity} that displays user preferences (via {@link PrefsFragment}).
+ */
 public class PrefsActivity extends PreferenceActivity {
 
+	/**
+	 * One of the possible values that the {@link Preference} to which {@link #APP_THEME_KEY}
+	 * maps can be (the other being {@link #THEME_LIGHT}).
+	 */
 	public static final String THEME_DARK = "THEME_DARK";
+
+	/**
+	 * One of the possible values that the {@link Preference} to which {@link #APP_THEME_KEY}
+	 * maps can be (the other being {@link #THEME_DARK}).
+	 */
 	public static final String THEME_LIGHT = "THEME_LIGHT";
+
+	/**
+	 * {@link CheckBoxPreference} key mapping to whether or not {@link BaseActivity#CACHE_DIR
+	 * CACHE_DIR} should be used to save persistent data. If not, the String to which
+	 * {@link #HISTORY_DIR_KEY} maps is used instead.
+	 */
 	private static final String HISTORY_USE_CACHE_KEY = BaseActivity.HISTORY_USE_CACHE_KEY;
+
+	/**
+	 * {@link Preference} key mapping to the String representation of a directory where persistent
+	 * data can be stored. The directory is only used if the value to which {@link
+	 * #HISTORY_USE_CACHE_KEY} maps is true.
+	 */
 	private static final String HISTORY_DIR_KEY = BaseActivity.HISTORY_DIR_KEY;
+
+	/**
+	 * {@link ListPreference} key mapping to one of three String values: "0" (for {@link
+	 * BaseActivity.EditMode#READ READ} mode), "1" (for {@link BaseActivity.EditMode#WRITE WRITE}
+	 * mode), or "2" (for {@link BaseActivity.EditMode#ARITHMETIC ARITHMETIC} mode). The mapped
+	 * String represent which {@link BaseActivity.EditMode EditMode} is currently being used.
+	 */
 	private static final String EDIT_MODE_KEY = BaseActivity.EDIT_MODE_KEY;
-	private static final String RESTORE_DEFAULTS_KEY = BaseActivity.RESTORE_DEFAULTS_KEY;
+
+	/**
+	 * {@link ListPreference} key mapping to either {@link #THEME_DARK} or {@link #THEME_LIGHT},
+	 * depending on which theme is currently being used.
+	 */
 	private static final String APP_THEME_KEY = BaseActivity.APP_THEME_KEY;
+
+	/**
+	 * {@link Preference} key used for resetting preferences back to their default values.
+	 */
+	private static final String RESTORE_DEFAULTS_KEY = BaseActivity.RESTORE_DEFAULTS_KEY;
+
+	/** Request code used for selecting a directory with aFileChooser. */
 	private static final int DIR_CHANGE_CODE = 777;
+
+	/**
+	 * Maps special {@link Preference} keys to their default values when the default values are
+	 * impossible to know before runtime (e.g., the external cache directory, which {@link
+	 * #HISTORY_USE_CACHE_KEY} maps to by default).
+	 */
 	private static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
 
+	/**
+	 * A reference to {@link PrefsActivity} that is used for methods that require {@link
+	 * android.content.Context Context} in {@link PrefsFragment}.
+	 */
 	private static Activity mActivity;
+	
+	/** Used to access persistent user preferences. Editing them requires {@link #mEditor}. */
 	private static SharedPreferences mPrefs;
+	
+	/** Used to edit persistent user preferences stored in {@link #mPrefs}. */
 	private static SharedPreferences.Editor mEditor;
+	
+	/**
+	 * 
+	 */
 	private static CheckBoxPreference mHistoryUseCachePref;
 	private static ListPreference mEditModePref, mAppThemePref;
 	private static Preference mRestoreDefaultsPref, mHistoryDirPref;

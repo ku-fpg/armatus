@@ -393,7 +393,7 @@ public class ConsoleActivity extends BaseActivity {
 				public boolean onEditorAction(TextView v, int actionId,
 						KeyEvent event) {
 					if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-						String searchCriterion = StringUtils.applyCharWrap(mSearchInputView.getText().toString());
+						String searchCriterion = StringUtils.withCharWrap(mSearchInputView.getText().toString());
 						if (!searchCriterion.equalsIgnoreCase(mPrevSearchCriterion)) {
 							executeSearch(searchCriterion, SearchAction.BEGIN, null);
 						} else {
@@ -578,7 +578,7 @@ public class ConsoleActivity extends BaseActivity {
 					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
 				} else {
 					mConsoleInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
-							.getCommand().getCommandName() + " " + keywordNStr);
+							.getCommand().getCommandName() + StringUtils.NBSP + keywordNStr);
 				}
 			}
 			mConsoleInputEditText.requestFocus(); //Prevents ListView from stealing focus

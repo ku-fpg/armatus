@@ -153,7 +153,7 @@ public class ConsoleListView extends ListView {
 				copyBuilder.deleteCharAt(copyBuilder.length() - 1); //Remove final newline
 				ClipboardManager clipboard = (ClipboardManager) mConsole.getSystemService(Context.CLIPBOARD_SERVICE);
 				ClipData copiedText = ClipData.newPlainText("copiedText",
-						StringUtils.removeCharWrap(copyBuilder.toString()));
+						StringUtils.withoutCharWrap(copyBuilder.toString()));
 				clipboard.setPrimaryClip(copiedText);
 				mConsole.showToast((mPrevCheckedStates.size() == 1 ? "Entry" : "Entries") + " copied to clipboard!");
 				mode.finish();

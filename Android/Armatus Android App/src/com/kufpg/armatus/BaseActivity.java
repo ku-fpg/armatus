@@ -50,8 +50,9 @@ public class BaseActivity extends Activity {
 	/**
 	 * {@link android.preference.ListPreference ListPreference} key mapping to one of three String
 	 * values: "0" (for {@link BaseActivity.EditMode#READ READ} mode), "1" (for {@link BaseActivity.
-	 * EditMode#WRITE WRITE} mode), or "2" (for {@link BaseActivity.EditMode#ARITHMETIC} mode). The
-	 * mapped String represent which {@link BaseActivity.EditMode EditMode} is currently being used.
+	 * EditMode#WRITE WRITE} mode), or "2" (for {@link BaseActivity.EditMode#ARITHMETIC ARITHMETIC}
+	 * mode). The mapped String represent which {@link BaseActivity.EditMode EditMode} is currently
+	 * being used.
 	 */
 	public static String EDIT_MODE_KEY;
 

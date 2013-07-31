@@ -2,8 +2,11 @@ package com.kufpg.armatus.console;
 
 import com.kufpg.armatus.EditManager.Edit;
 
+/**
+ * An {@link Edit} that interacts with a {@link ConsoleActivity}.
+ */
 public class ConsoleEdit implements Edit {
-	
+	/** Reference to the current console. */
 	private ConsoleActivity mConsole;
 	
 	public ConsoleEdit(ConsoleActivity console) {
@@ -15,10 +18,19 @@ public class ConsoleEdit implements Edit {
 		redo();
 	}
 	
+	/**
+	 * Restores the reference to the current console, which can be destroyed after
+	 * device standby or rotation.
+	 * @param console The {@link ConsoleActivity} to reconnect to.
+	 */
 	void attachConsole(ConsoleActivity console) {
 		mConsole = console;
 	}
 	
+	/**
+	 * Returns a reference to the current console.
+	 * @return the referenced {@link ConsoleActivity}.
+	 */
 	public ConsoleActivity getConsole() {
 		return mConsole;
 	}

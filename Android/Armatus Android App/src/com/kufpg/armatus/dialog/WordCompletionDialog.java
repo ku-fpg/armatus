@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.kufpg.armatus.R;
 import com.kufpg.armatus.console.ConsoleActivity;
+import com.kufpg.armatus.util.StringUtils;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -55,8 +56,9 @@ public class WordCompletionDialog extends DialogFragment {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				((ConsoleActivity) getActivity()).setInputText(((TextView) view).getText().toString() + " ");
-				((ConsoleActivity) getActivity()).setSoftKeyboardVisible(true);
+				ConsoleActivity console = (ConsoleActivity) getActivity();
+				console.setInputText(((TextView) view).getText().toString() + StringUtils.NBSP);
+				console.setSoftKeyboardVisible(true);
 				dismiss();
 			}
 		});
