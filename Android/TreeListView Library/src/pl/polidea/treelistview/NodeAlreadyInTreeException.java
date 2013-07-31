@@ -1,4 +1,4 @@
-package pl.polidea.treeview;
+package pl.polidea.treelistview;
 
 /**
  * The node being added is already in the tree.

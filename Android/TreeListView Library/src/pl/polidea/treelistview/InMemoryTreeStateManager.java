@@ -1,4 +1,4 @@
-package pl.polidea.treeview;
+package pl.polidea.treelistview;
 
 import java.util.ArrayList;
 import java.util.Arrays;

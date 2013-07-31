@@ -1,4 +1,4 @@
-package pl.polidea.treeview;
+package pl.polidea.treelistview;
 
 import android.util.Log;
 

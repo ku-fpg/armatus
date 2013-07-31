@@ -1,13 +1,11 @@
-package pl.polidea.treeview.demo;
+package com.kufpg.armatus.treelistview;
 
 import java.util.Arrays;
 import java.util.Set;
 
-import com.kufpg.armatus.R;
-
-import pl.polidea.treeview.AbstractTreeListAdapter;
-import pl.polidea.treeview.TreeNodeInfo;
-import pl.polidea.treeview.TreeStateManager;
+import pl.polidea.treelistview.AbstractTreeListAdapter;
+import pl.polidea.treelistview.TreeNodeInfo;
+import pl.polidea.treelistview.TreeStateManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -15,6 +13,8 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.kufpg.armatus.R;
 
 /**
  * This is a very simple adapter that provides very basic tree view with a

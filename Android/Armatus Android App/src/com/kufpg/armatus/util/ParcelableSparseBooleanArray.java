@@ -5,7 +5,8 @@ import android.os.Parcelable;
 import android.util.SparseBooleanArray;
 
 /**
- * Credit goes to opsidao of Stack Overflow (http://stackoverflow.com/a/16711258/1567086)
+ * Extension of {@link SparseBooleanArray} that is {@link Parcelable}.
+ * Credit goes to <a href="http://stackoverflow.com/a/16711258/1567086">opsidao of Stack Overflow</a>.
  */
 public class ParcelableSparseBooleanArray extends SparseBooleanArray implements Parcelable {
 	public static Parcelable.Creator<ParcelableSparseBooleanArray> CREATOR =

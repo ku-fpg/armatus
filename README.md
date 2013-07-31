@@ -23,6 +23,8 @@ Software used
 
 —<a href="http://code.google.com/p/guava-libraries/">Guava</a> by Google under the Apache License 2.0
 
+—<a href="https://github.com/RyanGlScott/AsyncActivityTask">AsyncActivityTask</a>, a modification of <a href="https://github.com/callorico/CustomAsyncTask">CustomAsyncTask</a> by <a href="https://github.com/callorico">Ryan "callorico" Kaneshiro</a>.
+
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
 
 —<a href="http://code.google.com/p/tree-view-list-android/">tree-view-list-android</a> by <a href="http://code.google.com/u/109485687940011053436/">Jarek Potiuk</a> under the New BSD License

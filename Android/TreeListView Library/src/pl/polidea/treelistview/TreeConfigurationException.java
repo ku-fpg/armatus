@@ -1,4 +1,4 @@
-package pl.polidea.treeview;
+package pl.polidea.treelistview;
 
 /**
  * Exception thrown when there is a problem with configuring tree.

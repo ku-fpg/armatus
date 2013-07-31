@@ -1,17 +1,14 @@
-package pl.polidea.treeview.demo;
+package com.kufpg.armatus.treelistview;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.kufpg.armatus.BaseActivity;
-import com.kufpg.armatus.R;
-
-import pl.polidea.treeview.InMemoryTreeStateManager;
-import pl.polidea.treeview.TreeBuilder;
-import pl.polidea.treeview.TreeNodeInfo;
-import pl.polidea.treeview.TreeStateManager;
-import pl.polidea.treeview.TreeListView;
+import pl.polidea.treelistview.InMemoryTreeStateManager;
+import pl.polidea.treelistview.TreeBuilder;
+import pl.polidea.treelistview.TreeListView;
+import pl.polidea.treelistview.TreeNodeInfo;
+import pl.polidea.treelistview.TreeStateManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,6 +18,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+
+import com.kufpg.armatus.BaseActivity;
+import com.kufpg.armatus.R;
 
 /**
  * Demo activity showing how the tree view can be used.

@@ -1,4 +1,4 @@
-package pl.polidea.treeview;
+package pl.polidea.treelistview;
 
 /**
  * This exception is thrown when the tree does not contain node requested.

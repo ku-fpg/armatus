@@ -1,9 +1,8 @@
 package com.kufpg.armatus;
 
-import pl.polidea.treeview.demo.TreeListViewDemo;
-
 import com.kufpg.armatus.console.ConsoleActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
+import com.kufpg.armatus.treelistview.TreeListViewDemo;
 import com.kufpg.armatus.util.StickyButton;
 
 import android.content.Intent;
@@ -13,6 +12,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * The {@link Activity} that is opened when the app is first started. This is merely a
+ * crossroads for all of the various demos of features that may one day make it into the
+ * final Armatus app.
+ */
 public class MainActivity extends BaseActivity {
 	private TextView mButtonsView;
 	private StickyButton mStickyButton;

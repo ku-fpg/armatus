@@ -35,7 +35,7 @@ public class PrefsActivity extends PreferenceActivity {
 	private static final String RESTORE_DEFAULTS_KEY = BaseActivity.RESTORE_DEFAULTS_KEY;
 	private static final String APP_THEME_KEY = BaseActivity.APP_THEME_KEY;
 	private static final int DIR_CHANGE_CODE = 777;
-	private static Map<String, Object> STATIC_PREF_DEFAULTS_MAP;
+	private static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
 
 	private static Activity mActivity;
 	private static SharedPreferences mPrefs;
@@ -74,7 +74,7 @@ public class PrefsActivity extends PreferenceActivity {
 			mAppThemePref = (ListPreference) findPreference(APP_THEME_KEY);
 			mRestoreDefaultsPref = findPreference(RESTORE_DEFAULTS_KEY);
 
-			STATIC_PREF_DEFAULTS_MAP = BaseActivity.getStaticPrefDefaults();
+			DYNAMIC_PREF_DEFAULTS_MAP = BaseActivity.getDyanmicPrefDefaults();
 			for (Entry<String, ?> entry : mPrefs.getAll().entrySet()) {
 				updatePrefSummary(entry.getKey());
 			}
@@ -161,11 +161,11 @@ public class PrefsActivity extends PreferenceActivity {
 		private static SharedPreferences.Editor restoreDefaultValues() {
 			mEditor.clear();
 			PreferenceManager.setDefaultValues(mActivity, R.xml.preferences, true);
-			return setStaticPrefValues();
+			return setDyanmicPrefValues();
 		}
 
-		private static SharedPreferences.Editor setStaticPrefValues() {
-			for (Entry<String, Object> entry : STATIC_PREF_DEFAULTS_MAP.entrySet()) {
+		private static SharedPreferences.Editor setDyanmicPrefValues() {
+			for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
 				if (entry.getValue() instanceof String) {
 					mEditor.putString(entry.getKey(), (String) entry.getValue());
 				}

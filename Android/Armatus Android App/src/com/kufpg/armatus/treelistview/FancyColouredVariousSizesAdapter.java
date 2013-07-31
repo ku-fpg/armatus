@@ -1,17 +1,17 @@
-package pl.polidea.treeview.demo;
+package com.kufpg.armatus.treelistview;
 
 import java.util.Set;
 
-import com.kufpg.armatus.R;
-
-import pl.polidea.treeview.TreeNodeInfo;
-import pl.polidea.treeview.TreeStateManager;
+import pl.polidea.treelistview.TreeNodeInfo;
+import pl.polidea.treelistview.TreeStateManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.kufpg.armatus.R;
 
 final class FancyColouredVariousSizesAdapter extends SimpleStandardAdapter {
 	public FancyColouredVariousSizesAdapter(final TreeListViewDemo activity,

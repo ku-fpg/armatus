@@ -11,7 +11,7 @@
         android:scrollbars="vertical"
         android:visibility="gone" /> <!-- Just to test some attributes in IDE -->
 
-    <pl.polidea.treeview.TreeListView
+    <pl.polidea.treelistview.TreeListView
         android:id="@+id/mainTreeView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
