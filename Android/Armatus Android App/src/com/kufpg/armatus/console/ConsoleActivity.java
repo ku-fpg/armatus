@@ -18,7 +18,7 @@ import com.kufpg.armatus.R;
 import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.console.ConsoleEdits.Clear;
 import com.kufpg.armatus.console.ConsoleEdits.AddEntry;
-import com.kufpg.armatus.console.ConsoleSearcher.Direction;
+import com.kufpg.armatus.console.ConsoleSearcher.SearchDirection;
 import com.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 import com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import com.kufpg.armatus.dialog.GestureDialog;
@@ -73,8 +73,8 @@ import android.widget.TextView.OnEditorActionListener;
 public class ConsoleActivity extends BaseActivity {
 
 	public static final int DEFAULT_FONT_SIZE = 15;
-	public static final int ENTRY_CONSOLE_LIMIT = 100;
-	public static final int ENTRY_COMMAND_HISTORY_LIMIT = 200;
+	public static final int CONSOLE_ENTRY_LIMIT = 100;
+	public static final int COMMAND_HISTORY_ENTRY_LIMIT = 200;
 	private static final int LONG_CLICKED_GROUP = 42;
 	private static final int DRAGGED_GROUP = 43;
 	private static final int SCROLL_DURATION = 500;
@@ -115,7 +115,7 @@ public class ConsoleActivity extends BaseActivity {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		requestWindowFeature(Window.FEATURE_PROGRESS);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_sliding_menu_activity);
 
@@ -397,7 +397,7 @@ public class ConsoleActivity extends BaseActivity {
 						if (!searchCriterion.equalsIgnoreCase(mPrevSearchCriterion)) {
 							executeSearch(searchCriterion, SearchAction.BEGIN, null);
 						} else {
-							executeSearch(null, SearchAction.CONTINUE, Direction.NEXT);
+							executeSearch(null, SearchAction.CONTINUE, SearchDirection.NEXT);
 						}
 						mPrevSearchCriterion = searchCriterion;
 						return true;
@@ -427,10 +427,10 @@ public class ConsoleActivity extends BaseActivity {
 			invalidateOptionsMenu();
 			return true;
 		case R.id.find_text_next:
-			executeSearch(null, SearchAction.CONTINUE, Direction.NEXT);
+			executeSearch(null, SearchAction.CONTINUE, SearchDirection.NEXT);
 			return true;
 		case R.id.find_text_previous:
-			executeSearch(null, SearchAction.CONTINUE, Direction.PREVIOUS);
+			executeSearch(null, SearchAction.CONTINUE, SearchDirection.PREVIOUS);
 			return true;
 		case R.id.find_text_cancel:
 			executeSearch(null, SearchAction.END, null);
@@ -743,7 +743,7 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	private void executeSearch(String criterion, SearchAction action, Direction direction) {
+	private void executeSearch(String criterion, SearchAction action, SearchDirection direction) {
 		if (mInputEnabled) {
 			setInputEnabled(false);
 			MatchParams params = null;
@@ -834,7 +834,7 @@ public class ConsoleActivity extends BaseActivity {
 	 * Refreshes the console entries, removing excessive entries from the top if ENTRY_LIMIT is exceeded.
 	 */
 	private void updateConsoleEntries() {
-		if (mConsoleEntries.size() > ENTRY_CONSOLE_LIMIT) {
+		if (mConsoleEntries.size() > CONSOLE_ENTRY_LIMIT) {
 			mConsoleEntries.remove(0);
 		}
 		mConsoleAdapter.notifyDataSetChanged();
@@ -851,7 +851,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	private void updateCommandHistoryEntries() {
-		if (mCommandHistoryEntries.size() > ENTRY_COMMAND_HISTORY_LIMIT) {
+		if (mCommandHistoryEntries.size() > COMMAND_HISTORY_ENTRY_LIMIT) {
 			mCommandHistoryEntries.remove(0);
 		}
 		mCommandHistoryAdapter.notifyDataSetChanged();

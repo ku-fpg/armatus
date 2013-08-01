@@ -37,7 +37,7 @@ public class TreeListViewDemo extends BaseActivity {
 		1, 2, 1, 0, 0, 0, 1, 2, 3, 2, 0, 0, 1, 2, 0, 1, 2, 0, 1 };
 	private static final int LEVEL_NUMBER = 4;
 	private TreeStateManager<Long> mManager = null;
-	private FancyColouredVariousSizesAdapter mFancyAdapter;
+	private FancyColoredVariousSizesAdapter mFancyAdapter;
 	private SimpleStandardAdapter mSimpleAdapter;
 	private TreeType mTreeType;
 	private boolean mCollapsible, mRecursive;
@@ -68,7 +68,7 @@ public class TreeListViewDemo extends BaseActivity {
 		}
 		setContentView(R.layout.tree_list_view_demo);
 		mTreeView = (TreeListView) findViewById(R.id.mainTreeView);
-		mFancyAdapter = new FancyColouredVariousSizesAdapter(this, mSelected,
+		mFancyAdapter = new FancyColoredVariousSizesAdapter(this, mSelected,
 				mManager, LEVEL_NUMBER);
 		mSimpleAdapter = new SimpleStandardAdapter(this, mSelected, mManager,
 				LEVEL_NUMBER);

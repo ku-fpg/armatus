@@ -58,10 +58,11 @@ public class ConsoleInputEditText extends EditText {
 		mIndent = new LeadingMarginSpan.Standard(0, 0);
 		getText().setSpan(mIndent, 0, 0, 0);
 		addTextChangedListener(new TextWatcher() {
-			/**
-			 * 
-			 */
-			private int mChangedStartIndex, mChangedEndIndex;
+			/** Tracks the beginning index (inclusive) of the most recent text change. */
+			private int mChangedStartIndex;
+			
+			/** Tracks the end index (exclusive) of the most recent text change. */
+			private int mChangedEndIndex;
 			
 			@Override
 			public void afterTextChanged(Editable s) {

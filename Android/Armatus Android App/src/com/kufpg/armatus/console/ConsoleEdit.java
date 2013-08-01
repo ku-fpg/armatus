@@ -9,6 +9,10 @@ public class ConsoleEdit implements Edit {
 	/** Reference to the current console. */
 	private ConsoleActivity mConsole;
 	
+	/**
+	 * Constructs a new instance.
+	 * @param console reference to the current console.
+	 */
 	public ConsoleEdit(ConsoleActivity console) {
 		mConsole = console;
 	}

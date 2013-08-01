@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import com.kufpg.armatus.R;
 
-final class FancyColouredVariousSizesAdapter extends SimpleStandardAdapter {
-	public FancyColouredVariousSizesAdapter(final TreeListViewDemo activity,
+final class FancyColoredVariousSizesAdapter extends SimpleStandardAdapter {
+	public FancyColoredVariousSizesAdapter(final TreeListViewDemo activity,
 			final Set<Long> selected,
 			final TreeStateManager<Long> treeStateManager,
 			final int numberOfLevels) {

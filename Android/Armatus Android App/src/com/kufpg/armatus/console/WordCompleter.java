@@ -40,6 +40,11 @@ public class WordCompleter implements Parcelable, TextWatcher {
 	 */
 	private ConsoleActivity mConsole;
 
+	/**
+	 * Constructs a new instance and populates the dictionary using the commands listed
+	 * in {@link CommandDispatcher}.
+	 * @param console reference to the current console.
+	 */
 	public WordCompleter(ConsoleActivity console) {
 		mConsole = console;
 		ImmutableSortedSet.Builder<String> dictBuilder = ImmutableSortedSet.naturalOrder();

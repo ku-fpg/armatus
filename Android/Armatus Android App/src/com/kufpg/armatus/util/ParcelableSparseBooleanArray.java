@@ -35,10 +35,14 @@ public class ParcelableSparseBooleanArray extends SparseBooleanArray implements 
 		}
 	};
 
-	public ParcelableSparseBooleanArray() {
+	/** Constructs a new {@link ParcelableSparseBooleanArray} with no mappings. */
+	public ParcelableSparseBooleanArray() {}
 
-	}
-
+	/**
+	 * Constructs a new {@link ParcelableSparseBooleanArray} instance containing the
+	 * mappings of the specified {@link SparseBooleanArray}.
+	 * @param sparseBooleanArray The array to copy.
+	 */
 	public ParcelableSparseBooleanArray(SparseBooleanArray sparseBooleanArray) {
 		for (int i = 0; i < sparseBooleanArray.size(); i++) {
 			put(sparseBooleanArray.keyAt(0), sparseBooleanArray.valueAt(0));

@@ -2,12 +2,14 @@ package com.kufpg.armatus.console;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
 import com.kufpg.armatus.BaseActivity;
 import com.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import com.kufpg.armatus.server.HermitServer;
@@ -15,9 +17,12 @@ import com.kufpg.armatus.util.NetworkUtils;
 import com.kufpg.armatus.util.StringUtils;
 
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Contains all {@link Command}s and {@link Keyword}s that the console uses and allows
+ * {@link ConsoleActivity} to execute commands.
+ */
 @SuppressWarnings("unused")
 public class CommandDispatcher {
 	public static final String ALPHA_CONVERSATION = "Alpha Conversation";
@@ -27,6 +32,7 @@ public class CommandDispatcher {
 	public static final String UNFOLD_FOLD_INLINE = "Unfold/Fold/Inline";
 	public static final String MISCELLANEOUS = "Miscellaneous";
 
+	/** Reference to the current console */
 	private static ConsoleActivity mConsole;
 
 	//List of Commands
@@ -515,20 +521,41 @@ public class CommandDispatcher {
 			}
 		}
 	};
-	private static final Map<String, Command> COMMAND_MAP = mapCommands();
+
+	/** Maps {@link Command} names to their respective instances. */
+	private static final SortedMap<String, Command> COMMAND_MAP = mapCommands();
+
+	/**
+	 * Maps {@link Command} group names to their group colors (in hexadecimal string
+	 * form) as displayed in the {@link ConsoleActivity}'s {@link android.widget.ExpandableListView
+	 * ExpandableListView} of {@link com.kufpg.armatus.drag.DragIcon DragIcons}.
+	 * */
 	private static final Map<String, String> GROUP_COLOR_MAP = mapGroupColors();
+
+	/** Maps any {@link Command} aliases to their true names. */
 	private static final Map<String, String> ALIASED_COMMAND_MAP = mapAliasedCommands();
 
 	//List of Keywords
 	private static final Keyword RED = new Keyword("red", "toast", PrettyPrinter.RED);
 	private static final Keyword GREEN = new Keyword("green", "toast", PrettyPrinter.GREEN);
 	private static final Keyword BLUE = new Keyword("blue", "toast", PrettyPrinter.BLUE);
+
+	/** Maps{@link Keyword} names to their respective instances. */
 	private static Map<String, Keyword> KEYWORD_MAP = mapKeywords();
 
+	/**
+	 * Constructs a new instance.
+	 * @param console reference to the current console.
+	 */
 	public CommandDispatcher(ConsoleActivity console) {
 		mConsole = console;
 	}
 
+	/**
+	 * Attempts to run a {@link Command} on the console.
+	 * @param commandName The name of the <code>Command</code> to run.
+	 * @param args The parameters of the <code>Command</code>.
+	 */
 	public void runOnConsole(String commandName, String... args) {
 		Command command = COMMAND_MAP.get(commandName);
 		if (command != null) {
@@ -538,6 +565,11 @@ public class CommandDispatcher {
 		}
 	}
 
+	/**
+	 * Attempts to run a {@link Command} on the console.
+	 * @param commandThe <code>Command</code> to run.
+	 * @param args The parameters of the <code>Command</code>.
+	 */
 	private void runOnConsole(Command command, String... args) {
 		String commandString = command.getCommandName()
 				+ StringUtils.NBSP + varargsToString(args);
@@ -562,6 +594,13 @@ public class CommandDispatcher {
 		command.run(args);
 	}
 
+	/**
+	 * Attempts to run the {@link Command} associated with the given {@link
+	 * Keyword} name.
+	 * @param keywordName The name of the <code>Keyword</code> whose {@link Command}
+	 * should be run.
+	 * @param arg The parameter of the {@link Command}.
+	 */
 	public void runKeywordCommand(String keywordName, String arg) {
 		Keyword keyword = KEYWORD_MAP.get(keywordName);
 		if (keyword != null) {
@@ -571,40 +610,90 @@ public class CommandDispatcher {
 		}
 	}
 
+	/**
+	 * Returns whether the specified name is a {@link Command} alias.
+	 * @param commandName The name to look up.
+	 * @return <code>true</code> if the name is a <code>Command</code> alias.
+	 */
 	public static boolean isAlias(String commandName) {
 		return ALIASED_COMMAND_MAP.containsKey(commandName);
 	}
 
+	/**
+	 * Returns whether the specified name is a {@link Command} name.
+	 * @param commandName The name to look up.
+	 * @return <code>true</code> if the given name is also a <code>Command</code> name.
+	 */
 	public static boolean isCommand(String commandName) {
 		return COMMAND_MAP.containsKey(commandName);
 	}
 
+	/**
+	 * Returns whether the specified name is a {@link Keyword} name.
+	 * @param keywordName The name to look up.
+	 * @return <code>true</code> if the given name is also a <code>Keyword</code> name.
+	 */
 	public static boolean isKeyword(String keywordName) {
 		return KEYWORD_MAP.containsKey(keywordName);
 	}
 
+	/**
+	 * Returns the {@link Command} instance with the specified name.
+	 * @param commandName The name of the <code>Command</code>.
+	 * @return the <code>Command</code> with the given name, or <code>null</code> if
+	 * <code>commandName</code> does not correspond to a <code>Command</code>.
+	 */
 	public static Command getCommand(String commandName) {
 		return COMMAND_MAP.get(commandName);
 	}
-	
+
+	/**
+	 * Returns a sorted set of all {@link Command} names in {@link CommandDispatcher}.
+	 * @return a {@link SortedSet} of all <code>Command</code> names.
+	 */
 	static SortedSet<String> getCommandNames() {
 		SortedSet<String> commandNames = new TreeSet<String>();
 		commandNames.addAll(COMMAND_MAP.keySet());
 		return commandNames;
 	}
 
+	/**
+	 * Returns the hexadecimal string representation of the color associated with the
+	 * specified {@link Command} group name.
+	 * @param groupName The <code>Command</code> group name.
+	 * @return the color of the group, or <code>null</code> if <code>groupName</code>
+	 * does not correspond to a group.
+	 */
 	public static String getGroupColor(String groupName) {
 		return GROUP_COLOR_MAP.get(groupName);
 	}
 
+	/**
+	 * Return the {@link Keyword} instance with the specified name.
+	 * @param keywordName The name of the <code>Keyword</code>.
+	 * @return the <code>Keyword</code> with the given name, or <code>null</code> if
+	 * <code>keywordName</code> does not correspond to a <code>Keyword</code>.
+	 */
 	public static Keyword getKeyword(String keywordName) {
 		return KEYWORD_MAP.get(keywordName);
 	}
 
+	/**
+	 * Returns the real {@link Command} name associated with the specified alias.
+	 * @param alias The name of the alias for which the real name should be returned.
+	 * @return The true <code>Command</code> name, or <code>null</code> is <code>alias
+	 * </code> does not correspond to a <code>Command</code> name.
+	 */
 	public static String unaliasCommand(String alias) {
 		return ALIASED_COMMAND_MAP.get(alias);
 	}
 
+	/**
+	 * Combines several strings into a single string, which each original string separated
+	 * by a space.
+	 * @param varargs The strings to combine into one.
+	 * @return A new string consisting of each input string separated by a space.
+	 */
 	private static String varargsToString(String... varargs) {
 		StringBuilder builder = new StringBuilder();
 		for(String string : varargs) {
@@ -613,8 +702,13 @@ public class CommandDispatcher {
 		return builder.toString().trim();
 	}
 
-	private static Map<String, Command> mapCommands() {
-		ImmutableMap.Builder<String, Command> commandBuilder = ImmutableMap.builder();
+	/**
+	 * Initializes {@link #COMMAND_MAP} by mapping {@link Command} names to their
+	 * respective instances.
+	 * @return a {@link SortedMap} of <code>Command</code> names to their instances.
+	 */
+	private static SortedMap<String, Command> mapCommands() {
+		ImmutableSortedMap.Builder<String, Command> commandBuilder = ImmutableSortedMap.naturalOrder();
 		Field[] fields = CommandDispatcher.class.getDeclaredFields();
 		for (Field f : fields) {
 			try {
@@ -629,6 +723,11 @@ public class CommandDispatcher {
 		return commandBuilder.build();
 	}
 
+	/**
+	 * Initializes {@link #ALIASED_COMMAND_MAP} by mapping any {@link Command} aliases
+	 * to their true command names.
+	 * @return a {@link Map} of command alias names to their real names.
+	 */
 	private static Map<String, String> mapAliasedCommands() {
 		ImmutableMap.Builder<String, String> aliasBuilder = ImmutableMap.builder();
 		Field[] fields = CommandDispatcher.class.getDeclaredFields();
@@ -646,18 +745,30 @@ public class CommandDispatcher {
 		}
 		return aliasBuilder.build();
 	}
-	
+
+	/**
+	 * Initializes {@link #GROUP_COLOR_MAP} by mapping group names to their group colors
+	 * (in hexadecimal string form) as displayed in the {@link ConsoleActivity}'s {@link
+	 * android.widget.ExpandableListView ExpandableListView} of {@link
+	 * com.kufpg.armatus.drag.DragIcon DragIcons}.
+	 * @return a {@link Map} of group names to their group colors.
+	 */
 	private static Map<String, String> mapGroupColors() {
 		ImmutableMap.Builder<String, String> groupColorBuilder = ImmutableMap.builder();
 		return groupColorBuilder.put(ALPHA_CONVERSATION, PrettyPrinter.RED)
-		.put(FIX_POINT, PrettyPrinter.GREEN)
-		.put(LOCAL, PrettyPrinter.PURPLE)
-		.put(NEW_DEBUG_NAV_GHC, PrettyPrinter.BLUE)
-		.put(UNFOLD_FOLD_INLINE, PrettyPrinter.YELLOW)
-		.put(MISCELLANEOUS, PrettyPrinter.GRAY)
-		.build();
+				.put(FIX_POINT, PrettyPrinter.GREEN)
+				.put(LOCAL, PrettyPrinter.PURPLE)
+				.put(NEW_DEBUG_NAV_GHC, PrettyPrinter.BLUE)
+				.put(UNFOLD_FOLD_INLINE, PrettyPrinter.YELLOW)
+				.put(MISCELLANEOUS, PrettyPrinter.GRAY)
+				.build();
 	}
 
+	/**
+	 * Initializes {@link #KEYWORD_MAP} by mapping {@link Keyword} names to their
+	 * respective instances.
+	 * @return a {@link Map} of <code>Keyword</code> names to their instances.
+	 */
 	private static Map<String, Keyword> mapKeywords() {
 		ImmutableMap.Builder<String, Keyword> keywordBuilder = ImmutableMap.builder();
 		Field[] fields = CommandDispatcher.class.getDeclaredFields();
@@ -674,37 +785,85 @@ public class CommandDispatcher {
 	}
 
 	/**
-	 * A Command is a series of instructions that is ran when run(args) is called.
-	 * A Command can have any number of arguments and may accept at least a
-	 * certain number of arguments is it is initialized with a lowerArgBound.
+	 * Provides instructions (via the {@link #run(String...)} method) for the console to
+	 * execute when the user enters a command. A <code>Command</code> can have any number
+	 * of arguments and may accept at least a certain number of arguments is it is
+	 * initialized with a <code>lowerArgBound</code>.
 	 */
 	public static abstract class Command {
-
+		/** The real {@link Command} name. */
 		private String mCommandName;
+
+		/** The {@link Command} name's alias. Useful for referencing <code>Command</code>
+		 * names with special characters such as <code>&gt;&gt;&gt;</code>. */
 		private String mCommandAlias;
+
+		/** The name of the group to which this {@link Command} belongs. */
 		private String mGroupName;
+
+		/** The number of arguments that this {@link Command} takes. If {@link
+		 * #mLowerArgBound} is <code>true</code>, <code>mArgsCount</code> specifies the
+		 * <em>minimum</em> number of arguments that this <code>Command</code> can take. */
 		private int mArgsCount;
+
+		/** <code>true</code> if {@link #mArgsCount} is a minimum amount, <code>false
+		 * </code> if <code>mArgsCount</code> is a precise quantity. */
 		private boolean mLowerArgBound = false;
 
+		/**
+		 * Constructs a new instance.
+		 * @param commandName The name of the {@link Command}.
+		 * @param groupName The group name to associate this <code>Command</code> with.
+		 * @param argsCount The number of arguments that this <code>Command</code> must
+		 * take.
+		 */
 		public Command(String commandName, String groupName, int argsCount) {
 			mCommandName = commandName;
 			mGroupName = groupName;
 			mArgsCount = argsCount;
 		}
 
+		/**
+		 * Constructs a new instance, specifying if the {@link Command} has a lower
+		 * argument bound.
+		 * @param commandName The name of the <code>Command</code>.
+		 * @param groupName The group name to associate this <code>Command</code> with.
+		 * @param argsCount The number of arguments that this <code>Command</code> must
+		 * take. If <code>lowerArgBound</code> is <code>true</code>, this is a minimum
+		 * amount.
+		 * @param lowerArgBound <code>true</code> if <code>argsCount</code> is a minimum
+		 * amount, <code>false</code> if <code>argsCount</code> is a precise quantity.
+		 */
 		public Command(String commandName, String groupName, int argsCount, boolean lowerArgBound) {
 			this(commandName, groupName, argsCount);
 			mLowerArgBound = lowerArgBound;
 		}
 
+		/**
+		 * Constructs a new instance that has an alias.
+		 * @param commandName The real name of the {@link Command}.
+		 * @param commandAlias The <code>Command</code>'s alias.
+		 * @param groupName The group name to associate this <code>Command</code> with.
+		 * @param argsCount The number of arguments that this <code>Command</code> must
+		 * take.
+		 */
 		public Command(String commandName, String commandAlias, String groupName, int argsCount) {
 			this(commandName, groupName, argsCount);
 			mCommandAlias = commandAlias;
 		}
 
 		/**
-		 * Use this constructor for commands with special characters in
-		 * their names (e.g., >>>).
+		 * Constructs a new instance, specifying a {@link Command} alias and if the
+		 * <code>Command</code> has a lower argument bound.
+		 * argument bound.
+		 * @param commandName The real name of the <code>Command</code>.
+		 * @param commandAlias The <code>Command</code>'s alias.
+		 * @param groupName The group name to associate this <code>Command</code> with.
+		 * @param argsCount The number of arguments that this <code>Command</code> must
+		 * take. If <code>lowerArgBound</code> is <code>true</code>, this is a minimum
+		 * amount.
+		 * @param lowerArgBound <code>true</code> if <code>argsCount</code> is a minimum
+		 * amount, <code>false</code> if <code>argsCount</code> is a precise quantity.
 		 */
 		public Command(String commandName, String commandAlias,
 				String groupName, int argsCount, boolean lowerArgBound) {
@@ -712,40 +871,80 @@ public class CommandDispatcher {
 			mCommandAlias = commandAlias;
 		}
 
+		/**
+		 * Returns the true name of the {@link Command}.
+		 * @return the real (not aliased) name of the <code>Command</code>.
+		 */
 		public String getCommandName() {
 			return mCommandName;
 		}
 
+		/**
+		 * Returns the {@link Command} alias.
+		 * @return the <code>Command</code> alias, or <code>null</code> if there is none.
+		 */
 		public String getCommandAlias() {
 			return mCommandAlias;
 		}
 
+		/**
+		 * Returns the name of the group this {@link Command} is associated with.
+		 * @return this <code>Command</code>'s group name.
+		 */
 		public String getGroupName() {
 			return mGroupName;
 		}
 
+		/**
+		 * Return the (possibly minimum) number of arguments that this {@link Command}
+		 * must take.
+		 * @return the number of arguments that the <code>Command</code> takes.
+		 */
 		public int getArgsCount() {
 			return mArgsCount;
 		}
 
+		/**
+		 * Returns whether the {@link Command} accepts a minimum number of arguments.
+		 * @return if the <code>Command</code> has a lower argument bound.
+		 */
 		public boolean hasLowerArgBound() {
 			return mLowerArgBound;
 		}
 
+		/**
+		 * The instructions that are ran when this {@link Command} is run on the console.
+		 * @param args Parameters that the <code>Command</code> uses.
+		 */
 		protected abstract void run(String... args);
 	}
 
 	/**
-	 * As opposed to a Command, a Keyword is a word that ConsoleTextView.PrettyPrinter
-	 * singles out as important (by coloring it). When a keyword is accessed by long-
-	 * clicking a ConsoleTextView, a corresponding command is run.
+	 * As opposed to a {@link Command}, a <code>Keyword</code> is a word that {@link 
+	 * PrettyPrinter} singles out as important (by coloring it). When a <code>Keyword</code>
+	 * is accessed by long-clicking a {@link ConsoleListView} entry and selecting it via
+	 * the context menu, a corresponding <code>Command</code> is run.
 	 */
 	public static class Keyword {
-
+		/** The name of the {@link Keyword}. */
 		private String mKeywordName;
+
+		/** The {@link Command} associated with this {@link Keyword} when chosen in a
+		 * context menu. */
 		private Command mCommand;
+
+		/** How {@link PrettyPrinter} colors this {@link Keyword}. Represented as a
+		 * hexadecimal string. */
 		private String mColor;
 
+		/**
+		 * Constructs a new instance.
+		 * @param keywordName The name of the {@link Keyword}.
+		 * @param commandName The name of the {@link Command} associated with this <code>
+		 * Keyword</code> when chosen in a context menu.
+		 * @param color The hexadecimal string representation of the color that {@link
+		 * PrettyPrinter} uses to color this <code>Keyword</code>.
+		 */
 		public Keyword(String keywordName, String commandName, String color) {
 			mKeywordName = keywordName;
 			if (isCommand(commandName)) {
@@ -756,14 +955,28 @@ public class CommandDispatcher {
 			mColor = color;
 		}
 
+		/**
+		 * Returns the name of this {@link Keyword}.
+		 * @return the <code>Keyword</code> name.
+		 */
 		public String getKeywordName() {
 			return mKeywordName;
 		}
 
+		/**
+		 * Returns the {@link Command} associated with this {@link Keyword} when
+		 * chosen in a context menu.
+		 * @return the <code>Command</code> associated with this <code>Keyword</code>.
+		 */
 		public Command getCommand() {
 			return mCommand;
 		}
 
+		/**
+		 * Returns the hexadecimal string representation of the color that {@link
+		 * PrettyPrinter} uses to color this {@link Keyword}.
+		 * @return <code>PrettyPrinter</code>'s color for this <code>Keyword</code>.
+		 */
 		public String getColor() {
 			return mColor;
 		}

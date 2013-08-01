@@ -90,19 +90,43 @@ public class PrefsActivity extends PreferenceActivity {
 	 * android.content.Context Context} in {@link PrefsFragment}.
 	 */
 	private static Activity mActivity;
-	
+
 	/** Used to access persistent user preferences. Editing them requires {@link #mEditor}. */
 	private static SharedPreferences mPrefs;
-	
+
 	/** Used to edit persistent user preferences stored in {@link #mPrefs}. */
 	private static SharedPreferences.Editor mEditor;
-	
+
 	/**
-	 * 
+	 * Preference that adjusts whether or not {@link BaseActivity#CACHE_DIR CACHE_DIR}
+	 * should be used to save persistent data (the value mapped to by {@link
+	 * #HISTORY_USE_CACHE_KEY}).
 	 */
 	private static CheckBoxPreference mHistoryUseCachePref;
-	private static ListPreference mEditModePref, mAppThemePref;
-	private static Preference mRestoreDefaultsPref, mHistoryDirPref;
+
+	/**
+	 * Preference that can change the String representation of a directory where persistent
+	 * data can be stored (the value mapped to by {@link #HISTORY_DIR_KEY})..
+	 */
+	private static Preference mHistoryDirPref;
+
+	/**
+	 * Preference that can change the string representation of what the current {@link
+	 * BaseActivity.EditMode EditMode} is (the value mapped to by {@link #EDIT_MODE_KEY}).
+	 */
+	private static ListPreference mEditModePref;
+
+	/**
+	 * Preference that can change the current app theme (the value mapped to by {@link
+	 * #APP_THEME_KEY}).
+	 */
+	private static ListPreference mAppThemePref;
+
+	/**
+	 * Preference that can restore the default app preferences (mapped to by {@link
+	 * #RESTORE_DEFAULTS_KEY}).
+	 */
+	private static Preference mRestoreDefaultsPref;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +137,9 @@ public class PrefsActivity extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 	}
 
+	/**
+	 * Where the user can change the app preferences.
+	 */
 	public static class PrefsFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +150,7 @@ public class PrefsActivity extends PreferenceActivity {
 			mPrefs.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
 				@Override
 				public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-					updatePrefSummary(key);
+					refreshPrefSummary(key);
 				}
 			});
 			mEditor = mPrefs.edit();
@@ -136,7 +163,7 @@ public class PrefsActivity extends PreferenceActivity {
 
 			DYNAMIC_PREF_DEFAULTS_MAP = BaseActivity.getDyanmicPrefDefaults();
 			for (Entry<String, ?> entry : mPrefs.getAll().entrySet()) {
-				updatePrefSummary(entry.getKey());
+				refreshPrefSummary(entry.getKey());
 			}
 
 			mHistoryUseCachePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -218,26 +245,12 @@ public class PrefsActivity extends PreferenceActivity {
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 
-		private static SharedPreferences.Editor restoreDefaultValues() {
-			mEditor.clear();
-			PreferenceManager.setDefaultValues(mActivity, R.xml.preferences, true);
-			return setDyanmicPrefValues();
-		}
-
-		private static SharedPreferences.Editor setDyanmicPrefValues() {
-			for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
-				if (entry.getValue() instanceof String) {
-					mEditor.putString(entry.getKey(), (String) entry.getValue());
-				}
-			}
-			return mEditor;
-		}
-
-		private void showToast(String message) {
-			Toast.makeText(mActivity, message, Toast.LENGTH_SHORT).show();
-		}
-
-		private static void updatePrefSummary(String key) {
+		/**
+		 * Dispatches a change to the {@link Preference} summary of the specified key.
+		 * @param key The key of the <code>Preference</code> whose summary should be
+		 * refreshed.
+		 */
+		private static void refreshPrefSummary(String key) {
 			if (key.equals(HISTORY_USE_CACHE_KEY)) {
 				if (mPrefs.getBoolean(HISTORY_USE_CACHE_KEY, true)) {
 					mHistoryDirPref.setSummary(mPrefs.getString(HISTORY_DIR_KEY, null));
@@ -251,6 +264,42 @@ public class PrefsActivity extends PreferenceActivity {
 					mAppThemePref.setSummary("Light theme");
 				}
 			}
+		}
+
+		/**
+		 * Restores the default app preferences.
+		 * @return a {@link SharedPreferences.Editor} with the above changes. Calling
+		 * {@link SharedPreferences.Editor#commit() commit()} is needed for the changes
+		 * to go into effect.
+		 */
+		private static SharedPreferences.Editor restoreDefaultValues() {
+			mEditor.clear();
+			PreferenceManager.setDefaultValues(mActivity, R.xml.preferences, true);
+			return restoreDyanmicPrefValues();
+		}
+
+		/**
+		 * Restores the preferences that are impossible to know before runtime to their
+		 * default values.
+		 * @return a {@link SharedPreferences.Editor} with the above changes. Calling
+		 * {@link SharedPreferences.Editor#commit() commit()} is needed for the changes
+		 * to go into effect.
+		 */
+		private static SharedPreferences.Editor restoreDyanmicPrefValues() {
+			for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
+				if (entry.getValue() instanceof String) {
+					mEditor.putString(entry.getKey(), (String) entry.getValue());
+				}
+			}
+			return mEditor;
+		}
+
+		/**
+		 * Utility method for easily showing a quick message to the user.
+		 * @param message The message to display.
+		 */
+		private void showToast(String message) {
+			Toast.makeText(mActivity, message, Toast.LENGTH_SHORT).show();
 		}
 	}
 }
