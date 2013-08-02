@@ -247,7 +247,7 @@ public class PrefsActivity extends PreferenceActivity {
 
 		/**
 		 * Dispatches a change to the {@link Preference} summary of the specified key.
-		 * @param key The key of the <code>Preference</code> whose summary should be
+		 * @param key The key of the {@code Preference} whose summary should be
 		 * refreshed.
 		 */
 		private static void refreshPrefSummary(String key) {

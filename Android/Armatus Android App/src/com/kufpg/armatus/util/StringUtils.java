@@ -68,8 +68,8 @@ public class StringUtils {
 
 	/**
 	 * Returns an {@link Editable} with all regular spaces replaced by non-breaking spaces.
-	 * @param editable The <code>Editable</code> object to apply character wrap to.
-	 * @return an <code>Editable</code> object with all spaces replaced by {@link #NBSP}.
+	 * @param editable The {@code Editable} object to apply character wrap to.
+	 * @return an {@code Editable} object with all spaces replaced by {@link #NBSP}.
 	 */
 	public static Editable withCharWrap(Editable editable) {
 		for (int i = 0; i < editable.length(); i++) {
@@ -91,8 +91,8 @@ public class StringUtils {
 
 	/**
 	 * Returns an {@link Editable} with all non-breaking spaces replaced by regular spaces.
-	 * @param str The <code>Editable</code> object from which character wrap should be removed.
-	 * @return an <code>Editable</code> object with all non-breaking spaces replaced by regular
+	 * @param str The {@code Editable} object from which character wrap should be removed.
+	 * @return an {@code Editable} object with all non-breaking spaces replaced by regular
 	 * ones.
 	 */
 	public static Editable withoutCharWrap(Editable editable) {

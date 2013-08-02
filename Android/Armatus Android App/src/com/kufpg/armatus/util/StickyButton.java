@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 /**
- * A {@link Button} that "sticks" when the user clicks it. That is, this <code>Button</code>'s
+ * A {@link Button} that "sticks" when the user clicks it. That is, this {@code Button}'s
  * {@link OnClickListener} will be called once when the user initially clicks the button, and
  * any subsequent clicks will have no effect until {@link #unstick()} is called.
  */
@@ -19,12 +19,12 @@ public class StickyButton extends Button {
 	/** The listener that is called upon an initial button click. */
 	private OnClickListener mOnClickListener;
 	
-	/** If <code>StickyButton</code> is stuck, clicks will not call {@link View.OnClickListener
+	/** If {@code StickyButton} is stuck, clicks will not call {@link View.OnClickListener
 	 * OnClickListener}'s {@link View.OnClickListener#onClick(View) onClick(View)} method. */
 	private boolean mIsStuck = false;
 	
-	/** Used to prevent the {@link Button} from queuing clicks, even if the <code>Button
-	 * </code> is not enabled. */
+	/** Used to prevent the {@link Button} from queuing clicks, even if the {@code Button}
+	 * is not enabled. */
 	private final ReentrantLock mLock = new ReentrantLock(true);
 	
 	/** {@link #mLock}'s condition. */
@@ -62,7 +62,7 @@ public class StickyButton extends Button {
 	/** 
 	 * Returns whether a click will call this {@link Button}'s {@link View.OnClickListener
 	 * OnClickListener}.
-	 * @return <code>true</code> if the button will call {@link View.OnClickListener#onClick(View)
+	 * @return {@code true} if the button will call {@link View.OnClickListener#onClick(View)
 	 * onClick(View)}.
 	 */
 	public boolean isStuck() {
@@ -90,10 +90,10 @@ public class StickyButton extends Button {
 	 * Prevents this {@link Button}'s {@link View.OnClickListener OnClickListener} from calling
 	 * {@link View.OnClickListener#onClick(View) onClick(View)} upon any subsequent clicks until
 	 * {@link #unstick()} is called. This method will also allow you to determine whether or not
-	 * the <code>OnClickListener</code> should be called on the initial click.
-	 * @param callListener if <code>true</code>, {@link #mOnClickListener} will call <code>onClick(View)
-	 * </code>. Setting this to <code>false</code> can be useful if you need to restore the
-	 * {@link StickyButton}'s state (e.g., after a screen rotation).
+	 * the {@code OnClickListener} should be called on the initial click.
+	 * @param callListener if {@code true}, {@link #mOnClickListener} will call {@code onClick(View)}
+	 * Setting this to {@code false} can be useful if you need to restore the {@link StickyButton}'s
+	 * state (e.g., after a screen rotation).
 	 */
 	private void click(boolean callListener) {
 		mLock.lock();

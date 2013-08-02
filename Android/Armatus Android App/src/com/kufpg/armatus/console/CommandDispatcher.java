@@ -553,8 +553,8 @@ public class CommandDispatcher {
 
 	/**
 	 * Attempts to run a {@link Command} on the console.
-	 * @param commandName The name of the <code>Command</code> to run.
-	 * @param args The parameters of the <code>Command</code>.
+	 * @param commandName The name of the {@code Command} to run.
+	 * @param args The parameters of the {@code Command}.
 	 */
 	public void runOnConsole(String commandName, String... args) {
 		Command command = COMMAND_MAP.get(commandName);
@@ -567,8 +567,8 @@ public class CommandDispatcher {
 
 	/**
 	 * Attempts to run a {@link Command} on the console.
-	 * @param commandThe <code>Command</code> to run.
-	 * @param args The parameters of the <code>Command</code>.
+	 * @param commandThe {@code Command} to run.
+	 * @param args The parameters of the {@code Command}.
 	 */
 	private void runOnConsole(Command command, String... args) {
 		String commandString = command.getCommandName()
@@ -597,9 +597,9 @@ public class CommandDispatcher {
 	/**
 	 * Attempts to run the {@link Command} associated with the given {@link
 	 * Keyword} name.
-	 * @param keywordName The name of the <code>Keyword</code> whose {@link Command}
+	 * @param keywordName The name of the {@code Keyword} whose {@code Command}
 	 * should be run.
-	 * @param arg The parameter of the {@link Command}.
+	 * @param arg The parameter of the {@code Command}.
 	 */
 	public void runKeywordCommand(String keywordName, String arg) {
 		Keyword keyword = KEYWORD_MAP.get(keywordName);
@@ -613,7 +613,7 @@ public class CommandDispatcher {
 	/**
 	 * Returns whether the specified name is a {@link Command} alias.
 	 * @param commandName The name to look up.
-	 * @return <code>true</code> if the name is a <code>Command</code> alias.
+	 * @return {@code true} if the name is a {@code Command} alias.
 	 */
 	public static boolean isAlias(String commandName) {
 		return ALIASED_COMMAND_MAP.containsKey(commandName);
@@ -622,7 +622,7 @@ public class CommandDispatcher {
 	/**
 	 * Returns whether the specified name is a {@link Command} name.
 	 * @param commandName The name to look up.
-	 * @return <code>true</code> if the given name is also a <code>Command</code> name.
+	 * @return {@code true} if the given name is also a {@code Command} name.
 	 */
 	public static boolean isCommand(String commandName) {
 		return COMMAND_MAP.containsKey(commandName);
@@ -631,7 +631,7 @@ public class CommandDispatcher {
 	/**
 	 * Returns whether the specified name is a {@link Keyword} name.
 	 * @param keywordName The name to look up.
-	 * @return <code>true</code> if the given name is also a <code>Keyword</code> name.
+	 * @return {@code true} if the given name is also a <{@code Keyword} name.
 	 */
 	public static boolean isKeyword(String keywordName) {
 		return KEYWORD_MAP.containsKey(keywordName);
@@ -639,9 +639,9 @@ public class CommandDispatcher {
 
 	/**
 	 * Returns the {@link Command} instance with the specified name.
-	 * @param commandName The name of the <code>Command</code>.
-	 * @return the <code>Command</code> with the given name, or <code>null</code> if
-	 * <code>commandName</code> does not correspond to a <code>Command</code>.
+	 * @param commandName The name of the {@code Command}.
+	 * @return the {@code Command} with the given name, or {@code null} if
+	 * {@code commandName} does not correspond to a {@code Command}.
 	 */
 	public static Command getCommand(String commandName) {
 		return COMMAND_MAP.get(commandName);
@@ -649,7 +649,7 @@ public class CommandDispatcher {
 
 	/**
 	 * Returns a sorted set of all {@link Command} names in {@link CommandDispatcher}.
-	 * @return a {@link SortedSet} of all <code>Command</code> names.
+	 * @return a {@link SortedSet} of all {@code Command} names.
 	 */
 	static SortedSet<String> getCommandNames() {
 		SortedSet<String> commandNames = new TreeSet<String>();
@@ -660,8 +660,8 @@ public class CommandDispatcher {
 	/**
 	 * Returns the hexadecimal string representation of the color associated with the
 	 * specified {@link Command} group name.
-	 * @param groupName The <code>Command</code> group name.
-	 * @return the color of the group, or <code>null</code> if <code>groupName</code>
+	 * @param groupName The {@code Command} group name.
+	 * @return the color of the group, or {@code null} if {@code groupName}
 	 * does not correspond to a group.
 	 */
 	public static String getGroupColor(String groupName) {
@@ -670,9 +670,9 @@ public class CommandDispatcher {
 
 	/**
 	 * Return the {@link Keyword} instance with the specified name.
-	 * @param keywordName The name of the <code>Keyword</code>.
-	 * @return the <code>Keyword</code> with the given name, or <code>null</code> if
-	 * <code>keywordName</code> does not correspond to a <code>Keyword</code>.
+	 * @param keywordName The name of the {@code Keyword}.
+	 * @return the {@code Keyword} with the given name, or {@code null} if
+	 * {@code keywordName} does not correspond to a {@code Keyword}.
 	 */
 	public static Keyword getKeyword(String keywordName) {
 		return KEYWORD_MAP.get(keywordName);
@@ -681,8 +681,8 @@ public class CommandDispatcher {
 	/**
 	 * Returns the real {@link Command} name associated with the specified alias.
 	 * @param alias The name of the alias for which the real name should be returned.
-	 * @return The true <code>Command</code> name, or <code>null</code> is <code>alias
-	 * </code> does not correspond to a <code>Command</code> name.
+	 * @return The true {@code Command} name, or {@code null} if {@code alias} does
+	 * not correspond to a {@code Command} name.
 	 */
 	public static String unaliasCommand(String alias) {
 		return ALIASED_COMMAND_MAP.get(alias);
@@ -705,7 +705,7 @@ public class CommandDispatcher {
 	/**
 	 * Initializes {@link #COMMAND_MAP} by mapping {@link Command} names to their
 	 * respective instances.
-	 * @return a {@link SortedMap} of <code>Command</code> names to their instances.
+	 * @return a {@link SortedMap} of {@code Command} names to their instances.
 	 */
 	private static SortedMap<String, Command> mapCommands() {
 		ImmutableSortedMap.Builder<String, Command> commandBuilder = ImmutableSortedMap.naturalOrder();
@@ -767,7 +767,7 @@ public class CommandDispatcher {
 	/**
 	 * Initializes {@link #KEYWORD_MAP} by mapping {@link Keyword} names to their
 	 * respective instances.
-	 * @return a {@link Map} of <code>Keyword</code> names to their instances.
+	 * @return a {@link Map} of {@code Keyword} names to their instances.
 	 */
 	private static Map<String, Keyword> mapKeywords() {
 		ImmutableMap.Builder<String, Keyword> keywordBuilder = ImmutableMap.builder();
@@ -786,36 +786,35 @@ public class CommandDispatcher {
 
 	/**
 	 * Provides instructions (via the {@link #run(String...)} method) for the console to
-	 * execute when the user enters a command. A <code>Command</code> can have any number
-	 * of arguments and may accept at least a certain number of arguments is it is
-	 * initialized with a <code>lowerArgBound</code>.
+	 * execute when the user enters a command. A {@code Command} can have any number
+	 * of arguments and may accept at least a certain number of arguments if it is
+	 * initialized with a lower argument bound.
 	 */
 	public static abstract class Command {
 		/** The real {@link Command} name. */
 		private String mCommandName;
 
-		/** The {@link Command} name's alias. Useful for referencing <code>Command</code>
-		 * names with special characters such as <code>&gt;&gt;&gt;</code>. */
+		/** The {@link Command} name's alias. Useful for referencing {@code Command}
+		 * names with special characters such as {@code >>>}. */
 		private String mCommandAlias;
 
 		/** The name of the group to which this {@link Command} belongs. */
 		private String mGroupName;
 
 		/** The number of arguments that this {@link Command} takes. If {@link
-		 * #mLowerArgBound} is <code>true</code>, <code>mArgsCount</code> specifies the
-		 * <em>minimum</em> number of arguments that this <code>Command</code> can take. */
+		 * #mLowerArgBound} is {@code true}, {@code mArgsCount} specifies the
+		 * <em>minimum</em> number of arguments that this {@code Command} can take. */
 		private int mArgsCount;
 
-		/** <code>true</code> if {@link #mArgsCount} is a minimum amount, <code>false
-		 * </code> if <code>mArgsCount</code> is a precise quantity. */
+		/** {@code true } if {@link #mArgsCount} is a minimum amount, {@code false} if
+		 * {@code mArgsCount} is a precise quantity. */
 		private boolean mLowerArgBound = false;
 
 		/**
 		 * Constructs a new instance.
 		 * @param commandName The name of the {@link Command}.
-		 * @param groupName The group name to associate this <code>Command</code> with.
-		 * @param argsCount The number of arguments that this <code>Command</code> must
-		 * take.
+		 * @param groupName The group name to associate this {@code Command} with.
+		 * @param argsCount The number of arguments that this {@code Command} must take.
 		 */
 		public Command(String commandName, String groupName, int argsCount) {
 			mCommandName = commandName;
@@ -826,13 +825,12 @@ public class CommandDispatcher {
 		/**
 		 * Constructs a new instance, specifying if the {@link Command} has a lower
 		 * argument bound.
-		 * @param commandName The name of the <code>Command</code>.
-		 * @param groupName The group name to associate this <code>Command</code> with.
-		 * @param argsCount The number of arguments that this <code>Command</code> must
-		 * take. If <code>lowerArgBound</code> is <code>true</code>, this is a minimum
-		 * amount.
-		 * @param lowerArgBound <code>true</code> if <code>argsCount</code> is a minimum
-		 * amount, <code>false</code> if <code>argsCount</code> is a precise quantity.
+		 * @param commandName The name of the {@code Command}.
+		 * @param groupName The group name to associate this {@code Command} with.
+		 * @param argsCount The number of arguments that this {@code Command} must
+		 * take. If {@code lowerArgBound} is {@code true}, this is a minimum amount.
+		 * @param lowerArgBound {@code true} if {@code argsCount} is a minimum
+		 * amount, {@code false} if {@code argsCount} is a precise quantity.
 		 */
 		public Command(String commandName, String groupName, int argsCount, boolean lowerArgBound) {
 			this(commandName, groupName, argsCount);
@@ -842,10 +840,9 @@ public class CommandDispatcher {
 		/**
 		 * Constructs a new instance that has an alias.
 		 * @param commandName The real name of the {@link Command}.
-		 * @param commandAlias The <code>Command</code>'s alias.
-		 * @param groupName The group name to associate this <code>Command</code> with.
-		 * @param argsCount The number of arguments that this <code>Command</code> must
-		 * take.
+		 * @param commandAlias The {@code Command}'s alias.
+		 * @param groupName The group name to associate this {@code Command} with.
+		 * @param argsCount The number of arguments that this {@code Command} must take.
 		 */
 		public Command(String commandName, String commandAlias, String groupName, int argsCount) {
 			this(commandName, groupName, argsCount);
@@ -854,16 +851,15 @@ public class CommandDispatcher {
 
 		/**
 		 * Constructs a new instance, specifying a {@link Command} alias and if the
-		 * <code>Command</code> has a lower argument bound.
+		 * {@code Command} has a lower argument bound.
 		 * argument bound.
-		 * @param commandName The real name of the <code>Command</code>.
-		 * @param commandAlias The <code>Command</code>'s alias.
-		 * @param groupName The group name to associate this <code>Command</code> with.
-		 * @param argsCount The number of arguments that this <code>Command</code> must
-		 * take. If <code>lowerArgBound</code> is <code>true</code>, this is a minimum
-		 * amount.
-		 * @param lowerArgBound <code>true</code> if <code>argsCount</code> is a minimum
-		 * amount, <code>false</code> if <code>argsCount</code> is a precise quantity.
+		 * @param commandName The real name of the {@code Command}.
+		 * @param commandAlias The {@code Command}'s alias.
+		 * @param groupName The group name to associate this {@code Command} with.
+		 * @param argsCount The number of arguments that this {@code Command} must
+		 * take. If {@code lowerArgBound} is {@code true}, this is a minimum amount.
+		 * @param lowerArgBound {@code true} if {@code argsCount} is a minimum
+		 * amount, {@code false} if {@code argsCount} is a precise quantity.
 		 */
 		public Command(String commandName, String commandAlias,
 				String groupName, int argsCount, boolean lowerArgBound) {
@@ -873,7 +869,7 @@ public class CommandDispatcher {
 
 		/**
 		 * Returns the true name of the {@link Command}.
-		 * @return the real (not aliased) name of the <code>Command</code>.
+		 * @return the real (not aliased) name of the {@code Command}.
 		 */
 		public String getCommandName() {
 			return mCommandName;
@@ -881,7 +877,7 @@ public class CommandDispatcher {
 
 		/**
 		 * Returns the {@link Command} alias.
-		 * @return the <code>Command</code> alias, or <code>null</code> if there is none.
+		 * @return the {@code Command} alias, or {@code null} if there is none.
 		 */
 		public String getCommandAlias() {
 			return mCommandAlias;
@@ -889,7 +885,7 @@ public class CommandDispatcher {
 
 		/**
 		 * Returns the name of the group this {@link Command} is associated with.
-		 * @return this <code>Command</code>'s group name.
+		 * @return this {@code Command}'s group name.
 		 */
 		public String getGroupName() {
 			return mGroupName;
@@ -898,7 +894,7 @@ public class CommandDispatcher {
 		/**
 		 * Return the (possibly minimum) number of arguments that this {@link Command}
 		 * must take.
-		 * @return the number of arguments that the <code>Command</code> takes.
+		 * @return the number of arguments that the {@code Command} takes.
 		 */
 		public int getArgsCount() {
 			return mArgsCount;
@@ -906,7 +902,7 @@ public class CommandDispatcher {
 
 		/**
 		 * Returns whether the {@link Command} accepts a minimum number of arguments.
-		 * @return if the <code>Command</code> has a lower argument bound.
+		 * @return if the {@code Command} has a lower argument bound.
 		 */
 		public boolean hasLowerArgBound() {
 			return mLowerArgBound;
@@ -914,16 +910,16 @@ public class CommandDispatcher {
 
 		/**
 		 * The instructions that are ran when this {@link Command} is run on the console.
-		 * @param args Parameters that the <code>Command</code> uses.
+		 * @param args Parameters that the {@code Command} uses.
 		 */
 		protected abstract void run(String... args);
 	}
 
 	/**
-	 * As opposed to a {@link Command}, a <code>Keyword</code> is a word that {@link 
-	 * PrettyPrinter} singles out as important (by coloring it). When a <code>Keyword</code>
+	 * As opposed to a {@link Command}, a {@code Keyword} is a word that {@link 
+	 * PrettyPrinter} singles out as important (by coloring it). When a {@code Keyword}
 	 * is accessed by long-clicking a {@link ConsoleListView} entry and selecting it via
-	 * the context menu, a corresponding <code>Command</code> is run.
+	 * the context menu, a corresponding {@code Command} is run.
 	 */
 	public static class Keyword {
 		/** The name of the {@link Keyword}. */
@@ -940,10 +936,10 @@ public class CommandDispatcher {
 		/**
 		 * Constructs a new instance.
 		 * @param keywordName The name of the {@link Keyword}.
-		 * @param commandName The name of the {@link Command} associated with this <code>
-		 * Keyword</code> when chosen in a context menu.
+		 * @param commandName The name of the {@link Command} associated with this {@code
+		 * Keyword} when chosen in a context menu.
 		 * @param color The hexadecimal string representation of the color that {@link
-		 * PrettyPrinter} uses to color this <code>Keyword</code>.
+		 * PrettyPrinter} uses to color this {@code Keyword}.
 		 */
 		public Keyword(String keywordName, String commandName, String color) {
 			mKeywordName = keywordName;
@@ -957,7 +953,7 @@ public class CommandDispatcher {
 
 		/**
 		 * Returns the name of this {@link Keyword}.
-		 * @return the <code>Keyword</code> name.
+		 * @return the {@code Keyword} name.
 		 */
 		public String getKeywordName() {
 			return mKeywordName;
@@ -966,7 +962,7 @@ public class CommandDispatcher {
 		/**
 		 * Returns the {@link Command} associated with this {@link Keyword} when
 		 * chosen in a context menu.
-		 * @return the <code>Command</code> associated with this <code>Keyword</code>.
+		 * @return the {@code Command} associated with this {@code Keyword}.
 		 */
 		public Command getCommand() {
 			return mCommand;
@@ -975,7 +971,7 @@ public class CommandDispatcher {
 		/**
 		 * Returns the hexadecimal string representation of the color that {@link
 		 * PrettyPrinter} uses to color this {@link Keyword}.
-		 * @return <code>PrettyPrinter</code>'s color for this <code>Keyword</code>.
+		 * @return {@code PrettyPrinter}'s color for this {@code Keyword}.
 		 */
 		public String getColor() {
 			return mColor;

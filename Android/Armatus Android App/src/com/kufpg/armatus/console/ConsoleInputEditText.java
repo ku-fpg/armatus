@@ -15,11 +15,11 @@ import android.widget.EditText;
 /**
  * An {@link EditText} that has two unique properties:
  * <ol>
- * <li>The first line of a <code>ConsoleInputEditText</code> is indented. This is indended
- * to allow for a custom prompt (e.g., <code>armatus@android~$</code>) to be placed in the
- * space left by the indentation.</code></li>
+ * <li>The first line of a {@code ConsoleInputEditText} is indented. This is intended
+ * to allow for a custom prompt (e.g., {@code armatus@android~$}) to be placed in the
+ * space left by the indentation.</li>
  * <li>This class does not use the default word-wrapping behavior of {@link
- * android.widget.TextView TextView}; instead, <code>ConsoleInputEdiText</code> wraps by
+ * android.widget.TextView TextView}; instead, {@code ConsoleInputEditText} wraps by
  * character to more closely resemble an actual terminal.</li>
  * </ol>
  */

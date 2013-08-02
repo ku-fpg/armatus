@@ -22,7 +22,7 @@ public class PrettyPrinter {
 	/**
 	 * Sets the text in a {@link TextView} to a string whose {@link
 	 * CommandDispatcher.Keyword Keywords} have been colored appropriately.
-	 * @param tv The <code>TextView</code> whose text should be set.
+	 * @param tv The {@code TextView} whose text should be set.
 	 * @param text The string to use as the text.
 	 */
 	public static void setPrettyText(TextView tv, String text) {

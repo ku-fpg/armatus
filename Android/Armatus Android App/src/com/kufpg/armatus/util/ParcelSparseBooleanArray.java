@@ -8,12 +8,12 @@ import android.util.SparseBooleanArray;
  * Extension of {@link SparseBooleanArray} that is {@link Parcelable}.
  * Credit goes to <a href="http://stackoverflow.com/a/16711258/1567086">opsidao of Stack Overflow</a>.
  */
-public class ParcelableSparseBooleanArray extends SparseBooleanArray implements Parcelable {
-	public static Parcelable.Creator<ParcelableSparseBooleanArray> CREATOR =
-			new Parcelable.Creator<ParcelableSparseBooleanArray>() {
+public class ParcelSparseBooleanArray extends SparseBooleanArray implements Parcelable {
+	public static Parcelable.Creator<ParcelSparseBooleanArray> CREATOR =
+			new Parcelable.Creator<ParcelSparseBooleanArray>() {
 		@Override
-		public ParcelableSparseBooleanArray createFromParcel(Parcel source) {
-			ParcelableSparseBooleanArray read = new ParcelableSparseBooleanArray();
+		public ParcelSparseBooleanArray createFromParcel(Parcel source) {
+			ParcelSparseBooleanArray read = new ParcelSparseBooleanArray();
 			int size = source.readInt();
 
 			int[] keys = new int[size];
@@ -30,20 +30,20 @@ public class ParcelableSparseBooleanArray extends SparseBooleanArray implements 
 		}
 
 		@Override
-		public ParcelableSparseBooleanArray[] newArray(int size) {
-			return new ParcelableSparseBooleanArray[size];
+		public ParcelSparseBooleanArray[] newArray(int size) {
+			return new ParcelSparseBooleanArray[size];
 		}
 	};
 
-	/** Constructs a new {@link ParcelableSparseBooleanArray} with no mappings. */
-	public ParcelableSparseBooleanArray() {}
+	/** Constructs a new {@link ParcelSparseBooleanArray} with no mappings. */
+	public ParcelSparseBooleanArray() {}
 
 	/**
-	 * Constructs a new {@link ParcelableSparseBooleanArray} instance containing the
+	 * Constructs a new {@link ParcelSparseBooleanArray} instance containing the
 	 * mappings of the specified {@link SparseBooleanArray}.
 	 * @param sparseBooleanArray The array to copy.
 	 */
-	public ParcelableSparseBooleanArray(SparseBooleanArray sparseBooleanArray) {
+	public ParcelSparseBooleanArray(SparseBooleanArray sparseBooleanArray) {
 		for (int i = 0; i < sparseBooleanArray.size(); i++) {
 			put(sparseBooleanArray.keyAt(0), sparseBooleanArray.valueAt(0));
 		}

@@ -8,16 +8,16 @@ import com.google.common.collect.Lists;
 import com.kufpg.armatus.EditManager.Edit;
 
 /**
- * An <code>EditManager</code> tracks a series of {@link EditManager.Edit Edits}, any of
- * which can be undone or redone if needed. Undoing an <code>Edit</code> pushes it onto
- * the redo stack, and redoing an edit pushes it onto the undo stack. Applying a new <code>
- * Edit</code> pushes it onto the undo stack and clears the redo stack.
+ * An {@code EditManager} tracks a series of {@link EditManager.Edit Edits}, any of
+ * which can be undone or redone if needed. Undoing an {@code Edit} pushes it onto
+ * the redo stack, and redoing an edit pushes it onto the undo stack. Applying a new {@code
+ * Edit} pushes it onto the undo stack and clears the redo stack.
  */
 public class EditManager implements Iterable<Edit> {
 	/**
 	 * The maximum number of {@link EditManager.Edit Edits} that this {@link EditManager}
-	 * can track. If this limit is reached and another <code>Edit</code> is applied, the
-	 * bottom <code>Edit</code> of the undo stack is cleared to make room.
+	 * can track. If this limit is reached and another {@code Edit} is applied, the
+	 * bottom {@code Edit} of the undo stack is cleared to make room.
 	 */
 	private static final int DEFAULT_EDIT_LIMIT = 100;
 	
@@ -40,14 +40,14 @@ public class EditManager implements Iterable<Edit> {
 	
 	/**
 	 * Tracks {@link EditManager.Edit Edits} that have been previously applied or redone.
-	 * Calling {@link #undo EditManager.undo()} will pop an <code>Edit</code> off of this stack
+	 * Calling {@link #undo EditManager.undo()} will pop an {@code Edit} off of this stack
 	 * and call its own {@link EditManager.Edit#undo() undo()} method. 
 	 */
 	private Stack<Edit> mUndoStack = new Stack<Edit>();
 	
 	/**
 	 * Tracks {@link EditManager.Edit Edits} that have been undone. Calling {@link #redo
-	 * EditManager.redo()} will pop an <code>Edit</code> off of this stack and call its
+	 * EditManager.redo()} will pop an {@code Edit} off of this stack and call its
 	 * own {@link EditManager#redo() redo()} method.
 	 */
 	private Stack<Edit> mRedoStack = new Stack<Edit>();
@@ -63,7 +63,7 @@ public class EditManager implements Iterable<Edit> {
 	/**
 	 * Constructs and empty {@link EditManager} with a custom {@link EditManager.Edit Edit}
 	 * limit.
-	 * @param limit The maximum number of <code>Edits</code> that this <code>EditManager</code>
+	 * @param limit The maximum number of {@code Edit} that this {@code EditManager}
 	 * can track.
 	 */
 	public EditManager(int limit) {
@@ -72,9 +72,9 @@ public class EditManager implements Iterable<Edit> {
 
 	/**
 	 * Invokes an {@link EditManager.Edit Edit} for the first time. This method will call the
-	 * <code>Edit</code>'s {@link EditManager.Edit#applyEdit() applyEdit()} method, push it
+	 * {@code Edit}'s {@link EditManager.Edit#applyEdit() applyEdit()} method, push it
 	 * onto the undo stack, and clear the redo stack.
-	 * @param edit The <code>Edit</code> being applied.
+	 * @param edit The {@code Edit} being applied.
 	 */
 	public synchronized void applyEdit(Edit edit) {
 		if (mUndoStack.size() == mEditLimit) {
@@ -92,9 +92,9 @@ public class EditManager implements Iterable<Edit> {
 
 	/**
 	 * Returns whether this {@link EditManager} is capable of redoing an action. By default,
-	 * an <code>EditManager</code> can redo if its redo stack is not empty, although subclasses
+	 * an {@code EditManager} can redo if its redo stack is not empty, although subclasses
 	 * can override this method to impose additional restrictions.
-	 * @return <code>true</code> if {@link EditManager#redo() redo()} can be called successfully.
+	 * @return {@code true} if {@link EditManager#redo() redo()} can be called successfully.
 	 */
 	public synchronized boolean canRedo() {
 		return !mRedoStack.empty();
@@ -102,9 +102,9 @@ public class EditManager implements Iterable<Edit> {
 
 	/**
 	 * Returns whether this {@link EditManager} is capable of undoing an action. By default,
-	 * an <code>EditManager</codE> can undo if its undo stack is not empty, although subclasses
+	 * an {@code EditManager} can undo if its undo stack is not empty, although subclasses
 	 * can override this method to impose additional restrictions.
-	 * @return <code>true</code> if {@link EditManager#undo() undo()} can be called successfully.
+	 * @return {@code true} if {@link EditManager#undo() undo()} can be called successfully.
 	 */
 	public synchronized boolean canUndo() {
 		return !mUndoStack.empty();
@@ -123,7 +123,7 @@ public class EditManager implements Iterable<Edit> {
 
 	/**
 	 * Returns the maximum {@link EditManager.Edit Edit} limit.
-	 * @return the maximum <code>Edit</code> limit.
+	 * @return the maximum {@code Edit} limit.
 	 */
 	public synchronized int getLimit() {
 		return mEditLimit;
@@ -174,8 +174,8 @@ public class EditManager implements Iterable<Edit> {
 	/**
 	 * Sets the maximum number of {@link EditManager.Edit Edits} that this {@link EditManager}
 	 * can track.
-	 * @param editLimit The desired maximum <code>Edit</code> limit.
-	 * @throws IllegalArgumentException if <code>editLimit</code> is less than the minimum
+	 * @param editLimit The desired maximum {@code Edit} limit.
+	 * @throws IllegalArgumentException if {@code editLimit} is less than the minimum
 	 * edit limit.
 	 */
 	public synchronized void setLimit(int editLimit) throws IllegalArgumentException {
@@ -217,7 +217,7 @@ public class EditManager implements Iterable<Edit> {
 	public interface Edit {
 		/**
 		 * Called when the {@link Edit} is initially added to an {@link EditManager}. This
-		 * is similar to {@link #redo()} except that <code>applyEdit()</code> is only called
+		 * is similar to {@link #redo()} except that {@code applyEdit()} is only called
 		 * once, so it is a good place to do tasks that don't need to be undone.
 		 */
 		void applyEdit();

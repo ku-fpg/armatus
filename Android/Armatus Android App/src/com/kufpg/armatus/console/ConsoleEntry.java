@@ -22,7 +22,7 @@ public class ConsoleEntry implements Serializable {
 	 */
 	private int mNum;
 	
-	/** The contents of the entry, not including the <code>hermit&lt;num&gt; </code>prefix. */
+	/** The contents of the entry, not including the {@code hermit<num> }prefix. */
 	private String mShortContents = "";
 	
 	/**
@@ -52,7 +52,7 @@ public class ConsoleEntry implements Serializable {
 	/**
 	 * Constructs a new instance with the specified {@link ConsoleEntry}'s number
 	 * and contents.
-	 * @param entry the <code>ConsoleEntry</code> to copy.
+	 * @param entry the {@code ConsoleEntry} to copy.
 	 */
 	public ConsoleEntry(ConsoleEntry entry) {
 		this(entry.getNum(), entry.getShortContents());
@@ -67,7 +67,7 @@ public class ConsoleEntry implements Serializable {
 	}
 
 	/**
-	 * Returns this entry's contents without the <code>hermit&lt;num&gt; </code>prefix.
+	 * Returns this entry's contents without the {@code hermit<num> }prefix.
 	 * @return the unadorned entry contents.
 	 */
 	public String getShortContents() {
@@ -75,7 +75,7 @@ public class ConsoleEntry implements Serializable {
 	}
 	
 	/**
-	 * Returns this entry's contents including the <code>hermit&lt;num&gt; </code>prefix.
+	 * Returns this entry's contents including the {@code hermit<num> }prefix.
 	 * @return the entry contents, including the prefix.
 	 */
 	public String getFullContents() {
@@ -85,7 +85,7 @@ public class ConsoleEntry implements Serializable {
 	/**
 	 * Returns the list of {@link CommandDispatcher.Keyword Keywords} contained in this
 	 * entry.
-	 * @return the list of <code>Keywords</code>.
+	 * @return the list of {@code Keywords}.
 	 */
 	public final List<String> getKeywords() {
 		return mKeywords;

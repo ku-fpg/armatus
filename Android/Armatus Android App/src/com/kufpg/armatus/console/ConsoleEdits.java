@@ -19,7 +19,7 @@ public class ConsoleEdits {
 		 * Constructs a new instance, where the {@link ConsoleEntry} will contain the
 		 * specified contents.
 		 * @param console reference to the current console.
-		 * @param contents what the <code>ConsoleEntry</code> to be added will contain.
+		 * @param contents what the {@code ConsoleEntry} to be added will contain.
 		 */
 		public AddEntry(ConsoleActivity console, String contents) {
 			super(console);
@@ -43,15 +43,15 @@ public class ConsoleEdits {
 	public static class Clear extends ConsoleEdit {
 		/** Contains the {@link ConsoleEntry ConsoleEntries} that are to be cleared. */
 		private List<ConsoleEntry> mOriginalEntries;
-		/** The {@link ConsoleEntry} number used for the <code>clear</code> command. */
+		/** The {@link ConsoleEntry} number used for the {@code clear} command. */
 		private int mInputNum;
 
 		/**
 		 * Constructs a new instance with references to the {@link ConsoleEntry} number
-		 * used for the <code>clear</code> commands as well as the entries that are to be
+		 * used for the {@code clear} commands as well as the entries that are to be
 		 * cleared.
 		 * @param console reference to the current console.
-		 * @param inputNum the entry number used for the <code>clear</code> command.
+		 * @param inputNum the entry number used for the {@code clear} command.
 		 * @param originalEntries the entries that are to be cleared.
 		 */
 		public Clear(ConsoleActivity console, int inputNum, List<ConsoleEntry> originalEntries) {

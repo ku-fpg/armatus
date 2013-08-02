@@ -22,7 +22,7 @@ public class NetworkUtils {
 	/**
 	 * Returns whether the device's airplane mode is on.
 	 * @param context The {@link Context} to use.
-	 * @return <code>true</code> if airplane mode is on.
+	 * @return {@code true} if airplane mode is on.
 	 */
 	@SuppressLint({ "NewApi", "InlinedApi" })
 	@SuppressWarnings("deprecation")
@@ -39,7 +39,7 @@ public class NetworkUtils {
 	/**
 	 * Returns whether the device's Wi-Fi is connected.
 	 * @param context The {@link Context} to use.
-	 * @return <code>true</code> if Wi-Fi is connected.
+	 * @return {@code true} if Wi-Fi is connected.
 	 */
 	public static boolean isWifiConnected(Context context) {
 		if (mConMan == null) {

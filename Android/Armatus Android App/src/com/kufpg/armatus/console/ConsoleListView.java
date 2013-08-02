@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kufpg.armatus.R;
-import com.kufpg.armatus.util.ParcelableSparseBooleanArray;
+import com.kufpg.armatus.util.ParcelSparseBooleanArray;
 import com.kufpg.armatus.util.StringUtils;
 
 import android.content.ClipData;
@@ -23,13 +23,31 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+/**
+ * Used in {@link ConsoleActivity} to display console entries. This class defines special
+ * {@link AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
+ * onItemClick(AdapterView, View, int, long)} and {@link ActionMode} behavior.
+ */
 public class ConsoleListView extends ListView {
+	/** Reference to the current console. */
 	private ConsoleActivity mConsole;
+
+	/** Reference to the {@link ListView}'s action mode (if visible). */
 	private ActionMode mActionMode;
+
+	/** Reference to {@link #mActionMode}'s callback (if visible). */
 	private ActionModeCallback mCallback;
+
+	/** Reference to the {@link MenuItem} that allows for swapping  {@link ConsoleEntry}
+	 * keywords. */
 	private MenuItem mSwapItem;
-	private SparseBooleanArray mPrevCheckedStates = new ParcelableSparseBooleanArray();
-	private int mPrevCheckedPos = INVALID_POSITION;
+
+	/** Tracks which {@link ConsoleEntry ConsoleEntries} are currently checked, since
+	 * {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE CHOICE_MODE_MULTIPLE}'s
+	 * checking behavior is not desirable. */
+	private SparseBooleanArray mPrevCheckedStates = new ParcelSparseBooleanArray();
+
+	/** Tracks if {@link #mActionMode} is visible. */
 	private boolean mActionModeVisible = false;
 
 	public ConsoleListView(Context context) {
@@ -47,6 +65,12 @@ public class ConsoleListView extends ListView {
 		init(context);
 	}
 
+	/**
+	 * Initializes variables and sets special
+	 * {@link AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
+	 * onItemClick(AdapterView, View, int, long)} behavior.
+	 * @param context The {@link Context} to use.
+	 */
 	private void init(Context context) {
 		mConsole = (ConsoleActivity) context;
 		mCallback = new ActionModeCallback();
@@ -86,7 +110,7 @@ public class ConsoleListView extends ListView {
 	public Parcelable onSaveInstanceState() {
 		Parcelable superState = super.onSaveInstanceState();
 		SavedState ss = new SavedState(superState);
-		ss.checkedStates = (ParcelableSparseBooleanArray) mPrevCheckedStates;
+		ss.checkedStates = (ParcelSparseBooleanArray) mPrevCheckedStates;
 		return ss;
 	}
 
@@ -99,7 +123,6 @@ public class ConsoleListView extends ListView {
 		SavedState ss = (SavedState) state;
 		super.onRestoreInstanceState(ss.getSuperState());
 		mPrevCheckedStates = ss.checkedStates;
-		setItemChecked(mPrevCheckedPos, true);
 		if (mPrevCheckedStates.size() > 0) {
 			setActionModeVisible(true);
 			for (int i = 0; i < mPrevCheckedStates.size(); i++) {
@@ -108,6 +131,11 @@ public class ConsoleListView extends ListView {
 		}
 	}
 
+	/**
+	 * Shows or hides the {@link ListView}'s {@link ActionMode}.
+	 * @param visible {@code true} if the {@code ActionMode} should be shown,
+	 * {@code false} if it should be hidden.
+	 */
 	public void setActionModeVisible(boolean visible) {
 		if (visible && !mActionModeVisible) {
 			mActionMode = startActionMode(mCallback);
@@ -116,16 +144,29 @@ public class ConsoleListView extends ListView {
 		}
 	}
 
+	/**
+	 * Returns whether a particular {@link ConsoleEntry} is currently shown to the
+	 * user on-screen.
+	 * @param entryIndex The index of the entry to look up.
+	 * @return {@code true} if the entry is currently visible to the user.
+	 */
 	public boolean isEntryVisible(int entryIndex) {
 		return getFirstVisiblePosition() <= entryIndex && entryIndex <= getLastVisiblePosition();
 	}
 
+	/**
+	 * Returns whether the the {@link ListView}'s {@link ActionMode} is visible.
+	 * @return {@code true} if the {@code ActionMode} is visible.
+	 */
 	public boolean isActionModeVisible() {
 		return mActionModeVisible;
 	}
 
+	/**
+	 * Defines the behavior of {@code ConsoleListView}'s {@link ActionMode} callback,
+	 * such as item click behavior and subtitle updating.
+	 */
 	private class ActionModeCallback implements Callback {
-
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
@@ -190,7 +231,7 @@ public class ConsoleListView extends ListView {
 	}
 
 	protected static class SavedState extends BaseSavedState {
-		ParcelableSparseBooleanArray checkedStates;
+		ParcelSparseBooleanArray checkedStates;
 
 		SavedState(Parcelable superState) {
 			super(superState);

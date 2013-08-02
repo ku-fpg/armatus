@@ -16,7 +16,7 @@ import android.os.Parcelable;
 /**
  * Searches a console's entries for words that match a given criterion. Because this
  * class can potentially store a lot of data, it is recommended that if you need to
- * destroy a <code>ConsoleSearcher</code>, you should parcel it and reload it later
+ * destroy a {@code ConsoleSearcher}, you should parcel it and reload it later
  * instead of recreating a new instance every time.
  */
 public class ConsoleSearcher implements Parcelable {
@@ -68,7 +68,7 @@ public class ConsoleSearcher implements Parcelable {
 	/**
 	 * Begin a new search with a specified search criterion.
 	 * @param criterion The string to search for.
-	 * @return The {@link MatchParams} of the first match, or <code>null</code> if there
+	 * @return The {@link MatchParams} of the first match, or {@code null} if there
 	 * are no matches.
 	 */
 	public synchronized MatchParams beginSearch(String criterion) {
@@ -105,7 +105,7 @@ public class ConsoleSearcher implements Parcelable {
 	/**
 	 * Resume the ongoing search in the specified {@link SearchDirection}.
 	 * @param direction Either {@link SearchDirection#NEXT} or {@link SearchDirection#PREVIOUS}.
-	 * @return The {@link MatchParams} of the newly selected match, or <code>null</code>
+	 * @return The {@link MatchParams} of the newly selected match, or {@code null}
 	 * if there are no matches.
 	 */
 	public synchronized MatchParams continueSearch(SearchDirection direction) {
@@ -152,7 +152,7 @@ public class ConsoleSearcher implements Parcelable {
 
 	/**
 	 * Returns the current search criterion.
-	 * @return the current search criterion or <code>null</code> if there is no
+	 * @return the current search criterion or {@code null} if there is no
 	 * ongoing search.
 	 */
 	public synchronized String getCriterion() {
@@ -174,8 +174,8 @@ public class ConsoleSearcher implements Parcelable {
 	 * @param contents The string whose matches should be returned. The string must match
 	 * the contents of a current {@link ConsoleEntry} (ignoring case) or this method will
 	 * not return the correct result.
-	 * @return a {@link SortedSet} of the string matches' <code>TextView</code> offsets.
-	 * If there are no matches, <code>null</code> is returned.
+	 * @return a {@link SortedSet} of the string matches' {@code TextView} offsets.
+	 * If there are no matches, {@code null} is returned.
 	 */
 	public synchronized SortedSet<Integer> getMatchOffsets(String contents) {
 		if (hasMatches(contents)) {
@@ -186,10 +186,10 @@ public class ConsoleSearcher implements Parcelable {
 	}
 
 	/**
-	 * Returns a sorted set of string starting indexes (inclusive) where <code>pattern
-	 * </code> is located in <code>target</code>.
-	 * @param pattern The string to search for in <code>target</code>.
-	 * @param target The string in which <code>pattern</code> matches are searched for.
+	 * Returns a sorted set of string starting indexes (inclusive) where {@code pattern}
+	 * is located in {@code target}.
+	 * @param pattern The string to search for in {@code target}.
+	 * @param target The string in which {@code pattern} matches are searched for.
 	 * @return A {@link SortedSet} of indexes indicating matches. If there are no
 	 * matches, the set will only contain {@link #NO_MATCH}.
 	 */
@@ -211,7 +211,7 @@ public class ConsoleSearcher implements Parcelable {
 
 	/**
 	 * Return the parameters of the selected match.
-	 * @return the currently selected {@link MatchParams} or <code>null</code if there
+	 * @return the currently selected {@link MatchParams} or {@code null} if there
 	 * is either no ongoing search or no search matches.
 	 */
 	public synchronized MatchParams getSelectedMatch() {
@@ -309,7 +309,7 @@ public class ConsoleSearcher implements Parcelable {
 		 * Constructs a new instance with the specified {@link android.widget.ListView
 		 * ListView} index and {@link android.widget.TextView TextView} offset.
 		 * @param listIndex The list index.
-		 * @param textViewOffset The <code>TextView</code> offset.
+		 * @param textViewOffset The {@code TextView} offset.
 		 */
 		public MatchParams(int listIndex, int textViewOffset) {
 			this.listIndex = listIndex;
@@ -318,7 +318,7 @@ public class ConsoleSearcher implements Parcelable {
 
 		/**
 		 * Constructs a new instance from the specified {@link MatchParams}.
-		 * @param params The <code>MatchParams</code> to copy.
+		 * @param params The {@code MatchParams} to copy.
 		 */
 		public MatchParams(MatchParams params) {
 			listIndex = params.listIndex;

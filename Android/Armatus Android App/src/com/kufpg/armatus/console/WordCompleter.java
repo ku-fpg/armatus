@@ -18,7 +18,7 @@ import com.kufpg.armatus.util.StringUtils;
 /**
  * A {@link TextWatcher} that analyzes user input and can make suggestions to complete
  * the input based on a dictionary. Because the dictionary can potentially be very large,
- * it is recommended that if you need to destroy a <code>WordCompleter</code>, you should
+ * it is recommended that if you need to destroy a {@code WordCompleter}, you should
  * parcel it and reload it later instead of recreating a new instance every time.
  */
 public class WordCompleter implements Parcelable, TextWatcher {
@@ -97,10 +97,10 @@ public class WordCompleter implements Parcelable, TextWatcher {
 
 	/**
 	 * Returns a suggestion to complete the current input. If there is more than one
-	 * suggestion, this will return <code>null</code> and instead open a dialog listing
+	 * suggestion, this will return {@code null} and instead open a dialog listing
 	 * all of the suggestions.
 	 * @param partialWord The current input.
-	 * @return The suggestion for completing the current input, or <code>null</code> if
+	 * @return The suggestion for completing the current input, or {@code null} if
 	 * there is more than one suggestion.
 	 */
 	public String completeWord(String partialWord) {
@@ -125,7 +125,7 @@ public class WordCompleter implements Parcelable, TextWatcher {
 	/**
 	 * Rebuilds {@link #mFilteredDictionary}.
 	 * @param curPartialWord The new word to considered for completion when
-	 * constructing <code>mFilteredDictionary</code>.
+	 * constructing {@code mFilteredDictionary}.
 	 */
 	private void resetFilter(String curPartialWord) {
 		mFilteredDictionary = new TreeSet<String>(COMMAND_DICTIONARY);

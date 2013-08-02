@@ -17,11 +17,28 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+/**
+ * {@link android.widget.ExpandableListAdapter ExpandableListAdapter} for a menu containing
+ * {@link DragIcon}s representing various console {@link
+ * com.kufpg.armatus.console.CommandDispatcher.Command Command}s.
+ */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
+	/** Contains all {@link com.kufpg.armatus.console.CommandDispatcher.Command Command}
+	 * group names in the order displayed in the list. */
 	private static List<String> GROUP_LIST;
+	
+	/** Maps {@link com.kufpg.armatus.console.CommandDispatcher.Command Command} group
+	 * names to the {@code Command} names belonging to each group in the order specified
+	 * by {@code strings.xml}. */
 	private static ListMultimap<String, String> GROUP_TO_COMMAND_MAP;
+	
+	/** Reference to the current context. */
 	private Context mContext;
 
+	/**
+	 * Constructs a new instance and initializes the menu data if necessary.
+	 * @param context The {@link Context} to use.
+	 */
 	public CommandExpandableMenuAdapter(Context context) {
 		mContext = context;
 		if (GROUP_LIST == null || GROUP_TO_COMMAND_MAP == null) {
@@ -115,15 +132,22 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		return true;
 	}
 
+	/** Holds group title information for efficiency purposes. */
 	private static class CommandExpandableMenuHeader {
 		TextView title;
 		View groupColor;
 	}
 
+	/** Holds a {@link DragIcon} reference for efficiency purposes. */
 	private static class CommandExpandableMenuItem {
 		DragIcon icon;
 	}
 
+	/**
+	 * Initializes {@link #GROUP_LIST} and {@link #GROUP_TO_COMMAND_MAP} by scanning through
+	 * {@code strings.xml} and reading the names of the strings.
+	 * @param context The {@link Context} to use.
+	 */
 	private static void loadExpandableMenuData(Context context) {
 		TypedArray ta = context.getResources().obtainTypedArray(R.array.command_group_arrays);
 		ImmutableList.Builder<String> groupListBuilder = ImmutableList.builder();

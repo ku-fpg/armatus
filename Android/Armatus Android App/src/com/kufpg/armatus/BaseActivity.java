@@ -188,7 +188,7 @@ public class BaseActivity extends Activity {
 	/**
 	 * Returns whether the application's {@link EditManager} is capable of redoing
 	 * an action. Subclasses of {@link BaseActivity} can impose additional restrictions.
-	 * @return <code>true</code> if the application-level <code>EditManager</code> is
+	 * @return {@code true} if the application-level {@code EditManager} is
 	 * allowed to redo an action.
 	 */
 	public boolean canRedo() {
@@ -198,7 +198,7 @@ public class BaseActivity extends Activity {
 	/**
 	 * Returns whether the application's {@link EditManager} is capable of undoing
 	 * an action. Subclasses of {@link BaseActivity} can impose additional restrictions.
-	 * @return <code>true</code> if the application-level <code>EditManager</code> is
+	 * @return {@code true} if the application-level {@code EditManager} is
 	 * allowed to undo an action.
 	 */
 	public boolean canUndo() {
@@ -228,7 +228,7 @@ public class BaseActivity extends Activity {
 	 * @param context The {@link Context} to use.
 	 * @param packageName The app's package name. Make sure to pass in the full package name, or
 	 * this method will not return the correct result.
-	 * @return <code>true</code> if the app is currently installed.
+	 * @return {@code true} if the app is currently installed.
 	 */
 	public static boolean appInstalledOrNot(Context context, String packageName) {
 		PackageManager pm = context.getPackageManager();
@@ -253,7 +253,7 @@ public class BaseActivity extends Activity {
 	/**
 	 * Returns an instance of this app's {@link SharedPreferences}, which allow you to look
 	 * up persistent preference data using their keys.
-	 * @return the app's <code>SharedPreferences</code>.
+	 * @return the app's {@code SharedPreferences}.
 	 */
 	protected static SharedPreferences getPrefs() {
 		return mPrefs;
@@ -263,15 +263,15 @@ public class BaseActivity extends Activity {
 	 * Returns a {@link SharedPreferences.Editor}, which allows you to modify the app's
 	 * persistent preference data. Make sure to call {@link SharedPreferences.Editor#commit()
 	 * commit()} after making any changes.
-	 * @return the app's <code>SharedPreferences</code> editor.
+	 * @return the app's {@code SharedPreferences} editor.
 	 */
 	protected static SharedPreferences.Editor getPrefsEditor() {
 		return mEditor;
 	}
 
 	/**
-	 * Returns the resource ID of the current app theme (either <code>ThemeLight</code> or
-	 * <code>ThemeDark</code>.
+	 * Returns the resource ID of the current app theme (either {@code ThemeLight} or
+	 * {@code ThemeDark}.
 	 * @return the current app theme's resource ID.
 	 */
 	protected static int getThemePrefId() {
@@ -300,7 +300,7 @@ public class BaseActivity extends Activity {
 	 * Initializes {@link #DYNAMIC_PREF_DEFAULTS_MAP} by mapping {@link
 	 * android.preference.Preference Preference} keys to their default values when the default
 	 * values are impossible to know before runtime.
-	 * @return a map of <code>Preference</code> keys to their dynamic default values.
+	 * @return a map of {@code Preference} keys to their dynamic default values.
 	 */
 	private static Map<String, ? extends Object> mapDynamicPrefDefaults() {
 		return ImmutableMap.of(HISTORY_DIR_KEY, CACHE_DIR);
