@@ -48,17 +48,20 @@
             android:id="@+id/find_text_next"
             android:icon="?attr/actionFindNext"
             android:orderInCategory="95"
-            android:showAsAction="always"/>
+            android:showAsAction="always"
+            android:title="Find next"/>
         <item
             android:id="@+id/find_text_previous"
             android:icon="?attr/actionFindPrevious"
             android:orderInCategory="96"
-            android:showAsAction="always"/>
+            android:showAsAction="always"
+            android:title="Find previous"/>
         <item
             android:id="@+id/find_text_cancel"
             android:icon="?attr/actionCancel"
             android:orderInCategory="97"
-            android:showAsAction="always"/>
+            android:showAsAction="always"
+            android:title="Cancel search"/>
     </group>
     <group android:id="@+id/history_group" >
         <item

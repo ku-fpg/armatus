@@ -37,6 +37,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -216,7 +217,9 @@ public class ConsoleActivity extends BaseActivity {
 				case DragEvent.ACTION_DROP:
 				case DragEvent.ACTION_DRAG_ENDED:
 					View dragSource = (View) event.getLocalState();
-					dragSource.setVisibility(View.VISIBLE);
+					if (dragSource != null) {
+						dragSource.setVisibility(View.VISIBLE);
+					}
 					return true;
 				default:
 					return false;
@@ -709,19 +712,19 @@ public class ConsoleActivity extends BaseActivity {
 	public void setTempCommand(String commandName) {
 		mTempCommand = commandName;
 	}
-	
+
 	public void showEntrySelectionDialog(List<ConsoleEntry> entries) {
 		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
 	}
-	
+
 	public void showKeywordSwapDialog(int entryNum, String entryContents) {
 		showDialog(KeywordSwapDialog.newInstance(entryNum, entryContents), KEYWORD_SWAP_TAG);
 	}
-	
+
 	public void showWordCompletionDialog(List<String> suggestions) {
 		showDialog(WordCompletionDialog.newInstance(mCompleter.getWordSuggestions()), WORD_COMPLETION_TAG);
 	}
-	
+
 	private void showDialog(DialogFragment fragment, String tag) {
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		Fragment prev = getFragmentManager().findFragmentByTag(tag);
@@ -778,11 +781,9 @@ public class ConsoleActivity extends BaseActivity {
 	 * This probably works best on Nexus 7s.
 	 */
 	private void refreshSlidingMenu() {
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_portrait);
-		} else {
-			mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_landscape);
-		}
+		Drawable command = getResources().getDrawable(R.drawable.template_command_example);
+		int width = command.getIntrinsicWidth();
+		mSlidingMenu.setBehindWidth(Math.round(width + 0.05f*width));
 	}
 
 	synchronized void resizeEmptySpace() {

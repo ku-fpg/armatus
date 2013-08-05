@@ -97,7 +97,7 @@ public class KeywordSwapAdapter extends ArrayAdapter<String> {
 						DragShadowBuilder builder = new DragShadowBuilder(holder.layout) {
 							@Override
 							public void onDrawShadow(Canvas canvas) {
-								super.onDrawShadow(canvas); 
+								super.onDrawShadow(canvas);
 								Paint rectPaint = new Paint();
 								rectPaint.setColor(mContext.getResources().getColor(android.R.color.holo_orange_dark));
 								rectPaint.setAlpha(55);
