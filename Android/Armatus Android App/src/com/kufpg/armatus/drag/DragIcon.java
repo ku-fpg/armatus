@@ -16,16 +16,33 @@ import android.widget.ImageView;
  * A draggable image that represents a Command that can be run on console entry Keywords.
  */
 public class DragIcon extends ImageView {
-	private String mCommandName, mCommandImagePath;
+	private String mCommandName; 
+	private String mCommandImagePath;
 
+	/**
+	 * DragIcon Function for selected icon
+	 * @param context
+	 */
 	public DragIcon(Context context) {
 		this(context, null);
 	}
 
+	/**
+	 * DragIcon with context and an attribute set within icon
+	 * @param context
+	 * @param attrs
+	 */
 	public DragIcon(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
+	/**
+	 * DragIcon function that allows drag after a long click that is triggered by listener.
+	 * Uses elements
+	 * @param context
+	 * @param attrs
+	 * @param defStyle
+	 */
 	public DragIcon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		setOnLongClickListener(new OnLongClickListener() {
@@ -40,10 +57,20 @@ public class DragIcon extends ImageView {
 		});
 	}
 
+	/**
+	 * Function to get name of the command on the icon
+	 * @return mCommandName
+	 */
 	public String getCommandName() {
 		return mCommandName;
 	}
 
+	/**
+	 * Function to connect icons with correct command. Runs check, if the command is NULL automatically makes it toast command.
+	 * Looks at icon and strips it down to the actual command to link icon with command.
+	 * Works with {@link CommandDispatcher.Command Command}
+	 * @param commandName
+	 */
 	public void setCommandName(String commandName) {
 		if (commandName == null) {
 			mCommandName = "toast"; //Because toast is delicious
@@ -73,6 +100,13 @@ public class DragIcon extends ImageView {
 		}
 	}
 
+	/**
+	 * Function to check to see if the command has a icon. 
+	 * Works with {@link CommandDispatcher.Command Command}
+	 * @param context
+	 * @param commandName
+	 * @return
+	 */
 	public static boolean commandHasIcon(Context context, String commandName) {
 		Command command = CommandDispatcher.getCommand(commandName);
 		if (commandName == null || command == null) {
