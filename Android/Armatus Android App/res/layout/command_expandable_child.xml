@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.kufpg.armatus.drag.DragIcon xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drag_icon"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
-    android:gravity="center" />
+    android:paddingTop="5dp" >
+
+    <com.kufpg.armatus.drag.DragIcon
+        android:id="@+id/drag_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+</RelativeLayout>
