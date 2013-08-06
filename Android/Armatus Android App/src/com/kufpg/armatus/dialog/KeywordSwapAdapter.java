@@ -23,12 +23,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/**
+ * KeywordSwapAdpater Class and extends {@link android.widget.ArrayAdapter ArrayAdapter}. 
+ */
 public class KeywordSwapAdapter extends ArrayAdapter<String> {
 	private static int ITEM_HIGHLIGHT = -1;
 	private LayoutInflater mInflater;
 	private Context mContext;
 	private List<String> mKeywords;
 
+	/**
+	 * KeywordSwapAdapter Function/Constructor. Creats a inflater from the context that is passed in.
+	 * @param {@link android.content.Context context}
+	 * @param {@link java.util.List keywords}
+	 */
 	public KeywordSwapAdapter(Context context, List<String> keywords) {
 		super(context, R.layout.keyword_swap_item, keywords);
 		mInflater = LayoutInflater.from(context);
@@ -129,6 +137,11 @@ public class KeywordSwapAdapter extends ArrayAdapter<String> {
 		return convertView;
 	}
 
+	/**
+	 * Boolean function of canBeGragged. Reads from the index and runs a if statements that returns true or false
+	 * @param index
+	 * @return
+	 */
 	public boolean canBeDragged(int index) {
 		if (index == 0 || index == getCount() - 1) {
 			return true;
@@ -136,6 +149,12 @@ public class KeywordSwapAdapter extends ArrayAdapter<String> {
 		return false;
 	}
 
+	/**
+	 * Boolean function of canBeSwapped. Reads from the pos1 and pos2, then runs a if statements that returns true or false
+	 * @param pos1
+	 * @param pos2
+	 * @return
+	 */
 	private boolean canBeSwapped(int pos1, int pos2) {
 		if ((pos1 == 0 && pos2 == getCount() - 1) ||
 				(pos2 == 0 && pos1 == getCount() - 1)) {
@@ -145,6 +164,9 @@ public class KeywordSwapAdapter extends ArrayAdapter<String> {
 		}
 	}
 	
+	/**
+	 * Static class KeywordViewHolder. Has three static variables in it with static values.
+	 */
 	private static class KeywordViewHolder {
 		public LinearLayout layout;
 		public ImageView icon;

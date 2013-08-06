@@ -36,6 +36,9 @@ public class CommandDispatcher {
 	private static ConsoleActivity mConsole;
 
 	//List of Commands
+	/**
+	 * All the static final command names for the commands. Each static final runs a function with a string of arguments that will on the console the command they are looking at is in a specific group with the group name. 
+	 */
 	private static final Command ALPHA = new Command("alpha", ALPHA_CONVERSATION, 0) {
 		@Override
 		protected void run(String... args) {

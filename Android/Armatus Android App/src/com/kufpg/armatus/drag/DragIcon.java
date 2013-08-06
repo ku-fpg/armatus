@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 /**
- * A draggable image that represents a Command that can be run on console entry Keywords.
+ * A drag able image that represents a Command that can be run on console entry Keywords. It extends {@link android.widget.ImageView ImageView}
  */
 public class DragIcon extends ImageView {
 	private String mCommandName; 
@@ -21,7 +21,7 @@ public class DragIcon extends ImageView {
 
 	/**
 	 * DragIcon Function for selected icon
-	 * @param context
+	 * @param {@link android.content.Context context}
 	 */
 	public DragIcon(Context context) {
 		this(context, null);
@@ -29,8 +29,8 @@ public class DragIcon extends ImageView {
 
 	/**
 	 * DragIcon with context and an attribute set within icon
-	 * @param context
-	 * @param attrs
+	 * @param {@link android.content.Context context}
+	 * @param {@link android.util.AttributeSet attrs}
 	 */
 	public DragIcon(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -39,8 +39,8 @@ public class DragIcon extends ImageView {
 	/**
 	 * DragIcon function that allows drag after a long click that is triggered by listener.
 	 * Uses elements
-	 * @param context
-	 * @param attrs
+	 * @param {@link android.content.Context context}
+	 * @param {@link android.util.AttributeSet attrs}
 	 * @param defStyle
 	 */
 	public DragIcon(Context context, AttributeSet attrs, int defStyle) {
@@ -69,7 +69,7 @@ public class DragIcon extends ImageView {
 	 * Function to connect icons with correct command. Runs check, if the command is NULL automatically makes it toast command.
 	 * Looks at icon and strips it down to the actual command to link icon with command.
 	 * Works with {@link CommandDispatcher.Command Command}
-	 * @param commandName
+	 * @param {@link java.lang.String commandName}
 	 */
 	public void setCommandName(String commandName) {
 		if (commandName == null) {
@@ -103,8 +103,8 @@ public class DragIcon extends ImageView {
 	/**
 	 * Function to check to see if the command has a icon. 
 	 * Works with {@link CommandDispatcher.Command Command}
-	 * @param context
-	 * @param commandName
+	 * @param {@link android.content.Context context}
+	 * @param {@link java.lang.String commandName}
 	 * @return
 	 */
 	public static boolean commandHasIcon(Context context, String commandName) {

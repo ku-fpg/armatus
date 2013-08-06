@@ -19,6 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+/**
+ * ConsoleEntrySelectionDialog Class. This class extends {@link android.app.DialogFragment DialogFragment} class. 
+ * Task of building strings and making the dialog of the console. 
+ */
 public class ConsoleEntrySelectionDialog extends DialogFragment {
 	private ClipboardManager mClipboard;
 	private TextView mContentsView;
@@ -26,6 +30,12 @@ public class ConsoleEntrySelectionDialog extends DialogFragment {
 	private int mFirstEntryNum;
 	private String mContents;
 
+	/**
+	 * Static {@link com.kufpg.armatus.dialog.ConsoleEntrySelectionDialog ConsoleEntrySelectionDialog}. 
+	 * Constructor of dialog with the entry/conent.
+	 * @param entries
+	 * @return cesd
+	 */
 	public static ConsoleEntrySelectionDialog newInstance(List<ConsoleEntry> entries) {
 		ConsoleEntrySelectionDialog cesd = new ConsoleEntrySelectionDialog();
 

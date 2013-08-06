@@ -11,6 +11,10 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+/**
+ * Contains functions for dragging icons on edges. Also has values for the edge height and time per entry. 
+ * Extends {@link android.widget.RelativeLayout RelativeLayout} class.
+ */
 public class ListViewDragEdges extends RelativeLayout {
 	private static final int TIME_PER_ENTRY = 200;
 	private static final int EDGE_HEIGHT = 20;
@@ -18,22 +22,44 @@ public class ListViewDragEdges extends RelativeLayout {
 	private DragEdge mTopEdge, mBottomEdge;
 	private LayoutParams mTopParams, mBottomParams;
 
+	/**
+	 * List View Drag Edges Function
+	 * Able to drag from edges of images with getting the {@link Android.Content.Context context}
+	 * @param {@link Android.Content.Context context}
+	 */
 	public ListViewDragEdges(Context context) {
 		super(context);
 		init(context);
 	}
 	
+	/**
+	 * List View Drag Edges with attributes function
+	 * Able to drag from edges of images with getting the context and the attributes
+	 * {@link Android.Conent.Context} {@link Android.util.AttributeSet}
+	 * @param {@link Android.Content.Context context}
+	 * @param {@link android.util.AttributeSet attrs}
+	 */
 	public ListViewDragEdges(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context);
 	}
 
-	
+	/**
+	 * List View Drag Edges with attributes function
+	 * Able to drag from edges of images with getting the context, attributes and style
+	 * {@link Android.Conent.Context} {@link Android.util.AttributeSet}
+	 * @param {@link Android.Content.Context context}
+	 * @param {@link android.util.AttributeSet attrs}
+	 * @param defStyle
+	 */
 	public ListViewDragEdges(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(context);
 	}
 	
+	/**
+	 * Function to override Inflate using {@link android.widget.ListView ListView} and {@link android.widget.RelativeLayout RelativeLayout}
+	 */
 	@Override
 	protected void onFinishInflate() {
 		super.onFinishInflate();
@@ -45,6 +71,11 @@ public class ListViewDragEdges extends RelativeLayout {
 		addView(mBottomEdge, mBottomParams);
 	}
 	
+	/**
+	 * init Function: 
+	 * Creates a {@link com.kufpg.armatus.drag.ListViewDragEdges.DragEdge DragEdges} from the {@link Android.Content.Context Context} for top and bottom and checks for a case of a onDrag event.
+	 * @param {@link Android.Content.Context context}
+	 */
 	private void init(Context context) {
 		mTopEdge = new DragEdge(context) {
 			@Override
@@ -89,6 +120,9 @@ public class ListViewDragEdges extends RelativeLayout {
         info.setClassName(ListViewDragEdges.class.getName());
     }
     
+    /**
+     * Stop List Scroll Function that stops the scrolling function
+     */
     private void stopListScroll() {
     	MotionEvent cancel = MotionEvent.obtain(SystemClock.uptimeMillis(),
 				SystemClock.uptimeMillis(),	MotionEvent.ACTION_CANCEL, 0, 0, 0);
@@ -96,23 +130,49 @@ public class ListViewDragEdges extends RelativeLayout {
 		cancel.recycle();
     }
     
+    /**
+     * Drag Edge Class that extends {@link android.view.View View} and implements {@link android.view.View.OnDragListener OnDragListener}. 
+     */
     private class DragEdge extends View implements OnDragListener {
     	
+    	/**
+    	 * DragEdge function. On a drag of edge this function gets the {@link android.content.Context context} of the image. 
+    	 * After that it runs it through the {@link com.kufpg.armatus.drag.ListViewDragEdges.DragEdge.init init} function.
+    	 * @param c{@link Android.Content.Context context}
+    	 */
     	public DragEdge(Context context) {
     		super(context);
     		init();
     	}
     	
+    	/**
+    	 * DragEdge function. On a drag of edge this function gets the {@link android.content.Context context} 
+    	 * and {@link android.util.AttributeSet AttributeSet} of the image. 
+    	 * After that it runs it through the {@link com.kufpg.armatus.drag.ListViewDragEdges.DragEdge.init init} function.
+    	 * @param {@link Android.Content.Context context}
+    	 * @param {@link andorid.util.AttributeSet attrs}
+    	 */
     	public DragEdge(Context context, AttributeSet attrs) {
     		super(context, attrs);
     		init();
     	}
 
+    	/**
+    	 * DragEdge function. On a drag of edge this function gets the {@link android.content.Context context}, {@link android.util.AttributeSet AttributeSet} 
+    	 * and style of the image. 
+    	 * After that it runs it through the {@link com.kufpg.armatus.drag.ListViewDragEdges.DragEdge.init init} function.
+    	 * @param {@link Android.Content.Context context}
+    	 * @param {@link android.util.AttributeSet attrs}
+    	 * @param defStyle
+    	 */
     	public DragEdge(Context context, AttributeSet attrs, int defStyle) {
     		super(context, attrs, defStyle);
     		init();
     	}
     	
+    	/**
+    	 * Private Void function. Sets the background to transparent then sets the {@link android.view.View.OnDragListener OnDragListener} to the "this" variable.
+    	 */
     	private void init() {
     		setBackgroundColor(getResources().getColor(android.R.color.transparent));
     		setOnDragListener(this);

@@ -26,6 +26,10 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 
+/**
+ * GestureDialog Class for the various gestures. Extends the {@link android.app.DialogFragment DialogFragment} and 
+ * implements the {@link android.gesture.GestureOverLayView.OnGesturePerfomedListner OnGesturePerformedListner}. 
+ */
 public class GestureDialog extends DialogFragment implements OnGesturePerformedListener {
 
 	private GestureLibrary mGestureLib;
@@ -87,7 +91,11 @@ public class GestureDialog extends DialogFragment implements OnGesturePerformedL
 		super.onActivityCreated(savedInstanceState);
 		resizeGestureView();
 	}
-
+	
+	/**
+	 * Private resizeGestureView function
+	 * Looks at the size of the window and adjusts the gesture to the screen.
+	 */
 	private void resizeGestureView() {
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		Point size = new Point();

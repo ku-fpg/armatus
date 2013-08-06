@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+/**
+ * TermianlNotInstallDialog Class, this class extends the {@link com.kufpg.armatus.dialog.YesOrNoDialog YesOrNoDialog} class.
+ * This class will tell if a console application is installed or not.
+ */
 public class TerminalNotInstalledDialog extends YesOrNoDialog {
 	public TerminalNotInstalledDialog() {
 		super(null, null);

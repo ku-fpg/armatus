@@ -18,10 +18,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * WordCompletionDialog Class, this extends the {@link android.app.DialogFragment DialogFragment} class. 
+ * This class allows for the application to complete words in the input.
+ */
 public class WordCompletionDialog extends DialogFragment {
 
 	private List<String> mWords;
 
+	/**
+	 * WordCompletionDialog Instance Function. This function creates a new instance for the word completion that returns an argument.
+	 * @param {@link java.lang.String words}
+	 * @return
+	 */
 	public static WordCompletionDialog newInstance(List<String> words) {
 		WordCompletionDialog wcd = new WordCompletionDialog();
 

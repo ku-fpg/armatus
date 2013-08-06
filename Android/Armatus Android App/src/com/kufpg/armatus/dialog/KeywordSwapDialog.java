@@ -19,6 +19,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 
+/**
+ * KeywordSwapDialog Class, this class extends {@link android.app.DialogFragment DialogFragment} class. 
+ * This class makes all the dialog within the keyword swap.
+ */
 public class KeywordSwapDialog extends DialogFragment {
 
 	private int mEntryNum;
@@ -28,6 +32,12 @@ public class KeywordSwapDialog extends DialogFragment {
 	private KeywordSwapAdapter mKeywordAdapter;
 	private Button mResetButton, mToastButton;
 
+	/**
+	 * Static KeywordSwapDialog Instance Function. This function creates a new instance with a entry number and its contents.
+	 * @param entryNum
+	 * @param {@link java.lang.String entryContents}
+	 * @return
+	 */
 	public static KeywordSwapDialog newInstance(int entryNum, String entryContents) {
 		KeywordSwapDialog ksd = new KeywordSwapDialog();
 
