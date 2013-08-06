@@ -27,4 +27,19 @@
         android:layout_height="0dip"
         android:layout_alignParentBottom="true" />
 
+    <TextView
+        android:id="@+id/console_search_matches_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/text_view_rounded_corners"
+        android:padding="5dp"
+        android:text="0 matches"
+        android:textAppearance="@android:style/TextAppearance.Small"
+        android:textColor="@android:color/black"
+        android:textCursorDrawable="@null"
+        android:textIsSelectable="false"
+        android:visibility="gone" />
+
 </RelativeLayout>

@@ -24,7 +24,7 @@
         android:layout_alignLeft="@+id/console_input_num"
         android:layout_alignTop="@+id/console_input_num"
         android:background="@null"
-        android:imeOptions="actionGo"
+        android:imeOptions="actionGo|flagNoExtractUi"
         android:inputType="textNoSuggestions|textMultiLine"
         android:singleLine="false"
         android:textColor="?attr/codeColor"

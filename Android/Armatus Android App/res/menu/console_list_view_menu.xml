@@ -35,34 +35,13 @@
         android:showAsAction="never"
         android:title="Find text"
         android:visible="false"/>
+    <item
+        android:id="@+id/find_text_action"
+        android:actionLayout="@layout/find_text"
+        android:orderInCategory="94"
+        android:showAsAction="always"
+        android:visible="false"/>
 
-    <group
-        android:id="@+id/find_text_group"
-        android:visible="false" >
-        <item
-            android:id="@+id/find_text_action"
-            android:actionLayout="@layout/find_text"
-            android:orderInCategory="94"
-            android:showAsAction="always"/>
-        <item
-            android:id="@+id/find_text_next"
-            android:icon="?attr/actionFindNext"
-            android:orderInCategory="95"
-            android:showAsAction="always"
-            android:title="Find next"/>
-        <item
-            android:id="@+id/find_text_previous"
-            android:icon="?attr/actionFindPrevious"
-            android:orderInCategory="96"
-            android:showAsAction="always"
-            android:title="Find previous"/>
-        <item
-            android:id="@+id/find_text_cancel"
-            android:icon="?attr/actionCancel"
-            android:orderInCategory="97"
-            android:showAsAction="always"
-            android:title="Cancel search"/>
-    </group>
     <group android:id="@+id/history_group" >
         <item
             android:id="@+id/save_history"

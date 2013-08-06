@@ -31,6 +31,9 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	/** Text color used alongside a yellow highlight (to improve readability). */
 	private static final CharacterStyle BLACK_TEXT = new ForegroundColorSpan(Color.BLACK);
 	
+	/** Text color used alongside a gray highlight (to improve readability). */
+	private static final CharacterStyle WHITE_TEXT = new ForegroundColorSpan(Color.WHITE);
+	
 	/** Reference to the current console. */
 	private ConsoleActivity mConsole;
 
@@ -102,7 +105,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 							setSpans(contents, offset, offset + criterion.length(), highlight, BLACK_TEXT);
 						} else {
 							highlight = new BackgroundColorSpan(Color.DKGRAY);
-							contents.setSpan(highlight, offset, offset + criterion.length(), 0);
+							setSpans(contents, offset, offset + criterion.length(), highlight, WHITE_TEXT);
 						}
 					}
 					holder.contents.setText(contents);
@@ -137,6 +140,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			noHighlight.removeSpan(span);
 		}
 		noHighlight.removeSpan(BLACK_TEXT);
+		noHighlight.removeSpan(WHITE_TEXT);
 		tv.setText(noHighlight);
 	}
 

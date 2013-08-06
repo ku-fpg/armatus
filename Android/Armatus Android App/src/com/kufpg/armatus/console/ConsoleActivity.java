@@ -35,7 +35,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -62,6 +61,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -98,7 +98,7 @@ public class ConsoleActivity extends BaseActivity {
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
 	private List<ConsoleEntry> mConsoleEntries;
 	private List<String> mCommandHistoryEntries;
-	private TextView mConsoleInputNumView, mFilterMatches;
+	private TextView mConsoleInputNumView, mSearchMatches;
 	private ConsoleInputEditText mConsoleInputEditText;
 	private View mConsoleEmptySpace;
 	private EditText mSearchInputView;
@@ -126,6 +126,7 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandHistoryListView = (ListView) findViewById(R.id.command_history_list);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
 		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
+		mSearchMatches = (TextView) findViewById(R.id.console_search_matches_indicator);
 		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNumView = (TextView) mConsoleInputLayout.findViewById(R.id.console_input_num);
@@ -369,17 +370,40 @@ public class ConsoleActivity extends BaseActivity {
 		menu.setGroupVisible(R.id.menu_icons_group, !mSearchEnabled);
 		menu.setGroupVisible(R.id.history_group, true);
 		menu.findItem(R.id.find_text_option).setVisible(!mSearchEnabled);
-		menu.setGroupVisible(R.id.find_text_group, mSearchEnabled);
+		menu.findItem(R.id.find_text_action).setVisible(mSearchEnabled);
 
-		boolean isShown =  !mSearchEnabled || (getResources().getConfiguration().orientation
-				== Configuration.ORIENTATION_LANDSCAPE);
-		getActionBar().setDisplayShowHomeEnabled(isShown);
-		getActionBar().setDisplayShowTitleEnabled(isShown);
+//		boolean isShown =  !mSearchEnabled || (getResources().getConfiguration().orientation
+//				== Configuration.ORIENTATION_LANDSCAPE);
+//		getActionBar().setDisplayShowHomeEnabled(isShown);
+//		getActionBar().setDisplayShowTitleEnabled(isShown);
 
 		if (mSearchEnabled) {
 			View actionView = menu.findItem(R.id.find_text_action).getActionView();
 			mSearchInputView = (EditText) actionView.findViewById(R.id.find_text_box);
-			mFilterMatches = (TextView) actionView.findViewById(R.id.find_text_matches);
+			final ImageButton nextButton, prevButton, cancelButton;
+			nextButton = (ImageButton) actionView.findViewById(R.id.find_text_next);
+			prevButton = (ImageButton) actionView.findViewById(R.id.find_text_previous);
+			cancelButton = (ImageButton) actionView.findViewById(R.id.find_text_cancel);
+			final OnClickListener actionLayoutButtonListener = new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					switch (v.getId()) {
+					case R.id.find_text_next:
+						executeSearch(null, SearchAction.CONTINUE, SearchDirection.NEXT);
+						break;
+					case R.id.find_text_previous:
+						executeSearch(null, SearchAction.CONTINUE, SearchDirection.PREVIOUS);
+						break;
+					case R.id.find_text_cancel:
+						executeSearch(null, SearchAction.END, null);
+						mConsoleInputEditText.requestFocus();
+						break;
+					}
+				}
+			};
+			nextButton.setOnClickListener(actionLayoutButtonListener);
+			prevButton.setOnClickListener(actionLayoutButtonListener);
+			cancelButton.setOnClickListener(actionLayoutButtonListener);
 
 			if (mTempSearchInput != null) {
 				mSearchInputView.setText(mTempSearchInput);
@@ -428,16 +452,6 @@ public class ConsoleActivity extends BaseActivity {
 		case R.id.find_text_option:
 			mSearchEnabled = true;
 			invalidateOptionsMenu();
-			return true;
-		case R.id.find_text_next:
-			executeSearch(null, SearchAction.CONTINUE, SearchDirection.NEXT);
-			return true;
-		case R.id.find_text_previous:
-			executeSearch(null, SearchAction.CONTINUE, SearchDirection.PREVIOUS);
-			return true;
-		case R.id.find_text_cancel:
-			executeSearch(null, SearchAction.END, null);
-			mConsoleInputEditText.requestFocus();
 			return true;
 		case R.id.save_history:
 			if (mInputEnabled) {
@@ -752,6 +766,7 @@ public class ConsoleActivity extends BaseActivity {
 			MatchParams params = null;
 			switch (action) {
 			case BEGIN:
+				mSearchMatches.setVisibility(View.VISIBLE);
 				params = mSearcher.beginSearch(criterion);
 				break;
 			case CONTINUE:
@@ -763,6 +778,7 @@ public class ConsoleActivity extends BaseActivity {
 				mSearchEnabled = false;
 				mPrevSearchCriterion = null;
 				mSearcher.endSearch();
+				mSearchMatches.setVisibility(View.GONE);
 				invalidateOptionsMenu();
 				setInputEnabled(true);
 				return;
@@ -828,7 +844,7 @@ public class ConsoleActivity extends BaseActivity {
 		} else {
 			caption = "0";
 		}
-		mFilterMatches.setText(caption + " match" + (caption.endsWith("1") ? "" : "es"));
+		mSearchMatches.setText(caption + " match" + (caption.endsWith("1") ? "" : "es"));
 	}
 
 	/**
