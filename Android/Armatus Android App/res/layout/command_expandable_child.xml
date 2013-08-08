@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="5dp" >
 
-    <com.kufpg.armatus.drag.DragIcon
+    <edu.kufpg.armatus.drag.DragIcon
         android:id="@+id/drag_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

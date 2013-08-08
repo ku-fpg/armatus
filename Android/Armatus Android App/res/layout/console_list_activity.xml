@@ -5,12 +5,12 @@
     android:background="?attr/consoleBackgroundColor"
     android:orientation="vertical" >
 
-    <com.kufpg.armatus.drag.ListViewDragEdges
+    <edu.kufpg.armatus.drag.ListViewDragEdges
         android:id="@+id/console_list_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <com.kufpg.armatus.console.ConsoleListView
+        <edu.kufpg.armatus.console.ConsoleListView
             android:id="@+id/console_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -19,7 +19,7 @@
             android:dividerHeight="0dp"
             android:paddingTop="@dimen/entry_padding"
             android:splitMotionEvents="false" />
-    </com.kufpg.armatus.drag.ListViewDragEdges>
+    </edu.kufpg.armatus.drag.ListViewDragEdges>
 
     <View
         android:id="@+id/console_empty_space"

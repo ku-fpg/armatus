@@ -17,7 +17,7 @@
         android:textSize="15sp"
         android:typeface="monospace" />
 
-    <com.kufpg.armatus.console.ConsoleInputEditText
+    <edu.kufpg.armatus.console.ConsoleInputEditText
         android:id="@+id/console_input_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
