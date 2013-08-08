@@ -23,8 +23,14 @@
     <string name="pref_history_use_cache">pref_history_use_cache</string>
     <string name="pref_history_dir">pref_history_dir</string>
     <string name="pref_edit_mode">pref_edit_mode</string>
+    <string name="pref_app_theme">pref_app_theme</string>
+    <string name="pref_app_theme_dark">THEME_DARK</string>
+    <string name="pref_app_theme_light">THEME_LIGHT</string>
+    <string name="pref_network_source">pref_network_source</string>
+    <string name="pref_network_source_web">WEB_SERVER</string>
+    <string name="pref_network_source_bluetooth">BLUETOOTH_SERVER</string>
+    <string name="pref_choose_bluetooth_device">pref_choose_bluetooth_device</string>
     <string name="pref_restore_defaults">pref_restore_defaults</string>
-    <string name="pref_app_theme">app_theme</string>
 
     <string-array name="command_groups">
         <item>Alpha Conversation</item>

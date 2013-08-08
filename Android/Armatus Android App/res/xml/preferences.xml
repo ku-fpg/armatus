@@ -10,7 +10,7 @@
             android:title="Saved history source" />
 
         <Preference
-            android:dependency="pref_history_use_cache"
+            android:dependency="@string/pref_history_use_cache"
             android:key="@string/pref_history_dir"
             android:title="Edit saved history directory" />
 
@@ -22,13 +22,30 @@
             android:key="@string/pref_edit_mode"
             android:summary="Defines what commands can be performed on the code"
             android:title="Edit mode" />
-        <ListPreference
-            android:defaultValue="THEME_DARK"
+
+        <edu.kufpg.armatus.util.UpdatingListPreference
+            android:defaultValue="@string/pref_app_theme_dark"
             android:dialogTitle="Select a theme"
             android:entries="@array/app_theme_entries"
             android:entryValues="@array/app_theme_values"
             android:key="@string/pref_app_theme"
+            android:summary="%s"
             android:title="App theme" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Networking" >
+        <edu.kufpg.armatus.util.UpdatingListPreference
+            android:defaultValue="@string/pref_network_source_web"
+            android:dialogTitle="Select a network source"
+            android:entries="@array/network_source_entries"
+            android:entryValues="@array/network_source_values"
+            android:key="@string/pref_network_source"
+            android:summary="%s"
+            android:title="Network source" />
+
+        <Preference
+            android:dependency="@string/pref_network_source"
+            android:key="@string/pref_choose_bluetooth_device"
+            android:title="Choose Bluetooth device" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Miscellaneous" >
         <Preference

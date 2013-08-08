@@ -21,7 +21,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 /**
- * The {@link Activity} which all other Activities should extend. BaseActivity has utilties such as
+ * The {@link Activity} which all other Activities should extend. BaseActivity has utilities such as
  * preference keys, a central {@link EditManager}, {@link SharedPreferences}, and the ability to
  * detect a theme change (and restart).
  */
@@ -58,16 +58,43 @@ public class BaseActivity extends Activity {
 
 	/**
 	 * {@link android.preference.ListPreference ListPreference} key mapping to either {@link
-	 * PrefsActivity#THEME_DARK THEME_DARK} or {@link PrefsActivity#THEME_LIGHT THEME_LIGHT},
-	 * depending on which theme is currently being used.
+	 * #APP_THEME_DARK} or {@link #APP_THEME_LIGHT}, depending on which theme is currently
+	 * being used.
 	 */
 	public static String APP_THEME_KEY;
+	
+	/**
+	 * One of the possible values that the {@link android.preference.Preference Preference} to
+	 * which {@link #APP_THEME_KEY} maps can be (the other being {@link #APP_THEME_LIGHT}).
+	 */
+	public static String APP_THEME_DARK;
 
 	/**
-	 * {@link android.preference.Preference Preference} key used for resetting preferences back to
-	 * their default values. Not very useful outside of {@link PrefsActivity}.
+	 * One of the possible values that the {@link android.preference.Preference Preference} to
+	 * which {@link #APP_THEME_KEY} maps can be (the other being {@link #APP_THEME_DARK}).
 	 */
-	public static String RESTORE_DEFAULTS_KEY;
+	public static String APP_THEME_LIGHT;
+	
+	/**
+	 * {@link android.preference.ListPreference ListPreference} key mapping to either {@link
+	 * #NETWORK_SOURCE_WEB_SERVER} or {@link #NETWORK_SOURCE_BLUETOOTH_SERVER}, depending on
+	 * which network source is currently being used.
+	 */
+	public static String NETWORK_SOURCE_KEY;
+	
+	/**
+	 * One of the possible values that the {@link android.preference.Preference Preference} to
+	 * which {@link #NETWORK_SOURCE_KEY} maps can be (the other being {@link
+	 * #NETWORK_SOURCE_BLUETOOTH_SERVER}).
+	 */
+	public static String NETWORK_SOURCE_WEB_SERVER;
+	
+	/**
+	 * One of the possible values that the {@link android.preference.Preference Preference} to
+	 * which {@link #NETWORK_SOURCE_KEY} maps can be (the other being {@link
+	 * #NETWORK_SOURCE_WEB_SERVER}).
+	 */
+	public static String NETWORK_SOURCE_BLUETOOTH_SERVER;
 
 	/**
 	 * Maps special {@link android.preference.Preference Preference} keys to their default values
@@ -76,56 +103,60 @@ public class BaseActivity extends Activity {
 	 */
 	private static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
 
-	/** Used to access persistent user preferences. Editing them requires {@link #mEditor}. */
-	private static SharedPreferences mPrefs;
+	/** Used to access persistent user preferences. Editing them requires {@link #sEditor}. */
+	private static SharedPreferences sPrefs;
 
-	/** Used to edit persistent user preferences stored in {@link #mPrefs}. */
-	private static SharedPreferences.Editor mEditor;
+	/** Used to edit persistent user preferences stored in {@link #sPrefs}. */
+	private static SharedPreferences.Editor sEditor;
 
 	/** An application-wide edit manager. */
-	private static EditManager mEditManager = new EditManager();
+	private static EditManager sEditManager = new EditManager();
 
-	/** MenuItem which undoes edits stored in {@link #mEditManager}. */
-	private static MenuItem mUndoIcon;
+	/** MenuItem which undoes edits stored in {@link #sEditManager}. */
+	private static MenuItem sUndoIcon;
 
-	/** MenuItem which redoes edits stored in {@link #mEditManager}. */
-	private static MenuItem mRedoIcon;
+	/** MenuItem which redoes edits stored in {@link #sEditManager}. */
+	private static MenuItem sRedoIcon;
 
 	/** Tracks the ID of the current application theme. */
-	private static int mThemeId;
+	private static int sThemeId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		PACKAGE_NAME = getApplicationContext().getPackageName();
-		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		mEditor = mPrefs.edit();
+		sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		sEditor = sPrefs.edit();
 		HISTORY_USE_CACHE_KEY = getResources().getString(R.string.pref_history_use_cache);
 		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
 		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
-		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
 		APP_THEME_KEY = getResources().getString(R.string.pref_app_theme);
+		APP_THEME_DARK = getResources().getString(R.string.pref_app_theme_dark);
+		APP_THEME_LIGHT = getResources().getString(R.string.pref_app_theme_light);
+		NETWORK_SOURCE_KEY = getResources().getString(R.string.pref_network_source);
+		NETWORK_SOURCE_WEB_SERVER = getResources().getString(R.string.pref_network_source_web);
+		NETWORK_SOURCE_BLUETOOTH_SERVER = getResources().getString(R.string.pref_network_source_bluetooth);
 		DYNAMIC_PREF_DEFAULTS_MAP = mapDynamicPrefDefaults();
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 
 		//Set dynamic preferences' default values
 		for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
 			if (entry.getValue() instanceof String) {
-				if (mPrefs.getString(entry.getKey(), null) == null) {
-					mEditor.putString(entry.getKey(), (String) entry.getValue());
+				if (sPrefs.getString(entry.getKey(), null) == null) {
+					sEditor.putString(entry.getKey(), (String) entry.getValue());
 				}
 			}
 		}
-		mEditor.commit();
+		sEditor.commit();
 
-		mEditManager.setOnEditListener(new OnEditListener() {
+		sEditManager.setOnEditListener(new OnEditListener() {
 			@Override
 			public void onEditAction() {
 				updateIconTitles();
 			}
 		});
 
-		mThemeId = getThemePrefId();
-		setTheme(mThemeId);
+		sThemeId = getThemePrefId();
+		setTheme(sThemeId);
 
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getActionBar();
@@ -136,8 +167,8 @@ public class BaseActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.console_list_view_menu, menu);
-		mUndoIcon = menu.findItem(R.id.undo);
-		mRedoIcon = menu.findItem(R.id.redo);
+		sUndoIcon = menu.findItem(R.id.undo);
+		sRedoIcon = menu.findItem(R.id.redo);
 		updateIconTitles();
 		return true;
 	}
@@ -147,13 +178,13 @@ public class BaseActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.undo:
 			if (canUndo()) {
-				mEditManager.undo();
+				sEditManager.undo();
 				updateIconTitles();
 			}
 			return true;
 		case R.id.redo:
 			if (canRedo()) {
-				mEditManager.redo();
+				sEditManager.redo();
 				updateIconTitles();
 			}
 			return true;
@@ -170,7 +201,7 @@ public class BaseActivity extends Activity {
 	@Override
 	protected void onResume() {
 		//If the theme has changed while navigating the back stack
-		if (mThemeId != getThemePrefId()) {
+		if (sThemeId != getThemePrefId()) {
 			recreate();
 		}
 		//
@@ -192,7 +223,7 @@ public class BaseActivity extends Activity {
 	 * allowed to redo an action.
 	 */
 	public boolean canRedo() {
-		return mEditManager.canRedo();
+		return sEditManager.canRedo();
 	}
 
 	/**
@@ -202,7 +233,7 @@ public class BaseActivity extends Activity {
 	 * allowed to undo an action.
 	 */
 	public boolean canUndo() {
-		return mEditManager.canUndo();
+		return sEditManager.canUndo();
 	}
 
 	/**
@@ -247,7 +278,7 @@ public class BaseActivity extends Activity {
 	 * @return the application-level {@link EditManager}.
 	 */
 	protected EditManager getEditManager() {
-		return mEditManager;
+		return sEditManager;
 	}
 
 	/**
@@ -256,7 +287,7 @@ public class BaseActivity extends Activity {
 	 * @return the app's {@code SharedPreferences}.
 	 */
 	protected static SharedPreferences getPrefs() {
-		return mPrefs;
+		return sPrefs;
 	}
 
 	/**
@@ -266,7 +297,7 @@ public class BaseActivity extends Activity {
 	 * @return the app's {@code SharedPreferences} editor.
 	 */
 	protected static SharedPreferences.Editor getPrefsEditor() {
-		return mEditor;
+		return sEditor;
 	}
 
 	/**
@@ -275,11 +306,13 @@ public class BaseActivity extends Activity {
 	 * @return the current app theme's resource ID.
 	 */
 	protected static int getThemePrefId() {
-		String theme = mPrefs.getString(APP_THEME_KEY, null);
-		if (theme.equals(PrefsActivity.THEME_LIGHT)) {
+		String theme = sPrefs.getString(APP_THEME_KEY, null);
+		if (theme.equals(APP_THEME_LIGHT)) {
 			return R.style.ThemeLight;
-		} else {
+		} else if (theme.equals(APP_THEME_DARK)) {
 			return R.style.ThemeDark;
+		} else {
+			return -1;
 		}
 	}
 
@@ -287,8 +320,8 @@ public class BaseActivity extends Activity {
 	 * Updates the titles of the undo and redo icons in the options menu.
 	 */
 	protected static void updateIconTitles() {
-		mUndoIcon.setTitleCondensed(String.valueOf(mEditManager.getRemainingUndosCount()));
-		mRedoIcon.setTitleCondensed(String.valueOf(mEditManager.getRemainingRedosCount()));
+		sUndoIcon.setTitleCondensed(String.valueOf(sEditManager.getRemainingUndosCount()));
+		sRedoIcon.setTitleCondensed(String.valueOf(sEditManager.getRemainingRedosCount()));
 	}
 
 	/** @return {@link #DYNAMIC_PREF_DEFAULTS_MAP}. */

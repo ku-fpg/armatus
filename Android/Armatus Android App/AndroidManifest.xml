@@ -15,7 +15,7 @@
     <supports-screens android:smallScreens="false" />
 
     <application
-        android:name="edu.kufpg.armatus.BaseApplication"
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
@@ -29,16 +29,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.kufpg.armatus.PrefsActivity"
+            android:name=".PrefsActivity"
             android:label="@string/title_preference_screen" />
         <activity
-            android:name="edu.kufpg.armatus.console.ConsoleActivity"
+            android:name=".console.ConsoleActivity"
             android:label="@string/app_name" />
         <activity
-            android:name="edu.kufpg.armatus.treelistview.TreeListViewDemo"
+            android:name=".treelistview.TreeListViewDemo"
             android:label="@string/app_name" />
         <activity
-            android:name="edu.kufpg.armatus.TextSizePinchZoomActivity"
+            android:name=".TextSizePinchZoomActivity"
             android:label="@string/app_name" />
         <activity
             android:name="com.ipaulpro.afilechooser.FileChooserActivity"
