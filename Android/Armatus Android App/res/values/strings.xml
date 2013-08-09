@@ -20,24 +20,29 @@
     <string name="console_load_history_message">All unsaved progress will be lost. Do you still want to load session history?</string>
     <string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
     <string name="swap">swap</string>
-    <string name="pref_history_use_cache">pref_history_use_cache</string>
-    <string name="pref_history_dir">pref_history_dir</string>
-    <string name="pref_edit_mode">pref_edit_mode</string>
-    <string name="pref_app_theme">pref_app_theme</string>
+    
+    <!--  SharedPreferences -->
+    <string name="pref_is_history_dir_custom">IS_HISTORY_DIR_CUSTOM</string>
+    <string name="pref_history_dir">HISTORY_DIR</string>
+    <string name="pref_edit_mode">EDIT_MODE</string>
+    <string name="pref_app_theme">APP_THEME</string>
     <string name="pref_app_theme_dark">THEME_DARK</string>
     <string name="pref_app_theme_light">THEME_LIGHT</string>
-    <string name="pref_network_source">pref_network_source</string>
+    <string name="pref_network_source">NETWORK_SOURCE</string>
     <string name="pref_network_source_web">WEB_SERVER</string>
     <string name="pref_network_source_bluetooth">BLUETOOTH_SERVER</string>
-    <string name="pref_choose_bluetooth_device">pref_choose_bluetooth_device</string>
-    <string name="pref_restore_defaults">pref_restore_defaults</string>
+    <string name="pref_choose_bluetooth_device">CHOOSE_BLUETOOTH_DEVICE</string>
+    <string name="pref_bluetooth_device_name">BLUETOOTH_DEVICE_NAME</string>
+    <string name="pref_bluetooth_device_address">BLUETOOTH_DEVICE_ADDRESS</string>
+    <string name="pref_restore_defaults">RESTORE_DEFAULTS</string>
 
-    <!-- DeviceListActivity -->
-    <string name="scanning">Scanning for devices…</string>
-    <string name="select_device">Select a device to connect</string>
-    <string name="title_paired_devices">Paired Devices</string>
-    <string name="title_other_devices">Other Available Devices</string>
-    <string name="button_scan">Scan for devices</string>
+    <!-- BluetoothDeviceListActivity -->
+    <string name="bluetooth_scanning_title">Scanning for devices…</string>
+    <string name="bluetooth_select_device_title">Select a device to connect</string>
+    <string name="bluetooth_paired_devices_heading">Paired Devices</string>
+    <string name="bluetooth_other_devices_heading">Other Available Devices</string>
+    <string name="bluetooth_button_scan">Scan for devices</string>
+    <string name="bluetooth_button_cancel">Cancel scan</string>
 
     <string-array name="command_groups">
         <item>Alpha Conversation</item>

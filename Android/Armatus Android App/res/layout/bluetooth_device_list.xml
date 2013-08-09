@@ -19,41 +19,41 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/title_paired_devices"
+        android:id="@+id/bluetooth_paired_devices_title"
         style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_paired_devices"
+        android:text="@string/bluetooth_paired_devices_heading"
         android:visibility="gone" />
 
     <ListView
-        android:id="@+id/paired_devices"
+        android:id="@+id/bluetooth_paired_devices_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title_paired_devices"
+        android:layout_below="@+id/bluetooth_paired_devices_title"
         android:stackFromBottom="true" />
 
     <TextView
-        android:id="@+id/title_new_devices"
+        android:id="@+id/bluetooth_new_devices_title"
         style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/paired_devices"
-        android:text="@string/title_other_devices"
+        android:layout_below="@+id/bluetooth_paired_devices_list"
+        android:text="@string/bluetooth_other_devices_heading"
         android:visibility="gone" />
 
     <ListView
-        android:id="@+id/new_devices"
+        android:id="@+id/bluetooth_new_devices_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title_new_devices"
+        android:layout_below="@+id/bluetooth_new_devices_title"
         android:stackFromBottom="true" />
 
     <Button
-        android:id="@+id/button_scan"
+        android:id="@+id/bluetooth_scan_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/new_devices"
-        android:text="@string/button_scan" />
+        android:layout_below="@+id/bluetooth_new_devices_list"
+        android:text="@string/bluetooth_button_scan" />
 
 </RelativeLayout>

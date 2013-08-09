@@ -117,9 +117,10 @@ public class ConsoleActivity extends BaseActivity {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		requestWindowFeature(Window.FEATURE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_sliding_menu_activity);
+		setProgressBarIndeterminate(true);
 
 		mConsoleLayout = (RelativeLayout) findViewById(R.id.console_list_layout);
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
@@ -478,7 +479,7 @@ public class ConsoleActivity extends BaseActivity {
 					mHistory.put(COMMANDS_HISTORY_TAG, commandHistory);
 
 					String path = "";
-					if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
+					if (getPrefs().getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
 						path = getPrefs().getString(HISTORY_DIR_KEY, null);
 					} else {
 						path = CACHE_DIR;
@@ -503,7 +504,7 @@ public class ConsoleActivity extends BaseActivity {
 					@Override
 					protected void yes(DialogInterface dialog, int whichButton) {
 						String path = "";
-						if (getPrefs().getBoolean(HISTORY_USE_CACHE_KEY, true)) {
+						if (getPrefs().getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
 							path = getPrefs().getString(HISTORY_DIR_KEY, null);
 						} else {
 							path = CACHE_DIR;

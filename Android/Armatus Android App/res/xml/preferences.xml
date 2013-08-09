@@ -4,13 +4,13 @@
     <PreferenceCategory android:title="Editor settings" >
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="@string/pref_history_use_cache"
+            android:key="@string/pref_is_history_dir_custom"
             android:summaryOff="Use app cache"
             android:summaryOn="Specify location manually"
             android:title="Saved history source" />
 
         <Preference
-            android:dependency="@string/pref_history_use_cache"
+            android:dependency="@string/pref_is_history_dir_custom"
             android:key="@string/pref_history_dir"
             android:title="Edit saved history directory" />
 
@@ -43,7 +43,6 @@
             android:title="Network source" />
 
         <Preference
-            android:dependency="@string/pref_network_source"
             android:key="@string/pref_choose_bluetooth_device"
             android:title="Choose Bluetooth device" />
     </PreferenceCategory>

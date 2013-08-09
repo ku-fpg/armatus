@@ -18,7 +18,6 @@
         <item name="expanderClose">@drawable/expander_close_holo_dark</item>
         <item name="expanderGroup">@drawable/expander_group_holo_dark</item>
         <item name="expanderOpen">@drawable/expander_open_holo_dark</item>
-        <item name="android:actionBarStyle">@style/ThemeDark.ActionBar</item>
     </style>
 
     <style name="ThemeLight" parent="android:Theme.Holo.Light">
@@ -39,10 +38,6 @@
         <item name="expanderClose">@drawable/expander_close_holo_light</item>
         <item name="expanderGroup">@drawable/expander_group_holo_light</item>
         <item name="expanderOpen">@drawable/expander_open_holo_light</item>
-    </style>
-
-    <style name="ThemeDark.ActionBar" parent="android:Widget.Holo.ActionBar">
-        <item name="android:background">@drawable/ab_dark</item>
     </style>
 
 </resources>

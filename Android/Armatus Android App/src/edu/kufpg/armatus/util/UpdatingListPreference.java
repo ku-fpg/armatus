@@ -21,7 +21,7 @@ public class UpdatingListPreference extends ListPreference {
 	@Override
 	public void setValue(final String value) {
 		super.setValue(value);
-		notifyChanged();
+		notifyChanged(); //Why ListPreference doesn't do this in the first place is beyond me
 	}
 
 }

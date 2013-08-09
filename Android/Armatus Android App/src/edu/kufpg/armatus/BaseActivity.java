@@ -35,15 +35,16 @@ public class BaseActivity extends Activity {
 
 	/**
 	 * {@link android.preference.CheckBoxPreference CheckBoxPreference} key mapping to whether or
-	 * not {@link #CACHE_DIR} should be used to save persistent data. If not, the String to which
-	 * {@link #HISTORY_DIR_KEY} maps is used instead.
+	 * not {@link #CACHE_DIR} should be used to save persistent data (if the mapped value is {@code
+	 * false}). If the mapped value is {@code true}, the String to which {@link #HISTORY_DIR_KEY}
+	 * maps is used instead.
 	 */
-	public static String HISTORY_USE_CACHE_KEY;
+	public static String IS_HISTORY_DIR_CUSTOM_KEY;
 
 	/**
 	 * {@link android.preference.Preference Preference} key mapping to the String representation
 	 * of a directory where persistent data can be stored. The directory is only used if the value
-	 * to which {@link #HISTORY_USE_CACHE_KEY} maps is true.
+	 * to which {@link #IS_HISTORY_DIR_CUSTOM_KEY} maps is true.
 	 */
 	public static String HISTORY_DIR_KEY;
 
@@ -62,7 +63,7 @@ public class BaseActivity extends Activity {
 	 * being used.
 	 */
 	public static String APP_THEME_KEY;
-	
+
 	/**
 	 * One of the possible values that the {@link android.preference.Preference Preference} to
 	 * which {@link #APP_THEME_KEY} maps can be (the other being {@link #APP_THEME_LIGHT}).
@@ -74,21 +75,21 @@ public class BaseActivity extends Activity {
 	 * which {@link #APP_THEME_KEY} maps can be (the other being {@link #APP_THEME_DARK}).
 	 */
 	public static String APP_THEME_LIGHT;
-	
+
 	/**
 	 * {@link android.preference.ListPreference ListPreference} key mapping to either {@link
 	 * #NETWORK_SOURCE_WEB_SERVER} or {@link #NETWORK_SOURCE_BLUETOOTH_SERVER}, depending on
 	 * which network source is currently being used.
 	 */
 	public static String NETWORK_SOURCE_KEY;
-	
+
 	/**
 	 * One of the possible values that the {@link android.preference.Preference Preference} to
 	 * which {@link #NETWORK_SOURCE_KEY} maps can be (the other being {@link
 	 * #NETWORK_SOURCE_BLUETOOTH_SERVER}).
 	 */
 	public static String NETWORK_SOURCE_WEB_SERVER;
-	
+
 	/**
 	 * One of the possible values that the {@link android.preference.Preference Preference} to
 	 * which {@link #NETWORK_SOURCE_KEY} maps can be (the other being {@link
@@ -97,17 +98,29 @@ public class BaseActivity extends Activity {
 	public static String NETWORK_SOURCE_BLUETOOTH_SERVER;
 
 	/**
+	 * {@link android.preference.Preference Preference} key mapping to the friendly name of the
+	 * Bluetooth device being used (if enabled).
+	 */
+	public static String BLUETOOTH_DEVICE_NAME_KEY;
+
+	/**
+	 * {@link android.preference.Preference Preference} key mapping to the MAC address of the
+	 * Bluetooth device being used (if enabled).
+	 */
+	public static String BLUETOOTH_DEVICE_ADDRESS_KEY;
+
+	/**
 	 * Maps special {@link android.preference.Preference Preference} keys to their default values
 	 * when the default values are impossible to know before runtime (e.g., the external cache
-	 * directory, which {@link #HISTORY_USE_CACHE_KEY} maps to by default).
+	 * directory, which {@link #IS_HISTORY_DIR_CUSTOM_KEY} maps to by default).
 	 */
 	private static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
 
-	/** Used to access persistent user preferences. Editing them requires {@link #sEditor}. */
+	/** Used to access persistent user preferences. Editing them requires {@link #sPrefsEditor}. */
 	private static SharedPreferences sPrefs;
 
 	/** Used to edit persistent user preferences stored in {@link #sPrefs}. */
-	private static SharedPreferences.Editor sEditor;
+	private static SharedPreferences.Editor sPrefsEditor;
 
 	/** An application-wide edit manager. */
 	private static EditManager sEditManager = new EditManager();
@@ -125,8 +138,8 @@ public class BaseActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		PACKAGE_NAME = getApplicationContext().getPackageName();
 		sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		sEditor = sPrefs.edit();
-		HISTORY_USE_CACHE_KEY = getResources().getString(R.string.pref_history_use_cache);
+		sPrefsEditor = sPrefs.edit();
+		IS_HISTORY_DIR_CUSTOM_KEY = getResources().getString(R.string.pref_is_history_dir_custom);
 		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
 		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
 		APP_THEME_KEY = getResources().getString(R.string.pref_app_theme);
@@ -135,18 +148,12 @@ public class BaseActivity extends Activity {
 		NETWORK_SOURCE_KEY = getResources().getString(R.string.pref_network_source);
 		NETWORK_SOURCE_WEB_SERVER = getResources().getString(R.string.pref_network_source_web);
 		NETWORK_SOURCE_BLUETOOTH_SERVER = getResources().getString(R.string.pref_network_source_bluetooth);
+		BLUETOOTH_DEVICE_NAME_KEY = getResources().getString(R.string.pref_bluetooth_device_name);
+		BLUETOOTH_DEVICE_ADDRESS_KEY = getResources().getString(R.string.pref_bluetooth_device_address);
 		DYNAMIC_PREF_DEFAULTS_MAP = mapDynamicPrefDefaults();
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 
-		//Set dynamic preferences' default values
-		for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
-			if (entry.getValue() instanceof String) {
-				if (sPrefs.getString(entry.getKey(), null) == null) {
-					sEditor.putString(entry.getKey(), (String) entry.getValue());
-				}
-			}
-		}
-		sEditor.commit();
+		restoreDyanmicPrefDefaultValues().commit();
 
 		sEditManager.setOnEditListener(new OnEditListener() {
 			@Override
@@ -250,7 +257,11 @@ public class BaseActivity extends Activity {
 	 * {@link Object#toString() toString()} method.
 	 */
 	public void showToast(Object message) {
-		showToast(message.toString());
+		if (message != null) {
+			showToast(message.toString());
+		} else {
+			showToast("null");
+		}
 	}
 
 	/**
@@ -297,7 +308,7 @@ public class BaseActivity extends Activity {
 	 * @return the app's {@code SharedPreferences} editor.
 	 */
 	protected static SharedPreferences.Editor getPrefsEditor() {
-		return sEditor;
+		return sPrefsEditor;
 	}
 
 	/**
@@ -324,11 +335,6 @@ public class BaseActivity extends Activity {
 		sRedoIcon.setTitleCondensed(String.valueOf(sEditManager.getRemainingRedosCount()));
 	}
 
-	/** @return {@link #DYNAMIC_PREF_DEFAULTS_MAP}. */
-	static Map<String, ? extends Object> getDyanmicPrefDefaults() {
-		return DYNAMIC_PREF_DEFAULTS_MAP;
-	}
-
 	/**
 	 * Initializes {@link #DYNAMIC_PREF_DEFAULTS_MAP} by mapping {@link
 	 * android.preference.Preference Preference} keys to their default values when the default
@@ -337,6 +343,30 @@ public class BaseActivity extends Activity {
 	 */
 	private static Map<String, ? extends Object> mapDynamicPrefDefaults() {
 		return ImmutableMap.of(HISTORY_DIR_KEY, CACHE_DIR);
+	}
+	
+	/**
+	 * Restores the preferences that are impossible to know before runtime to their
+	 * default values.
+	 * @return a {@link SharedPreferences.Editor} with the above changes. Calling
+	 * {@link SharedPreferences.Editor#commit() commit()} is needed for the changes
+	 * to go into effect.
+	 */
+	static SharedPreferences.Editor restoreDyanmicPrefDefaultValues() {
+		for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
+			if (entry.getValue() instanceof String) {
+				sPrefsEditor.putString(entry.getKey(), (String) entry.getValue());
+			} else if (entry.getValue() instanceof Boolean) {
+				sPrefsEditor.putBoolean(entry.getKey(), (Boolean) entry.getValue());
+			} else if (entry.getValue() instanceof Integer) {
+				sPrefsEditor.putInt(entry.getKey(), (Integer) entry.getValue());
+			} else if (entry.getValue() instanceof Float) {
+				sPrefsEditor.putFloat(entry.getKey(), (Float) entry.getValue());
+			} else if (entry.getValue() instanceof Long) {
+				sPrefsEditor.putLong(entry.getKey(), (Long) entry.getValue());
+			}
+		}
+		return sPrefsEditor;
 	}
 
 	public static enum EditMode {
