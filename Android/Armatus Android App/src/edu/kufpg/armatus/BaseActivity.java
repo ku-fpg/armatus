@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -32,6 +33,9 @@ public class BaseActivity extends Activity {
 
 	/** The package name as specified in the Android Manifest file. */
 	public static String PACKAGE_NAME;
+	
+	/** The current device's manufacturer and product name. */
+	public static String DEVICE_NAME;
 
 	/**
 	 * {@link android.preference.CheckBoxPreference CheckBoxPreference} key mapping to whether or
@@ -137,6 +141,7 @@ public class BaseActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		PACKAGE_NAME = getApplicationContext().getPackageName();
+		DEVICE_NAME = Build.MANUFACTURER + " " + Build.PRODUCT;
 		sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		sPrefsEditor = sPrefs.edit();
 		IS_HISTORY_DIR_CUSTOM_KEY = getResources().getString(R.string.pref_is_history_dir_custom);

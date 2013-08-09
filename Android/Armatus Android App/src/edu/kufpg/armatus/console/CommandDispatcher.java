@@ -13,6 +13,8 @@ import com.google.common.collect.ImmutableSortedMap;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
+import edu.kufpg.armatus.server.BluetoothUtils;
+import edu.kufpg.armatus.server.HermitBluetoothServer;
 import edu.kufpg.armatus.server.HermitWebServer;
 import edu.kufpg.armatus.server.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
@@ -33,461 +35,473 @@ public class CommandDispatcher {
 	public static final String UNFOLD_FOLD_INLINE = "Unfold/Fold/Inline";
 	public static final String MISCELLANEOUS = "Miscellaneous";
 
-	/** Reference to the current console */
-	private static ConsoleActivity mConsole;
-
-	//List of Commands
-	/**
-	 * All the static final command names for the commands. Each static final runs a function with a string of arguments that will on the console the command they are looking at is in a specific group with the group name. 
-	 */
+	// All the static final command names for the commands. Each static final runs a function with a
+	// string of arguments that will on the console the command they are looking at is in a specific
+	// group with the group name. 
 	private static final Command ALPHA = new Command("alpha", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ALPHA_ALT = new Command("alpha-alt", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ALPHA_CASE = new Command("alpha-case", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ALPHA_CASE_BINDER = new Command("alpha-case-binder", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ALPHA_LAM = new Command("alpha-lam", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ALPHA_LET = new Command("alpha-let", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ALPHA_TOP = new Command("alpha-top", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command UNDERSHADOW = new Command("undershadow", ALPHA_CONVERSATION, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 
 	private static final Command FIX_COMPUTATION = new Command("fix-computation", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command FIX_INTRO = new Command("fix-intro", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ROLLING_RULE = new Command("rolling-rule", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command WW_ASSUMPTION_A = new Command("ww-assumption-a", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
-	private static final Command wwAssumptionB = new Command("ww-assumption-b", FIX_POINT, 0) {
+	private static final Command WW_ASSUMPTION_B = new Command("ww-assumption-b", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command WW_ASSUMPTION_C = new Command("ww-assumption-c", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command WW_FACTORISATION = new Command("ww-factorisation", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command WW_FUSION = new Command("ww-fusion", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command WW_SPLIT = new Command("ww-split", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command WW_SPLIT_PARAM = new Command("ww-split-param", FIX_POINT, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 
 	private static final Command ABSTRACT = new Command("abstract", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command BETA_EXPAND = new Command("beta-expand", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command BETA_REDUCE = new Command("beta-reduce", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command BETA_REDUCE_PLUS = new Command("beta-reduce-plus", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ETA_EXPAND = new Command("eta-expand", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ETA_REDUCE = new Command("eta-reduce", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command FLATTEN_MODULE = new Command("flatten-module", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command FLATTEN_PROGRAM = new Command("flatten-program", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command NONREC_TO_REC = new Command("nonrec-to-rec", LOCAL, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 
 	private static final Command ADD_RULE = new Command("add-rule", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command ANY_CALL = new Command("any-call", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command APPLY_RULE = new Command("apply-rule", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command APPLY_RULES = new Command("apply-rules", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command BINDING_GROUP_OF = new Command("binding-group-of", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command CAST_ELIMINATE = new Command("cast-eliminate", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command CLEANUP_UNFOLD = new Command("cleanup-unfold", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command COMPARE_VALUES = new Command("compare-values", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command CONSIDER = new Command("consider", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command CONSIDER_CONSTRUCT = new Command("consider-construct", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command CONSIDER_NAME = new Command("consider-name", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command DEBUG_UNFOLD = new Command("debug-unfold", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command DESHADOW_PROGRAM = new Command("deshadow-program", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command FREE_IDS = new Command("free-ids", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command INFO = new Command("info", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command INLINE_ALL = new Command("inline-all", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command LET_SUB = new Command("let-sub", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command LET_TUPLE = new Command("let-tuple", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command OBSERVE = new Command("observe", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command OBSERVE_FAIL = new Command("observe-fail", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command OCCURE_ANALYSIS = new Command("occure-analysis", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command PUSH = new Command("push", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command RESUME = new Command("resume", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command REWRITES = new Command(">>>", "rewrites", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command REWRITES_ONE_FAIL = new Command(">+>", "rewrites-one-fail", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command RHS_OF = new Command("rhs-of", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command SAFE_LET_SUB = new Command("safe-let-sub", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command SIMPLIFY = new Command("simplify", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command STATIC_ARGUMENT = new Command("static-argument", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command TEST = new Command("test", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command TRACE = new Command("trace", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command TRANSLATE_REWRITE = new Command("<+", "translate-rewrite", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command UNFOLD_RULE = new Command("unfold-rule", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command UNSAFE_REPLACE = new Command("unsafe-replace", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command VARIABLE = new Command("variable", NEW_DEBUG_NAV_GHC, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 
 	private static final Command FOLD = new Command("fold", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command FOLD_REMEMBERED = new Command("fold-remembered", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command INLINE = new Command("inline", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command INLINE_CASE_BINDER = new Command("inline-case-binder", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command INLINE_NAME = new Command("inline-name", UNFOLD_FOLD_INLINE, 0, false) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command INLINE_SCRUTINEE = new Command("inline-scrutinee", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command REMEMBER = new Command("remember", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 	private static final Command UNFOLD = new Command("unfold", UNFOLD_FOLD_INLINE, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.appendConsoleEntry("This is a " + getGroupName() + " command.");
+		protected void run(ConsoleActivity console, String... args) {
+			console.appendConsoleEntry("This is a " + getGroupName() + " command.");
 		}
 	};
 
+	private static final Command BLUETOOTH_TEST = new Command("bluetooth-test", MISCELLANEOUS, 0, true) {
+		@Override
+		protected void run(ConsoleActivity console, String... args) {
+			if (BluetoothUtils.isBluetoothEnabled(console)) {
+				if (BluetoothUtils.getBluetoothDevice(console) != null) {
+					new HermitBluetoothServer(console).execute("From Android with love");
+				} else {
+					delayCommand(this, args);
+					BluetoothUtils.findDeviceName(console);
+				}
+			} else {
+				delayCommand(this, args);
+				BluetoothUtils.enableBluetooth(console);
+			}
+		}
+	};
 	private static final Command CLEAR = new Command("clear", MISCELLANEOUS, 0, true) {
 		@Override
-		protected void run(String... args) {
-			mConsole.clear();
+		protected void run(ConsoleActivity console, String... args) {
+			console.clear();
 		}
 	};
 	private static final Command EXIT = new Command("exit", MISCELLANEOUS, 0) {
 		@Override
-		protected void run(String... args) {
-			mConsole.finish();
+		protected void run(ConsoleActivity console, String... args) {
+			console.finish();
 		}
 	};
 	private static final Command SERVER_TEST = new Command("server-test", MISCELLANEOUS, 0) {
 		@Override
-		protected void run(String... args) {
+		protected void run(ConsoleActivity console, String... args) {
 			try {
-				if (InternetUtils.isAirplaneModeOn(mConsole)) {
-					mConsole.appendConsoleEntry("Error: Please disable airplane mode before attempting to connect.");
-				} else if (!InternetUtils.isWifiConnected(mConsole)) {
-					mConsole.appendConsoleEntry("Error: No network connectivity.");
+				if (InternetUtils.isAirplaneModeOn(console)) {
+					console.appendConsoleEntry("Error: Please disable airplane mode before attempting to connect.");
+				} else if (!InternetUtils.isWifiConnected(console)) {
+					console.appendConsoleEntry("Error: No network connectivity.");
 				} else {
 					String jstr = "{command:server-test},{args:" + varargsToString(args) + "}";
-					HermitWebServer request = new HermitWebServer(mConsole);
+					HermitWebServer request = new HermitWebServer(console);
 					request.execute(new JSONObject(jstr));
 				}
 			} catch (Exception e) {
@@ -498,30 +512,29 @@ public class CommandDispatcher {
 	};
 	private static final Command TOAST = new Command("toast", MISCELLANEOUS, 0, true) {
 		@Override
-		protected void run(String... args) {
+		protected void run(ConsoleActivity console, String... args) {
 			Toast toast = null;
 			if (args.length == 0) {
-				toast = Toast.makeText(mConsole, "No arguments!", Toast.LENGTH_SHORT);
+				toast = Toast.makeText(console, "No arguments!", Toast.LENGTH_SHORT);
 			} else {
-				toast = Toast.makeText(mConsole,
-						varargsToString(args), Toast.LENGTH_SHORT);
+				toast = Toast.makeText(console, varargsToString(args), Toast.LENGTH_SHORT);
 			}
 			toast.show();
 		}
 	};
 	private static final Command TERMINAL = new Command("terminal", MISCELLANEOUS, 0, true){
 		@Override
-		protected void run(String... args){
+		protected void run(ConsoleActivity console, String... args){
 			String packageName = "jackpal.androidterm";
-			boolean installed = BaseActivity.appInstalledOrNot(mConsole, packageName);  
+			boolean installed = BaseActivity.appInstalledOrNot(console, packageName);  
 			if (installed) {
 				Intent i = new Intent("jackpal.androidterm.RUN_SCRIPT");
 				i.addCategory(Intent.CATEGORY_DEFAULT);
 				i.putExtra("jackpal.androidterm.iInitialCommand", varargsToString(args));
-				mConsole.startActivity(i);
+				console.startActivity(i);
 			} else {
 				TerminalNotInstalledDialog tnid = new TerminalNotInstalledDialog();
-				tnid.show(mConsole.getFragmentManager(), "tnid");
+				tnid.show(console.getFragmentManager(), "tnid");
 			}
 		}
 	};
@@ -544,101 +557,82 @@ public class CommandDispatcher {
 	private static final Keyword GREEN = new Keyword("green", "toast", PrettyPrinter.GREEN);
 	private static final Keyword BLUE = new Keyword("blue", "toast", PrettyPrinter.BLUE);
 
-	/** Maps{@link Keyword} names to their respective instances. */
+	/** Maps {@link Keyword} names to their respective instances. */
 	private static Map<String, Keyword> KEYWORD_MAP = mapKeywords();
 
-	/**
-	 * Constructs a new instance.
-	 * @param console reference to the current console.
-	 */
-	public CommandDispatcher(ConsoleActivity console) {
-		mConsole = console;
-	}
+	private static Command mDelayedCommand;
+	private static String[] mDelayedCommandArgs;
 
+	private CommandDispatcher() {}
+
+	public static void runDelayedCommand(ConsoleActivity console) {
+		if (isCommandPending()) {
+			mDelayedCommand.run(console, mDelayedCommandArgs);
+			mDelayedCommand = null;
+			mDelayedCommandArgs = null;
+		}
+	}
+	
 	/**
 	 * Attempts to run a {@link Command} on the console.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link Command}.
 	 * @param commandName The name of the {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
-	public void runOnConsole(String commandName, String... args) {
+	public static void runOnConsole(ConsoleActivity console, String commandName, String... args) {
 		Command command = COMMAND_MAP.get(commandName);
 		if (command != null) {
-			runOnConsole(command, args);
+			runOnConsole(console, command, args);
 		} else {
-			mConsole.appendConsoleEntry("Error: " + commandName + " is not a valid command.");
+			console.appendConsoleEntry("Error: " + commandName + " is not a valid command.");
 		}
 	}
 
 	/**
 	 * Attempts to run a {@link Command} on the console.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link Command}.
 	 * @param commandThe {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
-	private void runOnConsole(Command command, String... args) {
+	private static void runOnConsole(ConsoleActivity console, Command command, String... args) {
 		String commandString = command.getCommandName()
 				+ StringUtils.NBSP + varargsToString(args);
-		mConsole.addConsoleEntry(commandString);
-		mConsole.addCommandEntry(command.getCommandName());
+		console.addConsoleEntry(commandString);
+		console.addCommandEntry(command.getCommandName());
 
 		if (command.hasLowerArgBound()) {
 			if (args.length < command.getArgsCount()) {
-				mConsole.appendConsoleEntry("Error: " + command.getCommandName() +
+				console.appendConsoleEntry("Error: " + command.getCommandName() +
 						" requires at least " + command.getArgsCount() +
 						(command.getArgsCount() == 1 ? " argument." :
 								" arguments."));
 				return;
 			}
 		} else if (args.length != command.getArgsCount()) {
-			mConsole.appendConsoleEntry("Error: " + command.getCommandName() +
+			console.appendConsoleEntry("Error: " + command.getCommandName() +
 					" requires exactly " + command.getArgsCount() +
 					(command.getArgsCount() == 1 ? " argument." :
 							" arguments."));
 			return;
 		}
-		command.run(args);
+		command.run(console, args);
 	}
 
 	/**
 	 * Attempts to run the {@link Command} associated with the given {@link
 	 * Keyword} name.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link Command}.
 	 * @param keywordName The name of the {@code Keyword} whose {@code Command}
 	 * should be run.
 	 * @param arg The parameter of the {@code Command}.
 	 */
-	public void runKeywordCommand(String keywordName, String arg) {
+	public static void runKeywordCommand(ConsoleActivity console, String keywordName, String arg) {
 		Keyword keyword = KEYWORD_MAP.get(keywordName);
 		if (keyword != null) {
-			runOnConsole(keyword.getCommand(), arg);
+			runOnConsole(console, keyword.getCommand(), arg);
 		} else {
-			mConsole.appendConsoleEntry("Error: " + keyword + " is not a valid keyword.");
+			console.appendConsoleEntry("Error: " + keyword + " is not a valid keyword.");
 		}
-	}
-
-	/**
-	 * Returns whether the specified name is a {@link Command} alias.
-	 * @param commandName The name to look up.
-	 * @return {@code true} if the name is a {@code Command} alias.
-	 */
-	public static boolean isAlias(String commandName) {
-		return ALIASED_COMMAND_MAP.containsKey(commandName);
-	}
-
-	/**
-	 * Returns whether the specified name is a {@link Command} name.
-	 * @param commandName The name to look up.
-	 * @return {@code true} if the given name is also a {@code Command} name.
-	 */
-	public static boolean isCommand(String commandName) {
-		return COMMAND_MAP.containsKey(commandName);
-	}
-
-	/**
-	 * Returns whether the specified name is a {@link Keyword} name.
-	 * @param keywordName The name to look up.
-	 * @return {@code true} if the given name is also a <{@code Keyword} name.
-	 */
-	public static boolean isKeyword(String keywordName) {
-		return KEYWORD_MAP.containsKey(keywordName);
 	}
 
 	/**
@@ -681,6 +675,37 @@ public class CommandDispatcher {
 	public static Keyword getKeyword(String keywordName) {
 		return KEYWORD_MAP.get(keywordName);
 	}
+	
+	/**
+	 * Returns whether the specified name is a {@link Command} alias.
+	 * @param commandName The name to look up.
+	 * @return {@code true} if the name is a {@code Command} alias.
+	 */
+	public static boolean isAlias(String commandName) {
+		return ALIASED_COMMAND_MAP.containsKey(commandName);
+	}
+
+	/**
+	 * Returns whether the specified name is a {@link Command} name.
+	 * @param commandName The name to look up.
+	 * @return {@code true} if the given name is also a {@code Command} name.
+	 */
+	public static boolean isCommand(String commandName) {
+		return COMMAND_MAP.containsKey(commandName);
+	}
+	
+	public static boolean isCommandPending() {
+		return mDelayedCommand != null;
+	}
+
+	/**
+	 * Returns whether the specified name is a {@link Keyword} name.
+	 * @param keywordName The name to look up.
+	 * @return {@code true} if the given name is also a <{@code Keyword} name.
+	 */
+	public static boolean isKeyword(String keywordName) {
+		return KEYWORD_MAP.containsKey(keywordName);
+	}
 
 	/**
 	 * Returns the real {@link Command} name associated with the specified alias.
@@ -690,6 +715,11 @@ public class CommandDispatcher {
 	 */
 	public static String unaliasCommand(String alias) {
 		return ALIASED_COMMAND_MAP.get(alias);
+	}
+	
+	private static void delayCommand(Command command, String... args) {
+		mDelayedCommand = command;
+		mDelayedCommandArgs = args;
 	}
 
 	/**
@@ -789,7 +819,7 @@ public class CommandDispatcher {
 	}
 
 	/**
-	 * Provides instructions (via the {@link #run(String...)} method) for the console to
+	 * Provides instructions (via the {@link #run(ConsoleActivity, String...)} method) for the console to
 	 * execute when the user enters a command. A {@code Command} can have any number
 	 * of arguments and may accept at least a certain number of arguments if it is
 	 * initialized with a lower argument bound.
@@ -914,9 +944,10 @@ public class CommandDispatcher {
 
 		/**
 		 * The instructions that are ran when this {@link Command} is run on the console.
+		 * @param console The {@link ConsoleActivity} on which this {@code Command} will be run.
 		 * @param args Parameters that the {@code Command} uses.
 		 */
-		protected abstract void run(String... args);
+		protected abstract void run(ConsoleActivity console, String... args);
 	}
 
 	/**
@@ -950,7 +981,7 @@ public class CommandDispatcher {
 			if (isCommand(commandName)) {
 				mCommand = COMMAND_MAP.get(commandName);
 			} else {
-				mCommand = TOAST;
+				mCommand = CommandDispatcher.getCommand("toast");
 			}
 			mColor = color;
 		}

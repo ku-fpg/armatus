@@ -18,9 +18,17 @@ public class HermitBluetoothServer extends AsyncActivityTask<ConsoleActivity, St
 	private OutputStream mOutStream;
 	private InputStream mInStream;
 
-	public HermitBluetoothServer(ConsoleActivity activity, BluetoothDevice device) {
+	public HermitBluetoothServer(ConsoleActivity activity) {
 		super(activity);
-		mDevice = device;
+	}
+
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+
+		getActivity().setProgressBarVisibility(true);
+		getActivity().disableInput();
+		mDevice = BluetoothUtils.getBluetoothDevice(getActivity());
 	}
 
 	@Override
@@ -31,7 +39,7 @@ public class HermitBluetoothServer extends AsyncActivityTask<ConsoleActivity, St
 			publishProgress("Socket created! Attempting socket connection...");
 		} catch (IOException e) {
 			e.printStackTrace();
-			publishProgress("ERROR: Socket creation failed.");
+			publishProgress("ERROR: Socket creation failed. Ensure that the server is up and try again.");
 			return null;
 		}
 
@@ -132,6 +140,9 @@ public class HermitBluetoothServer extends AsyncActivityTask<ConsoleActivity, St
 			e.printStackTrace();
 			publishProgress("ERROR: Closing something failed.");
 		}
+
+		getActivity().enableInput();
+		getActivity().setProgressBarVisibility(false);
 	}
 
 }

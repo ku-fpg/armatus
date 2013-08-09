@@ -19,6 +19,7 @@ import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.EditManager.Edit;
 import edu.kufpg.armatus.console.ConsoleEdits.AddEntry;
 import edu.kufpg.armatus.console.ConsoleEdits.Clear;
+import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 import edu.kufpg.armatus.console.ConsoleSearcher.SearchDirection;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
@@ -27,6 +28,8 @@ import edu.kufpg.armatus.dialog.KeywordSwapDialog;
 import edu.kufpg.armatus.dialog.WordCompletionDialog;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
 import edu.kufpg.armatus.drag.DragIcon;
+import edu.kufpg.armatus.server.BluetoothDeviceListActivity;
+import edu.kufpg.armatus.server.BluetoothUtils;
 import edu.kufpg.armatus.util.JsonUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
@@ -104,7 +107,6 @@ public class ConsoleActivity extends BaseActivity {
 	private View mConsoleEmptySpace;
 	private EditText mSearchInputView;
 	private SlidingMenu mSlidingMenu;
-	private CommandDispatcher mDispatcher;
 	private WordCompleter mCompleter;
 	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
 	private JSONObject mHistory;
@@ -133,7 +135,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNumView = (TextView) mConsoleInputLayout.findViewById(R.id.console_input_num);
 		mConsoleInputEditText = (ConsoleInputEditText) mConsoleInputLayout.findViewById(R.id.console_input_edit_text);
-		mDispatcher = new CommandDispatcher(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		if (savedInstanceState == null) {
@@ -302,9 +303,10 @@ public class ConsoleActivity extends BaseActivity {
 								.split(StringUtils.WHITESPACE);
 						if (CommandDispatcher.isCommand(inputs[0])) {
 							if (inputs.length == 1) {
-								mDispatcher.runOnConsole(inputs[0]);
+								CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0]);
 							} else {
-								mDispatcher.runOnConsole(inputs[0], Arrays.copyOfRange(inputs, 1, inputs.length));
+								CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0],
+										Arrays.copyOfRange(inputs, 1, inputs.length));
 							}
 						} else {
 							addConsoleEntry(mConsoleInputEditText.getText().toString());
@@ -369,6 +371,34 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case BluetoothUtils.REQUEST_ENABLE_BLUETOOTH:
+			if (CommandDispatcher.isCommandPending()) {
+				if (resultCode == RESULT_OK) {
+					CommandDispatcher.runDelayedCommand(this);
+				} else {
+					appendConsoleEntry("ERROR: Failed to enable Bluetooth.");
+				}
+			}
+			break;
+		case BluetoothUtils.REQUEST_FIND_BLUETOOTH_DEVICE:
+			if (CommandDispatcher.isCommandPending()) {
+				if (resultCode == RESULT_OK) {
+					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
+					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
+					BluetoothUtils.setBluetoothDevice(this, name, address);
+					CommandDispatcher.runDelayedCommand(this);
+				} else {
+					appendConsoleEntry("ERROR: Failed to locate Bluetooth device.");
+				}
+			}
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
@@ -376,11 +406,6 @@ public class ConsoleActivity extends BaseActivity {
 		menu.setGroupVisible(R.id.history_group, true);
 		menu.findItem(R.id.find_text_option).setVisible(!mSearchEnabled);
 		menu.findItem(R.id.find_text_action).setVisible(mSearchEnabled);
-
-//		boolean isShown =  !mSearchEnabled || (getResources().getConfiguration().orientation
-//				== Configuration.ORIENTATION_LANDSCAPE);
-//		getActionBar().setDisplayShowHomeEnabled(isShown);
-//		getActionBar().setDisplayShowTitleEnabled(isShown);
 
 		if (mSearchEnabled) {
 			View actionView = menu.findItem(R.id.find_text_action).getActionView();
@@ -566,6 +591,7 @@ public class ConsoleActivity extends BaseActivity {
 			super.onCreateContextMenu(menu, v, menuInfo);
 
 			final int group;
+			mTempCommand = ((ConsoleEntryHolder) info.targetView.getTag()).draggedOverCommand;
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
 				menu.setHeaderTitle("Entry " + info.position + ": Execute " + mTempCommand + " on...");
 				group = DRAGGED_GROUP;
@@ -590,14 +616,14 @@ public class ConsoleActivity extends BaseActivity {
 			switch (item.getGroupId()) {
 			case DRAGGED_GROUP:
 				if (mInputEnabled) {
-					mDispatcher.runOnConsole(mTempCommand, keywordNStr);
+					CommandDispatcher.runOnConsole(this, mTempCommand, keywordNStr);
 				} else {
 					mConsoleInputEditText.setText(mTempCommand + StringUtils.NBSP + keywordNStr);
 				}
 				break;
 			case LONG_CLICKED_GROUP:
 				if (mInputEnabled) {
-					mDispatcher.runKeywordCommand(keywordNStr, keywordNStr);
+					CommandDispatcher.runKeywordCommand(this, keywordNStr, keywordNStr);
 				} else {
 					mConsoleInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
 							.getCommand().getCommandName() + StringUtils.NBSP + keywordNStr);
@@ -610,7 +636,7 @@ public class ConsoleActivity extends BaseActivity {
 
 	@Override
 	public void onContextMenuClosed(Menu menu) {
-		//Ensures that the temp variables do not persist to next context menu opening
+		//Ensures that this temp variable does not persist to next context menu opening
 		mTempCommand = null;
 	}
 
@@ -721,15 +747,6 @@ public class ConsoleActivity extends BaseActivity {
 	public void setInputText(String text) {
 		mConsoleInputEditText.setText(text);
 		mConsoleInputEditText.setSelection(mConsoleInputEditText.getText().length());
-	}
-
-	/**
-	 * Sets the name of the Command to be run on a keyword when selected from a ContextMenu.
-	 * Intended to be used in conjunction with CommandIcon.
-	 * @param commandName The name of the Command that will be run (if selected).
-	 */
-	public void setTempCommand(String commandName) {
-		mTempCommand = commandName;
 	}
 
 	public void showEntrySelectionDialog(List<ConsoleEntry> entries) {

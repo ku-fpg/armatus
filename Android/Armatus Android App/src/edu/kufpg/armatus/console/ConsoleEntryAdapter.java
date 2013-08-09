@@ -60,7 +60,8 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 					List<String> keywords = getItem(pos).getKeywords();
 					if (!keywords.isEmpty()) {
 						DragIcon icon = (DragIcon) event.getLocalState();
-						mConsole.setTempCommand(icon.getCommandName());
+						ConsoleEntryHolder holder = (ConsoleEntryHolder) v.getTag();
+						holder.draggedOverCommand = icon.getCommandName();
 						mConsole.openContextMenu(v);
 					}
 				}
@@ -158,8 +159,9 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	}
 
 	/** Holds {@link TextView} reference for efficiency purposes. */
-	private static class ConsoleEntryHolder {
+	static class ConsoleEntryHolder {
 		public TextView contents;
+		public String draggedOverCommand;
 	}
 
 }

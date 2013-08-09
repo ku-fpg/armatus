@@ -23,7 +23,6 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -66,14 +65,14 @@ public class PrefsActivity extends PreferenceActivity {
 	public static class PrefsFragment extends PreferenceFragment {
 		/** Request code used for selecting a directory with aFileChooser. */
 		private static final int DIR_CHANGE_CODE = 4242;
-		
+
 		/**
 		 * Preference that adjusts whether or not {@link BaseActivity#CACHE_DIR CACHE_DIR}
 		 * should be used to save persistent data (the value mapped to by {@link
 		 * BaseActivity#IS_HISTORY_DIR_CUSTOM_KEY IS_HISTORY_DIR_CUSTOM_KEY}).
 		 */
 		private CheckBoxPreference mIsHistoryDirCustomPref;
-		
+
 		/**
 		 * Preference that can change the String representation of a directory where persistent
 		 * data can be stored (the value mapped to by {@link BaseActivity#HISTORY_DIR_KEY
@@ -186,8 +185,11 @@ public class PrefsActivity extends PreferenceActivity {
 			mChooseBluetoothDevicePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
-					Intent serverIntent = new Intent(getActivity(), BluetoothDeviceListActivity.class);
-					startActivityForResult(serverIntent, BluetoothUtils.REQUEST_CONNECT_DEVICE);
+					if (BluetoothUtils.isBluetoothEnabled(getActivity())) {
+						BluetoothUtils.findDeviceName(PrefsFragment.this);
+					} else {
+						BluetoothUtils.enableBluetooth(PrefsFragment.this);
+					}
 					return true;
 				}
 			});
@@ -213,8 +215,6 @@ public class PrefsActivity extends PreferenceActivity {
 					return true;
 				}
 			});
-			
-			Log.d("TESTTEST", sPrefs.getString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, "nothing"));
 		}
 
 		@Override
@@ -236,7 +236,12 @@ public class PrefsActivity extends PreferenceActivity {
 					}
 				}
 				break;
-			case BluetoothUtils.REQUEST_CONNECT_DEVICE:
+			case BluetoothUtils.REQUEST_ENABLE_BLUETOOTH:
+				if (resultCode == RESULT_OK) {
+					BluetoothUtils.findDeviceName(this);
+				}
+				break;
+			case BluetoothUtils.REQUEST_FIND_BLUETOOTH_DEVICE:
 				if (resultCode == RESULT_OK) {
 					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
 					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
@@ -247,7 +252,7 @@ public class PrefsActivity extends PreferenceActivity {
 			}
 			super.onActivityResult(requestCode, resultCode, data);
 		}
-		
+
 		/**
 		 * Customizes the Bluetooth device {@link Preference} caption.
 		 * @param name The friendly name of the current Bluetooth device (if any).
@@ -260,7 +265,7 @@ public class PrefsActivity extends PreferenceActivity {
 				mChooseBluetoothDevicePref.setSummary(null);
 			}
 		}
-		
+
 		/**
 		 * Customizes the {@link Preference} caption for the console session history directory.
 		 * @param isCustom If the a custom directory should be used.
@@ -272,7 +277,7 @@ public class PrefsActivity extends PreferenceActivity {
 				mHistoryDirPref.setSummary(null);
 			}
 		}
-		
+
 		/**
 		 * Utility method for easily showing a quick message to the user.
 		 * @param message The message to display.
@@ -281,6 +286,6 @@ public class PrefsActivity extends PreferenceActivity {
 			Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 		}
 
-		
+
 	}
 }
