@@ -6,9 +6,13 @@ import java.util.Map.Entry;
 
 import com.ipaulpro.afilechooser.FileChooserActivity;
 import com.ipaulpro.afilechooser.utils.FileUtils;
+
+import edu.kufpg.armatus.dialog.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
+import edu.kufpg.armatus.server.BluetoothUtils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,7 +34,7 @@ import android.widget.Toast;
 public class PrefsActivity extends PreferenceActivity {
 
 	/** Request code used for selecting a directory with aFileChooser. */
-	private static final int DIR_CHANGE_CODE = 777;
+	private static final int DIR_CHANGE_CODE = 4242;
 
 	/**
 	 * Maps special {@link Preference} keys to their default values when the default values are
@@ -38,12 +42,6 @@ public class PrefsActivity extends PreferenceActivity {
 	 * BaseActivity#HISTORY_USE_CACHE_KEY HISTORY_USE_CACHE_KEY} maps to by default).
 	 */
 	private static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
-
-	/**
-	 * A reference to {@link PrefsActivity} that is used for methods that require {@link
-	 * android.content.Context Context} in {@link PrefsFragment}.
-	 */
-	private static Activity sActivity;
 
 	/** Used to access persistent user preferences. Editing them requires {@link #sEditor}. */
 	private static SharedPreferences sPrefs;
@@ -112,7 +110,6 @@ public class PrefsActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setTheme(BaseActivity.getThemePrefId());
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
-		sActivity = this;
 		CHOOSE_BLUETOOTH_DEVICE_KEY = getResources().getString(R.string.pref_choose_bluetooth_device);
 		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
 		
@@ -123,6 +120,7 @@ public class PrefsActivity extends PreferenceActivity {
 	 * Where the user can change the app preferences.
 	 */
 	public static class PrefsFragment extends PreferenceFragment {
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -156,7 +154,7 @@ public class PrefsActivity extends PreferenceActivity {
 			sHistoryDirPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
-					Intent intent = new Intent(sActivity, FileChooserActivity.class);
+					Intent intent = new Intent(getActivity(), FileChooserActivity.class);
 					intent.setType(FileUtils.MIME_TYPE_TEXT);
 					intent.addCategory(Intent.CATEGORY_OPENABLE);
 					startActivityForResult(intent, DIR_CHANGE_CODE);
@@ -175,7 +173,7 @@ public class PrefsActivity extends PreferenceActivity {
 			sAppThemePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					sActivity.recreate();
+					getActivity().recreate();
 					return true;
 				}
 			});
@@ -188,10 +186,11 @@ public class PrefsActivity extends PreferenceActivity {
 				}
 			});
 			
-			sChooseBluetoothDevicePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			sChooseBluetoothDevicePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					//TODO: Change Bluetooth device
+				public boolean onPreferenceClick(Preference preference) {
+					Intent serverIntent = new Intent(getActivity(), BluetoothDeviceListActivity.class);
+					startActivityForResult(serverIntent, BluetoothUtils.REQUEST_CONNECT_DEVICE);
 					return true;
 				}
 			});
@@ -203,9 +202,9 @@ public class PrefsActivity extends PreferenceActivity {
 					YesOrNoDialog restorePrefsDialog = new YesOrNoDialog("Restore default preferences", message) {
 						@Override
 						protected void yes(DialogInterface dialog, int whichButton) {
-							restoreDefaultValues().commit();
-							sActivity.finish();
-							startActivity(new Intent(sActivity, PrefsActivity.class));
+							restoreDefaultValues(getActivity());
+							getActivity().finish();
+							startActivity(new Intent(getActivity(), PrefsActivity.class));
 						}
 					};
 
@@ -234,21 +233,27 @@ public class PrefsActivity extends PreferenceActivity {
 					}
 				}
 				break;
+			case BluetoothUtils.REQUEST_CONNECT_DEVICE:
+				if (resultCode == RESULT_OK) {
+					showToast("It's good!");
+				} else if (resultCode == RESULT_CANCELED) {
+					showToast("Mama mia! It's a-no good!");
+				}
+				break;
 			}
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 
 		/**
-		 * Restores the default app preferences.
-		 * @return a {@link SharedPreferences.Editor} with the above changes. Calling
-		 * {@link SharedPreferences.Editor#commit() commit()} is needed for the changes
-		 * to go into effect.
+		 * Restores the default app preferences to those specified by XML and {@link 
+		 * PrefsActivity#DYNAMIC_PREF_DEFAULTS_MAP DYNAMIC_PREF_DEFAULTS_MAP}.
+		 * @param context The {@link Context} to use.
 		 */
-		private static SharedPreferences.Editor restoreDefaultValues() {
+		private static void restoreDefaultValues(Context context) {
 			sEditor.clear();
 			sEditor.commit();
-			PreferenceManager.setDefaultValues(sActivity, R.xml.preferences, true);
-			return restoreDyanmicPrefValues();
+			PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
+			restoreDyanmicPrefValues().commit();
 		}
 
 		/**
@@ -262,6 +267,14 @@ public class PrefsActivity extends PreferenceActivity {
 			for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
 				if (entry.getValue() instanceof String) {
 					sEditor.putString(entry.getKey(), (String) entry.getValue());
+				} else if (entry.getValue() instanceof Boolean) {
+					sEditor.putBoolean(entry.getKey(), (Boolean) entry.getValue());
+				} else if (entry.getValue() instanceof Integer) {
+					sEditor.putInt(entry.getKey(), (Integer) entry.getValue());
+				} else if (entry.getValue() instanceof Float) {
+					sEditor.putFloat(entry.getKey(), (Float) entry.getValue());
+				} else if (entry.getValue() instanceof Long) {
+					sEditor.putLong(entry.getKey(), (Long) entry.getValue());
 				}
 			}
 			return sEditor;
@@ -272,7 +285,7 @@ public class PrefsActivity extends PreferenceActivity {
 		 * @param message The message to display.
 		 */
 		private void showToast(String message) {
-			Toast.makeText(sActivity, message, Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 		}
 	}
 }

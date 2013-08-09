@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.util;
+package edu.kufpg.armatus.server;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,14 +10,14 @@ import android.provider.Settings;
 /**
  * Utility class containing methods that detail the network state of the device.
  */
-public class NetworkUtils {
+public class InternetUtils {
 	/** Monitors network connections. */
 	private static ConnectivityManager mConMan;
 	
 	/** Contains information about the current network connection (if there is one). */
 	private static NetworkInfo mNetworkInfo;
 
-	private NetworkUtils() {}
+	private InternetUtils() {}
 	
 	/**
 	 * Returns whether the device's airplane mode is on.

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white" >
+    android:background="?attr/consoleBackgroundColor" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,7 +14,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:text="Launch console"
-            android:textColor="@android:color/black"
             android:textSize="50sp" />
 
         <TextView
@@ -23,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/console_button"
             android:paddingLeft="5dp"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/codeColor"
             tools:context=".MainActivity" />
 
         <edu.kufpg.armatus.util.StickyButton
@@ -32,8 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/code_text_view"
-            android:text="Do something important (and lock)"
-            android:textColor="@android:color/black" />
+            android:text="Do something important (and lock)" />
 
         <Button
             android:id="@+id/unlock_button"
@@ -41,8 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/lock_button"
-            android:text="Unlock important button"
-            android:textColor="@android:color/black" />
+            android:text="Unlock important button" />
 
         <Button
             android:id="@+id/tree_button"
@@ -50,8 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/unlock_button"
-            android:text="Tree test"
-            android:textColor="@android:color/black" />
+            android:text="Tree test" />
 
         <Button
             android:id="@+id/pinchzoom_button"
@@ -59,8 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tree_button"
-            android:text="Launch pinch-zoom test"
-            android:textColor="@android:color/black" />
+            android:text="Launch pinch-zoom test" />
 
         <Button
             android:id="@+id/test_activity_button"
@@ -68,8 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/pinchzoom_button"
-            android:text="Launch TestActivity"
-            android:textColor="@android:color/black" />
+            android:text="Launch TestActivity" />
 
         <Button
             android:id="@+id/terminal_activity_button"
@@ -77,8 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/test_activity_button"
-            android:text="Launch terminal emulator"
-            android:textColor="@android:color/black" />
+            android:text="Launch terminal emulator" />
     </RelativeLayout>
 
 </ScrollView>

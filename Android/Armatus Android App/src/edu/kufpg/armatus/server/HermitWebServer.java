@@ -31,7 +31,7 @@ import edu.kufpg.armatus.console.ConsoleActivity;
  * Task that connects to a server running HERMIT-web and simulates HERMIT commands
  * by using HTTP GET and POST requests.
  */
-public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject, String, String> {
+public class HermitWebServer extends AsyncActivityTask<ConsoleActivity, JSONObject, String, String> {
 	/** The URL used for performing HTTP GET requests. */
 	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 	
@@ -44,7 +44,7 @@ public class HermitServer extends AsyncActivityTask<ConsoleActivity, JSONObject,
 	 * execute(JSONObject...)} instead).
 	 * @param console reference to the current console.
 	 */
-	public HermitServer(ConsoleActivity console) {
+	public HermitWebServer(ConsoleActivity console) {
 		super(console);
 	}
 

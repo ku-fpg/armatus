@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="ThemeDark" parent="android:Theme.Holo">
         <item name="actionCancel">@drawable/ic_action_cancel_dark</item>
@@ -18,7 +18,6 @@
         <item name="expanderClose">@drawable/expander_close_holo_dark</item>
         <item name="expanderGroup">@drawable/expander_group_holo_dark</item>
         <item name="expanderOpen">@drawable/expander_open_holo_dark</item>
-        <item name="treeListSelector">@drawable/list_selector_holo_dark</item>
         <item name="android:actionBarStyle">@style/ThemeDark.ActionBar</item>
     </style>
 
@@ -40,7 +39,6 @@
         <item name="expanderClose">@drawable/expander_close_holo_light</item>
         <item name="expanderGroup">@drawable/expander_group_holo_light</item>
         <item name="expanderOpen">@drawable/expander_open_holo_light</item>
-        <item name="treeListSelector">@drawable/list_selector_holo_light</item>
     </style>
 
     <style name="ThemeDark.ActionBar" parent="android:Widget.Holo.ActionBar">

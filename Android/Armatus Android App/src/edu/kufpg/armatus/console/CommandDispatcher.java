@@ -13,8 +13,8 @@ import com.google.common.collect.ImmutableSortedMap;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
-import edu.kufpg.armatus.server.HermitServer;
-import edu.kufpg.armatus.util.NetworkUtils;
+import edu.kufpg.armatus.server.HermitWebServer;
+import edu.kufpg.armatus.server.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 import android.content.Intent;
@@ -481,13 +481,13 @@ public class CommandDispatcher {
 		@Override
 		protected void run(String... args) {
 			try {
-				if (NetworkUtils.isAirplaneModeOn(mConsole)) {
+				if (InternetUtils.isAirplaneModeOn(mConsole)) {
 					mConsole.appendConsoleEntry("Error: Please disable airplane mode before attempting to connect.");
-				} else if (!NetworkUtils.isWifiConnected(mConsole)) {
+				} else if (!InternetUtils.isWifiConnected(mConsole)) {
 					mConsole.appendConsoleEntry("Error: No network connectivity.");
 				} else {
 					String jstr = "{command:server-test},{args:" + varargsToString(args) + "}";
-					HermitServer request = new HermitServer(mConsole);
+					HermitWebServer request = new HermitWebServer(mConsole);
 					request.execute(new JSONObject(jstr));
 				}
 			} catch (Exception e) {

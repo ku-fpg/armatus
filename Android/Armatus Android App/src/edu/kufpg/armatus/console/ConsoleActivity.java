@@ -149,6 +149,8 @@ public class ConsoleActivity extends BaseActivity {
 			setSoftKeyboardVisible(mSoftKeyboardVisible);
 			mSearchEnabled = savedInstanceState.getBoolean("findTextEnabled");
 			if (mSearchEnabled) {
+				mSearchMatches.setVisibility(View.VISIBLE);
+				mSearchMatches.setText(savedInstanceState.getString("searchMatches"));
 				mTempSearchInput = savedInstanceState.getString("searchInput");
 				mPrevSearchCriterion = savedInstanceState.getString("prevSearchCriterion");
 			} else {
@@ -338,6 +340,7 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putParcelable("consoleSearcher", mSearcher);
 		outState.putInt("consoleInputCursor", mConsoleInputEditText.getSelectionStart());
 		if (mSearchInputView != null) {
+			outState.putString("searchMatches", mSearchMatches.getText().toString());
 			outState.putString("searchInput", mSearchInputView.getText().toString());
 			outState.putString("prevSearchCriterion", mPrevSearchCriterion);
 		}
