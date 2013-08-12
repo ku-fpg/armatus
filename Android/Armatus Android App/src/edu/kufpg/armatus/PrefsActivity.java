@@ -201,8 +201,7 @@ public class PrefsActivity extends PreferenceActivity {
 					YesOrNoDialog restorePrefsDialog = new YesOrNoDialog("Restore default preferences", message) {
 						@Override
 						protected void yes(DialogInterface dialog, int whichButton) {
-							sPrefsEditor.clear();
-							sPrefsEditor.commit();
+							sPrefsEditor.clear().commit();
 							PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, true);
 							BaseActivity.restoreDyanmicPrefDefaultValues().commit();
 
@@ -245,7 +244,7 @@ public class PrefsActivity extends PreferenceActivity {
 				if (resultCode == RESULT_OK) {
 					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
 					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-					BluetoothUtils.setBluetoothDevice(getActivity(), name, address);
+					BluetoothUtils.setBluetoothDeviceInfo(getActivity(), name, address);
 					setChooseBluetoothDevicePrefSummary(name, address);
 				}
 				break;

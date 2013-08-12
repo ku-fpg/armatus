@@ -470,11 +470,11 @@ public class CommandDispatcher {
 				if (BluetoothUtils.getBluetoothDevice(console) != null) {
 					new HermitBluetoothServer(console).execute("From Android with love");
 				} else {
-					delayCommand(this, args);
+					delayCommand(this, false, args);
 					BluetoothUtils.findDeviceName(console);
 				}
 			} else {
-				delayCommand(this, args);
+				delayCommand(this, false, args);
 				BluetoothUtils.enableBluetooth(console);
 			}
 		}
@@ -562,14 +562,29 @@ public class CommandDispatcher {
 
 	private static Command mDelayedCommand;
 	private static String[] mDelayedCommandArgs;
+	private static boolean mIsDelayedCommandSynchronous;
 
 	private CommandDispatcher() {}
 
+	/**
+	 * Call this after a {@link Command} has finished so that the command dispatcher will
+	 * not execute the delayed {@code Command} later.
+	 */
+	public static void notifyDelayedCommandFinished() {
+		mDelayedCommand = null;
+		mDelayedCommandArgs = null;
+	}
+	
+	/**
+	 * Runs a {@link Command} if it was delayed for some reason.
+	 * @param console The {@link ConsoleActivity} to use.
+	 */
 	public static void runDelayedCommand(ConsoleActivity console) {
 		if (isCommandPending()) {
 			mDelayedCommand.run(console, mDelayedCommandArgs);
-			mDelayedCommand = null;
-			mDelayedCommandArgs = null;
+			if (mIsDelayedCommandSynchronous) {
+				notifyDelayedCommandFinished();
+			}
 		}
 	}
 	
@@ -694,6 +709,11 @@ public class CommandDispatcher {
 		return COMMAND_MAP.containsKey(commandName);
 	}
 	
+	/**
+	 * Returns whether the command dispatcher is waiting to execute a {@link Command}
+	 * that was delayed for some reason.
+	 * @return {@code true} if there is a {@code Command} waiting to be executed.
+	 */
 	public static boolean isCommandPending() {
 		return mDelayedCommand != null;
 	}
@@ -717,9 +737,20 @@ public class CommandDispatcher {
 		return ALIASED_COMMAND_MAP.get(alias);
 	}
 	
-	private static void delayCommand(Command command, String... args) {
+	/**
+	 * "Postpones" execution of a {@link Command} until later. Note that when the {@code
+	 * Command} "resumes," it is actually re-executing it. The {@link Command#run(ConsoleActivity, String...)
+	 * run(ConsoleActivity, String...)} part of the {@code Command} must behave so that
+	 * it appears to be resuming once certain conditions are met.
+	 * @param command The {@code Command} to postpone.
+	 * @param synchronous {@code true} if the delayed {@code Command} reference can be reset immediately
+	 * after it ends, {@code false} if the {@code Command} operates asynchronously and must wait.
+	 * @param args The arguments to pass to the {@code Command}.
+	 */
+	private static void delayCommand(Command command, boolean synchronous, String... args) {
 		mDelayedCommand = command;
 		mDelayedCommandArgs = args;
+		mIsDelayedCommandSynchronous = synchronous;
 	}
 
 	/**

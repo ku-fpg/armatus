@@ -387,7 +387,7 @@ public class ConsoleActivity extends BaseActivity {
 				if (resultCode == RESULT_OK) {
 					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
 					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-					BluetoothUtils.setBluetoothDevice(this, name, address);
+					BluetoothUtils.setBluetoothDeviceInfo(this, name, address);
 					CommandDispatcher.runDelayedCommand(this);
 				} else {
 					appendConsoleEntry("ERROR: Failed to locate Bluetooth device.");

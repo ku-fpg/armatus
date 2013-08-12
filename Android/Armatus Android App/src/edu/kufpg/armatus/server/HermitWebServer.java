@@ -24,14 +24,13 @@ import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 /**
  * Task that connects to a server running HERMIT-web and simulates HERMIT commands
  * by using HTTP GET and POST requests.
  */
-public class HermitWebServer extends AsyncActivityTask<ConsoleActivity, JSONObject, String, String> {
+public class HermitWebServer extends AsyncCommandTask<ConsoleActivity, JSONObject, String, String> {
 	/** The URL used for performing HTTP GET requests. */
 	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 	
