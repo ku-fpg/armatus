@@ -662,8 +662,7 @@ public class ConsoleActivity extends BaseActivity {
 
 	public void addCommandEntry(String commandName) {
 		if ((mCommandHistoryEntries.size() == 0
-				|| commandName != mCommandHistoryEntries.get(0))
-				&& DragIcon.commandHasIcon(this, commandName)) {
+				|| commandName != mCommandHistoryEntries.get(0))) {
 			mCommandHistoryEntries.add(0, commandName);
 			updateCommandHistoryEntries();
 		}
@@ -819,7 +818,7 @@ public class ConsoleActivity extends BaseActivity {
 	 * This probably works best on Nexus 7s.
 	 */
 	private void refreshSlidingMenu() {
-		Drawable command = getResources().getDrawable(R.drawable.template_command_example);
+		Drawable command = getResources().getDrawable(R.drawable.template_red);
 		int width = command.getIntrinsicWidth();
 		mSlidingMenu.setBehindWidth(Math.round(width + 0.05f*width));
 	}

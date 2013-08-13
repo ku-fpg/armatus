@@ -8,6 +8,8 @@
         android:id="@+id/drag_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center" />
+        android:layout_gravity="center" 
+        android:textColor="@android:color/black"
+        android:gravity="center"/>
 
 </RelativeLayout>

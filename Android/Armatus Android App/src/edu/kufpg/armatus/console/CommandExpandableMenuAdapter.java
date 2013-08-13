@@ -1,6 +1,8 @@
 package edu.kufpg.armatus.console;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -34,6 +36,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	
 	/** Reference to the current context. */
 	private Context mContext;
+	private Map<String,Integer> colorToImageMap = new HashMap<String, Integer>();
 
 	/**
 	 * Constructs a new instance and initializes the menu data if necessary.
@@ -41,9 +44,18 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	 */
 	public CommandExpandableMenuAdapter(Context context) {
 		mContext = context;
+		
 		if (GROUP_LIST == null || GROUP_TO_COMMAND_MAP == null) {
 			loadExpandableMenuData(mContext);
 		}
+		
+		colorToImageMap.put(PrettyPrinter.RED, R.drawable.template_red);
+		colorToImageMap.put(PrettyPrinter.BLUE, R.drawable.template_blue);
+		colorToImageMap.put(PrettyPrinter.YELLOW, R.drawable.template_yellow);
+		colorToImageMap.put(PrettyPrinter.GREEN,R.drawable.template_green);
+		colorToImageMap.put(PrettyPrinter.PURPLE,R.drawable.template_purple);
+		colorToImageMap.put(PrettyPrinter.GRAY, R.drawable.template_gray);
+		
 	}
 
 	@Override
@@ -62,6 +74,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			View view, ViewGroup parent) {
 		String commandName = getChild(groupPosition, childPosition);
 		CommandExpandableMenuItem item;
+		String groupName = getGroup(groupPosition);
 		if (view == null) {
 			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			view = inflater.inflate(R.layout.command_expandable_child, null);
@@ -72,7 +85,8 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			item = (CommandExpandableMenuItem) view.getTag();
 		}
 
-		item.icon.setCommandName(commandName);
+		item.icon.setText(commandName);
+		item.icon.setBackgroundResource(colorToImageMap.get(CommandDispatcher.getGroupColor(groupName)));
 		return view;
 	}
 

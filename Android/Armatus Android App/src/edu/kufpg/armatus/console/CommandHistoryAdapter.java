@@ -42,7 +42,7 @@ public class CommandHistoryAdapter extends ArrayAdapter<String> {
 		} else {
 			holder = (CommandEntryHolder) entryView.getTag();
 		}
-		holder.icon.setCommandName(getItem(position));
+		holder.icon.setText(getItem(position));
 		
 		return entryView;
 	}

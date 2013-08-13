@@ -11,13 +11,14 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * A drag able image that represents a Command that can be run on console entry Keywords. It extends {@link android.widget.ImageView ImageView}
  */
-public class DragIcon extends ImageView {
-	private String mCommandName; 
-	private String mCommandImagePath;
+public class DragIcon extends TextView {
+	//private String mCommandName; 
+	//private String mCommandImagePath;
 
 	/**
 	 * DragIcon Function for selected icon
@@ -55,49 +56,6 @@ public class DragIcon extends ImageView {
 				return true;
 			}
 		});
-	}
-
-	/**
-	 * Function to get name of the command on the icon
-	 * @return mCommandName
-	 */
-	public String getCommandName() {
-		return mCommandName;
-	}
-
-	/**
-	 * Function to connect icons with correct command. Runs check, if the command is NULL automatically makes it toast command.
-	 * Looks at icon and strips it down to the actual command to link icon with command.
-	 * Works with {@link CommandDispatcher.Command Command}
-	 * @param {@link java.lang.String commandName}
-	 */
-	public void setCommandName(String commandName) {
-		if (commandName == null) {
-			mCommandName = "toast"; //Because toast is delicious
-		} else if (CommandDispatcher.isAlias(commandName)) {
-			mCommandName = CommandDispatcher.unaliasCommand(commandName);
-		} else {
-			mCommandName = commandName;
-		}
-		
-		Command command = CommandDispatcher.getCommand(mCommandName);
-		if (command == null) {
-			mCommandName = "toast"; //It fills you up right
-		}
-		
-		String pathCommand = new String(commandName);
-		if (command.getCommandAlias() != null) {
-			pathCommand = command.getCommandAlias();
-		}
-
-		String groupName = CommandDispatcher.getCommand(mCommandName).getGroupName();	
-		groupName = groupName.replaceAll("[/ ]", "_").toLowerCase(Locale.US);
-		mCommandImagePath = "command_" + groupName + "_" + pathCommand.replace("-", "").toLowerCase(Locale.US);
-
-		int resid = getResources().getIdentifier(mCommandImagePath, "drawable", BaseActivity.PACKAGE_NAME);
-		if (resid != 0) {
-			setBackground(getResources().getDrawable(resid));
-		}
 	}
 
 	/**

@@ -61,7 +61,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 					if (!keywords.isEmpty()) {
 						DragIcon icon = (DragIcon) event.getLocalState();
 						ConsoleEntryHolder holder = (ConsoleEntryHolder) v.getTag();
-						holder.draggedOverCommand = icon.getCommandName();
+						holder.draggedOverCommand = icon.getText().toString();
 						mConsole.openContextMenu(v);
 					}
 				}
