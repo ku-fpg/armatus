@@ -1,7 +1,7 @@
 package edu.kufpg.armatus.console;
 
+import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
-
 import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;

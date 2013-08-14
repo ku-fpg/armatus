@@ -11,14 +11,14 @@ import edu.kufpg.armatus.console.ConsoleActivity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-public class HermitBluetoothServer extends AsyncCommandTask<ConsoleActivity, String, String, String> {
+public class HermitBluetoothServerRequest extends AsyncCommandTask<String, String, String> {
 	private BluetoothDevice mDevice;
 	private BluetoothSocket mSocket;
 	private OutputStream mOutStream;
 	private InputStream mInStream;
 
-	public HermitBluetoothServer(ConsoleActivity activity) {
-		super(activity);
+	public HermitBluetoothServerRequest(ConsoleActivity console) {
+		super(console);
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**

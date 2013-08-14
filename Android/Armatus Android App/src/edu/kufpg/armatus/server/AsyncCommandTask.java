@@ -1,9 +1,9 @@
 package edu.kufpg.armatus.server;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import edu.kufpg.armatus.AsyncActivityTask;
-import edu.kufpg.armatus.console.CommandDispatcher;
+import edu.kufpg.armatus.command.CommandDispatcher;
+import edu.kufpg.armatus.console.ConsoleActivity;
 
 /**
  * A task that is launched by a {@link CommandDispatcher.Command Command} that runs asynchronously.
@@ -15,10 +15,10 @@ import edu.kufpg.armatus.console.CommandDispatcher;
  * @param <Progress> The {@code Object} that this task uses to determine execution progress.
  * @param <Result> The {@code Object} that this task returns when execution is completed.
  */
-public abstract class AsyncCommandTask<A extends Activity, Params, Progress, Result> extends AsyncActivityTask<A, Params, Progress, Result> {
+public abstract class AsyncCommandTask<Params, Progress, Result> extends AsyncActivityTask<ConsoleActivity, Params, Progress, Result> {
 
-	public AsyncCommandTask(A activity) {
-		super(activity);
+	public AsyncCommandTask(ConsoleActivity console) {
+		super(console);
 	}
 
 	@Override

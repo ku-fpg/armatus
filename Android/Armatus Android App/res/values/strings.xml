@@ -49,7 +49,7 @@
         <item>Fix Point</item>
         <item>Local</item>
         <item>New/Debug/Nav/GHC</item>
-        <item>Unfold/Fold/Inline</item>
+        <item>Fold/Unfold/Inline</item>
         <item>Miscellaneous</item>
     </string-array>
 
@@ -59,7 +59,6 @@
         <item>@array/local_commands</item>
         <item>@array/new_debug_nav_ghc_commands</item>
         <item>@array/unfold_fold_inline_commands</item>
-        <item>@array/miscellaneous_commands</item>
     </array>
 
     <string-array name="alpha_conversation_commands">
@@ -123,15 +122,12 @@
         <item>occure-analysis</item>
         <item>push</item>
         <item>resume</item>
-        <item>rewrites</item>
-        <item>rewrites-one-fail</item>
         <item>rhs-of</item>
         <item>safe-let-sub</item>
         <item>simplify</item>
         <item>static-argument</item>
         <item>test</item>
         <item>trace</item>
-        <item>translate-rewrite</item>
         <item>unfold-rule</item>
         <item>unsafe-replace</item>
         <item>variable</item>
@@ -146,12 +142,6 @@
         <item>inline-scrutinee</item>
         <item>remember</item>
         <item>unfold</item>
-    </string-array>
-    <string-array name="miscellaneous_commands">
-        <item name="id">6</item>
-        <item>clear</item>
-        <item>exit</item>
-        <item>toast</item>
     </string-array>
 
 </resources>

@@ -17,6 +17,7 @@ import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.MainActivity;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.EditManager.Edit;
+import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.console.ConsoleEdits.AddEntry;
 import edu.kufpg.armatus.console.ConsoleEdits.Clear;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
@@ -27,12 +28,10 @@ import edu.kufpg.armatus.dialog.GestureDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
 import edu.kufpg.armatus.dialog.WordCompletionDialog;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
-import edu.kufpg.armatus.drag.DragIcon;
 import edu.kufpg.armatus.server.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.server.BluetoothUtils;
 import edu.kufpg.armatus.util.JsonUtils;
 import edu.kufpg.armatus.util.StringUtils;
-
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -332,7 +331,7 @@ public class ConsoleActivity extends BaseActivity {
 
 		updateConsoleEntries();
 		updateCommandHistoryEntries();
-		refreshSlidingMenu();
+		resizeSlidingMenu();
 	}
 
 	@Override
@@ -813,17 +812,7 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	/**
-	 * Changes the SlidingMenu offset depending on which screen orientation is enabled.
-	 * This probably works best on Nexus 7s.
-	 */
-	private void refreshSlidingMenu() {
-		Drawable command = getResources().getDrawable(R.drawable.template_red);
-		int width = command.getIntrinsicWidth();
-		mSlidingMenu.setBehindWidth(Math.round(width + 0.05f*width));
-	}
-
-	synchronized void resizeEmptySpace() {
+	private synchronized void resizeEmptySpace() {
 		mConsoleEmptySpace.post(new Runnable() {
 			@Override
 			public void run() {
@@ -831,6 +820,15 @@ public class ConsoleActivity extends BaseActivity {
 				mConsoleEmptySpace.requestLayout();
 			}
 		});
+	}
+	
+	/**
+	 * Changes the SlidingMenu width depending on the screen size.
+	 */
+	private void resizeSlidingMenu() {
+		Drawable command = getResources().getDrawable(R.drawable.template_white);
+		int width = command.getIntrinsicWidth();
+		mSlidingMenu.setBehindWidth(Math.round(width + 0.05f*width));
 	}
 
 	/**

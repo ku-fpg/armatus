@@ -14,6 +14,7 @@ import android.text.TextWatcher;
 
 import com.google.common.collect.ImmutableSortedSet;
 
+import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
