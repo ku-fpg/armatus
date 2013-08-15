@@ -12,8 +12,6 @@ import android.widget.TextView;
  * edu.kufpg.armatus.command.CommandDispatcher.Keyword Keywords}.
  */
 public class DragIcon extends TextView {
-	private String mGroupName;
-	
 	public DragIcon(Context context) {
 		super(context);
 		init();
@@ -40,13 +38,5 @@ public class DragIcon extends TextView {
 				return true;
 			}
 		});
-	}
-	
-	public String getGroupName() {
-		return mGroupName;
-	}
-	
-	public void setGroupName(String groupName) {
-		mGroupName = groupName;
 	}
 }

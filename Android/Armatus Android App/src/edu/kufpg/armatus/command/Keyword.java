@@ -10,9 +10,9 @@ public class Keyword {
 	/** The name of the {@link Keyword}. */
 	private String mKeywordName;
 
-	/** The {@link Command} associated with this {@link Keyword} when chosen in a
-	 * context menu. */
-	private Command mCommand;
+	/** The name of the {@link Command} associated with this {@link Keyword} when
+	 * chosen in a context menu. */
+	private String mCommandName;
 
 	/** How {@link PrettyPrinter} colors this {@link Keyword}. Represented as a
 	 * hexadecimal string. */
@@ -28,11 +28,7 @@ public class Keyword {
 	 */
 	public Keyword(String keywordName, String commandName, String color) {
 		mKeywordName = keywordName;
-		if (isCommand(commandName)) {
-			mCommand = COMMAND_MAP.get(commandName);
-		} else {
-			mCommand = CommandDispatcher.getCommand("toast");
-		}
+		mCommandName = commandName;
 		mColor = color;
 	}
 
@@ -49,8 +45,8 @@ public class Keyword {
 	 * chosen in a context menu.
 	 * @return the {@code Command} associated with this {@code Keyword}.
 	 */
-	public Command getCommand() {
-		return mCommand;
+	public String getCommandName() {
+		return mCommandName;
 	}
 
 	/**

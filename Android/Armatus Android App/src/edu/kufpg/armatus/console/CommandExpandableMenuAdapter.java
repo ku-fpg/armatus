@@ -1,7 +1,10 @@
 package edu.kufpg.armatus.console;
 
+import java.util.List;
+import java.util.Map;
+
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.command.CommandDispatcher;
+import edu.kufpg.armatus.command.CommandGroup;
 import edu.kufpg.armatus.drag.DragIcon;
 import android.content.Context;
 import android.graphics.Color;
@@ -17,6 +20,8 @@ import android.widget.TextView;
  * edu.kufpg.armatus.console.CommandDispatcher.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
+	private static List<String> GROUP_LIST;
+	private static Map<String, CommandGroup> GROUP_DATA_MAP;
 	private Context mContext;
 	private LayoutInflater mInflater;
 
@@ -24,15 +29,21 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	 * Constructs a new instance and initializes the menu data if necessary.
 	 * @param context The {@link Context} to use.
 	 */
-	public CommandExpandableMenuAdapter(Context context) {
+	public CommandExpandableMenuAdapter(Context context, List<String> groupList,
+			Map<String, CommandGroup> groupDataMap) {
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
+		if (GROUP_LIST == null) {
+			GROUP_LIST = groupList;
+		}
+		if (GROUP_DATA_MAP == null) {
+			GROUP_DATA_MAP = groupDataMap;
+		}
 	}
 
 	@Override
 	public String getChild(int groupPosition, int childPosition) {
-		return CommandExpandableMenu.getGroupMetadataMap(mContext)
-				.get(getGroup(groupPosition)).commandList.get(childPosition);
+		return GROUP_DATA_MAP.get(getGroup(groupPosition)).getCommandList().get(childPosition);
 	}
 
 	@Override
@@ -55,27 +66,27 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 		String commandName = getChild(groupPosition, childPosition);
 		String groupName = getGroup(groupPosition);
-		item.icon.setBackgroundResource(CommandExpandableMenu.getGroupMetadataMap(mContext)
-				.get(groupName).dragIconBackgroundId);
+		item.icon.setBackgroundResource(GROUP_DATA_MAP.get(groupName).getDragIconBackgroundId());
 		item.icon.setText(commandName);
-		item.icon.setGroupName(groupName);
+		item.icon.setTypeface(ConsoleActivity.TYPEFACE);
+		int newWidth = mContext.getResources().getDrawable(R.drawable.template_white).getIntrinsicWidth();
+		item.icon.getLayoutParams().width = newWidth;
 		return view;
 	}
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return CommandExpandableMenu.getGroupMetadataMap(mContext)
-				.get(getGroup(groupPosition)).commandList.size();
+		return GROUP_DATA_MAP.get(getGroup(groupPosition)).getCommandList().size();
 	}
 
 	@Override
 	public String getGroup(int groupPosition) {
-		return CommandExpandableMenu.getGroupList(mContext).get(groupPosition);
+		return GROUP_LIST.get(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return CommandExpandableMenu.getGroupList(mContext).size();
+		return GROUP_LIST.size();
 	}
 
 	@Override
@@ -98,7 +109,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		}
 
 		header.title.setText(groupName);
-		String colorHex = CommandExpandableMenu.getGroupMetadataMap(mContext).get(groupName).barColor;
+		String colorHex = GROUP_DATA_MAP.get(groupName).getBarColor();
 		if (colorHex == null) {
 			colorHex = PrettyPrinter.GRAY;
 		}

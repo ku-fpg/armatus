@@ -12,9 +12,6 @@ public abstract class Command {
 	/** The real {@link Command} name. */
 	private String mCommandName;
 
-	/** The name of the group to which this {@link Command} belongs. */
-	private String mGroupName;
-
 	/** The number of arguments that this {@link Command} takes. If {@link
 	 * #mLowerArgBound} is {@code true}, {@code mArgsCount} specifies the
 	 * <em>minimum</em> number of arguments that this {@code Command} can take. */
@@ -27,12 +24,10 @@ public abstract class Command {
 	/**
 	 * Constructs a new instance.
 	 * @param commandName The name of the {@link Command}.
-	 * @param groupName The group name to associate this {@code Command} with.
 	 * @param argsCount The number of arguments that this {@code Command} must take.
 	 */
-	public Command(String commandName, String groupName, int argsCount) {
+	public Command(String commandName, int argsCount) {
 		mCommandName = commandName;
-		mGroupName = groupName;
 		mArgsCount = argsCount;
 	}
 
@@ -40,14 +35,13 @@ public abstract class Command {
 	 * Constructs a new instance, specifying if the {@link Command} has a lower
 	 * argument bound.
 	 * @param commandName The name of the {@code Command}.
-	 * @param groupName The group name to associate this {@code Command} with.
 	 * @param argsCount The number of arguments that this {@code Command} must
 	 * take. If {@code lowerArgBound} is {@code true}, this is a minimum amount.
 	 * @param lowerArgBound {@code true} if {@code argsCount} is a minimum
 	 * amount, {@code false} if {@code argsCount} is a precise quantity.
 	 */
-	public Command(String commandName, String groupName, int argsCount, boolean lowerArgBound) {
-		this(commandName, groupName, argsCount);
+	public Command(String commandName, int argsCount, boolean lowerArgBound) {
+		this(commandName, argsCount);
 		mLowerArgBound = lowerArgBound;
 	}
 
@@ -57,14 +51,6 @@ public abstract class Command {
 	 */
 	public String getCommandName() {
 		return mCommandName;
-	}
-
-	/**
-	 * Returns the name of the group this {@link Command} is associated with.
-	 * @return this {@code Command}'s group name.
-	 */
-	public String getGroupName() {
-		return mGroupName;
 	}
 
 	/**

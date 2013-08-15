@@ -1,8 +1,7 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.command;
 
 import android.os.AsyncTask;
 import edu.kufpg.armatus.AsyncActivityTask;
-import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 /**

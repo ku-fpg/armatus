@@ -1,19 +1,15 @@
 package edu.kufpg.armatus.command;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import org.json.JSONObject;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.console.ConsoleActivity;
-import edu.kufpg.armatus.console.ConsoleListView;
 import edu.kufpg.armatus.console.PrettyPrinter;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import edu.kufpg.armatus.server.BluetoothUtils;
@@ -30,12 +26,9 @@ import android.widget.Toast;
  * {@link ConsoleActivity} to execute commands.
  */
 public class CommandDispatcher {
-	public static final String MISCELLANEOUS = "Miscellaneous";
+	public static final String CLIENT_COMMANDS_GROUP = "Client";
 
-	// All the static final command names for the commands. Each static final runs a function with a
-	// string of arguments that will on the console the command they are looking at is in a specific
-	// group with the group name. 
-	private static final Command BLUETOOTH_TEST = new Command("bluetooth-test", MISCELLANEOUS, 0, true) {
+	private static final Command BLUETOOTH_TEST = new Command("bluetooth-test", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			if (BluetoothUtils.isBluetoothEnabled(console)) {
@@ -51,19 +44,19 @@ public class CommandDispatcher {
 			}
 		}
 	};
-	private static final Command CLEAR = new Command("clear", MISCELLANEOUS, 0, true) {
+	private static final Command CLEAR = new Command("clear", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.clear();
 		}
 	};
-	private static final Command EXIT = new Command("exit", MISCELLANEOUS, 0) {
+	private static final Command EXIT = new Command("exit", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.finish();
 		}
 	};
-	private static final Command SERVER_TEST = new Command("server-test", MISCELLANEOUS, 0) {
+	private static final Command SERVER_TEST = new Command("server-test", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			try {
@@ -77,7 +70,7 @@ public class CommandDispatcher {
 						protected String onResponse(String response) {
 							return response;
 						}
-						
+
 						@Override
 						protected void onPostExecute(String formattedResponse) {
 							super.onPostExecute(formattedResponse);
@@ -92,7 +85,7 @@ public class CommandDispatcher {
 			}
 		}
 	};
-	private static final Command TOAST = new Command("toast", MISCELLANEOUS, 0, true) {
+	private static final Command TOAST = new Command("toast", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			Toast toast = null;
@@ -104,7 +97,7 @@ public class CommandDispatcher {
 			toast.show();
 		}
 	};
-	private static final Command TERMINAL = new Command("terminal", MISCELLANEOUS, 0, true){
+	private static final Command TERMINAL = new Command("terminal", 0, true){
 		@Override
 		protected void run(ConsoleActivity console, String... args){
 			String packageName = "jackpal.androidterm";
@@ -121,8 +114,7 @@ public class CommandDispatcher {
 		}
 	};
 
-	/** Maps {@link Command} names to their respective instances. */
-	private static final SortedMap<String, Command> COMMAND_MAP = mapCommands();
+	private static final SortedMap<String, Command> CLIENT_COMMAND_MAP = mapClientCommands();
 
 	//List of Keywords
 	private static final Keyword RED = new Keyword("red", "toast", PrettyPrinter.RED);
@@ -146,7 +138,7 @@ public class CommandDispatcher {
 		mDelayedCommand = null;
 		mDelayedCommandArgs = null;
 	}
-	
+
 	/**
 	 * Runs a {@link Command} if it was delayed for some reason.
 	 * @param console The {@link ConsoleActivity} to use.
@@ -159,7 +151,7 @@ public class CommandDispatcher {
 			}
 		}
 	}
-	
+
 	/**
 	 * Attempts to run a {@link Command} on the console.
 	 * @param console The {@link ConsoleActivity} on which to run the {@link Command}.
@@ -167,11 +159,11 @@ public class CommandDispatcher {
 	 * @param args The parameters of the {@code Command}.
 	 */
 	public static void runOnConsole(ConsoleActivity console, String commandName, String... args) {
-		Command command = COMMAND_MAP.get(commandName);
+		Command command = CLIENT_COMMAND_MAP.get(commandName);
 		if (command != null) {
 			runOnConsole(console, command, args);
 		} else {
-			console.appendConsoleEntry("Error: " + commandName + " is not a valid command.");
+			runOnConsole(console, createServerCommand(commandName), args);
 		}
 	}
 
@@ -185,7 +177,6 @@ public class CommandDispatcher {
 		String commandString = command.getCommandName()
 				+ StringUtils.NBSP + varargsToString(args);
 		console.addConsoleEntry(commandString);
-		console.addCommandEntry(command.getCommandName());
 
 		if (command.hasLowerArgBound()) {
 			if (args.length < command.getArgsCount()) {
@@ -216,7 +207,7 @@ public class CommandDispatcher {
 	public static void runKeywordCommand(ConsoleActivity console, String keywordName, String arg) {
 		Keyword keyword = KEYWORD_MAP.get(keywordName);
 		if (keyword != null) {
-			runOnConsole(console, keyword.getCommand(), arg);
+			runOnConsole(console, keyword.getCommandName(), arg);
 		} else {
 			console.appendConsoleEntry("Error: " + keyword + " is not a valid keyword.");
 		}
@@ -228,17 +219,17 @@ public class CommandDispatcher {
 	 * @return the {@code Command} with the given name, or {@code null} if
 	 * {@code commandName} does not correspond to a {@code Command}.
 	 */
-	public static Command getCommand(String commandName) {
-		return COMMAND_MAP.get(commandName);
+	public static Command getClientCommand(String commandName) {
+		return CLIENT_COMMAND_MAP.get(commandName);
 	}
 
 	/**
 	 * Returns a sorted set of all {@link Command} names in {@link CommandDispatcher}.
 	 * @return a {@link SortedSet} of all {@code Command} names.
 	 */
-	static SortedSet<String> getCommandNames() {
+	public static SortedSet<String> getClientCommandNames() {
 		SortedSet<String> commandNames = new TreeSet<String>();
-		commandNames.addAll(COMMAND_MAP.keySet());
+		commandNames.addAll(CLIENT_COMMAND_MAP.keySet());
 		return commandNames;
 	}
 
@@ -257,10 +248,10 @@ public class CommandDispatcher {
 	 * @param commandName The name to look up.
 	 * @return {@code true} if the given name is also a {@code Command} name.
 	 */
-	public static boolean isCommand(String commandName) {
-		return COMMAND_MAP.containsKey(commandName);
+	public static boolean isClientCommand(String commandName) {
+		return CLIENT_COMMAND_MAP.containsKey(commandName);
 	}
-	
+
 	/**
 	 * Returns whether the command dispatcher is waiting to execute a {@link Command}
 	 * that was delayed for some reason.
@@ -278,7 +269,7 @@ public class CommandDispatcher {
 	public static boolean isKeyword(String keywordName) {
 		return KEYWORD_MAP.containsKey(keywordName);
 	}
-	
+
 	/**
 	 * "Postpones" execution of a {@link Command} until later. Note that when the {@code
 	 * Command} "resumes," it is actually re-executing it. The {@link Command#run(ConsoleActivity, String...)
@@ -309,25 +300,15 @@ public class CommandDispatcher {
 		return builder.toString().trim();
 	}
 
-	/**
-	 * Initializes {@link #COMMAND_MAP} by mapping {@link Command} names to their
-	 * respective instances.
-	 * @return a {@link SortedMap} of {@code Command} names to their instances.
-	 */
-	private static SortedMap<String, Command> mapCommands() {
+	private static SortedMap<String, Command> mapClientCommands() {
 		ImmutableSortedMap.Builder<String, Command> commandBuilder = ImmutableSortedMap.naturalOrder();
-		Field[] fields = CommandDispatcher.class.getDeclaredFields();
-		for (Field f : fields) {
-			try {
-				if (f.getType().equals(Command.class)) {
-					Command command = (Command) f.get(Command.class);
-					commandBuilder.put(command.getCommandName(), command);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return commandBuilder.build();
+		return commandBuilder.put(BLUETOOTH_TEST.getCommandName(), BLUETOOTH_TEST)
+				.put(CLEAR.getCommandName(), CLEAR)
+				.put(EXIT.getCommandName(), EXIT)
+				.put(SERVER_TEST.getCommandName(), SERVER_TEST)
+				.put(TERMINAL.getCommandName(), TERMINAL)
+				.put(TOAST.getCommandName(), TOAST)
+				.build();
 	}
 
 	/**
@@ -336,7 +317,31 @@ public class CommandDispatcher {
 	 * @return a {@link Map} of {@code Keyword} names to their instances.
 	 */
 	private static Map<String, Keyword> mapKeywords() {
-		return ImmutableMap.of("red", RED, "green", GREEN, "blue", BLUE);
+		return ImmutableMap.of(RED.getKeywordName(), RED,
+				GREEN.getKeywordName(), GREEN,
+				BLUE.getKeywordName(), BLUE);
+	}
+	
+	private static ServerDefinedCommand createServerCommand(final String commandName) {
+		return new ServerDefinedCommand(commandName, 0, true) {
+			@Override
+			protected void run(ConsoleActivity console, String... args) {
+				new HermitWebServerRequest<String>(console) {
+					@Override
+					protected String doInBackground(String... params) {
+						publishProgress("Simulating real HERMIT command.");
+						return null;
+					}
+					
+					@Override
+					protected void onPostExecute(String result) {
+						super.onPostExecute(result);
+						//TODO: Check with server to see if command is real before posting
+						getActivity().addCommandEntry(commandName);
+					}
+				}.execute(getCommandName() + " " + varargsToString(args));
+			}
+		};
 	}
 
 }

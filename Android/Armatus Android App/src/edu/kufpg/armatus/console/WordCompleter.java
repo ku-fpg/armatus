@@ -12,8 +12,6 @@ import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-import com.google.common.collect.ImmutableSortedSet;
-
 import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
 
@@ -25,7 +23,7 @@ import edu.kufpg.armatus.util.StringUtils;
  */
 public class WordCompleter implements Parcelable, TextWatcher {
 	/** The set of all possible commands that can be considered. */
-	private final SortedSet<String> COMMAND_DICTIONARY;
+	private static SortedSet<String> COMMAND_DICTIONARY;
 	
 	/** A subset of {@link #COMMAND_DICTIONARY} containing only those commands which
 	 * match the word to be completed. */
@@ -47,10 +45,11 @@ public class WordCompleter implements Parcelable, TextWatcher {
 	 * in {@link CommandDispatcher}.
 	 * @param console reference to the current console.
 	 */
-	public WordCompleter(ConsoleActivity console) {
+	public WordCompleter(ConsoleActivity console, SortedSet<String> commandDictionary) {
 		mConsole = console;
-		ImmutableSortedSet.Builder<String> dictBuilder = ImmutableSortedSet.naturalOrder();
-		COMMAND_DICTIONARY = dictBuilder.addAll(CommandDispatcher.getCommandNames()).build();
+		if (COMMAND_DICTIONARY == null) {
+			COMMAND_DICTIONARY = commandDictionary;
+		}
 		resetFilter("");
 	}
 	

@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
-
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-public class HermitBluetoothServerRequest extends AsyncCommandTask<String, String, String> {
+public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActivity, String, String, String> {
 	private BluetoothDevice mDevice;
 	private BluetoothSocket mSocket;
 	private OutputStream mOutStream;

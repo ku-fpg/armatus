@@ -1,6 +1,12 @@
 package edu.kufpg.armatus.server;
 
+import edu.kufpg.armatus.console.ConsoleActivity;
+
 public class HermitBluetoothClient extends AbsHermitClient {
+
+	public HermitBluetoothClient(ConsoleActivity console) {
+		super(console);
+	}
 
 	@Override
 	public void init() {
