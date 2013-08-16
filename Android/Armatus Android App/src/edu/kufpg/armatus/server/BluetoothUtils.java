@@ -1,5 +1,6 @@
 package edu.kufpg.armatus.server;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import edu.kufpg.armatus.BaseActivity;
@@ -10,6 +11,7 @@ import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +44,12 @@ public class BluetoothUtils {
 	/** Reference to the device's Bluetooth adapter. */
 	private static BluetoothAdapter sAdapter;
 
+	private static BluetoothDevice sDevice;
+
+	private static BluetoothSocket sSocket;
+	
+	private static boolean sLastConnectionFailed = false;
+
 	/** Reference to the app's {@link SharedPreferences}. */
 	private static SharedPreferences sPrefs;
 
@@ -49,6 +57,25 @@ public class BluetoothUtils {
 	private static SharedPreferences.Editor sPrefsEditor;
 
 	private BluetoothUtils() {}
+
+	public static void closeBluetooth() {
+		if (sSocket != null) {
+			try {
+				if (sSocket.getOutputStream() != null) {
+					sSocket.getOutputStream().close();
+				}
+				if (sSocket.getInputStream() != null) {
+					sSocket.getInputStream().close();
+				}
+				sSocket.close();
+			} catch (IOException e) {
+				Log.w(TAG, "Error occurred when closing Bluetooth socket!");
+				e.printStackTrace();
+			}
+			sSocket = null;
+		}
+		sDevice = null;
+	}
 
 	/**
 	 * Retrieves the device's Bluetooth adapter (if it supports Bluetooth).
@@ -83,17 +110,48 @@ public class BluetoothUtils {
 	 */
 	public static BluetoothDevice getBluetoothDevice(Context context) {
 		String address = getPrefs(context).getString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, null);
-		BluetoothDevice device = null;
 		if (address != null) {
 			BluetoothAdapter adapter = getBluetoothAdapter(context);
 			if (adapter != null) {
-				device = adapter.getRemoteDevice(address);
+				if (sDevice == null) {
+					sDevice = adapter.getRemoteDevice(address);
+				}
+				return sDevice;
 			} else {
 				Log.w(TAG, "Cannot get Bluetooth device (Bluetooth not supported on this "
 						+ BaseActivity.DEVICE_NAME + ").");
+				return null;
 			}
+		} else {
+			Log.w(TAG, "Cannot get Bluetooth device (no device address found in preferences).");
+			return null;
 		}
-		return device;
+	}
+
+	public static BluetoothSocket getBluetoothSocket(Context context) {
+		BluetoothAdapter adapter = getBluetoothAdapter(context);
+		if (adapter != null) {
+			BluetoothDevice device = getBluetoothDevice(context);
+			if (device != null) {
+				if (sSocket == null) {
+					try {
+						sSocket = device.createRfcommSocketToServiceRecord(BASE_UUID);
+					} catch (IOException e) {
+						e.printStackTrace();
+						Log.w(TAG, "Cannot get Bluetooth socket (creation failed).");
+						return null;
+					}
+				}
+				return sSocket;
+			} else {
+				Log.w(TAG, "Cannot get Bluetooth socket (no device address found in preferences).");
+				return null;
+			}
+		} else {
+			Log.w(TAG, "Cannot get Bluetooth socket (Bluetooth not supported on this "
+					+ BaseActivity.DEVICE_NAME + ").");
+			return null;
+		}
 	}
 
 	/**
@@ -158,6 +216,29 @@ public class BluetoothUtils {
 		}
 	}
 
+	public static boolean isBluetoothConnected(Context context) {
+		BluetoothAdapter adapter = getBluetoothAdapter(context);
+		if (adapter != null) {
+			BluetoothDevice device = getBluetoothDevice(context);
+			if (device != null) {
+				BluetoothSocket socket = getBluetoothSocket(context);
+				if (socket != null) {
+					return socket.isConnected();
+				} else {
+					Log.w(TAG, "Cannot determine Bluetooth state (socket creation failed).");
+					return false;
+				}
+			} else {
+				Log.w(TAG, "Cannot determine Bluetooth state (no device found in preferences).");
+				return false;
+			}
+		} else {
+			Log.w(TAG, "Cannot determine Bluetooth state (Bluetooth not supported on this "
+					+ BaseActivity.DEVICE_NAME + ").");
+			return false;
+		}
+	}
+
 	/**
 	 * Returns whether Bluetooth is turned on.
 	 * @param context The {@link Context} to use.
@@ -173,6 +254,18 @@ public class BluetoothUtils {
 					+ BaseActivity.DEVICE_NAME + ").");
 			return false;
 		}
+	}
+	
+	public static boolean lastConnectionFailed() {
+		return sLastConnectionFailed;
+	}
+	
+	public static void notifyLastConnectionFailed() {
+		sLastConnectionFailed = true;
+	}
+	
+	public static void notifyLastConnectionSucceeded() {
+		sLastConnectionFailed = false;
 	}
 
 	/**

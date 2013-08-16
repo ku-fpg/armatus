@@ -301,13 +301,17 @@ public class ConsoleActivity extends BaseActivity {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
 					if (mInputEnabled) {
-						String[] inputs = mConsoleInputEditText.getText().toString().trim()
-								.split(StringUtils.WHITESPACE);
-						if (inputs.length == 1) {
-							CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0]);
+						String input = mConsoleInputEditText.getText().toString();
+						if (input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
+							addConsoleEntry(input);
 						} else {
-							CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0],
-									Arrays.copyOfRange(inputs, 1, inputs.length));
+							String[] inputs = input.trim().split(StringUtils.WHITESPACE);
+							if (inputs.length == 1) {
+								CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0]);
+							} else {
+								CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0],
+										Arrays.copyOfRange(inputs, 1, inputs.length));
+							}
 						}
 						mConsoleInputEditText.setText("");
 						return true;
@@ -374,6 +378,11 @@ public class ConsoleActivity extends BaseActivity {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
 				getEditManager().discardAllEdits();
+				if (getPrefs().getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
+					if (BluetoothUtils.isBluetoothConnected(ConsoleActivity.this)) {
+						BluetoothUtils.closeBluetooth();
+					}
+				}
 				Intent intent = new Intent(ConsoleActivity.this, MainActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);

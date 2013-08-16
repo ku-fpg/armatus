@@ -242,10 +242,14 @@ public class PrefsActivity extends PreferenceActivity {
 				break;
 			case BluetoothUtils.REQUEST_FIND_BLUETOOTH_DEVICE:
 				if (resultCode == RESULT_OK) {
-					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
-					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-					BluetoothUtils.setBluetoothDeviceInfo(getActivity(), name, address);
-					setChooseBluetoothDevicePrefSummary(name, address);
+					String newName = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
+					String newAddress = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
+					String oldAddress = sPrefs.getString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, null);
+					if (!newAddress.equals(oldAddress) && BluetoothUtils.isBluetoothConnected(getActivity())) {
+						BluetoothUtils.closeBluetooth();
+					}
+					BluetoothUtils.setBluetoothDeviceInfo(getActivity(), newName, newAddress);
+					setChooseBluetoothDevicePrefSummary(newName, newAddress);
 				}
 				break;
 			}
