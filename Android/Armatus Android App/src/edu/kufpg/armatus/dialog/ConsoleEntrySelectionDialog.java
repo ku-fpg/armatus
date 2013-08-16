@@ -8,7 +8,6 @@ import edu.kufpg.armatus.console.ConsoleEntry;
 import edu.kufpg.armatus.console.PrettyPrinter;
 import edu.kufpg.armatus.util.StringUtils;
 
-import android.app.DialogFragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ClipboardManager.OnPrimaryClipChangedListener;
@@ -23,7 +22,7 @@ import android.widget.TextView;
  * ConsoleEntrySelectionDialog Class. This class extends {@link android.app.DialogFragment DialogFragment} class. 
  * Task of building strings and making the dialog of the console. 
  */
-public class ConsoleEntrySelectionDialog extends DialogFragment {
+public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 	private ClipboardManager mClipboard;
 	private TextView mContentsView;
 	private OnPrimaryClipChangedListener mClipboardUnwrapper;

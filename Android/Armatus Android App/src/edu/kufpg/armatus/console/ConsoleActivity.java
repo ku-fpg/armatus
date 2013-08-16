@@ -116,7 +116,7 @@ public class ConsoleActivity extends BaseActivity {
 	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
 	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
-	private boolean mSoftKeyboardVisible = true;
+	private boolean mSoftKeyboardVisibility = true;
 	private boolean mSearchEnabled = false;
 	private int mConsoleInputNum = 0;
 	private int mConsoleEntriesHeight, mConsoleInputHeight, mScreenHeight, mConsoleWidth;
@@ -143,7 +143,7 @@ public class ConsoleActivity extends BaseActivity {
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		if (savedInstanceState == null) {
-			setSoftKeyboardVisible(true);
+			setSoftKeyboardVisibility(true);
 			mConsoleEntries = new ArrayList<ConsoleEntry>();
 			mCommandHistoryEntries = new ArrayList<String>();
 			mConsoleInputLayout.setLayoutParams(new AbsListView.LayoutParams(
@@ -151,8 +151,8 @@ public class ConsoleActivity extends BaseActivity {
 			mConsoleInputEditText.requestFocus();
 		} else {
 			mConsoleInputEditText.setText(savedInstanceState.getString("consoleInput"));
-			mSoftKeyboardVisible = savedInstanceState.getBoolean("softKeyboardVisibility");
-			setSoftKeyboardVisible(mSoftKeyboardVisible);
+			mSoftKeyboardVisibility = savedInstanceState.getBoolean("softKeyboardVisibility");
+			setSoftKeyboardVisibility(mSoftKeyboardVisibility);
 			mSearchEnabled = savedInstanceState.getBoolean("findTextEnabled");
 			if (mSearchEnabled) {
 				mSearchMatches.setVisibility(View.VISIBLE);
@@ -195,9 +195,9 @@ public class ConsoleActivity extends BaseActivity {
 				int rootHeight = rootView.getRootView().getHeight();
 				int heightDiff = rootHeight - rootView.getHeight();
 				if (heightDiff > rootHeight/3) { //This works on Nexus 7s, at the very least
-					mSoftKeyboardVisible = true;
+					mSoftKeyboardVisibility = true;
 				} else {
-					mSoftKeyboardVisible = false;
+					mSoftKeyboardVisibility = false;
 				}
 			}
 		});
@@ -205,7 +205,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleEmptySpace.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (!mSoftKeyboardVisible) {
+				if (!mSoftKeyboardVisibility) {
 					((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
 					.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 					mConsoleInputEditText.requestFocus();
@@ -363,7 +363,7 @@ public class ConsoleActivity extends BaseActivity {
 			outState.putString("searchInput", mSearchInputView.getText().toString());
 			outState.putString("prevSearchCriterion", mPrevSearchCriterion);
 		}
-		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
+		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisibility);
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
@@ -377,15 +377,7 @@ public class ConsoleActivity extends BaseActivity {
 		YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
 			@Override
 			protected void yes(DialogInterface dialog, int whichButton) {
-				getEditManager().discardAllEdits();
-				if (getPrefs().getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
-					if (BluetoothUtils.isBluetoothConnected(ConsoleActivity.this)) {
-						BluetoothUtils.closeBluetooth();
-					}
-				}
-				Intent intent = new Intent(ConsoleActivity.this, MainActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
+				exit();
 			}
 		};
 		exitDialog.show(getFragmentManager(), "exit");
@@ -732,10 +724,25 @@ public class ConsoleActivity extends BaseActivity {
 
 	public void disableInput() {
 		mInputEnabled = false;
+		mConsoleInputLayout.setVisibility(View.INVISIBLE);
 	}
 
 	public void enableInput() {
 		mInputEnabled = true;
+		mConsoleInputLayout.setVisibility(View.VISIBLE);
+		mConsoleInputEditText.requestFocus();
+	}
+	
+	public void exit() {
+		getEditManager().discardAllEdits();
+		if (getPrefs().getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
+			if (BluetoothUtils.isBluetoothConnected(this)) {
+				BluetoothUtils.closeBluetooth();
+			}
+		}
+		Intent intent = new Intent(this, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
 	}
 
 	/**
@@ -758,6 +765,10 @@ public class ConsoleActivity extends BaseActivity {
 
 	public SlidingMenu getSlidingMenu() {
 		return mSlidingMenu;
+	}
+	
+	public boolean isSoftKeyboardVisible() {
+		return mSoftKeyboardVisibility;
 	}
 
 	public void setInputEnabled(boolean enabled) {
@@ -869,7 +880,7 @@ public class ConsoleActivity extends BaseActivity {
 	 * Shows or hides the soft keyboard.
 	 * @param visible Set to true to show soft keyboard, false to hide.
 	 */
-	public void setSoftKeyboardVisible(boolean visible) {
+	public void setSoftKeyboardVisibility(boolean visible) {
 		if (visible) {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		} else {

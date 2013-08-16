@@ -28,7 +28,7 @@ import android.widget.Toast;
 public class CommandDispatcher {
 	public static final String CLIENT_COMMANDS_GROUP = "Client";
 
-	private static final Command BLUETOOTH_TEST = new Command("bluetooth-test", 0, true) {
+	private static final Command BLUETOOTH_TEST = new ClientDefinedCommand("bluetooth-test", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			if (BluetoothUtils.isBluetoothEnabled(console)) {
@@ -42,21 +42,23 @@ public class CommandDispatcher {
 				delayCommand(this, false, args);
 				BluetoothUtils.enableBluetooth(console);
 			}
+			super.run(console, args);
 		}
 	};
-	private static final Command CLEAR = new Command("clear", 0, true) {
+	private static final Command CLEAR = new ClientDefinedCommand("clear", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.clear();
+			super.run(console, args);
 		}
 	};
-	private static final Command EXIT = new Command("exit", 0) {
+	private static final Command EXIT = new ClientDefinedCommand("exit", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
-			console.finish();
+			console.exit();
 		}
 	};
-	private static final Command SERVER_TEST = new Command("server-test", 0) {
+	private static final Command SERVER_TEST = new ClientDefinedCommand("server-test", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			try {
@@ -83,9 +85,10 @@ public class CommandDispatcher {
 				e.printStackTrace();
 				return;
 			}
+			super.run(console, args);
 		}
 	};
-	private static final Command TOAST = new Command("toast", 0, true) {
+	private static final Command TOAST = new ClientDefinedCommand("toast", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			Toast toast = null;
@@ -95,9 +98,10 @@ public class CommandDispatcher {
 				toast = Toast.makeText(console, varargsToString(args), Toast.LENGTH_SHORT);
 			}
 			toast.show();
+			super.run(console, args);
 		}
 	};
-	private static final Command TERMINAL = new Command("terminal", 0, true){
+	private static final Command TERMINAL = new ClientDefinedCommand("terminal", 0, true){
 		@Override
 		protected void run(ConsoleActivity console, String... args){
 			String packageName = "jackpal.androidterm";
@@ -111,6 +115,7 @@ public class CommandDispatcher {
 				TerminalNotInstalledDialog tnid = new TerminalNotInstalledDialog();
 				tnid.show(console.getFragmentManager(), "tnid");
 			}
+			super.run(console, args);
 		}
 	};
 

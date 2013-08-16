@@ -7,7 +7,6 @@ import edu.kufpg.armatus.console.ConsoleActivity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
@@ -30,7 +29,7 @@ import android.widget.TextView;
  * GestureDialog Class for the various gestures. Extends the {@link android.app.DialogFragment DialogFragment} and 
  * implements the {@link android.gesture.GestureOverLayView.OnGesturePerfomedListner OnGesturePerformedListner}. 
  */
-public class GestureDialog extends DialogFragment implements OnGesturePerformedListener {
+public class GestureDialog extends ConsiderateDialog implements OnGesturePerformedListener {
 
 	private GestureLibrary mGestureLib;
 	private GestureOverlayView mGestureView;

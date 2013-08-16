@@ -7,10 +7,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.util.StringUtils;
 
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +21,7 @@ import android.widget.ListView;
  * KeywordSwapDialog Class, this class extends {@link android.app.DialogFragment DialogFragment} class. 
  * This class makes all the dialog within the keyword swap.
  */
-public class KeywordSwapDialog extends DialogFragment {
+public class KeywordSwapDialog extends ConsiderateDialog {
 
 	private int mEntryNum;
 	private String mEntryContents;
@@ -93,7 +91,7 @@ public class KeywordSwapDialog extends DialogFragment {
 				for (String word : mEntryWords) {
 					builder.append(word).append(" ");
 				}
-				((ConsoleActivity) getActivity()).showToast(builder.toString().trim());
+				getConsole().showToast(builder.toString().trim());
 			}
 		});
 

@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.util.StringUtils;
 
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +20,7 @@ import android.widget.TextView;
  * WordCompletionDialog Class, this extends the {@link android.app.DialogFragment DialogFragment} class. 
  * This class allows for the application to complete words in the input.
  */
-public class WordCompletionDialog extends DialogFragment {
+public class WordCompletionDialog extends ConsiderateDialog {
 
 	private List<String> mWords;
 
@@ -65,9 +63,7 @@ public class WordCompletionDialog extends DialogFragment {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				ConsoleActivity console = (ConsoleActivity) getActivity();
-				console.setInputText(((TextView) view).getText().toString() + StringUtils.NBSP);
-				console.setSoftKeyboardVisible(true);
+				getConsole().setInputText(((TextView) view).getText().toString() + StringUtils.NBSP);
 				dismiss();
 			}
 		});
