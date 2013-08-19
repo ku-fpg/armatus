@@ -6,10 +6,10 @@ import com.ipaulpro.afilechooser.FileChooserActivity;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
-import edu.kufpg.armatus.server.BluetoothDeviceListActivity;
-import edu.kufpg.armatus.server.BluetoothUtils;
-
+import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
+import edu.kufpg.armatus.networking.BluetoothUtils;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -51,12 +51,37 @@ public class PrefsActivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		CHOOSE_BLUETOOTH_DEVICE_KEY = getResources().getString(R.string.pref_choose_bluetooth_device);
 		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
-		sPrefs = BaseActivity.getPrefs();
-		sPrefsEditor = BaseActivity.getPrefsEditor();
+		getPrefs(this);
+		getPrefsEditor(this);
 
 		setTheme(BaseActivity.getThemePrefId());
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
 		super.onCreate(savedInstanceState);
+	}
+	
+	/**
+	 * Convenience for retrieving the app's default {@link SharedPreferences}.
+	 * @param context The {@link Context} to use.
+	 * @return The app's {@code SharedPreferences}.
+	 */
+	public static SharedPreferences getPrefs(Context context) {
+		if (sPrefs == null) {
+			sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+		}
+		return sPrefs;
+	}
+	
+	/**
+	 * Convenience for retrieving the {@code Editor} that can change the app's
+	 * {@link SharedPreferences}.
+	 * @param context The {@link Context} to use.
+	 * @return The app's {@code SharedPreferences.Editor}.
+	 */
+	public static SharedPreferences.Editor getPrefsEditor(Context context) {
+		if (sPrefsEditor == null) {
+			sPrefsEditor = getPrefs(context).edit();
+		}
+		return sPrefsEditor;
 	}
 
 	/**

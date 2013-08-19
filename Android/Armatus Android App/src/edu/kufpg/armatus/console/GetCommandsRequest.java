@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.command.CommandDispatcher;
 import edu.kufpg.armatus.command.CommandGroup;
-import edu.kufpg.armatus.server.HermitWebServerRequest;
+import edu.kufpg.armatus.networking.HermitWebServerRequest;
 
 public class GetCommandsRequest extends HermitWebServerRequest<String> {
 	private static final String[] GROUP_BAR_COLORS = { PrettyPrinter.RED, PrettyPrinter.BLUE,
@@ -105,10 +105,10 @@ public class GetCommandsRequest extends HermitWebServerRequest<String> {
 						dragIconBackgroundId, commandList));
 			}
 		}
-		commandSetBuilder.addAll(CommandDispatcher.getClientCommandNames());
+		commandSetBuilder.addAll(CommandDispatcher.getCustomCommandNames());
 		groupListBuilder.add(CommandDispatcher.CLIENT_COMMANDS_GROUP);
 		groupDataBuilder.put(CommandDispatcher.CLIENT_COMMANDS_GROUP, new CommandGroup(PrettyPrinter.GRAY,
-				R.drawable.template_gray, new ArrayList<String>(CommandDispatcher.getClientCommandNames())));
+				R.drawable.template_gray, new ArrayList<String>(CommandDispatcher.getCustomCommandNames())));
 
 		getActivity().initCommandRelatedVariables(commandSetBuilder.build(),
 				groupListBuilder.build(), groupDataBuilder.build());

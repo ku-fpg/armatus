@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
 import java.util.Set;
 

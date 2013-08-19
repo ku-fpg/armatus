@@ -1,13 +1,13 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
-import edu.kufpg.armatus.AsyncActivityTask;
+import edu.kufpg.armatus.command.AsyncCommandTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 /**
  * Task that connects to a server running HERMIT-web and simulates HERMIT commands
  * by using HTTP GET and POST requests.
  */
-public abstract class HermitWebServerRequest<Result> extends AsyncActivityTask<ConsoleActivity, String, String, Result> {
+public abstract class HermitWebServerRequest<Result> extends AsyncCommandTask<String, String, Result> {
 	/**
 	 * Constructs a new instance. The constructor is not the place to put any input
 	 * {@link JSONObject}s (do that in {@link android.os.AsyncTask#execute(JSONObject...)

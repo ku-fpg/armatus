@@ -9,14 +9,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 
 import edu.kufpg.armatus.BaseActivity;
+import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.console.PrettyPrinter;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
-import edu.kufpg.armatus.server.BluetoothUtils;
-import edu.kufpg.armatus.server.HermitBluetoothServerRequest;
-import edu.kufpg.armatus.server.HermitHttpGetRequest;
-import edu.kufpg.armatus.server.HermitWebServerRequest;
-import edu.kufpg.armatus.server.InternetUtils;
+import edu.kufpg.armatus.networking.HermitBluetoothServerRequest;
+import edu.kufpg.armatus.networking.HermitHttpGetRequest;
+import edu.kufpg.armatus.networking.HermitHttpPostRequest;
+import edu.kufpg.armatus.networking.HermitWebServerRequest;
 import edu.kufpg.armatus.util.StringUtils;
 import android.content.Intent;
 import android.widget.Toast;
@@ -28,21 +28,21 @@ import android.widget.Toast;
 public class CommandDispatcher {
 	public static final String CLIENT_COMMANDS_GROUP = "Client";
 
-	private static final Command BLUETOOTH_TEST = new ClientDefinedCommand("bluetooth-test", 0, true) {
+	private static final Command BLUETOOTH_TEST = new ServerDefinedCommand("bluetooth-test", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
-			if (BluetoothUtils.isBluetoothEnabled(console)) {
-				if (BluetoothUtils.getBluetoothDevice(console) != null) {
-					new HermitBluetoothServerRequest(console).execute("From Android with love");
-				} else {
-					delayCommand(this, false, args);
-					BluetoothUtils.findDeviceName(console);
-				}
+			String server = PrefsActivity.getPrefs(console).getString(BaseActivity.NETWORK_SOURCE_KEY, null);
+			if (BaseActivity.NETWORK_SOURCE_BLUETOOTH_SERVER.equals(server)) {
+				super.run(console, args);
 			} else {
-				delayCommand(this, false, args);
-				BluetoothUtils.enableBluetooth(console);
+				console.appendConsoleEntry("You must select \"Bluetooth\" as the network source in Settings"
+						+ " in order to use this command.");
 			}
-			super.run(console, args);
+		}
+		
+		@Override
+		protected void onConnect(ConsoleActivity console, String... args) {
+			new HermitBluetoothServerRequest(console).execute("From Android with love");
 		}
 	};
 	private static final Command CLEAR = new ClientDefinedCommand("clear", 0, true) {
@@ -58,34 +58,60 @@ public class CommandDispatcher {
 			console.exit();
 		}
 	};
-	private static final Command SERVER_TEST = new ClientDefinedCommand("server-test", 0) {
+	private static final Command HTTP_GET_TEST = new ServerDefinedCommand("http-get-test", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
-			try {
-				if (InternetUtils.isAirplaneModeOn(console)) {
-					console.appendConsoleEntry("Error: Please disable airplane mode before attempting to connect.");
-				} else if (!InternetUtils.isWifiConnected(console)) {
-					console.appendConsoleEntry("Error: No network connectivity.");
-				} else {
-					HermitWebServerRequest<String> request = new HermitHttpGetRequest<String>(console) {
-						@Override
-						protected String onResponse(String response) {
-							return response;
-						}
-
-						@Override
-						protected void onPostExecute(String formattedResponse) {
-							super.onPostExecute(formattedResponse);
-							getActivity().appendConsoleEntry(formattedResponse);
-						}
-					};
-					request.execute("TEST");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return;
+			String server = PrefsActivity.getPrefs(console).getString(BaseActivity.NETWORK_SOURCE_KEY, null);
+			if (BaseActivity.NETWORK_SOURCE_WEB_SERVER.equals(server)) {
+				super.run(console, args);
+			} else {
+				console.appendConsoleEntry("You must select \"Web server\" as the network source in Settings"
+						+ " in order to use this command.");
 			}
-			super.run(console, args);
+		}
+		
+		@Override
+		protected void onConnect(ConsoleActivity console, String... args) {
+			new HermitHttpGetRequest<String>(console) {
+				@Override
+				protected String onResponse(String response) {
+					return response;
+				}
+
+				@Override
+				protected void onPostExecute(String formattedResponse) {
+					super.onPostExecute(formattedResponse);
+					getActivity().appendConsoleEntry(formattedResponse);
+				}
+			}.execute("TEST");
+		}
+	};
+	private static final Command HTTP_POST_TEST = new ServerDefinedCommand("http-post-test", 0) {
+		@Override
+		protected void run(ConsoleActivity console, String... args) {
+			String server = PrefsActivity.getPrefs(console).getString(BaseActivity.NETWORK_SOURCE_KEY, null);
+			if (BaseActivity.NETWORK_SOURCE_WEB_SERVER.equals(server)) {
+				super.run(console, args);
+			} else {
+				console.appendConsoleEntry("You must select \"Web server\" as the network source in Settings"
+						+ " in order to use this command.");
+			}
+		}
+		
+		@Override
+		protected void onConnect(ConsoleActivity console, String... args) {
+			new HermitHttpPostRequest<String>(console) {
+				@Override
+				protected String onResponse(String response) {
+					return response;
+				}
+
+				@Override
+				protected void onPostExecute(String formattedResponse) {
+					super.onPostExecute(formattedResponse);
+					getActivity().appendConsoleEntry(formattedResponse);
+				}
+			}.execute("TEST");
 		}
 	};
 	private static final Command TOAST = new ClientDefinedCommand("toast", 0, true) {
@@ -119,7 +145,7 @@ public class CommandDispatcher {
 		}
 	};
 
-	private static final SortedMap<String, Command> CLIENT_COMMAND_MAP = mapClientCommands();
+	private static final SortedMap<String, Command> CUSTOM_COMMAND_MAP = mapCustomCommands();
 
 	//List of Keywords
 	private static final Keyword RED = new Keyword("red", "toast", PrettyPrinter.RED);
@@ -164,7 +190,7 @@ public class CommandDispatcher {
 	 * @param args The parameters of the {@code Command}.
 	 */
 	public static void runOnConsole(ConsoleActivity console, String commandName, String... args) {
-		Command command = CLIENT_COMMAND_MAP.get(commandName);
+		Command command = CUSTOM_COMMAND_MAP.get(commandName);
 		if (command != null) {
 			runOnConsole(console, command, args);
 		} else {
@@ -218,23 +244,13 @@ public class CommandDispatcher {
 		}
 	}
 
-	/**
-	 * Returns the {@link Command} instance with the specified name.
-	 * @param commandName The name of the {@code Command}.
-	 * @return the {@code Command} with the given name, or {@code null} if
-	 * {@code commandName} does not correspond to a {@code Command}.
-	 */
-	public static Command getClientCommand(String commandName) {
-		return CLIENT_COMMAND_MAP.get(commandName);
+	public static Command getCustomCommand(String commandName) {
+		return CUSTOM_COMMAND_MAP.get(commandName);
 	}
 
-	/**
-	 * Returns a sorted set of all {@link Command} names in {@link CommandDispatcher}.
-	 * @return a {@link SortedSet} of all {@code Command} names.
-	 */
-	public static SortedSet<String> getClientCommandNames() {
+	public static SortedSet<String> getCustomCommandNames() {
 		SortedSet<String> commandNames = new TreeSet<String>();
-		commandNames.addAll(CLIENT_COMMAND_MAP.keySet());
+		commandNames.addAll(CUSTOM_COMMAND_MAP.keySet());
 		return commandNames;
 	}
 
@@ -247,14 +263,9 @@ public class CommandDispatcher {
 	public static Keyword getKeyword(String keywordName) {
 		return KEYWORD_MAP.get(keywordName);
 	}
-
-	/**
-	 * Returns whether the specified name is a {@link Command} name.
-	 * @param commandName The name to look up.
-	 * @return {@code true} if the given name is also a {@code Command} name.
-	 */
-	public static boolean isClientCommand(String commandName) {
-		return CLIENT_COMMAND_MAP.containsKey(commandName);
+	
+	public static boolean isCustomCommand(String commandName) {
+		return CUSTOM_COMMAND_MAP.containsKey(commandName);
 	}
 
 	/**
@@ -285,7 +296,7 @@ public class CommandDispatcher {
 	 * after it ends, {@code false} if the {@code Command} operates asynchronously and must wait.
 	 * @param args The arguments to pass to the {@code Command}.
 	 */
-	private static void delayCommand(Command command, boolean synchronous, String... args) {
+	static void delayCommand(Command command, boolean synchronous, String... args) {
 		mDelayedCommand = command;
 		mDelayedCommandArgs = args;
 		mIsDelayedCommandSynchronous = synchronous;
@@ -305,12 +316,13 @@ public class CommandDispatcher {
 		return builder.toString().trim();
 	}
 
-	private static SortedMap<String, Command> mapClientCommands() {
+	private static SortedMap<String, Command> mapCustomCommands() {
 		ImmutableSortedMap.Builder<String, Command> commandBuilder = ImmutableSortedMap.naturalOrder();
 		return commandBuilder.put(BLUETOOTH_TEST.getCommandName(), BLUETOOTH_TEST)
 				.put(CLEAR.getCommandName(), CLEAR)
 				.put(EXIT.getCommandName(), EXIT)
-				.put(SERVER_TEST.getCommandName(), SERVER_TEST)
+				.put(HTTP_GET_TEST.getCommandName(), HTTP_GET_TEST)
+				.put(HTTP_POST_TEST.getCommandName(), HTTP_POST_TEST)
 				.put(TERMINAL.getCommandName(), TERMINAL)
 				.put(TOAST.getCommandName(), TOAST)
 				.build();
@@ -326,18 +338,18 @@ public class CommandDispatcher {
 				GREEN.getKeywordName(), GREEN,
 				BLUE.getKeywordName(), BLUE);
 	}
-	
+
 	private static ServerDefinedCommand createServerCommand(final String commandName) {
 		return new ServerDefinedCommand(commandName, 0, true) {
 			@Override
-			protected void run(ConsoleActivity console, String... args) {
+			protected void onConnect(ConsoleActivity console, String... args) {
 				new HermitWebServerRequest<String>(console) {
 					@Override
 					protected String doInBackground(String... params) {
 						publishProgress("Simulating real HERMIT command.");
 						return null;
 					}
-					
+
 					@Override
 					protected void onPostExecute(String result) {
 						super.onPostExecute(result);

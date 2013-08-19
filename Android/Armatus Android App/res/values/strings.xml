@@ -12,6 +12,8 @@
     <string name="popup_text">Font size:</string>
     <string name="copy">COPY</string>
     <string name="select">SELECT</string>
+    <string name="enable_wifi_title">Wi-Fi permission request</string>
+    <string name="enable_wifi_message">Armatus is requesting permission to turn on Wi-Fi. Do you want to do this?</string>
     <string name="terminal_not_installed_title">Error: ATE not installed</string>
     <string name="terminal_not_installed_message">To use the terminal, you must install the Android Terminal Emulator app. Afterwards, you must reinstall Armatus. Would you like to install ATE from the Play store now?</string>
     <string name="console_exit_title">Are you sure you want to exit?</string>

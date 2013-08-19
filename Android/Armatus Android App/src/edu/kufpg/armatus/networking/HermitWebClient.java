@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.console.GetCommandsRequest;

@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
 public interface HermitClient {
 	void init();

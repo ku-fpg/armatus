@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,13 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-import edu.kufpg.armatus.AsyncActivityTask;
+import edu.kufpg.armatus.command.AsyncCommandTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
-public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActivity, String, String, String> {
+public class HermitBluetoothServerRequest extends AsyncCommandTask<String, String, String> {
 	private BluetoothAdapter mAdapter;
 	private BluetoothDevice mDevice;
 	private BluetoothSocket mSocket;

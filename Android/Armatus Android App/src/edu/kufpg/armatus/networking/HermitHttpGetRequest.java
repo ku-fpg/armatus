@@ -1,70 +1,75 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.UnknownHostException;
-import java.util.Scanner;
 
+import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 public abstract class HermitHttpGetRequest<Result> extends HermitWebServerRequest<Result> {
-	
+
 	/** The URL used for performing HTTP GET requests. */
 	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
 
 	public HermitHttpGetRequest(ConsoleActivity console) {
 		super(console);
 	}
-	
+
 	@Override
 	protected Result doInBackground(String... params) {
-		HttpClient client = null;
+		HttpClient httpClient = null;
 		HttpResponse httpResponse = null;
-		String response;
+		String responseStr = null;
 
 		try {
 			final HttpParams httpParams = new BasicHttpParams();
-			//Set timeout length to 30 seconds
-			HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
-			client = new DefaultHttpClient(httpParams);
-			final HttpGet request = new HttpGet(SERVER_URL_GET);
+			//Set timeout length to 10 seconds
+			HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
+			httpClient = new DefaultHttpClient(httpParams);
+			final HttpGet get = new HttpGet(SERVER_URL_GET);
 			if (!isCancelled()) {
-				httpResponse = client.execute(request);
+				httpResponse = httpClient.execute(get);
 			}
-			final InputStream is = httpResponse.getEntity().getContent();
-			Scanner scanner = new Scanner(is).useDelimiter("\\A");
-			response = scanner.hasNext() ? scanner.next() : "";
-			scanner.close();
-		} catch (ConnectTimeoutException e) {
+
+			if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				final String entity = EntityUtils.toString(httpResponse.getEntity()).trim();
+				if (entity != null) {
+					responseStr = entity;
+				}
+			} else {
+				throw new HttpException(httpResponse.getStatusLine().getReasonPhrase());
+			}
+		} catch (HttpException e) {
 			e.printStackTrace();
-			response = "Connection timeout error.";
-		} catch (UnknownHostException e) {
+			responseStr = e.getMessage();
+		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-			response = "Unknown host error.";
+			responseStr = "ERROR: client protocol problem.";
 		} catch (IOException e) {
 			e.printStackTrace();
-			response = "IO error.";
+			responseStr = "ERROR: I/O problem.";
 		} finally {
-			client.getConnectionManager().shutdown();
+			httpClient.getConnectionManager().shutdown();
 		}
 
-		return onResponse(response);
+		return onResponse(responseStr);
 	}
-	
+
 	@Override
 	protected void onPostExecute(Result formattedResponse) {
 		super.onPostExecute(formattedResponse);
 	}
-	
+
 	protected abstract Result onResponse(String response);
 
 }

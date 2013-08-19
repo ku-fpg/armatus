@@ -17,6 +17,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.MainActivity;
+import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.EditManager.Edit;
 import edu.kufpg.armatus.command.CommandDispatcher;
@@ -31,10 +32,11 @@ import edu.kufpg.armatus.dialog.GestureDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
 import edu.kufpg.armatus.dialog.WordCompletionDialog;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
-import edu.kufpg.armatus.server.BluetoothDeviceListActivity;
-import edu.kufpg.armatus.server.BluetoothUtils;
-import edu.kufpg.armatus.server.HermitClient;
-import edu.kufpg.armatus.server.HermitWebClient;
+import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
+import edu.kufpg.armatus.networking.BluetoothUtils;
+import edu.kufpg.armatus.networking.HermitClient;
+import edu.kufpg.armatus.networking.HermitWebClient;
+import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.JsonUtils;
 import edu.kufpg.armatus.util.StringUtils;
 import android.app.DialogFragment;
@@ -43,6 +45,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -120,6 +123,7 @@ public class ConsoleActivity extends BaseActivity {
 	private boolean mSearchEnabled = false;
 	private int mConsoleInputNum = 0;
 	private int mConsoleEntriesHeight, mConsoleInputHeight, mScreenHeight, mConsoleWidth;
+	private SharedPreferences mPrefs;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -140,6 +144,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNumView = (TextView) mConsoleInputLayout.findViewById(R.id.console_input_num);
 		mConsoleInputEditText = (ConsoleInputEditText) mConsoleInputLayout.findViewById(R.id.console_input_edit_text);
+		mPrefs = PrefsActivity.getPrefs(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		if (savedInstanceState == null) {
@@ -384,7 +389,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case BluetoothUtils.REQUEST_ENABLE_BLUETOOTH:
 			if (CommandDispatcher.isCommandPending()) {
@@ -392,6 +397,17 @@ public class ConsoleActivity extends BaseActivity {
 					CommandDispatcher.runDelayedCommand(this);
 				} else {
 					appendConsoleEntry("ERROR: Failed to enable Bluetooth.");
+				}
+			}
+			break;
+		case InternetUtils.REQUEST_ENABLE_WIFI:
+			if (CommandDispatcher.isCommandPending()) {
+				//Unfortunately, ACTION_PICK_WIFI_NETWORK doesn't use RESULT_OK, so we
+				//have to check the Wi-Fi state manually.
+				if (InternetUtils.isWifiConnected(this)) {
+					CommandDispatcher.runDelayedCommand(this);
+				} else {
+					appendConsoleEntry("ERROR: Failed to enable Wi-Fi.");
 				}
 			}
 			break;
@@ -517,8 +533,8 @@ public class ConsoleActivity extends BaseActivity {
 					mHistory.put(COMMANDS_HISTORY_TAG, commandHistory);
 
 					String path = "";
-					if (getPrefs().getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
-						path = getPrefs().getString(HISTORY_DIR_KEY, null);
+					if (mPrefs.getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
+						path = mPrefs.getString(HISTORY_DIR_KEY, null);
 					} else {
 						path = CACHE_DIR;
 					}
@@ -542,8 +558,8 @@ public class ConsoleActivity extends BaseActivity {
 					@Override
 					protected void yes(DialogInterface dialog, int whichButton) {
 						String path = "";
-						if (getPrefs().getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
-							path = getPrefs().getString(HISTORY_DIR_KEY, null);
+						if (mPrefs.getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
+							path = mPrefs.getString(HISTORY_DIR_KEY, null);
 						} else {
 							path = CACHE_DIR;
 						}
@@ -735,7 +751,7 @@ public class ConsoleActivity extends BaseActivity {
 	
 	public void exit() {
 		getEditManager().discardAllEdits();
-		if (getPrefs().getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
+		if (mPrefs.getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
 			if (BluetoothUtils.isBluetoothConnected(this)) {
 				BluetoothUtils.closeBluetooth();
 			}

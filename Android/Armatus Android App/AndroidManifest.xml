@@ -56,7 +56,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.kufpg.armatus.server.BluetoothDeviceListActivity"
+            android:name="edu.kufpg.armatus.networking.BluetoothDeviceListActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/bluetooth_select_device_title" />
     </application>

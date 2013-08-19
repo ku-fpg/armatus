@@ -142,8 +142,8 @@ public class BaseActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		PACKAGE_NAME = getApplicationContext().getPackageName();
 		DEVICE_NAME = Build.MANUFACTURER + " " + Build.PRODUCT;
-		sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		sPrefsEditor = sPrefs.edit();
+		sPrefs = PrefsActivity.getPrefs(this);
+		sPrefsEditor = PrefsActivity.getPrefsEditor(this);
 		IS_HISTORY_DIR_CUSTOM_KEY = getResources().getString(R.string.pref_is_history_dir_custom);
 		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
 		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
@@ -293,27 +293,8 @@ public class BaseActivity extends Activity {
 	 * Returns the application-level {@link EditManager}.
 	 * @return the application-level {@link EditManager}.
 	 */
-	protected EditManager getEditManager() {
+	protected static EditManager getEditManager() {
 		return sEditManager;
-	}
-
-	/**
-	 * Returns an instance of this app's {@link SharedPreferences}, which allow you to look
-	 * up persistent preference data using their keys.
-	 * @return the app's {@code SharedPreferences}.
-	 */
-	protected static SharedPreferences getPrefs() {
-		return sPrefs;
-	}
-
-	/**
-	 * Returns a {@link SharedPreferences.Editor}, which allows you to modify the app's
-	 * persistent preference data. Make sure to call {@link SharedPreferences.Editor#commit()
-	 * commit()} after making any changes.
-	 * @return the app's {@code SharedPreferences} editor.
-	 */
-	protected static SharedPreferences.Editor getPrefsEditor() {
-		return sPrefsEditor;
 	}
 
 	/**

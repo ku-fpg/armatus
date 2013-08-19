@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.server;
+package edu.kufpg.armatus.networking;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -47,7 +47,7 @@ public class BluetoothUtils {
 	private static BluetoothDevice sDevice;
 
 	private static BluetoothSocket sSocket;
-	
+
 	private static boolean sLastConnectionFailed = false;
 
 	/** Reference to the app's {@link SharedPreferences}. */
@@ -75,6 +75,36 @@ public class BluetoothUtils {
 			sSocket = null;
 		}
 		sDevice = null;
+	}
+
+	/**
+	 * If Bluetooth is not already on, this method prompts the user to turn on Bluetooth.
+	 * @param activity The {@link Activity} that will handle the result (with the {@code
+	 * requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
+	 */
+	public static void enableBluetooth(Activity activity) {
+		if (getBluetoothAdapter(activity) != null) {
+			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
+		} else {
+			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
+					+ BaseActivity.DEVICE_NAME + ").");
+		}
+	}
+
+	/**
+	 * If Bluetooth is not already on, this method prompts the user to turn on Bluetooth.
+	 * @param activity The {@link Fragment} that will handle the result (with the {@code
+	 * requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
+	 */
+	public static void enableBluetooth(Fragment fragment) {
+		if (getBluetoothAdapter(fragment.getActivity()) != null) {
+			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			fragment.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
+		} else {
+			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
+					+ BaseActivity.DEVICE_NAME + ").");
+		}
 	}
 
 	/**
@@ -155,36 +185,6 @@ public class BluetoothUtils {
 	}
 
 	/**
-	 * If Bluetooth is not already on, this method prompts the user to turn on Bluetooth.
-	 * @param activity The {@link Activity} that will handle the result (with the {@code
-	 * requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
-	 */
-	public static void enableBluetooth(Activity activity) {
-		if (getBluetoothAdapter(activity) != null) {
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
-		} else {
-			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
-		}
-	}
-
-	/**
-	 * If Bluetooth is not already on, this method prompts the user to turn on Bluetooth.
-	 * @param activity The {@link Fragment} that will handle the result (with the {@code
-	 * requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
-	 */
-	public static void enableBluetooth(Fragment fragment) {
-		if (getBluetoothAdapter(fragment.getActivity()) != null) {
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			fragment.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
-		} else {
-			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
-		}
-	}
-
-	/**
 	 * Starts an {@link Intent} that allows the user to select a Bluetooth device from a list
 	 * of nearby devices.
 	 * @param activity The {@link Activity} that will handle the result (with the {@code
@@ -255,15 +255,15 @@ public class BluetoothUtils {
 			return false;
 		}
 	}
-	
+
 	public static boolean lastConnectionFailed() {
 		return sLastConnectionFailed;
 	}
-	
+
 	public static void notifyLastConnectionFailed() {
 		sLastConnectionFailed = true;
 	}
-	
+
 	public static void notifyLastConnectionSucceeded() {
 		sLastConnectionFailed = false;
 	}
@@ -288,9 +288,7 @@ public class BluetoothUtils {
 	 * @return The app's {@code SharedPreferences}.
 	 */
 	private static SharedPreferences getPrefs(Context context) {
-		if (sPrefs == null) {
-			sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		}
+		sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		return sPrefs;
 	}
 
