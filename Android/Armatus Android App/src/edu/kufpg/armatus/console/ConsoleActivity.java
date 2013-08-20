@@ -42,7 +42,6 @@ import edu.kufpg.armatus.util.StringUtils;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,18 +55,18 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.View.OnLayoutChangeListener;
-import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
@@ -207,21 +206,14 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		});
 
-		mConsoleEmptySpace.setOnClickListener(new OnClickListener() {
+		mConsoleEmptySpace.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public void onClick(View v) {
-				if (!mSoftKeyboardVisibility) {
-					((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
-					.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
-					mConsoleInputEditText.requestFocus();
-				}
-			}
-		});
-		mConsoleEmptySpace.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				mConsoleInputEditText.performLongClick();
-				return false;
+			public boolean onTouch(View v, MotionEvent event) {
+				/* Allows empty space to serve as "continuation" of the input EditText, so
+				 * if the user clicks or long-clicks the empty space, then the input
+				 * EditText will receive the touch event.
+				 */
+				return mConsoleInputEditText.dispatchTouchEvent(event);
 			}
 		});
 		mConsoleEmptySpace.setOnDragListener(new OnDragListener() {
@@ -233,9 +225,11 @@ public class ConsoleActivity extends BaseActivity {
 					return true;
 				case DragEvent.ACTION_DROP:
 				case DragEvent.ACTION_DRAG_ENDED:
-					View dragSource = (View) event.getLocalState();
-					if (dragSource != null) {
-						dragSource.setVisibility(View.VISIBLE);
+					if (event.getLocalState() instanceof View) {
+						View dragSource = (View) event.getLocalState();
+						if (dragSource != null) {
+							dragSource.setVisibility(View.VISIBLE);
+						}
 					}
 					return true;
 				default:
@@ -748,7 +742,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputLayout.setVisibility(View.VISIBLE);
 		mConsoleInputEditText.requestFocus();
 	}
-	
+
 	public void exit() {
 		getEditManager().discardAllEdits();
 		if (mPrefs.getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
@@ -782,7 +776,7 @@ public class ConsoleActivity extends BaseActivity {
 	public SlidingMenu getSlidingMenu() {
 		return mSlidingMenu;
 	}
-	
+
 	public boolean isSoftKeyboardVisible() {
 		return mSoftKeyboardVisibility;
 	}
