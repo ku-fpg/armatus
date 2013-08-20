@@ -60,7 +60,6 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
-import android.view.View.OnLayoutChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -99,7 +98,7 @@ public class ConsoleActivity extends BaseActivity {
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
 	private HermitClient mHermitClient;
-	private RelativeLayout mConsoleLayout, mConsoleInputLayout;
+	private RelativeLayout mConsoleInputLayout;
 	private ConsoleListView mConsoleListView;
 	private ListView mCommandHistoryListView;
 	private ExpandableListView mCommandExpandableMenuView;
@@ -121,7 +120,6 @@ public class ConsoleActivity extends BaseActivity {
 	private boolean mSoftKeyboardVisibility = true;
 	private boolean mSearchEnabled = false;
 	private int mConsoleInputNum = 0;
-	private int mConsoleEntriesHeight, mConsoleInputHeight, mScreenHeight, mConsoleWidth;
 	private SharedPreferences mPrefs;
 
 	@SuppressWarnings("unchecked")
@@ -132,7 +130,6 @@ public class ConsoleActivity extends BaseActivity {
 		setContentView(R.layout.console_sliding_menu_activity);
 		setProgressBarIndeterminate(true);
 
-		mConsoleLayout = (RelativeLayout) findViewById(R.id.console_list_layout);
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		mCommandHistoryListView = (ListView) findViewById(R.id.command_history_list);
@@ -181,16 +178,6 @@ public class ConsoleActivity extends BaseActivity {
 				}
 			}
 		}
-
-		mConsoleLayout.addOnLayoutChangeListener(new OnLayoutChangeListener() {
-			@Override
-			public void onLayoutChange(View v, int left, int top, int right,
-					int bottom, int oldLeft, int oldTop, int oldRight,
-					int oldBottom) {
-				mScreenHeight = mConsoleLayout.getMeasuredHeight();
-				resizeEmptySpace();
-			}
-		});
 
 		rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
@@ -242,24 +229,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleListAdapter = new ConsoleEntryAdapter(this, mConsoleEntries);
 		mConsoleListView.addFooterView(mConsoleInputLayout);
 		mConsoleListView.setAdapter(mConsoleListAdapter); //MUST be called after addFooterView()
-		mConsoleListView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
-			@Override
-			public void onLayoutChange(View v, int left, int top, int right,
-					int bottom, int oldLeft, int oldTop, int oldRight,
-					int oldBottom) {
-				mConsoleEntriesHeight = 0;
-				for (int i = 0; i < getEntryCount(); i++) {
-					View child = mConsoleListView.getAdapter().getView(i, null, mConsoleListView);
-					child.measure(MeasureSpec.makeMeasureSpec(mConsoleWidth, MeasureSpec.AT_MOST),
-							MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-					mConsoleEntriesHeight += child.getMeasuredHeight();
-					if (mConsoleEntriesHeight >= mScreenHeight) {
-						break;
-					}
-				}
-				resizeEmptySpace();
-			}
-		});
 
 		if (savedInstanceState == null) {
 			mSearcher = new ConsoleSearcher(mConsoleListAdapter);
@@ -318,16 +287,6 @@ public class ConsoleActivity extends BaseActivity {
 
 				}
 				return false;
-			}
-		});
-		mConsoleInputLayout.addOnLayoutChangeListener(new OnLayoutChangeListener() {
-			@Override
-			public void onLayoutChange(View v, int left, int top, int right,
-					int bottom, int oldLeft, int oldTop, int oldRight,
-					int oldBottom) {
-				mConsoleInputHeight = mConsoleInputLayout.getMeasuredHeight();
-				mConsoleWidth = mConsoleInputLayout.getMeasuredWidth();
-				resizeEmptySpace();
 			}
 		});
 
@@ -855,14 +814,9 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	private synchronized void resizeEmptySpace() {
-		mConsoleEmptySpace.post(new Runnable() {
-			@Override
-			public void run() {
-				mConsoleEmptySpace.getLayoutParams().height = mScreenHeight - mConsoleEntriesHeight - mConsoleInputHeight;
-				mConsoleEmptySpace.requestLayout();
-			}
-		});
+	void resizeEmptySpace(int newHeight) {
+		mConsoleEmptySpace.getLayoutParams().height = newHeight;
+		mConsoleEmptySpace.requestLayout();
 	}
 
 	/**
@@ -918,8 +872,6 @@ public class ConsoleActivity extends BaseActivity {
 		}
 		mConsoleListAdapter.notifyDataSetChanged();
 		updateInput();
-
-		resizeEmptySpace();
 	}
 
 	void updateConsoleEntries(int inputNum, List<ConsoleEntry> newEntries) {
