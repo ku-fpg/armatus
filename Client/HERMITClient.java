@@ -1,18 +1,38 @@
 import java.util.List;
+import org.json.JSONObject; // This is part of the Android API
 
 public class HERMITClient {
 
-    public HERMITClient() {}
+    private HERMITClient() {}
 
-    public Token connect(String url) {
+    private Token token;
+    private Connection connection;
+
+    /*
+     * This version of post take a JSONObject,
+     * and returns a JSONObject. 
+     *
+     */
+    private JSONObject post(String url,JSONObject arg) {
+	String result = connection.post(url,arg.toString());
+	return new JSONObject(result);
+    }
+
+    public static HERMITClient connect(Connection connection) {
+	// remember the server to talk to,
+	// and initialize the class-specific token.
+
+	connection.post("/connect","");
+
 	return null;
     }
 
-    public CommandResponse command(Token token, String str) {
+    // Q: can two command-calls be in flight at the same time?
+    public CommandResponse command(String str) {
 	return null;
     }
 
-    public List<CommandInfo> commands(Token token) {
+    public List<CommandInfo> commands() {
 	return null;
     }
 
@@ -61,6 +81,14 @@ public class HERMITClient {
 	    this.unique = unique;
 	    this.token = token;
 	}
+    }
+
+    public abstract class Continuation<V> {
+	public abstract void call(V o);
+    }
+
+    public abstract class Connection {
+	public abstract String post(String url,String json);
     }
 
 }
