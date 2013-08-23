@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jeremyfeinstein.slidingmenu.lib.SlidingMenu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sliding="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/console_sliding_menu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    sliding:fadeDegree="0.35"
+    sliding:mode="left_right"
+    sliding:shadowWidth="@dimen/shadow_width"
+    sliding:touchModeAbove="fullscreen"
+    sliding:viewAbove="@layout/console_list_activity"
+    sliding:viewBehind="@layout/command_expandable_menu"
+    sliding:viewBehindSecondary="@layout/command_history_menu" />

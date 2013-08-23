@@ -1,0 +1,149 @@
+<resources>
+
+    <color name="command_expandable_menu_background_dark">#242424</color>
+    <color name="command_expandable_menu_background_light">#f2f2f2</color>
+
+    <string name="app_name">Armatus</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Armatus</string>
+    <string name="title_preference_screen">Armatus preferences</string>
+    <string name="default_pref_message">Are you sure you want to restore the default settings?</string>
+    <string name="popup_text">Font size:</string>
+    <string name="copy">COPY</string>
+    <string name="select">SELECT</string>
+    <string name="enable_wifi_title">Wi-Fi permission request</string>
+    <string name="enable_wifi_message">Armatus is requesting permission to turn on Wi-Fi. Do you want to do this?</string>
+    <string name="terminal_not_installed_title">Error: ATE not installed</string>
+    <string name="terminal_not_installed_message">To use the terminal, you must install the Android Terminal Emulator app. Afterwards, you must reinstall Armatus. Would you like to install ATE from the Play store now?</string>
+    <string name="console_exit_title">Are you sure you want to exit?</string>
+    <string name="console_exit_message">All unsaved progress will be lost. Do you still want to exit the console?</string>
+    <string name="console_load_history_title">Are you sure you want to load session history?</string>
+    <string name="console_load_history_message">All unsaved progress will be lost. Do you still want to load session history?</string>
+    <string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
+    <string name="swap">swap</string>
+    
+    <!--  SharedPreferences -->
+    <string name="pref_is_history_dir_custom">IS_HISTORY_DIR_CUSTOM</string>
+    <string name="pref_history_dir">HISTORY_DIR</string>
+    <string name="pref_edit_mode">EDIT_MODE</string>
+    <string name="pref_app_theme">APP_THEME</string>
+    <string name="pref_app_theme_dark">THEME_DARK</string>
+    <string name="pref_app_theme_light">THEME_LIGHT</string>
+    <string name="pref_network_source">NETWORK_SOURCE</string>
+    <string name="pref_network_source_web">WEB_SERVER</string>
+    <string name="pref_network_source_bluetooth">BLUETOOTH_SERVER</string>
+    <string name="pref_choose_bluetooth_device">CHOOSE_BLUETOOTH_DEVICE</string>
+    <string name="pref_bluetooth_device_name">BLUETOOTH_DEVICE_NAME</string>
+    <string name="pref_bluetooth_device_address">BLUETOOTH_DEVICE_ADDRESS</string>
+    <string name="pref_restore_defaults">RESTORE_DEFAULTS</string>
+
+    <!-- BluetoothDeviceListActivity -->
+    <string name="bluetooth_scanning_title">Scanning for devices…</string>
+    <string name="bluetooth_select_device_title">Select a device to connect</string>
+    <string name="bluetooth_paired_devices_heading">Paired Devices</string>
+    <string name="bluetooth_other_devices_heading">Other Available Devices</string>
+    <string name="bluetooth_button_scan">Scan for devices</string>
+    <string name="bluetooth_button_cancel">Cancel scan</string>
+
+    <string-array name="command_groups">
+        <item>Alpha Conversation</item>
+        <item>Fix Point</item>
+        <item>Local</item>
+        <item>New/Debug/Nav/GHC</item>
+        <item>Fold/Unfold/Inline</item>
+        <item>Miscellaneous</item>
+    </string-array>
+
+    <array name="command_group_arrays">
+        <item>@array/alpha_conversation_commands</item>
+        <item>@array/fix_point_commands</item>
+        <item>@array/local_commands</item>
+        <item>@array/new_debug_nav_ghc_commands</item>
+        <item>@array/unfold_fold_inline_commands</item>
+    </array>
+
+    <string-array name="alpha_conversation_commands">
+        <item name="id">1</item>
+        <item>alpha</item>
+        <item>alpha-alt</item>
+        <item>alpha-case</item>
+        <item>alpha-case-binder</item>
+        <item>alpha-lam</item>
+        <item>alpha-let</item>
+        <item>alpha-top</item>
+        <item>undershadow</item>
+    </string-array>
+    <string-array name="fix_point_commands">
+        <item name="id">2</item>
+        <item>fix-computation</item>
+        <item>fix-intro</item>
+        <item>rolling-rule</item>
+        <item>ww-assumption-a</item>
+        <item>ww-assumption-b</item>
+        <item>ww-assumption-c</item>
+        <item>ww-factorisation</item>
+        <item>ww-fusion</item>
+        <item>ww-split</item>
+        <item>ww-split-param</item>
+    </string-array>
+    <string-array name="local_commands">
+        <item name="id">3</item>
+        <item>abstract</item>
+        <item>beta-expand</item>
+        <item>beta-reduce</item>
+        <item>beta-reduce-plus</item>
+        <item>eta-expand</item>
+        <item>eta-reduce</item>
+        <item>flatten-module</item>
+        <item>flatten-program</item>
+        <item>nonrec-to-rec</item>
+    </string-array>
+    <string-array name="new_debug_nav_ghc_commands">
+        <item name="id">4</item>
+        <item>add-rule</item>
+        <item>any-call</item>
+        <item>apply-rule</item>
+        <item>apply-rules</item>
+        <item>binding-group-of</item>
+        <item>cast-eliminate</item>
+        <item>cleanup-unfold</item>
+        <item>compare-values</item>
+        <item>consider</item>
+        <item>consider-construct</item>
+        <item>consider-name</item>
+        <item>debug-unfold</item>
+        <item>deshadow-program</item>
+        <item>free-ids</item>
+        <item>info</item>
+        <item>inline-all</item>
+        <item>let-sub</item>
+        <item>let-tuple</item>
+        <item>observe</item>
+        <item>observe-fail</item>
+        <item>occure-analysis</item>
+        <item>push</item>
+        <item>resume</item>
+        <item>rhs-of</item>
+        <item>safe-let-sub</item>
+        <item>simplify</item>
+        <item>static-argument</item>
+        <item>test</item>
+        <item>trace</item>
+        <item>unfold-rule</item>
+        <item>unsafe-replace</item>
+        <item>variable</item>
+    </string-array>
+    <string-array name="unfold_fold_inline_commands">
+        <item name="id">5</item>
+        <item>fold</item>
+        <item>fold-remembered</item>
+        <item>inline</item>
+        <item>inline-case-binder</item>
+        <item>inline-name</item>
+        <item>inline-scrutinee</item>
+        <item>remember</item>
+        <item>unfold</item>
+    </string-array>
+
+</resources>

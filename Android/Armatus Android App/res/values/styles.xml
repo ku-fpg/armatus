@@ -1,0 +1,43 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="ThemeDark" parent="android:Theme.Holo">
+        <item name="actionCancel">@drawable/ic_action_cancel_dark</item>
+        <item name="actionComplete">@drawable/ic_action_complete_dark</item>
+        <item name="actionCopy">@drawable/ic_action_copy_dark</item>
+        <item name="actionFindNext">@drawable/ic_action_find_next_dark</item>
+        <item name="actionFindPrevious">@drawable/ic_action_find_previous_dark</item>
+        <item name="actionGestures">@drawable/ic_action_gestures_dark</item>
+        <item name="actionRedo">@drawable/ic_action_redo_dark</item>
+        <item name="actionSelect">@drawable/ic_action_select_dark</item>
+        <item name="actionSwap">@drawable/ic_action_swap_dark</item>
+        <item name="actionUndo">@drawable/ic_action_undo_dark</item>
+        <item name="codeColor">@android:color/white</item>
+        <item name="commandExpandableMenuGroupBackground">@color/command_expandable_menu_background_dark</item>
+        <item name="consoleBackgroundColor">@android:color/black</item>
+        <item name="consoleListSelector">@drawable/console_list_selector_dark</item>
+        <item name="expanderClose">@drawable/expander_close_holo_dark</item>
+        <item name="expanderGroup">@drawable/expander_group_holo_dark</item>
+        <item name="expanderOpen">@drawable/expander_open_holo_dark</item>
+    </style>
+
+    <style name="ThemeLight" parent="android:Theme.Holo.Light">
+        <item name="actionCancel">@drawable/ic_action_cancel_light</item>
+        <item name="actionComplete">@drawable/ic_action_complete_light</item>
+        <item name="actionCopy">@drawable/ic_action_copy_light</item>
+        <item name="actionFindNext">@drawable/ic_action_find_next_light</item>
+        <item name="actionFindPrevious">@drawable/ic_action_find_previous_light</item>
+        <item name="actionGestures">@drawable/ic_action_gestures_light</item>
+        <item name="actionRedo">@drawable/ic_action_redo_light</item>
+        <item name="actionSelect">@drawable/ic_action_select_light</item>
+        <item name="actionSwap">@drawable/ic_action_swap_light</item>
+        <item name="actionUndo">@drawable/ic_action_undo_light</item>
+        <item name="codeColor">@android:color/black</item>
+        <item name="commandExpandableMenuGroupBackground">@color/command_expandable_menu_background_light</item>
+        <item name="consoleBackgroundColor">@android:color/white</item>
+        <item name="consoleListSelector">@drawable/console_list_selector_light</item>
+        <item name="expanderClose">@drawable/expander_close_holo_light</item>
+        <item name="expanderGroup">@drawable/expander_group_holo_light</item>
+        <item name="expanderOpen">@drawable/expander_open_holo_light</item>
+    </style>
+
+</resources>

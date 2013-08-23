@@ -1,0 +1,66 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <group android:id="@+id/menu_icons_group" >
+        <item
+            android:id="@+id/undo"
+            android:icon="?attr/actionUndo"
+            android:orderInCategory="1"
+            android:showAsAction="always|withText"
+            android:title="Undo"/>
+        <item
+            android:id="@+id/redo"
+            android:icon="?attr/actionRedo"
+            android:orderInCategory="2"
+            android:showAsAction="always|withText"
+            android:title="Redo"/>
+        <item
+            android:id="@+id/complete"
+            android:icon="?attr/actionComplete"
+            android:orderInCategory="3"
+            android:showAsAction="ifRoom"
+            android:title="Complete"
+            android:visible="false"/>
+        <item
+            android:id="@+id/gestures"
+            android:icon="?attr/actionGestures"
+            android:orderInCategory="4"
+            android:showAsAction="ifRoom"
+            android:title="Gestures"
+            android:visible="false"/>
+    </group>
+
+    <item
+        android:id="@+id/find_text_option"
+        android:orderInCategory="93"
+        android:showAsAction="never"
+        android:title="Find text"
+        android:visible="false"/>
+    <item
+        android:id="@+id/find_text_action"
+        android:actionLayout="@layout/find_text"
+        android:orderInCategory="94"
+        android:showAsAction="always"
+        android:visible="false"/>
+
+    <group android:id="@+id/history_group" >
+        <item
+            android:id="@+id/save_history"
+            android:orderInCategory="98"
+            android:showAsAction="never"
+            android:title="Save history"
+            android:visible="false"/>
+        <item
+            android:id="@+id/load_history"
+            android:orderInCategory="99"
+            android:showAsAction="never"
+            android:title="Load history"
+            android:visible="false"/>
+    </group>
+
+    <item
+        android:id="@+id/menu_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_settings"/>
+
+</menu>

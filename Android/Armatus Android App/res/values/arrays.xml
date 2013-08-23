@@ -1,0 +1,30 @@
+<resources>
+
+    <string-array name="edit_mode_entries">
+        <item>Read</item>
+        <item>Write</item>
+        <item>Arithmetic</item>
+    </string-array>
+    <string-array name="edit_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="app_theme_entries">
+        <item>Dark theme</item>
+        <item>Light theme</item>
+    </string-array>
+    <string-array name="app_theme_values">
+        <item>@string/pref_app_theme_dark</item>
+        <item>@string/pref_app_theme_light</item>
+    </string-array>
+    <string-array name="network_source_entries">
+        <item>Web server</item>
+        <item>Bluetooth server</item>
+    </string-array>
+    <string-array name="network_source_values">
+        <item>@string/pref_network_source_web</item>
+        <item>@string/pref_network_source_bluetooth</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,64 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="edu.kufpg.armatus"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="18" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="jackpal.androidterm.permission.RUN_SCRIPT" />
+
+    <supports-screens android:smallScreens="false" />
+
+    <application
+        android:name=".BaseApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name="edu.kufpg.armatus.MainActivity"
+            android:label="@string/title_activity_main" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".PrefsActivity"
+            android:label="@string/title_preference_screen" />
+        <activity
+            android:name=".console.ConsoleActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".treelistview.TreeListViewDemo"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".TextSizePinchZoomActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.ipaulpro.afilechooser.FileChooserActivity"
+            android:icon="@drawable/ic_chooser"
+            android:label="@string/choose_file" >
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="edu.kufpg.armatus.networking.BluetoothDeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/bluetooth_select_device_title" />
+    </application>
+
+</manifest>

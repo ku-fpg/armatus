@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="Editor settings" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_is_history_dir_custom"
+            android:summaryOff="Use app cache"
+            android:summaryOn="Specify location manually"
+            android:title="Saved history source" />
+
+        <Preference
+            android:dependency="@string/pref_is_history_dir_custom"
+            android:key="@string/pref_history_dir"
+            android:title="Edit saved history directory" />
+
+        <ListPreference
+            android:defaultValue="0"
+            android:dialogTitle="Select an edit mode"
+            android:entries="@array/edit_mode_entries"
+            android:entryValues="@array/edit_mode_values"
+            android:key="@string/pref_edit_mode"
+            android:summary="Defines what commands can be performed on the code"
+            android:title="Edit mode" />
+
+        <edu.kufpg.armatus.util.UpdatingListPreference
+            android:defaultValue="@string/pref_app_theme_dark"
+            android:dialogTitle="Select a theme"
+            android:entries="@array/app_theme_entries"
+            android:entryValues="@array/app_theme_values"
+            android:key="@string/pref_app_theme"
+            android:summary="%s"
+            android:title="App theme" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Networking" >
+        <edu.kufpg.armatus.util.UpdatingListPreference
+            android:defaultValue="@string/pref_network_source_web"
+            android:dialogTitle="Select a network source"
+            android:entries="@array/network_source_entries"
+            android:entryValues="@array/network_source_values"
+            android:key="@string/pref_network_source"
+            android:summary="%s"
+            android:title="Network source" />
+
+        <Preference
+            android:key="@string/pref_choose_bluetooth_device"
+            android:title="Choose Bluetooth device" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Miscellaneous" >
+        <Preference
+            android:key="@string/pref_restore_defaults"
+            android:title="Restore default settings" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

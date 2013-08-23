@@ -21,10 +21,17 @@ Software used
 -----
 —<a href="http://www.cosmix.org/software/">Droid Sans Mono</a> (w/ dotted zero) copyright Ascender Corp. under the Apache License, modified by <a href="http://www.cosmix.org">cosmix.org</a>
 
+—<a href="http://code.google.com/p/guava-libraries/">Guava</a> by Google under the Apache License 2.0
+
+—<a href="https://github.com/RyanGlScott/AsyncActivityTask">AsyncActivityTask</a>, a modification of <a href="https://github.com/callorico/CustomAsyncTask">CustomAsyncTask</a> by <a href="https://github.com/callorico">Ryan "callorico" Kaneshiro</a>.
+
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
+<<<<<<< HEAD
 
-—<a href="https://github.com/mrKlar/PagedDragDropGrid">PagedDragDropGrid</a> by <a href="https://github.com/mrKlar">Nicolas "mrKlar" Desjardins</a> under a custom open-source license
+—<a href="http://code.google.com/p/tree-view-list-android/">tree-view-list-android</a> by <a href="http://code.google.com/u/109485687940011053436/">Jarek Potiuk</a> under the New BSD License
+=======
+>>>>>>> refs/remotes/origin/Test
 
-—<a href="https://github.com/thquinn/DraggableGridView">DraggableGridView</a> by <a href="https://github.com/thquinn">Tom "thquinn" Quinn</a> under the Apache License 2.0
+—<a href="https://github.com/iPaulPro/aFileChooser">aFileChooser</a> by <a href="https://github.com/iPaulPro">Paul "iPaulPro" Burke</a> under the Apache License 2.0
 
 —<a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> by <a href="https://github.com/jackpal">Jack "jackpal" Palevich</a> under the Apache Licence 2.0

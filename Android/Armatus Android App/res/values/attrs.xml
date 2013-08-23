@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="themeAttrs">
+        <attr name="actionCancel" format="reference" />
+        <attr name="actionComplete" format="reference" />
+        <attr name="actionCopy" format="reference" />
+        <attr name="actionFindNext" format="reference" />
+        <attr name="actionFindPrevious" format="reference" />
+        <attr name="actionGestures" format="reference" />
+        <attr name="actionRedo" format="reference" />
+        <attr name="actionSelect" format="reference" />
+        <attr name="actionSwap" format="reference" />
+        <attr name="actionUndo" format="reference" />
+        <attr name="activityDialog" format="reference" />
+        <attr name="codeColor" format="reference" />
+        <attr name="commandExpandableMenuGroupBackground" format="reference" />
+        <attr name="consoleBackgroundColor" format="reference" />
+        <attr name="consoleListSelector" format="reference" />
+        <attr name="expanderClose" format="reference" />
+        <attr name="expanderGroup" format="reference" />
+        <attr name="expanderOpen" format="reference" />
+    </declare-styleable>
+
+</resources>

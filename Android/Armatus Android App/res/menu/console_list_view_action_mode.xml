@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/copy"
+        android:icon="?attr/actionCopy"
+        android:orderInCategory="1"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/copy"
+        android:titleCondensed="@string/copy">
+    </item>
+    <item
+        android:id="@+id/select"
+        android:icon="?attr/actionSelect"
+        android:orderInCategory="2"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/select"
+        android:titleCondensed="@string/select">
+    </item>
+    <item
+        android:id="@+id/swap"
+        android:icon="?attr/actionSwap"
+        android:orderInCategory="3"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/swap"
+        android:titleCondensed="@string/swap">
+    </item>
+
+</menu>

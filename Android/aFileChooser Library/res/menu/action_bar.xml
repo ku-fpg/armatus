@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/go_to_parent"
+        android:icon="@drawable/ic_go_to_parent"
+        android:showAsAction="always"
+        android:title="@string/parent_directory"/>
+
+</menu>
