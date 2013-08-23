@@ -26,6 +26,11 @@ class HERMITClientTest {
 
                 System.out.println("created client");
 
+                HERMITClient.CommandResponse resp = client.command("consider 'fib");
+
+                System.out.println("got reply : " + resp.toString());
+
         }
+
 
 }
