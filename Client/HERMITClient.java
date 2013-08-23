@@ -15,24 +15,29 @@ public class HERMITClient {
      * This version of post take a JSONObject,
      * and returns a JSONObject. 
      *
-     */
-    private JSONObject post(String url,JSONObject arg) {
+         private JSONObject post(String url,JSONObject arg) {
         String result = connection.post(url,arg.toString());
         return new JSONObject(result);
     }
+     */
+
 
     public static HERMITClient connect(Connection connection) {
         // remember the server to talk to,
         // and initialize the class-specific token.
 
-        String result = connection.post("/connect","");
-        JSONObject jsonToken = new JSONObject(result);
+        try {
+                String result = connection.post("/connect","");
+                JSONObject jsonToken = new JSONObject(result);
+                
+                HERMITClient client = new HERMITClient();
+                client.token = new Token(jsonToken);
+                client.connection = connection;
 
-        HERMITClient client = new HERMITClient();
-        client.token = null;
-        client.connection = connection;
-
-        return client;
+                return client;
+        } catch (Exception e) {
+                throw new java.lang.Error("something bad has happened");
+        }
     }
 
     // Q: can two command-calls be in flight at the same time?
@@ -132,7 +137,7 @@ public class HERMITClient {
     }
 
     public static abstract class Connection {
-        public abstract String post(String url,String json);
+        public abstract String post(String url,String json) throws java.io.IOException;
     }
 
 }
