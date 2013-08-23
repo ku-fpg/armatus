@@ -16,6 +16,8 @@ class HERMITClientTest {
                                 String result = "";
                                 if (url.equals("/connect")) {
                                         result = "{'unique':99,'token':22}";
+                                } else if (url.equals("/command")) {
+                                        result = "{'token':{'unique':99,'token':23},'glyphs': [{'text':\"Hello\"}]}";
                                 } else {
                                         throw new java.io.IOException("bad url" + url);
                                 }
@@ -29,6 +31,7 @@ class HERMITClientTest {
                 HERMITClient.CommandResponse resp = client.command("consider 'fib");
 
                 System.out.println("got reply : " + resp.toString());
+
 
         }
 

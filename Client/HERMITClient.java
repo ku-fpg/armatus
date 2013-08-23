@@ -11,17 +11,6 @@ public class HERMITClient {
     private Token token;
     private Connection connection;
 
-    /*
-     * This version of post take a JSONObject,
-     * and returns a JSONObject. 
-     *
-         private JSONObject post(String url,JSONObject arg) {
-        String result = connection.post(url,arg.toString());
-        return new JSONObject(result);
-    }
-     */
-
-
     public static HERMITClient connect(Connection connection) {
         // remember the server to talk to,
         // and initialize the class-specific token.
@@ -41,11 +30,21 @@ public class HERMITClient {
     }
 
     // Q: can two command-calls be in flight at the same time?
-    public CommandResponse command(String str) {
-        return null;
+    // A: not for now, synchronized uses a lock for this
+    public synchronized CommandResponse command(String str) {
+        JSONObject o = new JSONObject();
+        o.put("token",token.toJSONObject());
+        o.put("cmd",str);
+        try {
+                String result = connection.post("/command",o.toString());
+                return new HERMITClient.CommandResponse(new JSONObject(result));
+        } catch (Exception e) {
+                throw new java.lang.Error("something bad has happened");                
+        }
     }
 
-    public List<CommandInfo> commands() {
+    public synchronized List<CommandInfo> commands() {
+            // TODO
         return null;
     }
 
