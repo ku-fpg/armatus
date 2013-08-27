@@ -1,11 +1,8 @@
 package edu.kufpg.armatus.dialog;
 
-import java.util.List;
-
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.console.ConsoleEntry;
-import edu.kufpg.armatus.console.PrettyPrinter;
 import edu.kufpg.armatus.util.StringUtils;
 
 import android.content.ClipData;
@@ -13,6 +10,7 @@ import android.content.ClipboardManager;
 import android.content.ClipboardManager.OnPrimaryClipChangedListener;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +25,7 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 	private TextView mContentsView;
 	private OnPrimaryClipChangedListener mClipboardUnwrapper;
 	private int mFirstEntryNum;
-	private String mContents;
+	private CharSequence mContents;
 
 	/**
 	 * Static {@link edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog ConsoleEntrySelectionDialog}. 
@@ -35,21 +33,16 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 	 * @param entries
 	 * @return cesd
 	 */
-	public static ConsoleEntrySelectionDialog newInstance(List<ConsoleEntry> entries) {
+	public static ConsoleEntrySelectionDialog newInstance(int... entryNums) {
 		ConsoleEntrySelectionDialog cesd = new ConsoleEntrySelectionDialog();
 
 		Bundle args = new Bundle();
-		if (entries.size() == 1) {
-			args.putInt("firstEntryNum", entries.get(0).getNum());
+		if (entryNums.length == 1) {
+			args.putInt("firstEntryNum", entryNums[0]);
 		} else {
 			args.putInt("firstEntryNum", -1);
 		}
-		StringBuilder contentsBuilder = new StringBuilder();
-		for (ConsoleEntry entry : entries) {
-			contentsBuilder.append(entry.getFullContents()).append('\n');
-		}
-		contentsBuilder.deleteCharAt(contentsBuilder.length() - 1); //Remove final newline
-		args.putString("contents", contentsBuilder.toString());
+		args.putIntArray("entryNums", entryNums);
 		cesd.setArguments(args);
 
 		return cesd;
@@ -59,7 +52,14 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mFirstEntryNum = getArguments().getInt("firstEntryNum");
-		mContents = getArguments().getString("contents");
+		SpannableStringBuilder contentsBuilder = new SpannableStringBuilder();
+		for (int entryNum : getArguments().getIntArray("entryNums")) {
+			ConsoleEntry entry = getConsole().getEntries().get(entryNum);
+			contentsBuilder.append(entry.getFullContents()).append('\n');
+		}
+		contentsBuilder.delete(contentsBuilder.length() - 1, contentsBuilder.length()); //Remove final newline
+		mContents = contentsBuilder;
+		
 		mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
 		mClipboardUnwrapper = new OnPrimaryClipChangedListener() {
 			@Override
@@ -87,8 +87,8 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 			getDialog().setTitle("Selected entries");
 		}
 		mContentsView = (TextView) v.findViewById(R.id.console_entry_selection_dialog_contents);
+		mContentsView.setText(mContents);
 		mContentsView.setTypeface(ConsoleActivity.TYPEFACE);
-		PrettyPrinter.setPrettyText(mContentsView, mContents);
 
 		return v;
 	}

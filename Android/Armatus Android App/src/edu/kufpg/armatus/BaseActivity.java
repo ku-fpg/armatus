@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.collect.ImmutableMap;
-import edu.kufpg.armatus.EditManager.OnEditListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -126,15 +125,6 @@ public class BaseActivity extends Activity {
 	/** Used to edit persistent user preferences stored in {@link #sPrefs}. */
 	private static SharedPreferences.Editor sPrefsEditor;
 
-	/** An application-wide edit manager. */
-	private static EditManager sEditManager = new EditManager();
-
-	/** MenuItem which undoes edits stored in {@link #sEditManager}. */
-	private static MenuItem sUndoIcon;
-
-	/** MenuItem which redoes edits stored in {@link #sEditManager}. */
-	private static MenuItem sRedoIcon;
-
 	/** Tracks the ID of the current application theme. */
 	private static int sThemeId;
 
@@ -160,13 +150,6 @@ public class BaseActivity extends Activity {
 
 		restoreDyanmicPrefDefaultValues().commit();
 
-		sEditManager.setOnEditListener(new OnEditListener() {
-			@Override
-			public void onEditAction() {
-				updateIconTitles();
-			}
-		});
-
 		sThemeId = getThemePrefId();
 		setTheme(sThemeId);
 
@@ -179,9 +162,6 @@ public class BaseActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.console_list_view_menu, menu);
-		sUndoIcon = menu.findItem(R.id.undo);
-		sRedoIcon = menu.findItem(R.id.redo);
-		updateIconTitles();
 		return true;
 	}
 
@@ -189,16 +169,8 @@ public class BaseActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.undo:
-			if (canUndo()) {
-				sEditManager.undo();
-				updateIconTitles();
-			}
 			return true;
 		case R.id.redo:
-			if (canRedo()) {
-				sEditManager.redo();
-				updateIconTitles();
-			}
 			return true;
 		case R.id.menu_settings:
 			Intent settingsActivity = new Intent(this, PrefsActivity.class);
@@ -216,7 +188,7 @@ public class BaseActivity extends Activity {
 		if (sThemeId != getThemePrefId()) {
 			recreate();
 		}
-		//
+		
 		((BaseApplication<BaseActivity>) getApplication()).attachActivity(this);
 		super.onResume();
 	}
@@ -226,26 +198,6 @@ public class BaseActivity extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		((BaseApplication<BaseActivity>) getApplication()).detachActivity(this);
-	}
-
-	/**
-	 * Returns whether the application's {@link EditManager} is capable of redoing
-	 * an action. Subclasses of {@link BaseActivity} can impose additional restrictions.
-	 * @return {@code true} if the application-level {@code EditManager} is
-	 * allowed to redo an action.
-	 */
-	public boolean canRedo() {
-		return sEditManager.canRedo();
-	}
-
-	/**
-	 * Returns whether the application's {@link EditManager} is capable of undoing
-	 * an action. Subclasses of {@link BaseActivity} can impose additional restrictions.
-	 * @return {@code true} if the application-level {@code EditManager} is
-	 * allowed to undo an action.
-	 */
-	public boolean canUndo() {
-		return sEditManager.canUndo();
 	}
 
 	/**
@@ -290,14 +242,6 @@ public class BaseActivity extends Activity {
 	}
 
 	/**
-	 * Returns the application-level {@link EditManager}.
-	 * @return the application-level {@link EditManager}.
-	 */
-	protected static EditManager getEditManager() {
-		return sEditManager;
-	}
-
-	/**
 	 * Returns the resource ID of the current app theme (either {@code ThemeLight} or
 	 * {@code ThemeDark}.
 	 * @return the current app theme's resource ID.
@@ -312,15 +256,7 @@ public class BaseActivity extends Activity {
 			return -1;
 		}
 	}
-
-	/**
-	 * Updates the titles of the undo and redo icons in the options menu.
-	 */
-	protected static void updateIconTitles() {
-		sUndoIcon.setTitleCondensed(String.valueOf(sEditManager.getRemainingUndosCount()));
-		sRedoIcon.setTitleCondensed(String.valueOf(sEditManager.getRemainingRedosCount()));
-	}
-
+	
 	/**
 	 * Initializes {@link #DYNAMIC_PREF_DEFAULTS_MAP} by mapping {@link
 	 * android.preference.Preference Preference} keys to their default values when the default

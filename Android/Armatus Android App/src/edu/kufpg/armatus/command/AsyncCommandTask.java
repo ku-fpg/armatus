@@ -5,8 +5,8 @@ import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 /**
- * A task that is launched by a {@link CommandDispatcher.Command Command} that runs asynchronously.
- * This class is needed in order to properly notify the {@link CommandDispatcher} when there is
+ * A task that is launched by a {@link CustomCommandDispatcher.Command Command} that runs asynchronously.
+ * This class is needed in order to properly notify the {@link CustomCommandDispatcher} when there is
  * no longer a pending {@code Command} to execute.
  * @param <A> The {@code Activity} class this task is associated with.
  * @param <Params> The {@code Object} that this task takes as input when calling {@link
@@ -24,8 +24,8 @@ public abstract class AsyncCommandTask<Params, Progress, Result> extends AsyncAc
 	protected void onPostExecute(Result result) {
 		super.onPostExecute(result);
 
-		if (CommandDispatcher.isCommandPending()) {
-			CommandDispatcher.notifyDelayedCommandFinished();
+		if (CustomCommandDispatcher.isCommandPending()) {
+			CustomCommandDispatcher.notifyDelayedCommandFinished();
 		}
 	}
 

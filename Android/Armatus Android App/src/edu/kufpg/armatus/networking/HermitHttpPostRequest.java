@@ -2,31 +2,23 @@ package edu.kufpg.armatus.networking;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 public abstract class HermitHttpPostRequest<Result> extends HermitWebServerRequest<Result> {
-	/** The URL used for performing HTTP POST requests. */
-	private static final String SERVER_URL_POST = "http://posttestserver.com/post.php?";
 
 	public HermitHttpPostRequest(ConsoleActivity console) {
 		super(console);
@@ -44,14 +36,12 @@ public abstract class HermitHttpPostRequest<Result> extends HermitWebServerReque
 			HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
 			httpClient = new DefaultHttpClient(httpParams);
 
-			final List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-			nameValuePairs.add(new BasicNameValuePair("Armatus", "is"));
-			nameValuePairs.add(new BasicNameValuePair("super", "awesome"));
-			
-			final String requestUri = "dir=" + URLEncoder.encode("armatus", HTTP.UTF_8);
-
-			final HttpPost httpPost = new HttpPost(SERVER_URL_POST + requestUri);
-			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			final HttpPost httpPost = new HttpPost(params[0]);
+			httpPost.setHeader("Content-type", "application/json");
+			String jsonStr = params[1];
+			if (jsonStr != null && !jsonStr.isEmpty()) {
+				httpPost.setEntity(new StringEntity(params[1]));
+			}
 			if (!isCancelled()) {
 				httpResponse = httpClient.execute(httpPost);
 			}

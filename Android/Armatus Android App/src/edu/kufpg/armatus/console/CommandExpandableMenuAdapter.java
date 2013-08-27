@@ -1,13 +1,12 @@
 package edu.kufpg.armatus.console;
 
 import java.util.List;
-import java.util.Map;
+
+import com.google.common.collect.ListMultimap;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.command.CommandGroup;
 import edu.kufpg.armatus.drag.DragIcon;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +16,11 @@ import android.widget.TextView;
 /**
  * {@link android.widget.ExpandableListAdapter ExpandableListAdapter} for a menu containing
  * {@link DragIcon}s representing various console {@link
- * edu.kufpg.armatus.console.CommandDispatcher.Command Command}s.
+ * edu.kufpg.armatus.console.CustomCommandDispatcher.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	private static List<String> GROUP_LIST;
-	private static Map<String, CommandGroup> GROUP_DATA_MAP;
+	private static ListMultimap<String, String> TAG_MAP;
 	private Context mContext;
 	private LayoutInflater mInflater;
 
@@ -30,20 +29,20 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	 * @param context The {@link Context} to use.
 	 */
 	public CommandExpandableMenuAdapter(Context context, List<String> groupList,
-			Map<String, CommandGroup> groupDataMap) {
+			ListMultimap<String, String> tagMap) {
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
 		if (GROUP_LIST == null) {
 			GROUP_LIST = groupList;
 		}
-		if (GROUP_DATA_MAP == null) {
-			GROUP_DATA_MAP = groupDataMap;
+		if (TAG_MAP == null) {
+			TAG_MAP = tagMap;
 		}
 	}
 
 	@Override
 	public String getChild(int groupPosition, int childPosition) {
-		return GROUP_DATA_MAP.get(getGroup(groupPosition)).getCommandList().get(childPosition);
+		return TAG_MAP.get(getGroup(groupPosition)).get(childPosition);
 	}
 
 	@Override
@@ -65,8 +64,6 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		}
 
 		String commandName = getChild(groupPosition, childPosition);
-		String groupName = getGroup(groupPosition);
-		item.icon.setBackgroundResource(GROUP_DATA_MAP.get(groupName).getDragIconBackgroundId());
 		item.icon.setText(commandName);
 		item.icon.setTypeface(ConsoleActivity.TYPEFACE);
 		int newWidth = mContext.getResources().getDrawable(R.drawable.template_white).getIntrinsicWidth();
@@ -76,7 +73,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return GROUP_DATA_MAP.get(getGroup(groupPosition)).getCommandList().size();
+		return TAG_MAP.get(getGroup(groupPosition)).size();
 	}
 
 	@Override
@@ -96,24 +93,18 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public View getGroupView(int groupPosition, boolean isLastChild, View view, ViewGroup parent) {
-		String groupName = getGroup(groupPosition);
+		String tagName = getGroup(groupPosition);
 		CommandExpandableMenuHeader header;
 		if (view == null) {
 			view = mInflater.inflate(R.layout.command_expandable_group, null);
 			header = new CommandExpandableMenuHeader();
 			header.title = (TextView) view.findViewById(R.id.group_heading);
-			header.groupColor = (View) view.findViewById(R.id.group_color);
 			view.setTag(header);
 		} else {
 			header = (CommandExpandableMenuHeader) view.getTag();
 		}
 
-		header.title.setText(groupName);
-		String colorHex = GROUP_DATA_MAP.get(groupName).getBarColor();
-		if (colorHex == null) {
-			colorHex = PrettyPrinter.GRAY;
-		}
-		header.groupColor.setBackgroundColor(Color.parseColor(colorHex));
+		header.title.setText(tagName);
 
 		return view;
 	}
@@ -131,7 +122,6 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	/** Holds group title information for efficiency purposes. */
 	private static class CommandExpandableMenuHeader {
 		TextView title;
-		View groupColor;
 	}
 
 	/** Holds a {@link DragIcon} reference for efficiency purposes. */

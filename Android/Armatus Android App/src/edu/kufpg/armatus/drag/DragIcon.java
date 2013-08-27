@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * A draggable image associated with a {@link edu.kufpg.armatus.console.CommandDispatcher.Command
+ * A draggable image associated with a {@link edu.kufpg.armatus.console.CustomCommandDispatcher.Command
  * Command} that can be run on {@link edu.kufpg.armatus.console.ConsoleEntry ConsoleEntry} {@link
- * edu.kufpg.armatus.command.CommandDispatcher.Keyword Keywords}.
+ * edu.kufpg.armatus.command.CustomCommandDispatcher.Keyword Keywords}.
  */
 public class DragIcon extends TextView {
 	public DragIcon(Context context) {

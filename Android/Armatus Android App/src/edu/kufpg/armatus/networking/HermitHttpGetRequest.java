@@ -18,9 +18,6 @@ import edu.kufpg.armatus.console.ConsoleActivity;
 
 public abstract class HermitHttpGetRequest<Result> extends HermitWebServerRequest<Result> {
 
-	/** The URL used for performing HTTP GET requests. */
-	private static final String SERVER_URL_GET = "https://raw.github.com/flori/json/master/data/example.json";
-
 	public HermitHttpGetRequest(ConsoleActivity console) {
 		super(console);
 	}
@@ -36,7 +33,7 @@ public abstract class HermitHttpGetRequest<Result> extends HermitWebServerReques
 			//Set timeout length to 10 seconds
 			HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
 			httpClient = new DefaultHttpClient(httpParams);
-			final HttpGet get = new HttpGet(SERVER_URL_GET);
+			final HttpGet get = new HttpGet(params[0]);
 			if (!isCancelled()) {
 				httpResponse = httpClient.execute(get);
 			}

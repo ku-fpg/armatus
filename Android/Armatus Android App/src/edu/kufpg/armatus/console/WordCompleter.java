@@ -12,7 +12,7 @@ import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-import edu.kufpg.armatus.command.CommandDispatcher;
+import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -42,7 +42,7 @@ public class WordCompleter implements Parcelable, TextWatcher {
 
 	/**
 	 * Constructs a new instance and populates the dictionary using the commands listed
-	 * in {@link CommandDispatcher}.
+	 * in {@link CustomCommandDispatcher}.
 	 * @param console reference to the current console.
 	 */
 	public WordCompleter(ConsoleActivity console, SortedSet<String> commandDictionary) {

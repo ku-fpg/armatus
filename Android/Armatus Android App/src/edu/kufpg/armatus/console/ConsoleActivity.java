@@ -6,24 +6,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.collect.ListMultimap;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.MainActivity;
 import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.EditManager.Edit;
-import edu.kufpg.armatus.command.CommandDispatcher;
-import edu.kufpg.armatus.command.CommandGroup;
-import edu.kufpg.armatus.console.ConsoleEdits.AddEntry;
-import edu.kufpg.armatus.console.ConsoleEdits.Clear;
+import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 import edu.kufpg.armatus.console.ConsoleSearcher.SearchDirection;
@@ -34,8 +30,6 @@ import edu.kufpg.armatus.dialog.WordCompletionDialog;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
 import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.networking.BluetoothUtils;
-import edu.kufpg.armatus.networking.HermitClient;
-import edu.kufpg.armatus.networking.HermitWebClient;
 import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.JsonUtils;
 import edu.kufpg.armatus.util.StringUtils;
@@ -171,12 +165,6 @@ public class ConsoleActivity extends BaseActivity {
 			mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 			mCompleter = (WordCompleter) savedInstanceState.getParcelable("wordCompleter");
 			mCompleter.attachConsole(this);
-
-			for (Edit edit : getEditManager()) {
-				if (edit instanceof ConsoleEdit) {
-					((ConsoleEdit) edit).attachConsole(this);
-				}
-			}
 		}
 
 		rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -275,9 +263,9 @@ public class ConsoleActivity extends BaseActivity {
 						} else {
 							String[] inputs = input.trim().split(StringUtils.WHITESPACE);
 							if (inputs.length == 1) {
-								CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0]);
+								CustomCommandDispatcher.runCustomCommand(ConsoleActivity.this, inputs[0]);
 							} else {
-								CommandDispatcher.runOnConsole(ConsoleActivity.this, inputs[0],
+								CustomCommandDispatcher.runCustomCommand(ConsoleActivity.this, inputs[0],
 										Arrays.copyOfRange(inputs, 1, inputs.length));
 							}
 						}
@@ -294,18 +282,17 @@ public class ConsoleActivity extends BaseActivity {
 		updateCommandHistoryEntries();
 		resizeSlidingMenu();
 
-		mHermitClient = new HermitWebClient(this);
+		mHermitClient = new HermitClient(this);
 		if (savedInstanceState == null) {
-			//mHermitClient.init();
-			mHermitClient.getCommands();
+			mHermitClient.connect();
 		}
 	}
 
 	void initCommandRelatedVariables(SortedSet<String> commandDictionary,
-			List<String> groupList, Map<String, CommandGroup> groupDataMap) {
+			List<String> tagList, ListMultimap<String, String> tagMap) {
 		mCompleter = new WordCompleter(this, commandDictionary);
 		mConsoleInputEditText.addTextChangedListener(mCompleter);
-		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this, groupList, groupDataMap);
+		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this, tagList, tagMap);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 	}
 
@@ -345,32 +332,32 @@ public class ConsoleActivity extends BaseActivity {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case BluetoothUtils.REQUEST_ENABLE_BLUETOOTH:
-			if (CommandDispatcher.isCommandPending()) {
+			if (mHermitClient.isRequestDelayed()) {
 				if (resultCode == RESULT_OK) {
-					CommandDispatcher.runDelayedCommand(this);
+					mHermitClient.runDelayedRequest();
 				} else {
 					appendConsoleEntry("ERROR: Failed to enable Bluetooth.");
 				}
 			}
 			break;
 		case InternetUtils.REQUEST_ENABLE_WIFI:
-			if (CommandDispatcher.isCommandPending()) {
+			if (mHermitClient.isRequestDelayed()) {
 				//Unfortunately, ACTION_PICK_WIFI_NETWORK doesn't use RESULT_OK, so we
 				//have to check the Wi-Fi state manually.
 				if (InternetUtils.isWifiConnected(this)) {
-					CommandDispatcher.runDelayedCommand(this);
+					mHermitClient.runDelayedRequest();
 				} else {
 					appendConsoleEntry("ERROR: Failed to enable Wi-Fi.");
 				}
 			}
 			break;
 		case BluetoothUtils.REQUEST_FIND_BLUETOOTH_DEVICE:
-			if (CommandDispatcher.isCommandPending()) {
+			if (mHermitClient.isRequestDelayed()) {
 				if (resultCode == RESULT_OK) {
 					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
 					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
 					BluetoothUtils.setBluetoothDeviceInfo(this, name, address);
-					CommandDispatcher.runDelayedCommand(this);
+					mHermitClient.runDelayedRequest();
 				} else {
 					appendConsoleEntry("ERROR: Failed to locate Bluetooth device.");
 				}
@@ -598,18 +585,13 @@ public class ConsoleActivity extends BaseActivity {
 			switch (item.getGroupId()) {
 			case DRAGGED_GROUP:
 				if (mInputEnabled) {
-					CommandDispatcher.runOnConsole(this, mTempCommand, keywordNStr);
+					CustomCommandDispatcher.runCustomCommand(this, mTempCommand, keywordNStr);
 				} else {
 					mConsoleInputEditText.setText(mTempCommand + StringUtils.NBSP + keywordNStr);
 				}
 				break;
 			case LONG_CLICKED_GROUP:
-				if (mInputEnabled) {
-					CommandDispatcher.runKeywordCommand(this, keywordNStr, keywordNStr);
-				} else {
-					mConsoleInputEditText.setText(CommandDispatcher.getKeyword(keywordNStr)
-							.getCommandName() + StringUtils.NBSP + keywordNStr);
-				}
+				break;
 			}
 			mConsoleInputEditText.requestFocus(); //Prevents ListView from stealing focus
 		}
@@ -632,16 +614,6 @@ public class ConsoleActivity extends BaseActivity {
 		return super.onKeyDown(keyCode, event);
 	}
 
-	@Override
-	public boolean canRedo() {
-		return super.canRedo() && mInputEnabled;
-	}
-
-	@Override
-	public boolean canUndo() {
-		return super.canUndo() && mInputEnabled;
-	}
-
 	public void addCommandEntry(String commandName) {
 		if ((mCommandHistoryEntries.size() == 0
 				|| commandName != mCommandHistoryEntries.get(0))) {
@@ -651,11 +623,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public void addConsoleEntry(String contents) {
-		AddEntry edit = new AddEntry(this, contents);
-		getEditManager().applyEdit(edit);
-	}
-
-	void addConsoleEntry(ConsoleEntry entry) {
+		ConsoleEntry entry = new ConsoleEntry(getInputNum(), contents);
 		mConsoleInputNum++;
 		mConsoleEntries.add(entry);
 		updateConsoleEntries();
@@ -671,21 +639,13 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	public void appendConsoleEntry(String newContents) {
+	public void appendConsoleEntry(CharSequence newContents) {
 		mConsoleEntries.get(getEntryCount() - 1).appendContents(newContents);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
 	public void clear() {
-		Clear clear = new Clear(this, mConsoleInputNum, mConsoleEntries);
-		getEditManager().applyEdit(clear);
-	}
-
-	/**
-	 * Removes all console entries and resets the entry count.
-	 */
-	void clearConsole() {
 		mConsoleInputNum = 0;
 		mConsoleEntries.clear();
 		updateConsoleEntries();
@@ -703,7 +663,6 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public void exit() {
-		getEditManager().discardAllEdits();
 		if (mPrefs.getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
 			if (BluetoothUtils.isBluetoothConnected(this)) {
 				BluetoothUtils.closeBluetooth();
@@ -714,6 +673,10 @@ public class ConsoleActivity extends BaseActivity {
 		startActivity(intent);
 	}
 
+	public List<ConsoleEntry> getEntries() {
+		return mConsoleEntries;
+	}
+	
 	/**
 	 * @return the total number of console entries.
 	 */
@@ -749,7 +712,7 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputEditText.setSelection(mConsoleInputEditText.getText().length());
 	}
 
-	public void showEntrySelectionDialog(List<ConsoleEntry> entries) {
+	public void showEntrySelectionDialog(int... entries) {
 		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
 	}
 

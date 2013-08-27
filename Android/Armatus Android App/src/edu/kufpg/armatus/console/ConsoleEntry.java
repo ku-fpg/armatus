@@ -6,7 +6,7 @@ import java.util.List;
 
 import android.text.SpannableStringBuilder;
 
-import edu.kufpg.armatus.command.CommandDispatcher;
+import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -29,8 +29,8 @@ public class ConsoleEntry implements Serializable {
 	private CharSequence mShortContents;
 	
 	/**
-	 * All {@link CommandDispatcher.Keyword Keywords} (as specified in {@link
-	 * CommandDispatcher}) that this entry contains.
+	 * All {@link CustomCommandDispatcher.Keyword Keywords} (as specified in {@link
+	 * CustomCommandDispatcher}) that this entry contains.
 	 */
 	private final List<String> mKeywords = new ArrayList<String>();
 
@@ -81,7 +81,7 @@ public class ConsoleEntry implements Serializable {
 	}
 
 	/**
-	 * Returns the list of {@link CommandDispatcher.Keyword Keywords} contained in this
+	 * Returns the list of {@link CustomCommandDispatcher.Keyword Keywords} contained in this
 	 * entry.
 	 * @return the list of {@code Keywords}.
 	 */

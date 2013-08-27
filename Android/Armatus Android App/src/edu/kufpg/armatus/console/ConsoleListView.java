@@ -1,8 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.util.ParcelSparseBooleanArray;
 import edu.kufpg.armatus.util.StringUtils;
@@ -212,9 +209,9 @@ public class ConsoleListView extends ListView {
 				mode.finish();
 				return true;
 			case R.id.select:
-				List<ConsoleEntry> checkedEntries = new ArrayList<ConsoleEntry>();
+				int[] checkedEntries = new int[mPrevCheckedStates.size()];
 				for (int i = 0; i < mPrevCheckedStates.size(); i++) {
-					checkedEntries.add((ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(i)));
+					checkedEntries[i] = mPrevCheckedStates.keyAt(i);
 				}
 				mConsole.showEntrySelectionDialog(checkedEntries);
 				mode.finish();

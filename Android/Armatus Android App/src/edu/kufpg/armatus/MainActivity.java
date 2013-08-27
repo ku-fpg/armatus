@@ -66,7 +66,6 @@ public class MainActivity extends BaseActivity {
 		mConsoleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				getEditManager().discardAllEdits();
 				startActivity(new Intent(MainActivity.this, ConsoleActivity.class));
 			}
 		});
