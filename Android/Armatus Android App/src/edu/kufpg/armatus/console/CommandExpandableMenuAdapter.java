@@ -16,7 +16,7 @@ import android.widget.TextView;
 /**
  * {@link android.widget.ExpandableListAdapter ExpandableListAdapter} for a menu containing
  * {@link DragIcon}s representing various console {@link
- * edu.kufpg.armatus.console.CustomCommandDispatcher.Command Command}s.
+ * edu.kufpg.armatus.console.CustomCommand.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	private static List<String> GROUP_LIST;

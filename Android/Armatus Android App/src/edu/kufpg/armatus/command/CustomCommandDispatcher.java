@@ -14,26 +14,26 @@ import android.content.Intent;
 import android.widget.Toast;
 
 /**
- * Contains all {@link Command}s and {@link Keyword}s that the console uses and allows
+ * Contains all {@link CustomCommand}s and {@link Keyword}s that the console uses and allows
  * {@link ConsoleActivity} to execute commands.
  */
 public class CustomCommandDispatcher {
 	public static final String CLIENT_COMMANDS_GROUP = "Client";
 
-	private static final Command CLEAR = new ClientDefinedCommand("clear", 0, true) {
+	private static final CustomCommand CLEAR = new CustomCommand("clear", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.clear();
 			super.run(console, args);
 		}
 	};
-	private static final Command EXIT = new ClientDefinedCommand("exit", 0) {
+	private static final CustomCommand EXIT = new CustomCommand("exit", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.exit();
 		}
 	};
-	private static final Command TOAST = new ClientDefinedCommand("toast", 0, true) {
+	private static final CustomCommand TOAST = new CustomCommand("toast", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			Toast toast = null;
@@ -46,9 +46,10 @@ public class CustomCommandDispatcher {
 			super.run(console, args);
 		}
 	};
-	private static final Command TERMINAL = new ClientDefinedCommand("terminal", 0, true){
+	private static final CustomCommand TERMINAL = new CustomCommand("terminal", 0, true){
 		@Override
-		protected void run(ConsoleActivity console, String... args){
+		protected void run(ConsoleActivity console, String... args) {
+			super.run(console, args);
 			String packageName = "jackpal.androidterm";
 			boolean installed = BaseActivity.appInstalledOrNot(console, packageName);  
 			if (installed) {
@@ -60,34 +61,33 @@ public class CustomCommandDispatcher {
 				TerminalNotInstalledDialog tnid = new TerminalNotInstalledDialog();
 				tnid.show(console.getFragmentManager(), "tnid");
 			}
-			super.run(console, args);
 		}
 	};
 
-	private static final SortedMap<String, Command> CUSTOM_COMMAND_MAP = mapCustomCommands();
+	private static final SortedMap<String, CustomCommand> CUSTOM_COMMAND_MAP = mapCustomCommands();
 
 	private CustomCommandDispatcher() {}
 
 	/**
-	 * Attempts to run a {@link Command} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link Command}.
+	 * Attempts to run a {@link CustomCommand} on the console.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommand}.
 	 * @param commandName The name of the {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
 	public static void runCustomCommand(ConsoleActivity console, String commandName, String... args) {
-		Command command = CUSTOM_COMMAND_MAP.get(commandName);
+		CustomCommand command = CUSTOM_COMMAND_MAP.get(commandName);
 		if (command != null) {
 			runCustomCommand(console, command, args);
 		}
 	}
 
 	/**
-	 * Attempts to run a {@link Command} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link Command}.
+	 * Attempts to run a {@link CustomCommand} on the console.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommand}.
 	 * @param commandThe {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
-	private static void runCustomCommand(ConsoleActivity console, Command command, String... args) {
+	private static void runCustomCommand(ConsoleActivity console, CustomCommand command, String... args) {
 		String commandString = command.getCommandName()
 				+ StringUtils.NBSP + varargsToString(args);
 		console.addConsoleEntry(commandString);
@@ -110,7 +110,7 @@ public class CustomCommandDispatcher {
 		command.run(console, args);
 	}
 
-	public static Command getCustomCommand(String commandName) {
+	public static CustomCommand getCustomCommand(String commandName) {
 		return CUSTOM_COMMAND_MAP.get(commandName);
 	}
 
@@ -138,8 +138,8 @@ public class CustomCommandDispatcher {
 		return builder.toString().trim();
 	}
 
-	private static SortedMap<String, Command> mapCustomCommands() {
-		ImmutableSortedMap.Builder<String, Command> commandBuilder = ImmutableSortedMap.naturalOrder();
+	private static SortedMap<String, CustomCommand> mapCustomCommands() {
+		ImmutableSortedMap.Builder<String, CustomCommand> commandBuilder = ImmutableSortedMap.naturalOrder();
 		return commandBuilder.put(CLEAR.getCommandName(), CLEAR)
 				.put(EXIT.getCommandName(), EXIT)
 				.put(TERMINAL.getCommandName(), TERMINAL)

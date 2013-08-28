@@ -3,21 +3,20 @@ package edu.kufpg.armatus.console;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.SortedSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.common.collect.ImmutableList;
+import android.app.ProgressDialog;
+import android.content.Context;
+
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.command.CustomCommandDispatcher;
-import edu.kufpg.armatus.command.CommandGroup;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.HermitHttpGetRequest;
 import edu.kufpg.armatus.networking.HermitHttpPostRequest;
@@ -25,124 +24,14 @@ import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient {
+	private static final String EXAMPLE_URL = "http://64.189.177.136:3000";
 
 	private ConsoleActivity mConsole;
-
-	private enum RequestName {
-		CONNECT, COMMAND, COMMANDS
-	};
-
-	private RequestName mRequestName;
-	private HermitHttpGetRequest<Token> connectRequest;
-	private HermitHttpPostRequest<CommandResponse> runCommandRequest;
-	private HermitHttpPostRequest<List<CommandInfo>> fetchCommandsRequest;
+	private RequestName mDelayedRequestName;
+	private ProgressDialog mProgress;
 
 	public HermitClient(ConsoleActivity console) {
 		mConsole = console;
-		connectRequest = new HermitHttpGetRequest<Token>(mConsole) {
-
-			@Override
-			protected Token onResponse(String response) {
-				// TODO Auto-generated method stub
-
-				try {
-					return new Token(new JSONObject(response));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return null;
-				}
-			}
-			
-			@Override
-			protected void onPostExecute(Token token) {
-				super.onPostExecute(token);
-				fetchCommands();
-			}
-
-		};
-		runCommandRequest = new HermitHttpPostRequest<CommandResponse>(mConsole) {
-
-			@Override
-			protected CommandResponse onResponse(String response) {
-				// TODO Auto-generated method stub
-
-				try {
-					return new CommandResponse(new JSONObject(response));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return null;
-				}
-			}
-
-			@Override
-			protected void onPostExecute(CommandResponse response) {
-				super.onPostExecute(response);
-				getActivity().appendConsoleEntry(PrettyPrinter.createPrettyText(response.glyphs));
-			}
-
-		};
-		fetchCommandsRequest = new HermitHttpPostRequest<List<CommandInfo>>(
-				mConsole) {
-
-			@Override
-			protected List<CommandInfo> onResponse(String response) {
-				// TODO Auto-generated method stub
-				JSONObject insertNameHere = null;
-				try {
-					insertNameHere = new JSONObject(response);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if (insertNameHere == null) {
-					return null;
-				} else {
-					try {
-						JSONArray cmds = insertNameHere.getJSONArray("cmds");
-						List<CommandInfo> commandList = new ArrayList<CommandInfo>();
-						for (int i = 0; i < cmds.length(); i++) {
-							JSONObject cmdInfo = cmds.getJSONObject(i);
-							String name = cmdInfo.getString("name");
-							String help = cmdInfo.getString("help");
-							JSONArray tags = cmdInfo.getJSONArray("tags");
-							List<String> tagList = new ArrayList<String>();
-							for (int j = 0; j < tags.length(); j++) {
-								tagList.add(tags.getString(j));
-								commandList.add(new CommandInfo(name, help, tagList));
-							}
-						}
-
-						return commandList;
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						return null;
-					}
-
-				}
-			}
-
-			@Override
-			protected void onPostExecute(List<CommandInfo> commands) {
-				super.onPostExecute(commands);
-				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
-				ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
-				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
-
-				for (CommandInfo cmdInfo : commands) {
-					commandSetBuilder.add(cmdInfo.name);
-					for (String tag : cmdInfo.tags) {
-						tagSetBuilder.add(tag);
-						tagMapBuilder.put(tag, cmdInfo.name);
-					}
-				}
-				getActivity().initCommandRelatedVariables(commandSetBuilder.build(), new ArrayList<String>(tagSetBuilder.build()),
-						tagMapBuilder.build());
-			}
-
-		};
 	}
 
 	private boolean isConnected(ConsoleActivity console, RequestName name) {
@@ -175,45 +64,31 @@ public class HermitClient {
 	}
 
 	public void connect() {
-		// remember the server to talk to,
-		// and initialize the class-specific token.
 		if (isConnected(mConsole, RequestName.CONNECT)) {
-			try {
-				String result = connection.post("/connect", "");
-				JSONObject jsonToken = new JSONObject(result);
-
-				mToken = new Token(jsonToken);
-				this.connection = connection;
-			} catch (Exception e) {
-				throw new Error("something bad has happened");
-			}
+			newConnectRequest().execute(EXAMPLE_URL + "/connect");
 		}
 	}
 
-	public void runCommand(String str) {
-		String[] words = str.split(StringUtils.WHITESPACE);
-		if (CustomCommandDispatcher.isCustomCommand(words[0])) {
-			
-			CustomCommandDispatcher.runCustomCommand(mConsole, words[0],
-					Arrays.copyOfRange(words, 1, words.length));
+	public void runCommand(String input) {
+		String[] inputs = input.trim().split(StringUtils.WHITESPACE);
+		if (CustomCommandDispatcher.isCustomCommand(inputs[0])) {
+			if (inputs.length == 1) {
+				CustomCommandDispatcher.runCustomCommand(mConsole, inputs[0]);
+			} else {
+				CustomCommandDispatcher.runCustomCommand(mConsole, inputs[0],
+						Arrays.copyOfRange(inputs, 1, inputs.length));
+			}
 		} else {
 			if (isConnected(mConsole, RequestName.COMMAND)) {
 				JSONObject o = new JSONObject();
 				try {
-					o.put("token", mToken.toJSONObject());
-					o.put("cmd", str);
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					o.put("token", new Token(0,0).toJSONObject());
+					o.put("cmd", input);
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
-
-				try {
-					String result = connection.post("/command", o.toString());
-					// return new HermitClient.CommandResponse(new
-					// JSONObject(result));
-				} catch (Exception e) {
-					throw new Error("something bad has happened");
-				}
+				
+				newRunCommandRequest().execute(EXAMPLE_URL + "/command", o.toString());
 			}
 
 		}
@@ -221,7 +96,7 @@ public class HermitClient {
 
 	public void fetchCommands() {
 		if (isConnected(mConsole, RequestName.COMMANDS)) {
-
+			newFetchCommandsRequest().execute(EXAMPLE_URL + "/commands");
 		}
 	}
 
@@ -243,7 +118,6 @@ public class HermitClient {
 			try {
 				list.add(new Glyph(a.getJSONObject(i)));
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -271,15 +145,14 @@ public class HermitClient {
 
 	public static GlyphStyle getStyle(JSONObject o) {
 		if (o.has("style")) {
-			GlyphStyle mGlyphStyle = null;
+			GlyphStyle glyphStyle = null;
 			try {
-				mGlyphStyle = GlyphStyle.valueOf(o.getString("style"));
+				glyphStyle = GlyphStyle.valueOf(o.getString("style"));
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-			return mGlyphStyle;
+			return glyphStyle;
 		} else {
 			return GlyphStyle.NORMAL;
 		}
@@ -319,17 +192,167 @@ public class HermitClient {
 				o.put("unique", unique);
 				o.put("token", token);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			return o;
 		}
 	}
+	
+	private HermitHttpPostRequest<Token> newConnectRequest() {
+		return new HermitHttpPostRequest<Token>(mConsole) {
+
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+
+				getActivity().setProgressBarVisibility(false);
+				showProgressDialog(getActivity(), "Connecting...");
+			}
+
+			@Override
+			protected void onActivityDetached() {
+				if (mProgress != null) {
+					mProgress.dismiss();
+					mProgress = null;
+				}
+			}
+
+			@Override
+			protected void onActivityAttached() {
+				if (mProgress == null) {
+					showProgressDialog(getActivity(), "Connecting...");
+				}
+			}
+
+			@Override
+			protected Token onResponse(String response) {
+				try {
+					return new Token(new JSONObject(response));
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(Token token) {
+				super.onPostExecute(token);
+				if (mProgress != null) {
+					mProgress.dismiss();
+				}
+				fetchCommands();
+			}
+
+		};
+	}
+	
+	private HermitHttpGetRequest<List<CommandInfo>> newFetchCommandsRequest() {
+		return new HermitHttpGetRequest<List<CommandInfo>>(mConsole) {
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+
+				getActivity().setProgressBarVisibility(false);
+				showProgressDialog(getActivity(), "Fetching commands...");
+			}
+			
+			@Override
+			protected void onActivityDetached() {
+				if (mProgress != null) {
+					mProgress.dismiss();
+					mProgress = null;
+				}
+			}
+
+			@Override
+			protected void onActivityAttached() {
+				if (mProgress == null) {
+					showProgressDialog(getActivity(), "Fetching commands...");
+				}
+			}
+			
+			@Override
+			protected List<CommandInfo> onResponse(String response) {
+				JSONObject insertNameHere = null;
+				try {
+					insertNameHere = new JSONObject(response);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+				try {
+					JSONArray cmds = insertNameHere.getJSONArray("cmds");
+					List<CommandInfo> commandList = new ArrayList<CommandInfo>();
+					for (int i = 0; i < cmds.length(); i++) {
+						JSONObject cmdInfo = cmds.getJSONObject(i);
+						String name = cmdInfo.getString("name");
+						String help = cmdInfo.getString("help");
+						JSONArray tags = cmdInfo.getJSONArray("tags");
+						List<String> tagList = new ArrayList<String>();
+						for (int j = 0; j < tags.length(); j++) {
+							tagList.add(tags.getString(j));
+							commandList.add(new CommandInfo(name, help, tagList));
+						}
+					}
+
+					return commandList;
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(List<CommandInfo> commands) {
+				super.onPostExecute(commands);
+				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
+				ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
+				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
+
+				for (CommandInfo cmdInfo : commands) {
+					commandSetBuilder.add(cmdInfo.name);
+					for (String tag : cmdInfo.tags) {
+						tagSetBuilder.add(tag);
+						tagMapBuilder.put(tag, cmdInfo.name);
+					}
+				}
+				getActivity().initCommandRelatedVariables(commandSetBuilder.build(), new ArrayList<String>(tagSetBuilder.build()),
+						tagMapBuilder.build());
+				
+				if (mProgress != null) {
+					mProgress.dismiss();
+				}
+			}
+
+		};
+	}
+	
+	private HermitHttpPostRequest<CommandResponse> newRunCommandRequest() {
+		return new HermitHttpPostRequest<CommandResponse>(mConsole) {
+
+			@Override
+			protected CommandResponse onResponse(String response) {
+				try {
+					return new CommandResponse(new JSONObject(response));
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(CommandResponse response) {
+				super.onPostExecute(response);
+				getActivity().appendConsoleEntry(PrettyPrinter.createPrettyText(response.glyphs));
+			}
+
+		};
+	}
 
 	public void runDelayedRequest() {
-		if (mRequestName != null) {
-			switch (mRequestName) {
+		if (mDelayedRequestName != null) {
+			switch (mDelayedRequestName) {
 			case CONNECT:
 				connect();
 				break;
@@ -343,12 +366,30 @@ public class HermitClient {
 		}
 	}
 
+	private void showProgressDialog(Context context, String message) {
+		mProgress = new ProgressDialog(context);
+		mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mProgress.setMessage(message);
+		mProgress.setCancelable(false);
+		mProgress.show();
+	}
+
+
+
 	private void notifyDelay(RequestName name) {
-		mRequestName = name;
+		mDelayedRequestName = name;
+	}
+
+	public void notifyDelayedRequestFinished() {
+		mDelayedRequestName = null;
 	}
 
 	public boolean isRequestDelayed() {
-		return mRequestName != null;
+		return mDelayedRequestName != null;
 	}
+
+	private enum RequestName {
+		CONNECT, COMMAND, COMMANDS
+	};
 
 }

@@ -16,7 +16,7 @@ import org.apache.http.util.EntityUtils;
 
 import edu.kufpg.armatus.console.ConsoleActivity;
 
-public abstract class HermitHttpGetRequest<Result> extends HermitWebServerRequest<Result> {
+public abstract class HermitHttpGetRequest<Result> extends HermitHttpServerRequest<Result> {
 
 	public HermitHttpGetRequest(ConsoleActivity console) {
 		super(console);
@@ -44,11 +44,11 @@ public abstract class HermitHttpGetRequest<Result> extends HermitWebServerReques
 					responseStr = entity;
 				}
 			} else {
-				throw new HttpException(httpResponse.getStatusLine().getReasonPhrase());
+				throw new HttpException(httpResponse.getStatusLine().getStatusCode()+"");
 			}
 		} catch (HttpException e) {
 			e.printStackTrace();
-			responseStr = e.getMessage();
+			responseStr = "ERROR: server problem (" + httpResponse.getStatusLine().getStatusCode() + ").";
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 			responseStr = "ERROR: client protocol problem.";

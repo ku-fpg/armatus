@@ -1,16 +1,9 @@
 package edu.kufpg.armatus.console;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.google.common.collect.ListMultimap;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -31,7 +24,6 @@ import edu.kufpg.armatus.dialog.YesOrNoDialog;
 import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.InternetUtils;
-import edu.kufpg.armatus.util.JsonUtils;
 import edu.kufpg.armatus.util.StringUtils;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -85,9 +77,6 @@ public class ConsoleActivity extends BaseActivity {
 	private static final String SELECTION_TAG = "selection";
 	private static final String KEYWORD_SWAP_TAG = "keywordswap";
 	private static final String WORD_COMPLETION_TAG = "wordcomplete";
-	private static final String CONSOLE_HISTORY_TAG = "console";
-	private static final String COMMANDS_HISTORY_TAG = "commands";
-	private static final String SESSION_HISTORY_FILENAME = "/history.txt";
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
@@ -109,7 +98,6 @@ public class ConsoleActivity extends BaseActivity {
 	private SlidingMenu mSlidingMenu;
 	private WordCompleter mCompleter;
 	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
-	private JSONObject mHistory;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisibility = true;
 	private boolean mSearchEnabled = false;
@@ -261,13 +249,7 @@ public class ConsoleActivity extends BaseActivity {
 						if (input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
 							addConsoleEntry(input);
 						} else {
-							String[] inputs = input.trim().split(StringUtils.WHITESPACE);
-							if (inputs.length == 1) {
-								CustomCommandDispatcher.runCustomCommand(ConsoleActivity.this, inputs[0]);
-							} else {
-								CustomCommandDispatcher.runCustomCommand(ConsoleActivity.this, inputs[0],
-										Arrays.copyOfRange(inputs, 1, inputs.length));
-							}
+							mHermitClient.runCommand(input);
 						}
 						mConsoleInputEditText.setText("");
 						return true;
@@ -453,99 +435,8 @@ public class ConsoleActivity extends BaseActivity {
 			invalidateOptionsMenu();
 			return true;
 		case R.id.save_history:
-			if (mInputEnabled) {
-				try {
-					JSONArray consoleHistory = new JSONArray();
-					for (ConsoleEntry entry : mConsoleEntries) {
-						JSONObject entryJson = new JSONObject();
-						entryJson.put("num", entry.getNum());
-						entryJson.put("contents", entry.getShortContents());
-						consoleHistory.put(entryJson);
-					}
-
-					JSONArray commandHistory = new JSONArray();
-					for (String command : mCommandHistoryEntries) {
-						commandHistory.put(command);
-					}
-
-					mHistory = new JSONObject();
-					mHistory.put(CONSOLE_HISTORY_TAG, consoleHistory);
-					mHistory.put(COMMANDS_HISTORY_TAG, commandHistory);
-
-					String path = "";
-					if (mPrefs.getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
-						path = mPrefs.getString(HISTORY_DIR_KEY, null);
-					} else {
-						path = CACHE_DIR;
-					}
-					final File file = new File(path + SESSION_HISTORY_FILENAME);
-					if (file.exists()) {
-						JsonUtils.saveJsonFile(mHistory, file.getAbsolutePath());
-						showToast("Save complete!");
-					} else {
-						showToast("Error: file not found");
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
 			return true;
 		case R.id.load_history:
-			if (mInputEnabled) {
-				String title = getResources().getString(R.string.console_load_history_title);
-				String message = getResources().getString(R.string.console_load_history_message);
-				YesOrNoDialog exitDialog = new YesOrNoDialog(title, message) {
-					@Override
-					protected void yes(DialogInterface dialog, int whichButton) {
-						String path = "";
-						if (mPrefs.getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, true)) {
-							path = mPrefs.getString(HISTORY_DIR_KEY, null);
-						} else {
-							path = CACHE_DIR;
-						}
-
-						final File file = new File (path + SESSION_HISTORY_FILENAME);
-						if (file.exists()) {
-							JSONObject history = null;
-							try {
-								history = JsonUtils.openJsonFile(file.getAbsolutePath());
-
-								JSONArray consoleHistory = history.getJSONArray(CONSOLE_HISTORY_TAG);
-								mConsoleEntries.clear();
-								for (int i = 0; i < consoleHistory.length(); i++) {
-									JSONObject jsonEntry = consoleHistory.getJSONObject(i);
-									int num = jsonEntry.getInt("num");
-									String contents = jsonEntry.getString("contents");
-									ConsoleEntry entry = new ConsoleEntry(num, contents);
-									mConsoleEntries.add(entry);
-								}
-								mConsoleListAdapter = new ConsoleEntryAdapter(ConsoleActivity.this, mConsoleEntries);
-								mConsoleListView.setAdapter(mConsoleListAdapter);
-								updateConsoleEntries();
-
-								JSONArray commandHistory = history.getJSONArray(COMMANDS_HISTORY_TAG);
-								mCommandHistoryEntries.clear();
-								for (int i = 0; i < commandHistory.length(); i++) {
-									mCommandHistoryEntries.add(commandHistory.getString(i));
-								}
-								mCommandHistoryAdapter = new CommandHistoryAdapter(ConsoleActivity.this, mCommandHistoryEntries);
-								mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-								updateCommandHistoryEntries();
-
-								mConsoleInputEditText.requestFocus();
-								showToast("Loading complete!");
-							} catch (JSONException e) {
-								showToast("Error: invalid JSON");
-							} catch (FileNotFoundException e) {
-								showToast("Error: file not found"); //Should never happen
-							}
-						} else {
-							showToast("Error: file not found");
-						}
-					}
-				};
-				exitDialog.show(getFragmentManager(), "load");
-			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -682,6 +573,10 @@ public class ConsoleActivity extends BaseActivity {
 	 */
 	public int getEntryCount() {
 		return mConsoleEntries.size();
+	}
+	
+	public HermitClient getHermitClient() {
+		return mHermitClient;
 	}
 
 	/**

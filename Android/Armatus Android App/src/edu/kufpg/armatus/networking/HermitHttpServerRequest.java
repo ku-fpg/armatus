@@ -1,20 +1,20 @@
 package edu.kufpg.armatus.networking;
 
-import edu.kufpg.armatus.command.AsyncCommandTask;
+import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 /**
  * Task that connects to a server running HERMIT-web and simulates HERMIT commands
  * by using HTTP GET and POST requests.
  */
-public abstract class HermitWebServerRequest<Result> extends AsyncCommandTask<String, String, Result> {
+public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<ConsoleActivity, String, String, Result> {
 	/**
 	 * Constructs a new instance. The constructor is not the place to put any input
 	 * {@link JSONObject}s (do that in {@link android.os.AsyncTask#execute(JSONObject...)
 	 * execute(JSONObject...)} instead).
 	 * @param console reference to the current console.
 	 */
-	public HermitWebServerRequest(ConsoleActivity console) {
+	public HermitHttpServerRequest(ConsoleActivity console) {
 		super(console);
 	}
 
@@ -53,6 +53,10 @@ public abstract class HermitWebServerRequest<Result> extends AsyncCommandTask<St
 	}
 
 	private void end() {
+		if (getActivity().getHermitClient().isRequestDelayed()) {
+			getActivity().getHermitClient().notifyDelayedRequestFinished();
+		}
+		
 		getActivity().enableInput();
 		getActivity().setProgressBarVisibility(false);
 	}

@@ -18,7 +18,7 @@ import org.apache.http.util.EntityUtils;
 
 import edu.kufpg.armatus.console.ConsoleActivity;
 
-public abstract class HermitHttpPostRequest<Result> extends HermitWebServerRequest<Result> {
+public abstract class HermitHttpPostRequest<Result> extends HermitHttpServerRequest<Result> {
 
 	public HermitHttpPostRequest(ConsoleActivity console) {
 		super(console);
@@ -37,10 +37,12 @@ public abstract class HermitHttpPostRequest<Result> extends HermitWebServerReque
 			httpClient = new DefaultHttpClient(httpParams);
 
 			final HttpPost httpPost = new HttpPost(params[0]);
-			httpPost.setHeader("Content-type", "application/json");
-			String jsonStr = params[1];
-			if (jsonStr != null && !jsonStr.isEmpty()) {
-				httpPost.setEntity(new StringEntity(params[1]));
+			if (params.length > 1) {
+				String jsonStr = params[1];
+				httpPost.setHeader("Content-type", "application/json");
+				if (jsonStr != null && !jsonStr.isEmpty()) {
+					httpPost.setEntity(new StringEntity(params[1]));
+				}
 			}
 			if (!isCancelled()) {
 				httpResponse = httpClient.execute(httpPost);
@@ -56,7 +58,7 @@ public abstract class HermitHttpPostRequest<Result> extends HermitWebServerReque
 			}
 		}catch (HttpException e) {
 			e.printStackTrace();
-			responseStr = e.getMessage();
+			responseStr = "ERROR: server problem (" + httpResponse.getStatusLine().getStatusCode() + ").";
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			responseStr = "ERROR: unsupported encoding.";
