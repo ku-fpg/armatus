@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleSearcher.MatchParams;
-import edu.kufpg.armatus.drag.DragIcon;
 
 import android.graphics.Color;
 import android.text.Spannable;
@@ -13,10 +12,8 @@ import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnDragListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -40,8 +37,8 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	/** Reference to the console searcher. */
 	private ConsoleSearcher mSearcher;
 	
-	/** A drag listener applied to every {@link ConsoleEntry} {@link View}. */
-	private OnDragListener mOnDragListener;
+//	/** A drag listener applied to every {@link ConsoleEntry} {@link View}. */
+//	private OnDragListener mOnDragListener;
 
 	/**
 	 * Constructs a new instance with the specified entries.
@@ -52,22 +49,22 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
 		mConsole = console;
-		mOnDragListener = new OnDragListener() {
-			@Override
-			public boolean onDrag(View v, DragEvent event) {
-				if (event.getAction() == DragEvent.ACTION_DROP) {
-					int pos = mConsole.getListView().getPositionForView(v);
-					List<String> keywords = getItem(pos).getKeywords();
-					if (!keywords.isEmpty()) {
-						DragIcon icon = (DragIcon) event.getLocalState();
-						ConsoleEntryHolder holder = (ConsoleEntryHolder) v.getTag();
-						holder.draggedOverCommand = icon.getText().toString();
-						mConsole.openContextMenu(v);
-					}
-				}
-				return true;
-			}
-		};
+//		mOnDragListener = new OnDragListener() {
+//			@Override
+//			public boolean onDrag(View v, DragEvent event) {
+//				if (event.getAction() == DragEvent.ACTION_DROP) {
+//					int pos = mConsole.getListView().getPositionForView(v);
+//					List<String> keywords = getItem(pos).getKeywords();
+//					if (!keywords.isEmpty()) {
+//						DragIcon icon = (DragIcon) event.getLocalState();
+//						ConsoleEntryHolder holder = (ConsoleEntryHolder) v.getTag();
+//						holder.draggedOverCommand = icon.getText().toString();
+//						mConsole.openContextMenu(v);
+//					}
+//				}
+//				return true;
+//			}
+//		};
 	}
 
 	@Override
@@ -114,7 +111,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			}
 		}
 
-		convertView.setOnDragListener(mOnDragListener);
+//		convertView.setOnDragListener(mOnDragListener);
 
 		return convertView;
 	}

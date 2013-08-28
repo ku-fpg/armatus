@@ -18,13 +18,13 @@ import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.networking.BluetoothUtils;
-import edu.kufpg.armatus.networking.HermitHttpGetRequest;
-import edu.kufpg.armatus.networking.HermitHttpPostRequest;
+import edu.kufpg.armatus.networking.HermitHttpServerRequest;
+import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
 import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient {
-	private static final String EXAMPLE_URL = "http://64.189.177.136:3000";
+	private static final String EXAMPLE_URL = "http://10.92.78.212:3000";
 
 	private ConsoleActivity mConsole;
 	private RequestName mDelayedRequestName;
@@ -51,7 +51,7 @@ public class HermitClient {
 			}
 		} else if (BaseActivity.NETWORK_SOURCE_WEB_SERVER.equals(server)) {
 			if (InternetUtils.isAirplaneModeOn(console)) {
-				console.appendConsoleEntry("Error: Please disable airplane mode before attempting to connect.");
+				console.appendErrorResponse("ERROR: Please disable airplane mode before attempting to connect.");
 			} else if (!InternetUtils.isWifiConnected(console)
 					&& !InternetUtils.isMobileConnected(console)) {
 				notifyDelay(name);
@@ -199,8 +199,8 @@ public class HermitClient {
 		}
 	}
 	
-	private HermitHttpPostRequest<Token> newConnectRequest() {
-		return new HermitHttpPostRequest<Token>(mConsole) {
+	private HermitHttpServerRequest<Token> newConnectRequest() {
+		return new HermitHttpServerRequest<Token>(mConsole, HttpRequest.POST) {
 
 			@Override
 			protected void onPreExecute() {
@@ -234,21 +234,25 @@ public class HermitClient {
 					return null;
 				}
 			}
+			
+			@Override
+			protected void onCancelled() {
+				super.onCancelled();
+				dismissProgressDialog();
+			}
 
 			@Override
 			protected void onPostExecute(Token token) {
 				super.onPostExecute(token);
-				if (mProgress != null) {
-					mProgress.dismiss();
-				}
+				dismissProgressDialog();
 				fetchCommands();
 			}
 
 		};
 	}
 	
-	private HermitHttpGetRequest<List<CommandInfo>> newFetchCommandsRequest() {
-		return new HermitHttpGetRequest<List<CommandInfo>>(mConsole) {
+	private HermitHttpServerRequest<List<CommandInfo>> newFetchCommandsRequest() {
+		return new HermitHttpServerRequest<List<CommandInfo>>(mConsole, HttpRequest.GET) {
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
@@ -302,6 +306,12 @@ public class HermitClient {
 					return null;
 				}
 			}
+			
+			@Override
+			protected void onCancelled() {
+				super.onCancelled();
+				dismissProgressDialog();
+			}
 
 			@Override
 			protected void onPostExecute(List<CommandInfo> commands) {
@@ -309,7 +319,6 @@ public class HermitClient {
 				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
 				ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
 				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
-
 				for (CommandInfo cmdInfo : commands) {
 					commandSetBuilder.add(cmdInfo.name);
 					for (String tag : cmdInfo.tags) {
@@ -317,19 +326,17 @@ public class HermitClient {
 						tagMapBuilder.put(tag, cmdInfo.name);
 					}
 				}
+				
 				getActivity().initCommandRelatedVariables(commandSetBuilder.build(), new ArrayList<String>(tagSetBuilder.build()),
 						tagMapBuilder.build());
-				
-				if (mProgress != null) {
-					mProgress.dismiss();
-				}
+				dismissProgressDialog();
 			}
 
 		};
 	}
 	
-	private HermitHttpPostRequest<CommandResponse> newRunCommandRequest() {
-		return new HermitHttpPostRequest<CommandResponse>(mConsole) {
+	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest() {
+		return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
 
 			@Override
 			protected CommandResponse onResponse(String response) {
@@ -344,7 +351,7 @@ public class HermitClient {
 			@Override
 			protected void onPostExecute(CommandResponse response) {
 				super.onPostExecute(response);
-				getActivity().appendConsoleEntry(PrettyPrinter.createPrettyText(response.glyphs));
+				getActivity().appendCommandResponse(response);
 			}
 
 		};
@@ -374,6 +381,11 @@ public class HermitClient {
 		mProgress.show();
 	}
 
+	private void dismissProgressDialog() {
+		if (mProgress != null) {
+			mProgress.dismiss();
+		}
+	}
 
 
 	private void notifyDelay(RequestName name) {

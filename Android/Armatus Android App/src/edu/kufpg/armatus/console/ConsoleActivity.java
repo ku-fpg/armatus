@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.ListMultimap;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -16,6 +19,7 @@ import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 import edu.kufpg.armatus.console.ConsoleSearcher.SearchDirection;
+import edu.kufpg.armatus.console.HermitClient.CommandResponse;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import edu.kufpg.armatus.dialog.GestureDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -131,6 +135,7 @@ public class ConsoleActivity extends BaseActivity {
 			mCommandHistoryEntries = new ArrayList<String>();
 			mConsoleInputLayout.setLayoutParams(new AbsListView.LayoutParams(
 					AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
+			initCommandRelatedVariables(null, null, null);
 			mConsoleInputEditText.requestFocus();
 		} else {
 			mConsoleInputEditText.setText(savedInstanceState.getString("consoleInput"));
@@ -247,7 +252,7 @@ public class ConsoleActivity extends BaseActivity {
 					if (mInputEnabled) {
 						String input = mConsoleInputEditText.getText().toString();
 						if (input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
-							addConsoleEntry(input);
+							addConsoleUserInputEntry(input);
 						} else {
 							mHermitClient.runCommand(input);
 						}
@@ -272,9 +277,27 @@ public class ConsoleActivity extends BaseActivity {
 
 	void initCommandRelatedVariables(SortedSet<String> commandDictionary,
 			List<String> tagList, ListMultimap<String, String> tagMap) {
-		mCompleter = new WordCompleter(this, commandDictionary);
+		ImmutableList.Builder<String> tagListBuilder = ImmutableList.builder();
+		ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
+		ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
+
+		if (commandDictionary != null) {
+			commandSetBuilder.addAll(commandDictionary);
+		}
+		commandSetBuilder.addAll(CustomCommandDispatcher.getCustomCommandNames());
+		mCompleter = new WordCompleter(this, commandSetBuilder.build());
 		mConsoleInputEditText.addTextChangedListener(mCompleter);
-		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this, tagList, tagMap);
+
+		if (tagList != null) {
+			tagListBuilder.addAll(tagList);
+		}
+		tagListBuilder.add(CustomCommandDispatcher.CLIENT_COMMANDS_TAG);
+
+		if (tagMap != null) {
+			tagMapBuilder.putAll(tagMap);
+		}
+		tagMapBuilder.putAll(CustomCommandDispatcher.CLIENT_COMMANDS_TAG, CustomCommandDispatcher.getCustomCommandNames());
+		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this, tagListBuilder.build(), tagMapBuilder.build());
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 	}
 
@@ -318,7 +341,7 @@ public class ConsoleActivity extends BaseActivity {
 				if (resultCode == RESULT_OK) {
 					mHermitClient.runDelayedRequest();
 				} else {
-					appendConsoleEntry("ERROR: Failed to enable Bluetooth.");
+					appendErrorResponse("ERROR: Failed to enable Bluetooth.");
 				}
 			}
 			break;
@@ -329,7 +352,7 @@ public class ConsoleActivity extends BaseActivity {
 				if (InternetUtils.isWifiConnected(this)) {
 					mHermitClient.runDelayedRequest();
 				} else {
-					appendConsoleEntry("ERROR: Failed to enable Wi-Fi.");
+					appendErrorResponse("ERROR: Failed to enable Wi-Fi.");
 				}
 			}
 			break;
@@ -341,7 +364,7 @@ public class ConsoleActivity extends BaseActivity {
 					BluetoothUtils.setBluetoothDeviceInfo(this, name, address);
 					mHermitClient.runDelayedRequest();
 				} else {
-					appendConsoleEntry("ERROR: Failed to locate Bluetooth device.");
+					appendErrorResponse("ERROR: Failed to locate Bluetooth device.");
 				}
 			}
 			break;
@@ -450,22 +473,22 @@ public class ConsoleActivity extends BaseActivity {
 				!mConsoleEntries.get(info.position).getShortContents().toString().isEmpty()) { //To prevent empty lines
 			super.onCreateContextMenu(menu, v, menuInfo);
 
-			final int group;
+			//			final int group;
 			mTempCommand = ((ConsoleEntryHolder) info.targetView.getTag()).draggedOverCommand;
 			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
 				menu.setHeaderTitle("Entry " + info.position + ": Execute " + mTempCommand + " on...");
-				group = DRAGGED_GROUP;
+				//				group = DRAGGED_GROUP;
 			} else { //If user long-clicked entry
 				menu.setHeaderTitle("Entry " + info.position + ": Commands found");
 				menu.add(Menu.NONE, Menu.NONE, 1, "Sample transformation (does nothing)");
-				group = LONG_CLICKED_GROUP;
+				//				group = LONG_CLICKED_GROUP;
 			}
 
-			int order = 2;
-			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
-				menu.add(group, v.getId(), order, keyword);
-				order++;
-			}
+			//			int order = 2;
+			//			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
+			//				menu.add(group, v.getId(), order, keyword);
+			//				order++;
+			//			}
 		}
 	}
 
@@ -513,15 +536,27 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	public void addConsoleEntry(String contents) {
-		ConsoleEntry entry = new ConsoleEntry(getInputNum(), contents);
+	public void addConsoleUserInputEntry(String userInput) {
+		addConsoleEntry(userInput, null, null);
+	}
+
+	public void addConsoleCommandResponseEntry(CommandResponse commandResponse) {
+		addConsoleEntry(null, commandResponse, null);
+	}
+
+	public void addConsoleErrorResponseEntry(String errorResponse) {
+		addConsoleEntry(null, null, errorResponse);
+	}
+
+	private void addConsoleEntry(String userInput, CommandResponse commandResponse, String errorResponse) {
+		ConsoleEntry entry = new ConsoleEntry(getInputNum(), userInput, commandResponse, errorResponse);
 		mConsoleInputNum++;
 		mConsoleEntries.add(entry);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
 
-	void removeConsoleEntry() {
+	public void removeConsoleEntry() {
 		if (!mConsoleEntries.isEmpty()) {
 			mConsoleInputNum--;
 			mConsoleEntries.remove(getEntryCount() - 1);
@@ -530,10 +565,34 @@ public class ConsoleActivity extends BaseActivity {
 		}
 	}
 
-	public void appendConsoleEntry(CharSequence newContents) {
-		mConsoleEntries.get(getEntryCount() - 1).appendContents(newContents);
-		updateConsoleEntries();
-		scrollToBottom();
+	public void appendErrorResponse(String errorResponse) {
+		if (!mConsoleEntries.isEmpty()) {
+			ConsoleEntry prevEntry = mConsoleEntries.get(getEntryCount() - 1);
+			if (prevEntry.getErrorResponse() == null) {
+				prevEntry.appendErrorResponse(errorResponse);
+				updateConsoleEntries();
+				scrollToBottom();
+			} else {
+				addConsoleErrorResponseEntry(errorResponse);
+			}
+		} else {
+			addConsoleErrorResponseEntry(errorResponse);
+		}
+	}
+
+	public void appendCommandResponse(CommandResponse commandResponse) {
+		if (!mConsoleEntries.isEmpty()) {
+			ConsoleEntry prevEntry = mConsoleEntries.get(getEntryCount() - 1);
+			if (prevEntry.getCommandResponse() == null) {
+				prevEntry.appendCommandResponse(commandResponse);
+				updateConsoleEntries();
+				scrollToBottom();
+			} else {
+				addConsoleCommandResponseEntry(commandResponse);
+			}
+		} else {
+			addConsoleCommandResponseEntry(commandResponse);
+		}
 	}
 
 	public void clear() {
@@ -567,14 +626,14 @@ public class ConsoleActivity extends BaseActivity {
 	public List<ConsoleEntry> getEntries() {
 		return mConsoleEntries;
 	}
-	
+
 	/**
 	 * @return the total number of console entries.
 	 */
 	public int getEntryCount() {
 		return mConsoleEntries.size();
 	}
-	
+
 	public HermitClient getHermitClient() {
 		return mHermitClient;
 	}

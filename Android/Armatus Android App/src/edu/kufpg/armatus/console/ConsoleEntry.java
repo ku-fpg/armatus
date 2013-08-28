@@ -1,12 +1,10 @@
 package edu.kufpg.armatus.console;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.text.SpannableStringBuilder;
 
-import edu.kufpg.armatus.command.CustomCommandDispatcher;
+import edu.kufpg.armatus.console.HermitClient.CommandResponse;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -25,24 +23,42 @@ public class ConsoleEntry implements Serializable {
 	 */
 	private int mNum;
 	
-	/** The contents of the entry, not including the {@code hermit<num> }prefix. */
-	private CharSequence mShortContents;
+	private String mUserInput;
+	private CommandResponse mCommandResponse;
+	private String mErrorResponse;
 	
-	/**
-	 * All {@link CustomCommandDispatcher.Keyword Keywords} (as specified in {@link
-	 * CustomCommandDispatcher}) that this entry contains.
-	 */
-	private final List<String> mKeywords = new ArrayList<String>();
+	private transient CharSequence mShortContents;
 
-	/**
-	 * Constructs a new instance with the specified entry number and contents.
-	 * @param entryNum the number that will identify this entry.
-	 * @param contents what this entry will contain.
-	 */
-	public ConsoleEntry(int entryNum, CharSequence contents) {
+	public ConsoleEntry(int entryNum, String userInput) {
+		this(entryNum, userInput, null, null);
+	}
+	
+	public ConsoleEntry(int entryNum, String userInput, CommandResponse commandResponse) {
+		this(entryNum, userInput, commandResponse, null);
+	}
+	
+	public ConsoleEntry(int entryNum, String userInput, String errorResponse) {
+		this(entryNum, userInput, null, errorResponse);
+	}
+	
+	protected ConsoleEntry(int entryNum, String userInput, CommandResponse commandResponse, String errorResponse) {
 		mNum = entryNum;
-		mShortContents = contents;
+		mUserInput = userInput;
+		mCommandResponse = commandResponse;
+		mErrorResponse = errorResponse;
 		
+		SpannableStringBuilder builder = new SpannableStringBuilder();
+		if (userInput != null) {
+			builder.append(userInput).append("\n");
+		}
+		if (commandResponse != null) {
+			builder.append(PrettyPrinter.createPrettyText(commandResponse.glyphs)).append("\n");
+		}
+		if (errorResponse != null) {
+			builder.append(errorResponse).append("\n");
+		}
+		
+		mShortContents = builder.delete(builder.length()-1, builder.length());
 	}
 
 	/**
@@ -51,7 +67,7 @@ public class ConsoleEntry implements Serializable {
 	 * @param entry the {@code ConsoleEntry} to copy.
 	 */
 	public ConsoleEntry(ConsoleEntry entry) {
-		this(entry.getNum(), entry.getShortContents());
+		this(entry.getNum(), entry.getUserInput(), entry.getCommandResponse(), entry.getErrorResponse());
 	}
 
 	/**
@@ -60,6 +76,18 @@ public class ConsoleEntry implements Serializable {
 	 */
 	public int getNum() {
 		return mNum;
+	}
+	
+	public String getUserInput() {
+		return mUserInput;
+	}
+	
+	public CommandResponse getCommandResponse() {
+		return mCommandResponse;
+	}
+	
+	public String getErrorResponse() {
+		return mErrorResponse;
 	}
 
 	/**
@@ -75,27 +103,22 @@ public class ConsoleEntry implements Serializable {
 	 * @return the entry contents, including the prefix.
 	 */
 	public CharSequence getFullContents() {
-		SpannableStringBuilder builder = new SpannableStringBuilder("hermit<").append(""+getNum()).append(StringUtils.NBSP).append(getShortContents());
-		
+		SpannableStringBuilder builder = new SpannableStringBuilder("hermit<").append(""+getNum())
+				.append(">").append(StringUtils.NBSP).append(getShortContents());
 		return builder;
 	}
-
-	/**
-	 * Returns the list of {@link CustomCommandDispatcher.Keyword Keywords} contained in this
-	 * entry.
-	 * @return the list of {@code Keywords}.
-	 */
-	public final List<String> getKeywords() {
-		return mKeywords;
+	
+	public void appendCommandResponse(CommandResponse commandResponse) {
+		mCommandResponse = commandResponse;
+		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n")
+				.append(PrettyPrinter.createPrettyText(mCommandResponse.glyphs));
+		mShortContents = builder;
 	}
 	
-	/**
-	 * Edits the current contents by placing the specified string as a new line under
-	 * the previous contents.
-	 * @param newContents The string to append as a newline.
-	 */
-	public void appendContents(CharSequence newContents) {
-		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n").append(newContents);
+	public void appendErrorResponse(String errorResponse) {
+		mErrorResponse = errorResponse;
+		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n")
+				.append(mErrorResponse);
 		mShortContents = builder;
 	}
 

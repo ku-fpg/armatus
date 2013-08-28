@@ -104,7 +104,7 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
 
 	@Override
 	protected void onProgressUpdate(String... progress) {
-		getActivity().appendConsoleEntry(progress[0]);
+		//getActivity().appendErrorResponse(progress[0]);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
 	protected void onPostExecute(String result) {
 		super.onPostExecute(result);
 		if (result != null) {
-			getActivity().appendConsoleEntry("Response from server: " + result);
+			//getActivity().appendConsoleEntry("Response from server: " + result);
 			BluetoothUtils.notifyLastConnectionSucceeded();
 		} else {
 			BluetoothUtils.notifyLastConnectionFailed();

@@ -19,7 +19,7 @@ import android.widget.TextView;
  * edu.kufpg.armatus.console.CustomCommand.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
-	private static List<String> GROUP_LIST;
+	private static List<String> TAG_LIST;
 	private static ListMultimap<String, String> TAG_MAP;
 	private Context mContext;
 	private LayoutInflater mInflater;
@@ -32,8 +32,8 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			ListMultimap<String, String> tagMap) {
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
-		if (GROUP_LIST == null) {
-			GROUP_LIST = groupList;
+		if (TAG_LIST == null) {
+			TAG_LIST = groupList;
 		}
 		if (TAG_MAP == null) {
 			TAG_MAP = tagMap;
@@ -78,12 +78,12 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public String getGroup(int groupPosition) {
-		return GROUP_LIST.get(groupPosition);
+		return TAG_LIST.get(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return GROUP_LIST.size();
+		return TAG_LIST.size();
 	}
 
 	@Override

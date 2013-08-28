@@ -1,12 +1,19 @@
 package edu.kufpg.armatus;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import edu.kufpg.armatus.treelistview.TreeListViewDemo;
 import edu.kufpg.armatus.util.StickyButton;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -93,6 +100,17 @@ public class MainActivity extends BaseActivity {
 				}
 			}
 		});
+		
+//		WifiManager wim = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//		int ipAddress = wim.getConnectionInfo().getIpAddress();
+//		byte[] ipAddressBytes = BigInteger.valueOf(ipAddress).toByteArray();
+//		InetAddress addr = null;
+//		try {
+//			addr = InetAddress.getByAddress(ipAddressBytes);
+//		} catch (UnknownHostException e) {
+//			e.printStackTrace();
+//		}
+//		showToast(addr.getHostAddress());
 	}
 	
 	@Override

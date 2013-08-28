@@ -18,7 +18,7 @@ import android.widget.Toast;
  * {@link ConsoleActivity} to execute commands.
  */
 public class CustomCommandDispatcher {
-	public static final String CLIENT_COMMANDS_GROUP = "Client";
+	public static final String CLIENT_COMMANDS_TAG = "Client";
 
 	private static final CustomCommand CLEAR = new CustomCommand("clear", 0, true) {
 		@Override
@@ -90,18 +90,18 @@ public class CustomCommandDispatcher {
 	private static void runCustomCommand(ConsoleActivity console, CustomCommand command, String... args) {
 		String commandString = command.getCommandName()
 				+ StringUtils.NBSP + varargsToString(args);
-		console.addConsoleEntry(commandString);
+		console.addConsoleUserInputEntry(commandString);
 
 		if (command.hasLowerArgBound()) {
 			if (args.length < command.getArgsCount()) {
-				console.appendConsoleEntry("Error: " + command.getCommandName() +
+				console.appendErrorResponse("ERROR: " + command.getCommandName() +
 						" requires at least " + command.getArgsCount() +
 						(command.getArgsCount() == 1 ? " argument." :
 								" arguments."));
 				return;
 			}
 		} else if (args.length != command.getArgsCount()) {
-			console.appendConsoleEntry("Error: " + command.getCommandName() +
+			console.appendErrorResponse("ERROR: " + command.getCommandName() +
 					" requires exactly " + command.getArgsCount() +
 					(command.getArgsCount() == 1 ? " argument." :
 							" arguments."));
