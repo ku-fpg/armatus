@@ -40,6 +40,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.DragEvent;
 import android.view.KeyEvent;
@@ -273,6 +274,9 @@ public class ConsoleActivity extends BaseActivity {
 		if (savedInstanceState == null) {
 			mHermitClient.connect();
 		}
+		
+		InternetUtils.getIP(this);
+		Log.d("Console Avtivity", InternetUtils.getIP(this));
 	}
 
 	void initCommandRelatedVariables(SortedSet<String> commandDictionary,

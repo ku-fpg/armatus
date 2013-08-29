@@ -1,8 +1,13 @@
 package edu.kufpg.armatus.networking;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
+import android.R.string;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
@@ -29,6 +34,8 @@ public class InternetUtils {
 
 	/** Contains information about the current network connection (if there is one). */
 	private static NetworkInfo sWifiInfo;
+	
+	private static String ip = null;
 
 	private InternetUtils() {}
 
@@ -123,6 +130,33 @@ public class InternetUtils {
 			sConMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		}
 		return sConMan;
+	}
+	
+	public static void DetectIP(Context context)
+	{
+		if(isWifiConnected(context) == true)
+		{
+		WifiManager wim = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		int ipAddress = wim.getConnectionInfo().getIpAddress();
+		byte[] ipAddressBytes = BigInteger.valueOf(ipAddress).toByteArray();
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getByAddress(ipAddressBytes);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		ip = addr.getHostAddress();
+		//showToast(addr.getHostAddress());
+		}
+	}
+	
+	public static String getIP(Context context)
+	{
+		if(ip == null)
+		{
+			DetectIP(context);
+		}
+		return ip;
 	}
 
 }

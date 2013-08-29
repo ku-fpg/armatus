@@ -52,11 +52,9 @@ public class PrettyPrinter {
 		case SYNTAX:
 			return BLUE;
 		case VAR:
-			return GREEN;
+			return null;
 		case TYPE:
-			return PURPLE;
-		case LIT:
-			return GRAY;
+			return GREEN;
 		default:
 			return null;
 		}
