@@ -27,6 +27,13 @@ public class CustomCommandDispatcher {
 			super.run(console, args);
 		}
 	};
+	private static final CustomCommand CONNECT = new CustomCommand("connect", 1, false) {
+		@Override
+		protected void run(ConsoleActivity console, String... args) {
+			console.getHermitClient().connect("http://" + args[0] + ":3000");
+			super.run(console, args);
+		}
+	};
 	private static final CustomCommand EXIT = new CustomCommand("exit", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
@@ -141,6 +148,7 @@ public class CustomCommandDispatcher {
 	private static SortedMap<String, CustomCommand> mapCustomCommands() {
 		ImmutableSortedMap.Builder<String, CustomCommand> commandBuilder = ImmutableSortedMap.naturalOrder();
 		return commandBuilder.put(CLEAR.getCommandName(), CLEAR)
+				.put(CONNECT.getCommandName(), CONNECT)
 				.put(EXIT.getCommandName(), EXIT)
 				.put(TERMINAL.getCommandName(), TERMINAL)
 				.put(TOAST.getCommandName(), TOAST)

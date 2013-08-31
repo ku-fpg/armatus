@@ -40,7 +40,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.DragEvent;
 import android.view.KeyEvent;
@@ -138,6 +137,7 @@ public class ConsoleActivity extends BaseActivity {
 					AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
 			initCommandRelatedVariables(null, null, null);
 			mConsoleInputEditText.requestFocus();
+			mHermitClient = new HermitClient(this);
 		} else {
 			mConsoleInputEditText.setText(savedInstanceState.getString("consoleInput"));
 			mSoftKeyboardVisibility = savedInstanceState.getBoolean("softKeyboardVisibility");
@@ -159,6 +159,8 @@ public class ConsoleActivity extends BaseActivity {
 			mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 			mCompleter = (WordCompleter) savedInstanceState.getParcelable("wordCompleter");
 			mCompleter.attachConsole(this);
+			mHermitClient = savedInstanceState.getParcelable("hermitClient");
+			mHermitClient.attachConsole(this);
 		}
 
 		rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -269,14 +271,6 @@ public class ConsoleActivity extends BaseActivity {
 		updateConsoleEntries();
 		updateCommandHistoryEntries();
 		resizeSlidingMenu();
-
-		mHermitClient = new HermitClient(this);
-		if (savedInstanceState == null) {
-			mHermitClient.connect();
-		}
-		
-		InternetUtils.getIP(this);
-		Log.d("Console Avtivity", InternetUtils.getIP(this));
 	}
 
 	void initCommandRelatedVariables(SortedSet<String> commandDictionary,
@@ -322,6 +316,7 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
 		outState.putParcelable("wordCompleter", mCompleter);
+		outState.putParcelable("hermitClient", mHermitClient);
 	}
 
 	@Override

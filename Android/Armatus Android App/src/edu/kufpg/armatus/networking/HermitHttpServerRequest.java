@@ -16,6 +16,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import edu.kufpg.armatus.AsyncActivityTask;
@@ -82,7 +83,7 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 			}
 
 			if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-				final String entity = EntityUtils.toString(httpResponse.getEntity()).trim();
+				final String entity = EntityUtils.toString(httpResponse.getEntity(), HTTP.UTF_8).trim();
 				if (entity != null) {
 					responseStr = entity;
 				}

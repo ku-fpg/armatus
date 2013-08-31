@@ -1,5 +1,6 @@
 package edu.kufpg.armatus.console;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,8 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -23,54 +26,28 @@ import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
 import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
-public class HermitClient {
-	private static final String EXAMPLE_URL = "http://10.92.78.212:3000";
-
+public class HermitClient implements Parcelable {
 	private ConsoleActivity mConsole;
-	private RequestName mDelayedRequestName;
 	private ProgressDialog mProgress;
+
+	private RequestName mDelayedRequestName;
+	private String mServerUrl;
+	private Token mToken;
 
 	public HermitClient(ConsoleActivity console) {
 		mConsole = console;
 	}
 
-	private boolean isConnected(ConsoleActivity console, RequestName name) {
-		String server = PrefsActivity.getPrefs(console).getString(
-				BaseActivity.NETWORK_SOURCE_KEY, null);
-		if (BaseActivity.NETWORK_SOURCE_BLUETOOTH_SERVER.equals(server)) {
-			if (BluetoothUtils.isBluetoothEnabled(console)) {
-				if (BluetoothUtils.getBluetoothDevice(console) != null) {
-					return true;
-				} else {
-					notifyDelay(name);
-					BluetoothUtils.findDeviceName(console);
-				}
-			} else {
-				notifyDelay(name);
-				BluetoothUtils.enableBluetooth(console);
-			}
-		} else if (BaseActivity.NETWORK_SOURCE_WEB_SERVER.equals(server)) {
-			if (InternetUtils.isAirplaneModeOn(console)) {
-				console.appendErrorResponse("ERROR: Please disable airplane mode before attempting to connect.");
-			} else if (!InternetUtils.isWifiConnected(console)
-					&& !InternetUtils.isMobileConnected(console)) {
-				notifyDelay(name);
-				InternetUtils.enableWifi(console);
-			} else {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public void connect() {
-		if (isConnected(mConsole, RequestName.CONNECT)) {
-			newConnectRequest().execute(EXAMPLE_URL + "/connect");
+	public void connect(String serverUrl) {
+		mServerUrl = serverUrl;
+		if (isNetworkConnected(RequestName.CONNECT)) {
+			newConnectRequest().execute(mServerUrl + "/connect");
 		}
 	}
 
 	public void runCommand(String input) {
 		String[] inputs = input.trim().split(StringUtils.WHITESPACE);
+		mConsole.addConsoleUserInputEntry(input);
 		if (CustomCommandDispatcher.isCustomCommand(inputs[0])) {
 			if (inputs.length == 1) {
 				CustomCommandDispatcher.runCustomCommand(mConsole, inputs[0]);
@@ -79,118 +56,120 @@ public class HermitClient {
 						Arrays.copyOfRange(inputs, 1, inputs.length));
 			}
 		} else {
-			if (isConnected(mConsole, RequestName.COMMAND)) {
+			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired()) {
 				JSONObject o = new JSONObject();
 				try {
-					o.put("token", new Token(0,0).toJSONObject());
-					o.put("cmd", input);
+					o.put("token", mToken.toJSONObject());
+					o.put("cmd", StringUtils.withoutCharWrap(input));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				
-				newRunCommandRequest().execute(EXAMPLE_URL + "/command", o.toString());
+				newRunCommandRequest().execute(mServerUrl + "/command", o.toString(), inputs[0]);
 			}
 
 		}
 	}
 
 	public void fetchCommands() {
-		if (isConnected(mConsole, RequestName.COMMANDS)) {
-			newFetchCommandsRequest().execute(EXAMPLE_URL + "/commands");
+		if (isNetworkConnected(RequestName.COMMANDS)) {
+			newFetchCommandsRequest().execute(mServerUrl + "/commands");
 		}
 	}
 
 	public class CommandInfo {
-		public final String name, help;
+		public final String help, name;
 		public final List<String> tags;
 
-		public CommandInfo(String name, String help, List<String> tags) {
-			this.name = name;
+		public CommandInfo(String help, String name, List<String> tags) {
 			this.help = help;
+			this.name = name;
 			this.tags = tags;
 		}
 
 	}
 
-	public static List<Glyph> listOfGlyphs(JSONArray a) {
-		List<Glyph> list = new ArrayList<Glyph>();
-		for (int i = 0; i < a.length(); i++) {
-			try {
-				list.add(new Glyph(a.getJSONObject(i)));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-		return list;
-	}
-
-	public static class CommandResponse {
-		public final Token token;
+	public static class CommandResponse implements Serializable {
+		private static final long serialVersionUID = 6457446122656522614L;
+		public final int ast;
 		public final List<Glyph> glyphs;
 
 		public CommandResponse(JSONObject o) throws JSONException {
-			this(new Token(o.getJSONObject("token")), listOfGlyphs(o
-					.getJSONArray("glyphs")));
+			this(o.getInt("ast"), listOfGlyphs(o.getJSONArray("glyphs")));
 		}
 
-		public CommandResponse(Token token, List<Glyph> glyphs) {
-			this.token = token;
+		public CommandResponse(int ast, List<Glyph> glyphs) {
+			this.ast = ast;
 			this.glyphs = glyphs;
+		}
+
+		private static List<Glyph> listOfGlyphs(JSONArray a) {
+			List<Glyph> list = new ArrayList<Glyph>();
+			for (int i = 0; i < a.length(); i++) {
+				try {
+					list.add(new Glyph(a.getJSONObject(i)));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			return list;
 		}
 	}
 
 	public static enum GlyphStyle {
-		NORMAL, KEYWORD, SYNTAX, VAR, TYPE, LIT
+		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING
 	}
 
-	public static GlyphStyle getStyle(JSONObject o) {
-		if (o.has("style")) {
-			GlyphStyle glyphStyle = null;
-			try {
-				glyphStyle = GlyphStyle.valueOf(o.getString("style"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-			return glyphStyle;
-		} else {
-			return GlyphStyle.NORMAL;
-		}
-
-	}
-
-	public static class Glyph {
-		public final String text;
+	public static class Glyph implements Serializable {
+		private static final long serialVersionUID = -7814082698884658726L;
 		public final GlyphStyle style;
+		public final String text;
 
 		public Glyph(JSONObject o) throws JSONException {
-			this(o.getString("text"), getStyle(o));
+			this(getStyle(o), o.getString("text"));
 		}
 
-		public Glyph(String text, GlyphStyle style) {
-			this.text = text;
+		public Glyph(GlyphStyle style, String text) {
 			this.style = style;
+			this.text = text;
+		}
+
+		private static GlyphStyle getStyle(JSONObject o) {
+			if (o.has("style")) {
+				GlyphStyle glyphStyle = null;
+				try {
+					glyphStyle = GlyphStyle.valueOf(o.getString("style"));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				return glyphStyle;
+			} else {
+				return GlyphStyle.NORMAL;
+			}
+
 		}
 
 	}
 
-	public static class Token {
-		public final int unique, token;
+	public static class Token implements Serializable {
+		private static final long serialVersionUID = -8737445107687286266L;
+		public final int user;
+		public int ast;
 
 		public Token(JSONObject o) throws JSONException {
-			this(o.getInt("unique"), o.getInt("token"));
+			this(o.getInt("user"), o.getInt("ast"));
 		}
 
-		public Token(int unique, int token) {
-			this.unique = unique;
-			this.token = token;
+		public Token(int user, int ast) {
+			this.user = user;
+			this.ast = ast;
 		}
 
 		public JSONObject toJSONObject() {
 			JSONObject o = new JSONObject();
 			try {
-				o.put("unique", unique);
-				o.put("token", token);
+				o.put("user", user);
+				o.put("ast", ast);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -198,7 +177,7 @@ public class HermitClient {
 			return o;
 		}
 	}
-	
+
 	private HermitHttpServerRequest<Token> newConnectRequest() {
 		return new HermitHttpServerRequest<Token>(mConsole, HttpRequest.POST) {
 
@@ -234,7 +213,7 @@ public class HermitClient {
 					return null;
 				}
 			}
-			
+
 			@Override
 			protected void onCancelled() {
 				super.onCancelled();
@@ -244,13 +223,14 @@ public class HermitClient {
 			@Override
 			protected void onPostExecute(Token token) {
 				super.onPostExecute(token);
+				mToken = token;
 				dismissProgressDialog();
 				fetchCommands();
 			}
 
 		};
 	}
-	
+
 	private HermitHttpServerRequest<List<CommandInfo>> newFetchCommandsRequest() {
 		return new HermitHttpServerRequest<List<CommandInfo>>(mConsole, HttpRequest.GET) {
 			@Override
@@ -260,7 +240,7 @@ public class HermitClient {
 				getActivity().setProgressBarVisibility(false);
 				showProgressDialog(getActivity(), "Fetching commands...");
 			}
-			
+
 			@Override
 			protected void onActivityDetached() {
 				if (mProgress != null) {
@@ -275,7 +255,7 @@ public class HermitClient {
 					showProgressDialog(getActivity(), "Fetching commands...");
 				}
 			}
-			
+
 			@Override
 			protected List<CommandInfo> onResponse(String response) {
 				JSONObject insertNameHere = null;
@@ -296,7 +276,7 @@ public class HermitClient {
 						List<String> tagList = new ArrayList<String>();
 						for (int j = 0; j < tags.length(); j++) {
 							tagList.add(tags.getString(j));
-							commandList.add(new CommandInfo(name, help, tagList));
+							commandList.add(new CommandInfo(help, name, tagList));
 						}
 					}
 
@@ -306,7 +286,7 @@ public class HermitClient {
 					return null;
 				}
 			}
-			
+
 			@Override
 			protected void onCancelled() {
 				super.onCancelled();
@@ -326,7 +306,7 @@ public class HermitClient {
 						tagMapBuilder.put(tag, cmdInfo.name);
 					}
 				}
-				
+
 				getActivity().initCommandRelatedVariables(commandSetBuilder.build(), new ArrayList<String>(tagSetBuilder.build()),
 						tagMapBuilder.build());
 				dismissProgressDialog();
@@ -334,9 +314,18 @@ public class HermitClient {
 
 		};
 	}
-	
+
 	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest() {
 		return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
+			private String mmCommandName;
+
+			@Override
+			protected CommandResponse doInBackground(String... params) {
+				if (params.length > 2 && params[2] != null && !params[2].isEmpty()) {
+					mmCommandName = params[2].split(StringUtils.WHITESPACE)[0];
+				}
+				return super.doInBackground(params);
+			}
 
 			@Override
 			protected CommandResponse onResponse(String response) {
@@ -351,7 +340,9 @@ public class HermitClient {
 			@Override
 			protected void onPostExecute(CommandResponse response) {
 				super.onPostExecute(response);
+				mToken.ast = response.ast;
 				getActivity().appendCommandResponse(response);
+				getActivity().addCommandEntry(mmCommandName);
 			}
 
 		};
@@ -361,7 +352,7 @@ public class HermitClient {
 		if (mDelayedRequestName != null) {
 			switch (mDelayedRequestName) {
 			case CONNECT:
-				connect();
+				connect(mServerUrl);
 				break;
 			case COMMAND:
 				fetchCommands();
@@ -373,12 +364,8 @@ public class HermitClient {
 		}
 	}
 
-	private void showProgressDialog(Context context, String message) {
-		mProgress = new ProgressDialog(context);
-		mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mProgress.setMessage(message);
-		mProgress.setCancelable(false);
-		mProgress.show();
+	void attachConsole(ConsoleActivity console) {
+		mConsole = console;
 	}
 
 	private void dismissProgressDialog() {
@@ -386,7 +373,47 @@ public class HermitClient {
 			mProgress.dismiss();
 		}
 	}
+	
+	private boolean isNetworkConnected(RequestName name) {
+		String server = PrefsActivity.getPrefs(mConsole).getString(
+				BaseActivity.NETWORK_SOURCE_KEY, null);
+		if (BaseActivity.NETWORK_SOURCE_BLUETOOTH_SERVER.equals(server)) {
+			if (BluetoothUtils.isBluetoothEnabled(mConsole)) {
+				if (BluetoothUtils.getBluetoothDevice(mConsole) != null) {
+					return true;
+				} else {
+					notifyDelay(name);
+					BluetoothUtils.findDeviceName(mConsole);
+				}
+			} else {
+				notifyDelay(name);
+				BluetoothUtils.enableBluetooth(mConsole);
+			}
+		} else if (BaseActivity.NETWORK_SOURCE_WEB_SERVER.equals(server)) {
+			if (InternetUtils.isAirplaneModeOn(mConsole)) {
+				mConsole.appendErrorResponse("ERROR: Please disable airplane mode before attempting to connect.");
+			} else if (!InternetUtils.isWifiConnected(mConsole)
+					&& !InternetUtils.isMobileConnected(mConsole)) {
+				notifyDelay(name);
+				InternetUtils.enableWifi(mConsole);
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
 
+	public boolean isRequestDelayed() {
+		return mDelayedRequestName != null;
+	}
+	
+	private boolean isTokenAcquired() {
+		if (mToken == null) {
+			mConsole.appendErrorResponse("ERROR: No token (connect to server first).");
+			return false;
+		}
+		return true;
+	}
 
 	private void notifyDelay(RequestName name) {
 		mDelayedRequestName = name;
@@ -395,13 +422,47 @@ public class HermitClient {
 	public void notifyDelayedRequestFinished() {
 		mDelayedRequestName = null;
 	}
-
-	public boolean isRequestDelayed() {
-		return mDelayedRequestName != null;
+	
+	private void showProgressDialog(Context context, String message) {
+		mProgress = new ProgressDialog(context);
+		mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mProgress.setMessage(message);
+		mProgress.setCancelable(false);
+		mProgress.show();
 	}
 
 	private enum RequestName {
 		CONNECT, COMMAND, COMMANDS
 	};
+
+	public static final Parcelable.Creator<HermitClient> CREATOR
+	= new Parcelable.Creator<HermitClient>() {
+		public HermitClient createFromParcel(Parcel in) {
+			return new HermitClient(in);
+		}
+
+		public HermitClient[] newArray(int size) {
+			return new HermitClient[size];
+		}
+	};
+
+	private HermitClient(Parcel in) {
+		mDelayedRequestName = (RequestName) in.readSerializable();
+		mServerUrl = in.readString();
+		mToken = (Token) in.readSerializable();
+	}
+
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeSerializable(mDelayedRequestName);
+		dest.writeString(mServerUrl);
+		dest.writeSerializable(mToken);
+	}
 
 }

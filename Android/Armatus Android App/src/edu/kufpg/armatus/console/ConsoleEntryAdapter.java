@@ -7,6 +7,7 @@ import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleSearcher.MatchParams;
 
 import android.graphics.Color;
+import android.os.Parcel;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
@@ -25,20 +26,14 @@ import android.widget.TextView;
  * DragIcons} are being dragged (except for the footer, which does not react).
  */
 public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
-	/** Text color used alongside a yellow highlight (to improve readability). */
-	private static final CharacterStyle BLACK_TEXT = new ForegroundColorSpan(Color.BLACK);
-	
-	/** Text color used alongside a gray highlight (to improve readability). */
-	private static final CharacterStyle WHITE_TEXT = new ForegroundColorSpan(Color.WHITE);
-	
 	/** Reference to the current console. */
 	private ConsoleActivity mConsole;
 
 	/** Reference to the console searcher. */
 	private ConsoleSearcher mSearcher;
-	
-//	/** A drag listener applied to every {@link ConsoleEntry} {@link View}. */
-//	private OnDragListener mOnDragListener;
+
+	//	/** A drag listener applied to every {@link ConsoleEntry} {@link View}. */
+	//	private OnDragListener mOnDragListener;
 
 	/**
 	 * Constructs a new instance with the specified entries.
@@ -49,22 +44,22 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	public ConsoleEntryAdapter(ConsoleActivity console, List<ConsoleEntry> entries) {
 		super(console, R.layout.console_entry, entries);
 		mConsole = console;
-//		mOnDragListener = new OnDragListener() {
-//			@Override
-//			public boolean onDrag(View v, DragEvent event) {
-//				if (event.getAction() == DragEvent.ACTION_DROP) {
-//					int pos = mConsole.getListView().getPositionForView(v);
-//					List<String> keywords = getItem(pos).getKeywords();
-//					if (!keywords.isEmpty()) {
-//						DragIcon icon = (DragIcon) event.getLocalState();
-//						ConsoleEntryHolder holder = (ConsoleEntryHolder) v.getTag();
-//						holder.draggedOverCommand = icon.getText().toString();
-//						mConsole.openContextMenu(v);
-//					}
-//				}
-//				return true;
-//			}
-//		};
+		//		mOnDragListener = new OnDragListener() {
+		//			@Override
+		//			public boolean onDrag(View v, DragEvent event) {
+		//				if (event.getAction() == DragEvent.ACTION_DROP) {
+		//					int pos = mConsole.getListView().getPositionForView(v);
+		//					List<String> keywords = getItem(pos).getKeywords();
+		//					if (!keywords.isEmpty()) {
+		//						DragIcon icon = (DragIcon) event.getLocalState();
+		//						ConsoleEntryHolder holder = (ConsoleEntryHolder) v.getTag();
+		//						holder.draggedOverCommand = icon.getText().toString();
+		//						mConsole.openContextMenu(v);
+		//					}
+		//				}
+		//				return true;
+		//			}
+		//		};
 	}
 
 	@Override
@@ -94,14 +89,15 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 					Spannable contents = new SpannableString(holder.contents.getText());
 					Collection<Integer> offsets = mSearcher.getMatchOffsets(entryContents.toString());
 					for (int offset : offsets) {
-						CharacterStyle highlight;
 						MatchParams params = mSearcher.getSelectedMatch();
 						if (position == params.listIndex && offset == params.textViewOffset) {
-							highlight = new BackgroundColorSpan(Color.YELLOW);
-							setSpans(contents, offset, offset + criterion.length(), highlight, BLACK_TEXT);
+							MatchBackgroundSpan highlighted = new MatchBackgroundSpan(Color.parseColor("#FFBB00"));
+							MatchForegroundSpan blackText = new MatchForegroundSpan(Color.BLACK);
+							setSpans(contents, offset, offset + criterion.length(), highlighted, blackText);
 						} else {
-							highlight = new BackgroundColorSpan(Color.DKGRAY);
-							setSpans(contents, offset, offset + criterion.length(), highlight, WHITE_TEXT);
+							MatchBackgroundSpan unhighlighted = new MatchBackgroundSpan(Color.DKGRAY);
+							MatchForegroundSpan whiteText = new MatchForegroundSpan(Color.WHITE);
+							setSpans(contents, offset, offset + criterion.length(), unhighlighted, whiteText);
 						}
 					}
 					holder.contents.setText(contents);
@@ -111,7 +107,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 			}
 		}
 
-//		convertView.setOnDragListener(mOnDragListener);
+		//		convertView.setOnDragListener(mOnDragListener);
 
 		return convertView;
 	}
@@ -131,12 +127,14 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	 */
 	private void removeHighlight(TextView tv) {
 		Spannable noHighlight = new SpannableString(tv.getText());
-		CharacterStyle[] backgroundSpans = noHighlight.getSpans(0, noHighlight.length(), BackgroundColorSpan.class);
-		for (CharacterStyle span : backgroundSpans) {
+		CharacterStyle[] matchBackgrounds = noHighlight.getSpans(0, noHighlight.length(), MatchBackgroundSpan.class);
+		for (CharacterStyle span : matchBackgrounds) {
 			noHighlight.removeSpan(span);
 		}
-		noHighlight.removeSpan(BLACK_TEXT);
-		noHighlight.removeSpan(WHITE_TEXT);
+		CharacterStyle[] matchForegrounds = noHighlight.getSpans(0, noHighlight.length(), MatchForegroundSpan.class);
+		for (CharacterStyle span : matchForegrounds) {
+			noHighlight.removeSpan(span);
+		}
 		tv.setText(noHighlight);
 	}
 
@@ -157,6 +155,26 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	static class ConsoleEntryHolder {
 		public TextView contents;
 		public String draggedOverCommand;
+	}
+
+	private static class MatchBackgroundSpan extends BackgroundColorSpan {
+		public MatchBackgroundSpan(int color) {
+			super(color);
+		}
+
+		public MatchBackgroundSpan(Parcel src) {
+			super(src);
+		}
+	}
+
+	private static class MatchForegroundSpan extends ForegroundColorSpan {
+		public MatchForegroundSpan(int color) {
+			super(color);
+		}
+
+		public MatchForegroundSpan(Parcel src) {
+			super(src);
+		}
 	}
 
 }
