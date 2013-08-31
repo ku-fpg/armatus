@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableSortedMap;
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
-import edu.kufpg.armatus.util.StringUtils;
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -95,10 +94,6 @@ public class CustomCommandDispatcher {
 	 * @param args The parameters of the {@code Command}.
 	 */
 	private static void runCustomCommand(ConsoleActivity console, CustomCommand command, String... args) {
-		String commandString = command.getCommandName()
-				+ StringUtils.NBSP + varargsToString(args);
-		console.addConsoleUserInputEntry(commandString);
-
 		if (command.hasLowerArgBound()) {
 			if (args.length < command.getArgsCount()) {
 				console.appendErrorResponse("ERROR: " + command.getCommandName() +
