@@ -1,9 +1,11 @@
 package edu.kufpg.armatus.command;
 
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 
 import edu.kufpg.armatus.BaseActivity;
@@ -18,28 +20,31 @@ import android.widget.Toast;
  */
 public class CustomCommandDispatcher {
 	public static final String CLIENT_COMMANDS_TAG = "Client";
+	private static final String CLEAR_INFO = "Hides all currently visible console entries. The entries will still be accessible from the command history.";
+	private static final String CONNECT_INFO = "Attempts to connect to the HERMIT server. If successful, it will load additional commands.";
+	private static final String EXIT_INFO = "Leaves the current console sessions, discarding any unsaved history.";
+	private static final String TOAST_INFO = "Displays its arguments as a pop-up on the screen.";
+	private static final String TERMINAL_INFO = "Opens Android Terminal Emulator, if installed.";
 
-	private static final CustomCommand CLEAR = new CustomCommand("clear", 0, true) {
+	private static final CustomCommand CLEAR = new CustomCommand("clear", CLEAR_INFO, 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.clear();
-			super.run(console, args);
 		}
 	};
-	private static final CustomCommand CONNECT = new CustomCommand("connect", 1, false) {
+	private static final CustomCommand CONNECT = new CustomCommand("connect", CONNECT_INFO, 1, false) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.getHermitClient().connect("http://" + args[0] + ":3000");
-			super.run(console, args);
 		}
 	};
-	private static final CustomCommand EXIT = new CustomCommand("exit", 0) {
+	private static final CustomCommand EXIT = new CustomCommand("exit", EXIT_INFO, 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.exit();
 		}
 	};
-	private static final CustomCommand TOAST = new CustomCommand("toast", 0, true) {
+	private static final CustomCommand TOAST = new CustomCommand("toast", TOAST_INFO, 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			Toast toast = null;
@@ -49,13 +54,11 @@ public class CustomCommandDispatcher {
 				toast = Toast.makeText(console, varargsToString(args), Toast.LENGTH_SHORT);
 			}
 			toast.show();
-			super.run(console, args);
 		}
 	};
-	private static final CustomCommand TERMINAL = new CustomCommand("terminal", 0, true){
+	private static final CustomCommand TERMINAL = new CustomCommand("terminal", TERMINAL_INFO, 0, true){
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
-			super.run(console, args);
 			String packageName = "jackpal.androidterm";
 			boolean installed = BaseActivity.appInstalledOrNot(console, packageName);  
 			if (installed) {
@@ -71,6 +74,7 @@ public class CustomCommandDispatcher {
 	};
 
 	private static final SortedMap<String, CustomCommand> CUSTOM_COMMAND_MAP = mapCustomCommands();
+	private static final SortedMap<String, String> CUSTOM_COMMAND_INFO_MAP = mapCustomCommandInfo();
 
 	private CustomCommandDispatcher() {}
 
@@ -140,13 +144,23 @@ public class CustomCommandDispatcher {
 		return builder.toString().trim();
 	}
 
-	private static SortedMap<String, CustomCommand> mapCustomCommands() {
-		ImmutableSortedMap.Builder<String, CustomCommand> commandBuilder = ImmutableSortedMap.naturalOrder();
+	private static Map<String, CustomCommand> mapCustomCommands() {
+		ImmutableMap.Builder<String, CustomCommand> commandBuilder = ImmutableMap.builder();
 		return commandBuilder.put(CLEAR.getCommandName(), CLEAR)
 				.put(CONNECT.getCommandName(), CONNECT)
 				.put(EXIT.getCommandName(), EXIT)
 				.put(TERMINAL.getCommandName(), TERMINAL)
 				.put(TOAST.getCommandName(), TOAST)
+				.build();
+	}
+	
+	private static Map<String, String> mapCustomCommandInfo() {
+		ImmutableMap.Builder<String, String> commandInfoBuilder = ImmutableMap.builder();
+		return commandInfoBuilder.put(CLEAR.getCommandName(), CLEAR.getCommandInfo())
+				.put(CONNECT.getCommandName(), CONNECT.getCommandInfo())
+				.put(EXIT.getCommandName(), EXIT.getCommandInfo())
+				.put(TERMINAL.getCommandName(), TERMINAL.getCommandInfo())
+				.put(TOAST.getCommandName(), TOAST.getCommandInfo())
 				.build();
 	}
 

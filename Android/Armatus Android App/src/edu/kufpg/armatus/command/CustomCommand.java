@@ -8,9 +8,11 @@ import edu.kufpg.armatus.console.ConsoleActivity;
  * of arguments and may accept at least a certain number of arguments if it is
  * initialized with a lower argument bound.
  */
-public class CustomCommand {
+public abstract class CustomCommand {
 	/** The real {@link CustomCommand} name. */
 	private String mCommandName;
+	
+	private String mCommandInfo;
 
 	/** The number of arguments that this {@link CustomCommand} takes. If {@link
 	 * #mLowerArgBound} is {@code true}, {@code mArgsCount} specifies the
@@ -26,8 +28,9 @@ public class CustomCommand {
 	 * @param commandName The name of the {@link CustomCommand}.
 	 * @param argsCount The number of arguments that this {@code Command} must take.
 	 */
-	public CustomCommand(String commandName, int argsCount) {
+	public CustomCommand(String commandName, String commandInfo, int argsCount) {
 		mCommandName = commandName;
+		mCommandInfo = commandInfo;
 		mArgsCount = argsCount;
 	}
 
@@ -40,9 +43,13 @@ public class CustomCommand {
 	 * @param lowerArgBound {@code true} if {@code argsCount} is a minimum
 	 * amount, {@code false} if {@code argsCount} is a precise quantity.
 	 */
-	public CustomCommand(String commandName, int argsCount, boolean lowerArgBound) {
-		this(commandName, argsCount);
+	public CustomCommand(String commandName, String commandInfo, int argsCount, boolean lowerArgBound) {
+		this(commandName, commandInfo, argsCount);
 		mLowerArgBound = lowerArgBound;
+	}
+	
+	public String getCommandInfo() {
+		return mCommandInfo;
 	}
 
 	/**
@@ -75,7 +82,5 @@ public class CustomCommand {
 	 * @param console The {@link ConsoleActivity} on which this {@code Command} will be run.
 	 * @param args Parameters that the {@code Command} uses.
 	 */
-	protected void run(ConsoleActivity console, String... args) {
-		console.addCommandEntry(getCommandName());
-	}
+	protected abstract void run(ConsoleActivity console, String... args);
 }

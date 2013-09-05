@@ -1,10 +1,7 @@
 package edu.kufpg.armatus.console;
 
-import java.util.List;
-
-import com.google.common.collect.ListMultimap;
-
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.command.Commands;
 import edu.kufpg.armatus.drag.DragIcon;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -19,8 +16,6 @@ import android.widget.TextView;
  * edu.kufpg.armatus.console.CustomCommand.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
-	private static List<String> TAG_LIST;
-	private static ListMultimap<String, String> TAG_MAP;
 	private Context mContext;
 	private LayoutInflater mInflater;
 
@@ -28,21 +23,14 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	 * Constructs a new instance and initializes the menu data if necessary.
 	 * @param context The {@link Context} to use.
 	 */
-	public CommandExpandableMenuAdapter(Context context, List<String> groupList,
-			ListMultimap<String, String> tagMap) {
+	public CommandExpandableMenuAdapter(Context context) {
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
-		if (TAG_LIST == null) {
-			TAG_LIST = groupList;
-		}
-		if (TAG_MAP == null) {
-			TAG_MAP = tagMap;
-		}
 	}
 
 	@Override
 	public String getChild(int groupPosition, int childPosition) {
-		return TAG_MAP.get(getGroup(groupPosition)).get(childPosition);
+		return Commands.getTagMap().get(getGroup(groupPosition)).get(childPosition);
 	}
 
 	@Override
@@ -73,17 +61,17 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return TAG_MAP.get(getGroup(groupPosition)).size();
+		return Commands.getTagMap().get(getGroup(groupPosition)).size();
 	}
 
 	@Override
 	public String getGroup(int groupPosition) {
-		return TAG_LIST.get(groupPosition);
+		return Commands.getTagList().get(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return TAG_LIST.size();
+		return Commands.getTagList().size();
 	}
 
 	@Override
