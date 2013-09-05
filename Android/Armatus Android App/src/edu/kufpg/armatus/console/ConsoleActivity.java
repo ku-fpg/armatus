@@ -118,7 +118,6 @@ public class ConsoleActivity extends BaseActivity {
 
 		mConsoleListView = (ConsoleListView) findViewById(R.id.console_list_view);
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
-		mCommandHistoryListView = (ListView) findViewById(R.id.command_history_list);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
 		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
 		mSearchMatches = (TextView) findViewById(R.id.console_search_matches_indicator);
@@ -132,7 +131,6 @@ public class ConsoleActivity extends BaseActivity {
 		if (savedInstanceState == null) {
 			setSoftKeyboardVisibility(true);
 			mConsoleEntries = new ArrayList<ConsoleEntry>();
-			mCommandHistoryEntries = new ArrayList<String>();
 			mConsoleInputLayout.setLayoutParams(new AbsListView.LayoutParams(
 					AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
 			initCommandRelatedVariables(null, null, null);
@@ -154,7 +152,6 @@ public class ConsoleActivity extends BaseActivity {
 
 			mConsoleInputNum = savedInstanceState.getInt("consoleInputNum");
 			mConsoleEntries = (List<ConsoleEntry>) savedInstanceState.getSerializable("consoleEntries");
-			mCommandHistoryEntries = (List<String>) savedInstanceState.getSerializable("commandEntries");
 			mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this, null, null);
 			mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 			mCompleter = (WordCompleter) savedInstanceState.getParcelable("wordCompleter");
@@ -221,9 +218,6 @@ public class ConsoleActivity extends BaseActivity {
 			mSearcher.attachAdapter(mConsoleListAdapter);
 		}
 
-		mCommandHistoryAdapter = new CommandHistoryAdapter(this, mCommandHistoryEntries);
-		mCommandHistoryListView.setAdapter(mCommandHistoryAdapter);
-
 		mConsoleInputNumView.setTypeface(TYPEFACE);
 		mConsoleInputEditText.setTypeface(TYPEFACE);
 		mConsoleInputEditText.addTextChangedListener(new TextWatcher() {
@@ -269,7 +263,6 @@ public class ConsoleActivity extends BaseActivity {
 		});
 
 		updateConsoleEntries();
-		updateCommandHistoryEntries();
 		resizeSlidingMenu();
 	}
 
@@ -314,7 +307,6 @@ public class ConsoleActivity extends BaseActivity {
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisibility);
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
-		outState.putSerializable("commandEntries", (Serializable) mCommandHistoryEntries);
 		outState.putParcelable("wordCompleter", mCompleter);
 		outState.putParcelable("hermitClient", mHermitClient);
 	}
@@ -527,13 +519,13 @@ public class ConsoleActivity extends BaseActivity {
 		return super.onKeyDown(keyCode, event);
 	}
 
-	public void addCommandEntry(String commandName) {
+	/**public void addCommandEntry(String commandName) {
 		if ((mCommandHistoryEntries.size() == 0
 				|| commandName != mCommandHistoryEntries.get(0))) {
 			mCommandHistoryEntries.add(0, commandName);
 			updateCommandHistoryEntries();
 		}
-	}
+	}*/
 
 	public void addConsoleUserInputEntry(String userInput) {
 		addConsoleEntry(userInput, null, null);
@@ -797,12 +789,12 @@ public class ConsoleActivity extends BaseActivity {
 		updateConsoleEntries();
 	}
 
-	private void updateCommandHistoryEntries() {
+	/**private void updateCommandHistoryEntries() {
 		if (mCommandHistoryEntries.size() > COMMAND_HISTORY_ENTRY_LIMIT) {
 			mCommandHistoryEntries.remove(0);
 		}
 		mCommandHistoryAdapter.notifyDataSetChanged();
-	}
+	}*/
 
 	private void updateInput() {
 		mConsoleInputNumView.setText("hermit<" + mConsoleInputNum + "> ");

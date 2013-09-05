@@ -8,7 +8,7 @@ import edu.kufpg.armatus.console.ConsoleActivity;
  * of arguments and may accept at least a certain number of arguments if it is
  * initialized with a lower argument bound.
  */
-public class CustomCommand {
+public abstract class CustomCommand {
 	/** The real {@link CustomCommand} name. */
 	private String mCommandName;
 
@@ -75,7 +75,5 @@ public class CustomCommand {
 	 * @param console The {@link ConsoleActivity} on which this {@code Command} will be run.
 	 * @param args Parameters that the {@code Command} uses.
 	 */
-	protected void run(ConsoleActivity console, String... args) {
-		console.addCommandEntry(getCommandName());
-	}
+	protected abstract void run(ConsoleActivity console, String... args);
 }

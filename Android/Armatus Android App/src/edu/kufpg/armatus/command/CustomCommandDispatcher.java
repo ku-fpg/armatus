@@ -23,14 +23,12 @@ public class CustomCommandDispatcher {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.clear();
-			super.run(console, args);
 		}
 	};
 	private static final CustomCommand CONNECT = new CustomCommand("connect", 1, false) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.getHermitClient().connect("http://" + args[0] + ":3000");
-			super.run(console, args);
 		}
 	};
 	private static final CustomCommand EXIT = new CustomCommand("exit", 0) {
@@ -49,13 +47,11 @@ public class CustomCommandDispatcher {
 				toast = Toast.makeText(console, varargsToString(args), Toast.LENGTH_SHORT);
 			}
 			toast.show();
-			super.run(console, args);
 		}
 	};
 	private static final CustomCommand TERMINAL = new CustomCommand("terminal", 0, true){
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
-			super.run(console, args);
 			String packageName = "jackpal.androidterm";
 			boolean installed = BaseActivity.appInstalledOrNot(console, packageName);  
 			if (installed) {

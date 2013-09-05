@@ -342,7 +342,6 @@ public class HermitClient implements Parcelable {
 				super.onPostExecute(response);
 				mToken.ast = response.ast;
 				getActivity().appendCommandResponse(response);
-				getActivity().addCommandEntry(mmCommandName);
 			}
 
 		};
