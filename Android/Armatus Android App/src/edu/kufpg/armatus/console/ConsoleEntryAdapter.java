@@ -1,10 +1,10 @@
 package edu.kufpg.armatus.console;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleSearcher.MatchParams;
+import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
 
 import android.graphics.Color;
 import android.os.Parcel;
@@ -30,7 +30,7 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	private ConsoleActivity mConsole;
 
 	/** Reference to the console searcher. */
-	private ConsoleSearcher mSearcher;
+	private ConsoleWordSearcher mSearcher;
 
 	//	/** A drag listener applied to every {@link ConsoleEntry} {@link View}. */
 	//	private OnDragListener mOnDragListener;
@@ -87,11 +87,11 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 				if (mSearcher.hasMatches(entryContents.toString())) {
 					removeHighlight(holder.contents);
 					Spannable contents = new SpannableString(holder.contents.getText());
-					Collection<Integer> offsets = mSearcher.getMatchOffsets(entryContents.toString());
+					SortedSet<Integer> offsets = mSearcher.getMatchOffsets(entryContents.toString());
 					for (int offset : offsets) {
 						MatchParams params = mSearcher.getSelectedMatch();
 						if (position == params.listIndex && offset == params.textViewOffset) {
-							MatchBackgroundSpan highlighted = new MatchBackgroundSpan(Color.parseColor("#FFBB00"));
+							MatchBackgroundSpan highlighted = new MatchBackgroundSpan(Color.parseColor("#FFC400"));
 							MatchForegroundSpan blackText = new MatchForegroundSpan(Color.BLACK);
 							setSpans(contents, offset, offset + criterion.length(), highlighted, blackText);
 						} else {
@@ -115,9 +115,9 @@ public class ConsoleEntryAdapter extends ArrayAdapter<ConsoleEntry> {
 	/**
 	 * Restores the reference to the console searcher, which can be destroyed after
 	 * device standby or rotation.
-	 * @param searcher The {@link ConsoleSearcher} to reconnect to.
+	 * @param searcher The {@link ConsoleWordSearcher} to reconnect to.
 	 */
-	void attachSearcher(ConsoleSearcher searcher) {
+	void attachSearcher(ConsoleWordSearcher searcher) {
 		mSearcher = searcher;
 	}
 

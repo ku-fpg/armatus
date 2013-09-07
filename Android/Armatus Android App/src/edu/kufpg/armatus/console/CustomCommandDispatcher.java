@@ -1,21 +1,20 @@
-package edu.kufpg.armatus.command;
+package edu.kufpg.armatus.console;
 
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.NavigableMap;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ListMultimap;
 
 import edu.kufpg.armatus.BaseActivity;
-import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import android.content.Intent;
 import android.widget.Toast;
 
 /**
- * Contains all {@link CustomCommand}s and {@link Keyword}s that the console uses and allows
+ * Contains all {@link CustomCommandInfo}s and {@link Keyword}s that the console uses and allows
  * {@link ConsoleActivity} to execute commands.
  */
 public class CustomCommandDispatcher {
@@ -26,25 +25,25 @@ public class CustomCommandDispatcher {
 	private static final String TOAST_INFO = "Displays its arguments as a pop-up on the screen.";
 	private static final String TERMINAL_INFO = "Opens Android Terminal Emulator, if installed.";
 
-	private static final CustomCommand CLEAR = new CustomCommand("clear", CLEAR_INFO, 0, true) {
+	private static final CustomCommandInfo CLEAR = new CustomCommandInfo(CLEAR_INFO, "clear", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.clear();
 		}
 	};
-	private static final CustomCommand CONNECT = new CustomCommand("connect", CONNECT_INFO, 1, false) {
+	private static final CustomCommandInfo CONNECT = new CustomCommandInfo(CONNECT_INFO, "connect", 1, false) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.getHermitClient().connect("http://" + args[0] + ":3000");
 		}
 	};
-	private static final CustomCommand EXIT = new CustomCommand("exit", EXIT_INFO, 0) {
+	private static final CustomCommandInfo EXIT = new CustomCommandInfo(EXIT_INFO, "exit", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			console.exit();
 		}
 	};
-	private static final CustomCommand TOAST = new CustomCommand("toast", TOAST_INFO, 0, true) {
+	private static final CustomCommandInfo TOAST = new CustomCommandInfo(TOAST_INFO, "toast", 0, true) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			Toast toast = null;
@@ -56,7 +55,7 @@ public class CustomCommandDispatcher {
 			toast.show();
 		}
 	};
-	private static final CustomCommand TERMINAL = new CustomCommand("terminal", TERMINAL_INFO, 0, true){
+	private static final CustomCommandInfo TERMINAL = new CustomCommandInfo(TERMINAL_INFO, "terminal", 0, true){
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
 			String packageName = "jackpal.androidterm";
@@ -73,41 +72,50 @@ public class CustomCommandDispatcher {
 		}
 	};
 
-	private static final SortedMap<String, CustomCommand> CUSTOM_COMMAND_MAP = mapCustomCommands();
-	private static final SortedMap<String, String> CUSTOM_COMMAND_INFO_MAP = mapCustomCommandInfo();
+	private static final Map<String, CustomCommandInfo> CUSTOM_COMMAND_MAP = mapCustomCommands();
+	private static final ListMultimap<String, String> CUSTOM_COMMAND_TAGS_MAP = mapCustomCommandTags();
+	private static final NavigableMap<String, String> CUSTOM_COMMAND_HELP_MAP = mapCustomCommandHelp();
 
 	private CustomCommandDispatcher() {}
 
+	static NavigableMap<String, String> getCommandInfoMap() {
+		return CUSTOM_COMMAND_HELP_MAP;
+	}
+	
+	static ListMultimap<String, String> getCommandTagsMap() {
+		return CUSTOM_COMMAND_TAGS_MAP;
+	}
+	
 	/**
-	 * Attempts to run a {@link CustomCommand} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommand}.
+	 * Attempts to run a {@link CustomCommandInfo} on the console.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommandInfo}.
 	 * @param commandName The name of the {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
 	public static void runCustomCommand(ConsoleActivity console, String commandName, String... args) {
-		CustomCommand command = CUSTOM_COMMAND_MAP.get(commandName);
+		CustomCommandInfo command = CUSTOM_COMMAND_MAP.get(commandName);
 		if (command != null) {
 			runCustomCommand(console, command, args);
 		}
 	}
 
 	/**
-	 * Attempts to run a {@link CustomCommand} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommand}.
+	 * Attempts to run a {@link CustomCommandInfo} on the console.
+	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommandInfo}.
 	 * @param commandThe {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
-	private static void runCustomCommand(ConsoleActivity console, CustomCommand command, String... args) {
+	private static void runCustomCommand(ConsoleActivity console, CustomCommandInfo command, String... args) {
 		if (command.hasLowerArgBound()) {
 			if (args.length < command.getArgsCount()) {
-				console.appendErrorResponse("ERROR: " + command.getCommandName() +
+				console.appendErrorResponse("ERROR: " + command.getName() +
 						" requires at least " + command.getArgsCount() +
 						(command.getArgsCount() == 1 ? " argument." :
 								" arguments."));
 				return;
 			}
 		} else if (args.length != command.getArgsCount()) {
-			console.appendErrorResponse("ERROR: " + command.getCommandName() +
+			console.appendErrorResponse("ERROR: " + command.getName() +
 					" requires exactly " + command.getArgsCount() +
 					(command.getArgsCount() == 1 ? " argument." :
 							" arguments."));
@@ -116,16 +124,10 @@ public class CustomCommandDispatcher {
 		command.run(console, args);
 	}
 
-	public static CustomCommand getCustomCommand(String commandName) {
+	public static CustomCommandInfo getCustomCommand(String commandName) {
 		return CUSTOM_COMMAND_MAP.get(commandName);
 	}
 
-	public static SortedSet<String> getCustomCommandNames() {
-		SortedSet<String> commandNames = new TreeSet<String>();
-		commandNames.addAll(CUSTOM_COMMAND_MAP.keySet());
-		return commandNames;
-	}
-	
 	public static boolean isCustomCommand(String commandName) {
 		return CUSTOM_COMMAND_MAP.containsKey(commandName);
 	}
@@ -144,23 +146,28 @@ public class CustomCommandDispatcher {
 		return builder.toString().trim();
 	}
 
-	private static Map<String, CustomCommand> mapCustomCommands() {
-		ImmutableMap.Builder<String, CustomCommand> commandBuilder = ImmutableMap.builder();
-		return commandBuilder.put(CLEAR.getCommandName(), CLEAR)
-				.put(CONNECT.getCommandName(), CONNECT)
-				.put(EXIT.getCommandName(), EXIT)
-				.put(TERMINAL.getCommandName(), TERMINAL)
-				.put(TOAST.getCommandName(), TOAST)
+	private static Map<String, CustomCommandInfo> mapCustomCommands() {
+		ImmutableMap.Builder<String, CustomCommandInfo> commandBuilder = ImmutableMap.builder();
+		return commandBuilder.put(CLEAR.getName(), CLEAR)
+				.put(CONNECT.getName(), CONNECT)
+				.put(EXIT.getName(), EXIT)
+				.put(TERMINAL.getName(), TERMINAL)
+				.put(TOAST.getName(), TOAST)
 				.build();
 	}
-	
-	private static Map<String, String> mapCustomCommandInfo() {
-		ImmutableMap.Builder<String, String> commandInfoBuilder = ImmutableMap.builder();
-		return commandInfoBuilder.put(CLEAR.getCommandName(), CLEAR.getCommandInfo())
-				.put(CONNECT.getCommandName(), CONNECT.getCommandInfo())
-				.put(EXIT.getCommandName(), EXIT.getCommandInfo())
-				.put(TERMINAL.getCommandName(), TERMINAL.getCommandInfo())
-				.put(TOAST.getCommandName(), TOAST.getCommandInfo())
+
+	private static ListMultimap<String, String> mapCustomCommandTags() {
+		ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
+		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_MAP.keySet()).build();
+	}
+
+	private static NavigableMap<String, String> mapCustomCommandHelp() {
+		ImmutableSortedMap.Builder<String, String> commandInfoBuilder = ImmutableSortedMap.naturalOrder();
+		return commandInfoBuilder.put(CLEAR.getName(), CLEAR.getHelp())
+				.put(CONNECT.getName(), CONNECT.getHelp())
+				.put(EXIT.getName(), EXIT.getHelp())
+				.put(TERMINAL.getName(), TERMINAL.getHelp())
+				.put(TOAST.getName(), TOAST.getHelp())
 				.build();
 	}
 

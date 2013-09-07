@@ -19,7 +19,7 @@ import android.os.Parcelable;
  * destroy a {@code ConsoleSearcher}, you should parcel it and reload it later
  * instead of recreating a new instance every time.
  */
-public class ConsoleSearcher implements Parcelable {
+public class ConsoleWordSearcher implements Parcelable {
 	/** Value indicating that no matching indexes were found. */
 	private static final int NO_MATCH = -1;
 	
@@ -51,7 +51,7 @@ public class ConsoleSearcher implements Parcelable {
 	 * Constructs a new instance with a reference to the specified adapter.
 	 * @param adapter The {@link ConsoleEntryAdapter} to reference.
 	 */
-	public ConsoleSearcher(ConsoleEntryAdapter adapter) {
+	public ConsoleWordSearcher(ConsoleEntryAdapter adapter) {
 		attachAdapter(adapter);
 	}
 
@@ -249,26 +249,26 @@ public class ConsoleSearcher implements Parcelable {
 	}
 
 	/**
-	 * Returns if this {@link ConsoleSearcher} is currently searching.
+	 * Returns if this {@link ConsoleWordSearcher} is currently searching.
 	 * @return if a search is ongoing.
 	 */
 	public synchronized boolean isSearching() {
 		return mCriterion != null;
 	}
 
-	public static final Parcelable.Creator<ConsoleSearcher> CREATOR
-	= new Parcelable.Creator<ConsoleSearcher>() {
-		public ConsoleSearcher createFromParcel(Parcel in) {
-			return new ConsoleSearcher(in);
+	public static final Parcelable.Creator<ConsoleWordSearcher> CREATOR
+	= new Parcelable.Creator<ConsoleWordSearcher>() {
+		public ConsoleWordSearcher createFromParcel(Parcel in) {
+			return new ConsoleWordSearcher(in);
 		}
 
-		public ConsoleSearcher[] newArray(int size) {
-			return new ConsoleSearcher[size];
+		public ConsoleWordSearcher[] newArray(int size) {
+			return new ConsoleWordSearcher[size];
 		}
 	};
 
 	@SuppressWarnings("unchecked")
-	private ConsoleSearcher(Parcel in) {
+	private ConsoleWordSearcher(Parcel in) {
 		mCriterion = in.readString();
 		mSearchOffsetsMap = (SortedSetMultimap<String, Integer>) in.readSerializable();
 		mPreviousMatches = (Stack<MatchParams>) in.readSerializable();

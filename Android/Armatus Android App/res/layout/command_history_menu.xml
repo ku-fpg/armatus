@@ -11,11 +11,4 @@
         android:gravity="top|center_horizontal"
         android:text="Empty Menu" />
 
-    <ListView
-        android:id="@+id/command_history_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
-
 </LinearLayout>

@@ -1,7 +1,6 @@
 package edu.kufpg.armatus.console;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.command.Commands;
 import edu.kufpg.armatus.drag.DragIcon;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 /**
  * {@link android.widget.ExpandableListAdapter ExpandableListAdapter} for a menu containing
  * {@link DragIcon}s representing various console {@link
- * edu.kufpg.armatus.console.CustomCommand.Command Command}s.
+ * edu.kufpg.armatus.console.CustomCommandInfo.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	private Context mContext;
@@ -30,7 +29,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public String getChild(int groupPosition, int childPosition) {
-		return Commands.getTagMap().get(getGroup(groupPosition)).get(childPosition);
+		return Commands.getTagCommands(getGroup(groupPosition)).get(childPosition);
 	}
 
 	@Override
@@ -61,17 +60,17 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return Commands.getTagMap().get(getGroup(groupPosition)).size();
+		return Commands.getTagCommands(getGroup(groupPosition)).size();
 	}
 
 	@Override
 	public String getGroup(int groupPosition) {
-		return Commands.getTagList().get(groupPosition);
+		return Commands.getTag(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return Commands.getTagList().size();
+		return Commands.getTagCount();
 	}
 
 	@Override

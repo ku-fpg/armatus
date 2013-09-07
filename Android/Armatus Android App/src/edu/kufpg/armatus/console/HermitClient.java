@@ -3,7 +3,9 @@ package edu.kufpg.armatus.console;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,15 +13,20 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSortedSet;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.PrefsActivity;
-import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
@@ -76,33 +83,98 @@ public class HermitClient implements Parcelable {
 		}
 	}
 
-	public class CommandInfo {
-		public final String help, name;
-		public final List<String> tags;
+	public static class CommandInfo {
+		private final String mHelp, mName;
+		private final List<String> mTags;
 
 		public CommandInfo(String help, String name, List<String> tags) {
-			this.help = help;
-			this.name = name;
-			this.tags = tags;
+			mHelp = help;
+			mName = name;
+			mTags = tags;
+		}
+		
+		public String getHelp() {
+			return mHelp;
+		}
+		
+		public String getName() {
+			return mName;
+		}
+		
+		public List<String> getTags() {
+			return mTags;
 		}
 
 	}
 
 	public static class CommandResponse implements Serializable {
 		private static final long serialVersionUID = 6457446122656522614L;
-		public final int ast;
-		public final List<Glyph> glyphs;
+		private static final String BLUE = "#0090D3";
+		private static final String RED = "#CC060B";
+		private static final String YELLOW = "#FDFD0D";
+		private static final String GREEN = "#1DDA1C";
+		private static final String CYAN = "#1BE0CC";
+		
+		private final int mAst;
+		private final List<Glyph> mGlyphs;
 
 		public CommandResponse(JSONObject o) throws JSONException {
-			this(o.getInt("ast"), listOfGlyphs(o.getJSONArray("glyphs")));
+			this(o.getInt("ast"), jsonToGlyphs(o.getJSONArray("glyphs")));
 		}
 
 		public CommandResponse(int ast, List<Glyph> glyphs) {
-			this.ast = ast;
-			this.glyphs = glyphs;
+			mAst = ast;
+			mGlyphs = glyphs;
+		}
+		
+		public CharSequence createPrettyText() {
+			SpannableStringBuilder builder = new SpannableStringBuilder();
+			for (Glyph glyph : mGlyphs) {
+				SpannableString spanWord = new SpannableString(glyph.getText());
+				if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
+					spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
+							0, glyph.getText().length(), 0);
+					spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
+							0, glyph.getText().length(), 0);
+				} else {
+					String glyphColor = getGlyphColor(glyph.getStyle());
+					if (glyphColor != null) {
+						spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
+								0, glyph.getText().length(), 0);
+				}
+					
+				}
+				builder.append(spanWord);
+			}
+			return builder;
+		}
+		
+		public int getAst() {
+			return mAst;
+		}
+		
+		public List<Glyph> getGlyphs() {
+			return mGlyphs;
+		}
+		
+		private static String getGlyphColor(GlyphStyle style) {
+			switch (style) {
+			case KEYWORD:
+				return BLUE;
+			case SYNTAX:
+				return RED;
+			case COERCION:
+				return YELLOW;
+			case TYPE:
+				return GREEN;
+			case LIT:
+				return CYAN;
+			default:
+				return null;
+			}
 		}
 
-		private static List<Glyph> listOfGlyphs(JSONArray a) {
+		private static List<Glyph> jsonToGlyphs(JSONArray a) {
 			List<Glyph> list = new ArrayList<Glyph>();
 			for (int i = 0; i < a.length(); i++) {
 				try {
@@ -115,25 +187,30 @@ public class HermitClient implements Parcelable {
 		}
 	}
 
-	public static enum GlyphStyle {
-		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING
-	}
-
 	public static class Glyph implements Serializable {
 		private static final long serialVersionUID = -7814082698884658726L;
-		public final GlyphStyle style;
-		public final String text;
+		
+		private final GlyphStyle mStyle;
+		private final String mText;
 
 		public Glyph(JSONObject o) throws JSONException {
-			this(getStyle(o), o.getString("text"));
+			this(jsonToStyle(o), o.getString("text"));
 		}
 
 		public Glyph(GlyphStyle style, String text) {
-			this.style = style;
-			this.text = text;
+			mStyle = style;
+			mText = text;
+		}
+		
+		public GlyphStyle getStyle() {
+			return mStyle;
+		}
+		
+		public String getText() {
+			return mText;
 		}
 
-		private static GlyphStyle getStyle(JSONObject o) {
+		private static GlyphStyle jsonToStyle(JSONObject o) {
 			if (o.has("style")) {
 				GlyphStyle glyphStyle = null;
 				try {
@@ -150,26 +227,42 @@ public class HermitClient implements Parcelable {
 		}
 
 	}
+	
+	public static enum GlyphStyle {
+		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING
+	}
 
 	public static class Token implements Serializable {
 		private static final long serialVersionUID = -8737445107687286266L;
-		public final int user;
-		public int ast;
+		private final int mUser;
+		private int mAst;
 
 		public Token(JSONObject o) throws JSONException {
 			this(o.getInt("user"), o.getInt("ast"));
 		}
 
 		public Token(int user, int ast) {
-			this.user = user;
-			this.ast = ast;
+			mUser = user;
+			mAst = ast;
+		}
+		
+		public int getUser() {
+			return mUser;
+		}
+		
+		public int getAst() {
+			return mAst;
+		}
+		
+		public void setAst(int ast) {
+			mAst = ast;
 		}
 
 		public JSONObject toJSONObject() {
 			JSONObject o = new JSONObject();
 			try {
-				o.put("user", user);
-				o.put("ast", ast);
+				o.put("user", mUser);
+				o.put("ast", mAst);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -298,17 +391,24 @@ public class HermitClient implements Parcelable {
 				super.onPostExecute(commands);
 				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
 				ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
+				//ImmutableMap.Builder<String, String> commandHelpBuilder = ImmutableMap.builder();
+				Map<String, String> commandHelpMap = new HashMap<String, String>();
 				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
 				for (CommandInfo cmdInfo : commands) {
-					commandSetBuilder.add(cmdInfo.name);
-					for (String tag : cmdInfo.tags) {
+					commandSetBuilder.add(cmdInfo.getName());
+					commandHelpMap.put(cmdInfo.getName(), cmdInfo.getHelp());
+					//commandHelpBuilder.put(cmdInfo.getName(), cmdInfo.getHelp());
+					for (String tag : cmdInfo.getTags()) {
 						tagSetBuilder.add(tag);
-						tagMapBuilder.put(tag, cmdInfo.name);
+						tagMapBuilder.put(tag, cmdInfo.getName());
 					}
 				}
 
-				getActivity().initCommandRelatedVariables(commandSetBuilder.build(), new ArrayList<String>(tagSetBuilder.build()),
-						tagMapBuilder.build());
+				Commands.setCommandHelpMap(commandHelpMap);
+				Commands.setCommandSet(commandSetBuilder.build());
+				Commands.setTagList(ImmutableList.copyOf(tagSetBuilder.build()));
+				Commands.setTagMap(tagMapBuilder.build());
+				getActivity().updateCommandExpandableMenu();
 				dismissProgressDialog();
 			}
 
@@ -317,15 +417,15 @@ public class HermitClient implements Parcelable {
 
 	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest() {
 		return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
-			private String mmCommandName;
-
-			@Override
-			protected CommandResponse doInBackground(String... params) {
-				if (params.length > 2 && params[2] != null && !params[2].isEmpty()) {
-					mmCommandName = params[2].split(StringUtils.WHITESPACE)[0];
-				}
-				return super.doInBackground(params);
-			}
+//			private String mmCommandName;
+//
+//			@Override
+//			protected CommandResponse doInBackground(String... params) {
+//				if (params.length > 2 && params[2] != null && !params[2].isEmpty()) {
+//					mmCommandName = params[2].split(StringUtils.WHITESPACE)[0];
+//				}
+//				return super.doInBackground(params);
+//			}
 
 			@Override
 			protected CommandResponse onResponse(String response) {
@@ -340,7 +440,7 @@ public class HermitClient implements Parcelable {
 			@Override
 			protected void onPostExecute(CommandResponse response) {
 				super.onPostExecute(response);
-				mToken.ast = response.ast;
+				mToken.setAst(response.getAst());
 				getActivity().appendCommandResponse(response);
 			}
 

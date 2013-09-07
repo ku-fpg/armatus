@@ -12,7 +12,6 @@ import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-import edu.kufpg.armatus.command.CustomCommandDispatcher;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -21,9 +20,7 @@ import edu.kufpg.armatus.util.StringUtils;
  * it is recommended that if you need to destroy a {@code WordCompleter}, you should
  * parcel it and reload it later instead of recreating a new instance every time.
  */
-public class WordCompleter implements Parcelable, TextWatcher {
-	/** The set of all possible commands that can be considered. */
-	private static SortedSet<String> COMMAND_DICTIONARY;
+public class ConsoleWordCompleter implements Parcelable, TextWatcher {
 	
 	/** A subset of {@link #COMMAND_DICTIONARY} containing only those commands which
 	 * match the word to be completed. */
@@ -45,16 +42,13 @@ public class WordCompleter implements Parcelable, TextWatcher {
 	 * in {@link CustomCommandDispatcher}.
 	 * @param console reference to the current console.
 	 */
-	public WordCompleter(ConsoleActivity console, SortedSet<String> commandDictionary) {
+	public ConsoleWordCompleter(ConsoleActivity console, SortedSet<String> commandDictionary) {
 		mConsole = console;
-		if (COMMAND_DICTIONARY == null) {
-			COMMAND_DICTIONARY = commandDictionary;
-		}
 		resetFilter("");
 	}
 	
 	/**
-	 * Restores this {@link WordCompleter}'s reference to the current console, which
+	 * Restores this {@link ConsoleWordCompleter}'s reference to the current console, which
 	 * can be destroyed after device standby or rotation.
 	 * @param console The {@link ConsoleActivity} to reconnect to.
 	 */
@@ -80,7 +74,7 @@ public class WordCompleter implements Parcelable, TextWatcher {
 			}
 		} else if (curPartialWord.length() < mPrevPartialWord.length()) {
 			if (mPrevPartialWord.startsWith(curPartialWord)) {
-				for (String word : COMMAND_DICTIONARY) {
+				for (String word : Commands.getCommands()) {
 					if (word.startsWith(curPartialWord)) {
 						mFilteredDictionary.add(word);
 					}
@@ -129,7 +123,7 @@ public class WordCompleter implements Parcelable, TextWatcher {
 	 * constructing {@code mFilteredDictionary}.
 	 */
 	private void resetFilter(String curPartialWord) {
-		mFilteredDictionary = new TreeSet<String>(COMMAND_DICTIONARY);
+		mFilteredDictionary = new TreeSet<String>(Commands.getCommands());
 		mPrevPartialWord = "";
 		filterDictionary(curPartialWord);
 	}
@@ -148,20 +142,19 @@ public class WordCompleter implements Parcelable, TextWatcher {
 		}
 	}
 
-	public static final Parcelable.Creator<WordCompleter> CREATOR
-	= new Parcelable.Creator<WordCompleter>() {
-		public WordCompleter createFromParcel(Parcel in) {
-			return new WordCompleter(in);
+	public static final Parcelable.Creator<ConsoleWordCompleter> CREATOR
+	= new Parcelable.Creator<ConsoleWordCompleter>() {
+		public ConsoleWordCompleter createFromParcel(Parcel in) {
+			return new ConsoleWordCompleter(in);
 		}
 
-		public WordCompleter[] newArray(int size) {
-			return new WordCompleter[size];
+		public ConsoleWordCompleter[] newArray(int size) {
+			return new ConsoleWordCompleter[size];
 		}
 	};
 
 	@SuppressWarnings("unchecked")
-	private WordCompleter(Parcel in) {
-		COMMAND_DICTIONARY = (SortedSet<String>) in.readSerializable();
+	private ConsoleWordCompleter(Parcel in) {
 		mFilteredDictionary = (SortedSet<String>) in.readSerializable();
 		mPrevPartialWord = in.readString();
 	}
@@ -173,7 +166,6 @@ public class WordCompleter implements Parcelable, TextWatcher {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable((Serializable) COMMAND_DICTIONARY);
 		dest.writeSerializable((Serializable) mFilteredDictionary);
 		dest.writeString(mPrevPartialWord);
 	}

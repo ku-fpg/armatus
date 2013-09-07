@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * A draggable image associated with a {@link edu.kufpg.armatus.console.CustomCommand.Command
+ * A draggable image associated with a {@link edu.kufpg.armatus.console.CustomCommandInfo.Command
  * Command} that can be run on {@link edu.kufpg.armatus.console.ConsoleEntry ConsoleEntry} {@link
  * edu.kufpg.armatus.command.CustomCommandDispatcher.Keyword Keywords}.
  */

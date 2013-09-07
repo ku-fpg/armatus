@@ -52,7 +52,7 @@ public class ConsoleEntry implements Serializable {
 			builder.append(userInput).append("\n");
 		}
 		if (commandResponse != null) {
-			builder.append(PrettyPrinter.createPrettyText(commandResponse.glyphs)).append("\n");
+			builder.append(commandResponse.createPrettyText()).append("\n");
 		}
 		if (errorResponse != null) {
 			builder.append(errorResponse).append("\n");
@@ -111,7 +111,7 @@ public class ConsoleEntry implements Serializable {
 	public void appendCommandResponse(CommandResponse commandResponse) {
 		mCommandResponse = commandResponse;
 		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n")
-				.append(PrettyPrinter.createPrettyText(mCommandResponse.glyphs));
+				.append(mCommandResponse.createPrettyText());
 		mShortContents = builder;
 	}
 	
