@@ -32,6 +32,8 @@ import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient implements Parcelable {
+	public static int NO_TOKEN = -1;
+	
 	private ConsoleActivity mConsole;
 	private ProgressDialog mProgress;
 
@@ -346,6 +348,7 @@ public class HermitClient implements Parcelable {
 				super.onPostExecute(token);
 				mToken = token;
 				dismissProgressDialog();
+				getActivity().updateInput();
 				fetchCommands();
 			}
 
@@ -496,6 +499,10 @@ public class HermitClient implements Parcelable {
 		if (mProgress != null) {
 			mProgress.dismiss();
 		}
+	}
+	
+	public int getAst() {
+		return (mToken != null) ? mToken.getAst() : NO_TOKEN;
 	}
 	
 	private boolean isNetworkConnected(RequestName name) {

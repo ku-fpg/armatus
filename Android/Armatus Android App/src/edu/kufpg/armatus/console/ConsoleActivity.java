@@ -7,6 +7,7 @@ import java.util.List;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import edu.kufpg.armatus.BaseActivity;
+import edu.kufpg.armatus.BaseApplication;
 import edu.kufpg.armatus.MainActivity;
 import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.R;
@@ -90,6 +91,7 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleWordSearcher mSearcher;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
 	private List<ConsoleEntry> mConsoleEntries;
+	private ConsoleEntry mNextConsoleEntry;
 	private List<String> mUserInputHistory;
 	private int mUserInputHistoryChoice;
 	private TextView mConsoleInputNumView, mSearchMatches;
@@ -510,6 +512,11 @@ public class ConsoleActivity extends BaseActivity {
 			super.onCreateContextMenu(menu, v, menuInfo);
 			menu.setHeaderTitle("Input options");
 			getMenuInflater().inflate(R.menu.console_empty_space_context_menu, menu);
+			if (mConsoleInputEditText.length() == 0) {
+				menu.findItem(R.id.console_input_paste_append).setTitle("Paste");
+				menu.findItem(R.id.console_input_paste_append).setTitleCondensed("Paste");
+				menu.findItem(R.id.console_input_paste_replace).setVisible(false);
+			}
 			break;
 		case R.id.console_list_view:
 			if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
@@ -619,9 +626,18 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	private void addConsoleEntry(String userInput, CommandResponse commandResponse, String errorResponse) {
-		ConsoleEntry entry = new ConsoleEntry(getInputNum(), userInput, commandResponse, errorResponse);
+		if (userInput != null) {
+			mNextConsoleEntry.setUserInput(userInput);
+		}
+		if (commandResponse != null) {
+			mNextConsoleEntry.appendCommandResponse(commandResponse);
+		}
+		if (errorResponse != null) {
+			mNextConsoleEntry.appendErrorResponse(errorResponse);
+		}
+		
 		mConsoleInputNum++;
-		mConsoleEntries.add(entry);
+		mConsoleEntries.add(mNextConsoleEntry);
 		updateConsoleEntries();
 		scrollToBottom();
 	}
@@ -682,19 +698,21 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputEditText.requestFocus();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void exit() {
 		if (mPrefs.getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
 			if (BluetoothUtils.isBluetoothConnected(this)) {
 				BluetoothUtils.closeBluetooth();
 			}
 		}
+		((BaseApplication<ConsoleActivity>) getApplication()).cancelActivityTasks(this);
 		Intent intent = new Intent(this, MainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
 	}
 
-	public List<ConsoleEntry> getEntries() {
-		return mConsoleEntries;
+	public ConsoleEntry getEntry(int index) {
+		return mConsoleEntries.get(index);
 	}
 
 	/**
@@ -884,8 +902,9 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandExpandableMenuAdapter.notifyDataSetChanged();
 	}
 
-	private void updateInput() {
-		mConsoleInputNumView.setText("hermit<" + mConsoleInputNum + "> ");
+	void updateInput() {
+		mNextConsoleEntry = new ConsoleEntry(getInputNum(), mHermitClient.getAst(), null);
+		mConsoleInputNumView.setText(mNextConsoleEntry.getFullContentsPrefix());
 		mConsoleInputNumView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		final int width = mConsoleInputNumView.getMeasuredWidth();
 		final int padding = mConsoleInputNumView.getPaddingLeft();

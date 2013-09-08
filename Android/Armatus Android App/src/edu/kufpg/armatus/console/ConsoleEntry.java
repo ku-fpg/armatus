@@ -20,31 +20,121 @@ public class ConsoleEntry implements Parcelable {
 	 * of entries could exceed the {@link ConsoleActivity#CONSOLE_ENTRY_LIMIT
 	 * CONSOLE_ENTRY_LIMIT}).
 	 */
-	private int mNum;
-	
+	private int mEntryNum;
+	private int mAst;
+
 	private String mUserInput;
 	private CommandResponse mCommandResponse;
 	private String mErrorResponse;
 	private CharSequence mShortContents;
 
-	public ConsoleEntry(int entryNum, String userInput) {
-		this(entryNum, userInput, null, null);
+	public ConsoleEntry(int entryNum, int ast, String userInput) {
+		this(entryNum, ast, userInput, null, null);
 	}
-	
-	public ConsoleEntry(int entryNum, String userInput, CommandResponse commandResponse) {
-		this(entryNum, userInput, commandResponse, null);
+
+	public ConsoleEntry(int entryNum, int ast, String userInput, CommandResponse commandResponse) {
+		this(entryNum, ast, userInput, commandResponse, null);
 	}
-	
-	public ConsoleEntry(int entryNum, String userInput, String errorResponse) {
-		this(entryNum, userInput, null, errorResponse);
+
+	public ConsoleEntry(int entryNum, int ast, String userInput, String errorResponse) {
+		this(entryNum, ast, userInput, null, errorResponse);
 	}
-	
-	protected ConsoleEntry(int entryNum, String userInput, CommandResponse commandResponse, String errorResponse) {
-		mNum = entryNum;
+
+	protected ConsoleEntry(int entryNum, int ast, String userInput, CommandResponse commandResponse, String errorResponse) {
+		mEntryNum = entryNum;
+		mAst = ast;
 		mUserInput = userInput;
 		mCommandResponse = commandResponse;
 		mErrorResponse = errorResponse;
-		
+		mShortContents = buildShortContents(userInput, commandResponse, errorResponse);
+	}
+
+	protected ConsoleEntry(int entryNum, int ast, String userInput, CommandResponse commandResponse,
+			String errorResponse, CharSequence shortContents) {
+		mEntryNum = entryNum;
+		mAst = ast;
+		mUserInput = userInput;
+		mCommandResponse = commandResponse;
+		mErrorResponse = errorResponse;
+		mShortContents = shortContents;
+	}
+
+	/**
+	 * Constructs a new instance with the specified {@link ConsoleEntry}'s number
+	 * and contents.
+	 * @param entry the {@code ConsoleEntry} to copy.
+	 */
+	public ConsoleEntry(ConsoleEntry entry) {
+		this(entry.getEntryNum(), entry.getAst(), entry.getUserInput(), entry.getCommandResponse(),
+				entry.getErrorResponse(), entry.getShortContents());
+	}
+
+	public int getAst() {
+		return mAst;
+	}
+
+	/**
+	 * Returns the entry's unique number.
+	 * @return the number used to identify this entry.
+	 */
+	public int getEntryNum() {
+		return mEntryNum;
+	}
+
+	public String getUserInput() {
+		return mUserInput;
+	}
+
+	public CommandResponse getCommandResponse() {
+		return mCommandResponse;
+	}
+
+	public String getErrorResponse() {
+		return mErrorResponse;
+	}
+
+	/**
+	 * Returns this entry's contents without the {@code hermit<ast> }prefix.
+	 * @return the unadorned entry contents.
+	 */
+	public CharSequence getShortContents() {
+		return mShortContents;
+	}
+
+	/**
+	 * Returns this entry's contents including the {@code hermit<ast> }prefix.
+	 * @return the entry contents, including the prefix.
+	 */
+	public CharSequence getFullContents() {
+		return getFullContentsPrefix().append(getShortContents());
+	}
+
+	public SpannableStringBuilder getFullContentsPrefix() {
+		SpannableStringBuilder prefix;
+		if (mAst != HermitClient.NO_TOKEN) {
+			prefix = new SpannableStringBuilder("hermit<").append(""+mAst).append(">");
+		} else {
+			prefix = new SpannableStringBuilder("armatus:");
+		}
+		return prefix.append(StringUtils.NBSP);
+	}
+
+	public void appendCommandResponse(CommandResponse commandResponse) {
+		mCommandResponse = commandResponse;
+		mShortContents = buildShortContents(mUserInput, mCommandResponse, mErrorResponse);
+	}
+
+	public void appendErrorResponse(String errorResponse) {
+		mErrorResponse = errorResponse;
+		mShortContents = buildShortContents(mUserInput, mCommandResponse, mErrorResponse);
+	}
+
+	void setUserInput(String userInput) {
+		mUserInput = userInput;
+		mShortContents = buildShortContents(mUserInput, mCommandResponse, mErrorResponse);
+	}
+	
+	private CharSequence buildShortContents(String userInput, CommandResponse commandResponse, String errorResponse) {
 		SpannableStringBuilder builder = new SpannableStringBuilder();
 		if (userInput != null) {
 			builder.append(userInput).append("\n");
@@ -55,89 +145,29 @@ public class ConsoleEntry implements Parcelable {
 		if (errorResponse != null) {
 			builder.append(errorResponse).append("\n");
 		}
-		
-		mShortContents = builder.delete(builder.length()-1, builder.length());
-	}
 
-	/**
-	 * Constructs a new instance with the specified {@link ConsoleEntry}'s number
-	 * and contents.
-	 * @param entry the {@code ConsoleEntry} to copy.
-	 */
-	public ConsoleEntry(ConsoleEntry entry) {
-		this(entry.getNum(), entry.getUserInput(), entry.getCommandResponse(), entry.getErrorResponse());
-	}
-
-	/**
-	 * Returns the entry's unique number.
-	 * @return the number used to identify this entry.
-	 */
-	public int getNum() {
-		return mNum;
-	}
-	
-	public String getUserInput() {
-		return mUserInput;
-	}
-	
-	public CommandResponse getCommandResponse() {
-		return mCommandResponse;
-	}
-	
-	public String getErrorResponse() {
-		return mErrorResponse;
-	}
-
-	/**
-	 * Returns this entry's contents without the {@code hermit<num> }prefix.
-	 * @return the unadorned entry contents.
-	 */
-	public CharSequence getShortContents() {
-		return mShortContents;
-	}
-	
-	/**
-	 * Returns this entry's contents including the {@code hermit<num> }prefix.
-	 * @return the entry contents, including the prefix.
-	 */
-	public CharSequence getFullContents() {
-		SpannableStringBuilder builder = new SpannableStringBuilder("hermit<").append(""+getNum())
-				.append(">").append(StringUtils.NBSP).append(getShortContents());
+		if (builder.length() > 0) {
+			builder = builder.delete(builder.length()-1, builder.length());
+		}
 		return builder;
 	}
-	
-	public void appendCommandResponse(CommandResponse commandResponse) {
-		mCommandResponse = commandResponse;
-		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n")
-				.append(mCommandResponse.createPrettyText());
-		mShortContents = builder;
-	}
-	
-	public void appendErrorResponse(String errorResponse) {
-		mErrorResponse = errorResponse;
-		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n")
-				.append(mErrorResponse);
-		mShortContents = builder;
-	}
-	
+
 	public static final Parcelable.Creator<ConsoleEntry> CREATOR
 	= new Parcelable.Creator<ConsoleEntry>() {
 		public ConsoleEntry createFromParcel(Parcel in) {
-			return new ConsoleEntry(in);
+			int entryNum = in.readInt();
+			int ast = in.readInt();
+			String userInput = in.readString();
+			CommandResponse commandResponse = (CommandResponse) in.readSerializable();
+			String errorResponse = in.readString();
+			CharSequence shortContents = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+			return new ConsoleEntry(entryNum, ast, userInput, commandResponse, errorResponse, shortContents);
 		}
 
 		public ConsoleEntry[] newArray(int size) {
 			return new ConsoleEntry[size];
 		}
 	};
-
-	private ConsoleEntry(Parcel in) {
-		mNum = in.readInt();
-		mUserInput = in.readString();
-		mCommandResponse = (CommandResponse) in.readSerializable();
-		mErrorResponse = in.readString();
-		mShortContents = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
-	}
 
 	@Override
 	public int describeContents() {
@@ -146,7 +176,8 @@ public class ConsoleEntry implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(mNum);
+		dest.writeInt(mEntryNum);
+		dest.writeInt(mAst);
 		dest.writeString(mUserInput);
 		dest.writeSerializable(mCommandResponse);
 		dest.writeString(mErrorResponse);

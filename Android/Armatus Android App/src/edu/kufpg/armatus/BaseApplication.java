@@ -62,4 +62,10 @@ public class BaseApplication<A extends Activity> extends Application {
 			task.setActivity(activity);
 		}
 	}
+	
+	public void cancelActivityTasks(A activity) {
+		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getCanonicalName())) {
+			task.cancel(true);
+		}
+	}
 }

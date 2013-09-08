@@ -50,7 +50,7 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 			mFirstEntryNum = getArguments().getInt("firstEntryNum");
 			SpannableStringBuilder contentsBuilder = new SpannableStringBuilder();
 			for (int entryNum : getArguments().getIntArray("entryNums")) {
-				ConsoleEntry entry = getConsole().getEntries().get(entryNum);
+				ConsoleEntry entry = getConsole().getEntry(entryNum);
 				contentsBuilder.append(entry.getFullContents()).append('\n');
 			}
 			contentsBuilder.delete(contentsBuilder.length() - 1, contentsBuilder.length()); //Remove final newline
