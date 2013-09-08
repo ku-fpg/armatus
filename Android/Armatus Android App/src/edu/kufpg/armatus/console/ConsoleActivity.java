@@ -124,6 +124,7 @@ public class ConsoleActivity extends BaseActivity {
 			mConsoleInputLayout.setLayoutParams(new AbsListView.LayoutParams(
 					AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
 			mConsoleInputEditText.requestFocus();
+			mCompleter = new ConsoleWordCompleter(this);
 			mHermitClient = new HermitClient(this);
 		} else {
 			mConsoleInputEditText.setText(savedInstanceState.getString("consoleInput"));
@@ -204,12 +205,13 @@ public class ConsoleActivity extends BaseActivity {
 			mSearcher = savedInstanceState.getParcelable("consoleSearcher");
 			mSearcher.attachAdapter(mConsoleListAdapter);
 		}
-		
+
 		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 
 		mConsoleInputNumView.setTypeface(TYPEFACE);
 		mConsoleInputEditText.setTypeface(TYPEFACE);
+		mConsoleInputEditText.addTextChangedListener(mCompleter);
 		mConsoleInputEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable s) {}
@@ -585,19 +587,15 @@ public class ConsoleActivity extends BaseActivity {
 		return mHermitClient;
 	}
 
+	public String getInput() {
+		return StringUtils.withoutCharWrap(mConsoleInputEditText.getText().toString());
+	}
+
 	/**
 	 * @return the entry number for the console input field.
 	 */
 	public int getInputNum() {
 		return mConsoleInputNum;
-	}
-
-	public ListView getListView() {
-		return mConsoleListView;
-	}
-
-	public SlidingMenu getSlidingMenu() {
-		return mSlidingMenu;
 	}
 
 	public boolean isSoftKeyboardVisible() {
@@ -644,6 +642,18 @@ public class ConsoleActivity extends BaseActivity {
 				setInputText(completion);
 			}
 		}
+	}
+
+	ListView getListView() {
+		return mConsoleListView;
+	}
+
+	SlidingMenu getSlidingMenu() {
+		return mSlidingMenu;
+	}
+
+	ConsoleWordCompleter getWordCompleter() {
+		return mCompleter;
 	}
 
 	private void executeSearch(String criterion, SearchAction action, SearchDirection direction) {
@@ -737,8 +747,12 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleListAdapter.notifyDataSetChanged();
 		updateInput();
 	}
-	
+
 	void updateCommandExpandableMenu() {
+		int count = mCommandExpandableMenuAdapter.getGroupCount();
+		for (int i = 0; i < count; i++) {
+			mCommandExpandableMenuView.collapseGroup(i);
+		}
 		mCommandExpandableMenuAdapter.notifyDataSetChanged();
 	}
 

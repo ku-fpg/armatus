@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/console_entry_selection_dialog_contents"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/entry_padding"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textColor="?attr/codeColor"
-    android:textIsSelectable="true"
-    android:typeface="monospace" />
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/console_entry_selection_dialog_contents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/entry_padding"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?attr/codeColor"
+        android:textIsSelectable="true"
+        android:typeface="monospace" />
+
+</ScrollView>

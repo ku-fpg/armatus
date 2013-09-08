@@ -27,12 +27,6 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 	private int mFirstEntryNum;
 	private CharSequence mContents;
 
-	/**
-	 * Static {@link edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog ConsoleEntrySelectionDialog}. 
-	 * Constructor of dialog with the entry/conent.
-	 * @param entries
-	 * @return cesd
-	 */
 	public static ConsoleEntrySelectionDialog newInstance(int... entryNums) {
 		ConsoleEntrySelectionDialog cesd = new ConsoleEntrySelectionDialog();
 
@@ -51,15 +45,21 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mFirstEntryNum = getArguments().getInt("firstEntryNum");
-		SpannableStringBuilder contentsBuilder = new SpannableStringBuilder();
-		for (int entryNum : getArguments().getIntArray("entryNums")) {
-			ConsoleEntry entry = getConsole().getEntries().get(entryNum);
-			contentsBuilder.append(entry.getFullContents()).append('\n');
+
+		if (savedInstanceState == null) {
+			mFirstEntryNum = getArguments().getInt("firstEntryNum");
+			SpannableStringBuilder contentsBuilder = new SpannableStringBuilder();
+			for (int entryNum : getArguments().getIntArray("entryNums")) {
+				ConsoleEntry entry = getConsole().getEntries().get(entryNum);
+				contentsBuilder.append(entry.getFullContents()).append('\n');
+			}
+			contentsBuilder.delete(contentsBuilder.length() - 1, contentsBuilder.length()); //Remove final newline
+			mContents = contentsBuilder;
+		} else {
+			
+			mContents = savedInstanceState.getParcelable("contents");
 		}
-		contentsBuilder.delete(contentsBuilder.length() - 1, contentsBuilder.length()); //Remove final newline
-		mContents = contentsBuilder;
-		
+
 		mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
 		mClipboardUnwrapper = new OnPrimaryClipChangedListener() {
 			@Override
@@ -104,5 +104,12 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 		super.onPause();
 		mClipboard.removePrimaryClipChangedListener(mClipboardUnwrapper);
 	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putCharSequence("contents", mContents);
+	}
+	
 
 }

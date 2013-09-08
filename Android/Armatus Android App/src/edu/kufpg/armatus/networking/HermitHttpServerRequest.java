@@ -2,15 +2,18 @@ package edu.kufpg.armatus.networking;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
@@ -59,6 +62,7 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 			final HttpParams httpParams = new BasicHttpParams();
 			//Set timeout length to 10 seconds
 			HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
+			HttpConnectionParams.setSoTimeout(httpParams, 10000);
 			httpClient = new DefaultHttpClient(httpParams);
 			HttpUriRequest request = null;
 			if (mRequest.equals(HttpRequest.GET)) {
@@ -66,7 +70,7 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 			} else if (mRequest.equals(HttpRequest.POST)) {
 				final HttpPost httpPost = new HttpPost(params[0]);
 				if (params.length > 1) {
-					httpPost.setHeader("Content-type", "application/json");
+					httpPost.setHeader("content-type", "application/json");
 					if (params[1] != null && !params[1].isEmpty()) {
 						try {
 							httpPost.setEntity(new StringEntity(params[1]));
@@ -92,8 +96,14 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 			}
 		} catch (HttpException e) {
 			return cancelResult(e, "ERROR: server problem (" + httpResponse.getStatusLine().getStatusCode() + ").");
+		} catch (HttpHostConnectException e) {
+			return cancelResult(e, "ERROR: server connection refused.");
 		} catch (ClientProtocolException e) {
 			return cancelResult(e, "ERROR: client protocol problem.");
+		} catch (NoHttpResponseException e) {
+			return cancelResult(e, "ERROR: the target server failed to respond.");
+		} catch (SocketTimeoutException e) {
+			return cancelResult(e, "ERROR: the server connection timed out.");
 		} catch (IOException e) {
 			return cancelResult(e, "ERROR: I/O problem.");
 		} finally {

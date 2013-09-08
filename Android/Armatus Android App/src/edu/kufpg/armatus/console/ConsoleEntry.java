@@ -1,8 +1,9 @@
 package edu.kufpg.armatus.console;
 
-import java.io.Serializable;
-
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 
 import edu.kufpg.armatus.console.HermitClient.CommandResponse;
 import edu.kufpg.armatus.util.StringUtils;
@@ -12,9 +13,7 @@ import edu.kufpg.armatus.util.StringUtils;
  * is primarily used for populating {@link android.view.View Views} in {@link
  * ConsoleEntryAdapter}.
  */
-public class ConsoleEntry implements Serializable {
-	private static final long serialVersionUID = -1808578272659814103L;
-	
+public class ConsoleEntry implements Parcelable {
 	/** 
 	 * The unique entry number used to identify this entry. Entry numbers begin
 	 * at 0 (although the first entry in the console may not be 0 since the number
@@ -26,8 +25,7 @@ public class ConsoleEntry implements Serializable {
 	private String mUserInput;
 	private CommandResponse mCommandResponse;
 	private String mErrorResponse;
-	
-	private transient CharSequence mShortContents;
+	private CharSequence mShortContents;
 
 	public ConsoleEntry(int entryNum, String userInput) {
 		this(entryNum, userInput, null, null);
@@ -120,6 +118,39 @@ public class ConsoleEntry implements Serializable {
 		SpannableStringBuilder builder = new SpannableStringBuilder(getShortContents()).append("\n")
 				.append(mErrorResponse);
 		mShortContents = builder;
+	}
+	
+	public static final Parcelable.Creator<ConsoleEntry> CREATOR
+	= new Parcelable.Creator<ConsoleEntry>() {
+		public ConsoleEntry createFromParcel(Parcel in) {
+			return new ConsoleEntry(in);
+		}
+
+		public ConsoleEntry[] newArray(int size) {
+			return new ConsoleEntry[size];
+		}
+	};
+
+	private ConsoleEntry(Parcel in) {
+		mNum = in.readInt();
+		mUserInput = in.readString();
+		mCommandResponse = (CommandResponse) in.readSerializable();
+		mErrorResponse = in.readString();
+		mShortContents = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(mNum);
+		dest.writeString(mUserInput);
+		dest.writeSerializable(mCommandResponse);
+		dest.writeString(mErrorResponse);
+		TextUtils.writeToParcel(mShortContents, dest, 0);
 	}
 
 }

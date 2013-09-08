@@ -1,21 +1,22 @@
 package edu.kufpg.armatus.console;
 
 import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
+import java.util.SortedSet;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 
+import edu.kufpg.armatus.console.HermitClient.CommandInfo;
+
 public class Commands {
 	private static List<String> sTagList = ImmutableList.of(CustomCommandDispatcher.CLIENT_COMMANDS_TAG);
-	private static ListMultimap<String, String> sTagMap = CustomCommandDispatcher.getCommandTagsMap();
-	private static Map<String, String> sCommandHelpMap = CustomCommandDispatcher.getCommandInfoMap();
-	private static NavigableSet<String> sCommandSet = CustomCommandDispatcher.getCommandInfoMap().navigableKeySet();
+	private static ListMultimap<String, ? extends CommandInfo> sTagMap = CustomCommandDispatcher.getCommandTagsMap();
+	private static SortedSet<String> sCommandSet = getCustomCommandSet();
 	
 	private Commands() {}
 	
@@ -27,15 +28,11 @@ public class Commands {
 		return sTagList.size();
 	}
 	
-	public static List<String> getTagCommands(String tagName) {
+	public static List<? extends CommandInfo> getTagCommands(String tagName) {
 		return sTagMap.get(tagName);
 	}
 	
-	public static String getCommandHelp(String commandName) {
-		return sCommandHelpMap.get(commandName);
-	}
-	
-	static NavigableSet<String> getCommands() {
+	static SortedSet<String> getCommands() {
 		return sCommandSet;
 	}
 	
@@ -45,22 +42,26 @@ public class Commands {
 		sTagList = tagListBuilder.build();
 	}
 	
-	static void setTagMap(Multimap<? extends String, ? extends String> tagMap) {
-		ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
+	static void setTagMap(Multimap<? extends String, ? extends CommandInfo> tagMap) {
+		ImmutableListMultimap.Builder<String, CommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
 		tagMapBuilder.putAll(tagMap).putAll(CustomCommandDispatcher.getCommandTagsMap());
 		sTagMap = tagMapBuilder.build();
 	}
 	
-	static void setCommandHelpMap(Map<? extends String, ? extends String> commandInfoMap) {
-		ImmutableMap.Builder<String, String> commandHelpBuilder = ImmutableMap.builder();
-		commandHelpBuilder.putAll(commandInfoMap).putAll(CustomCommandDispatcher.getCommandInfoMap());
-		sCommandHelpMap = commandHelpBuilder.build();
-	}
-	
 	static void setCommandSet(Iterable<? extends String> commandSet) {
 		ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
-		commandSetBuilder.addAll(commandSet).addAll(CustomCommandDispatcher.getCommandInfoMap().navigableKeySet());
+		commandSetBuilder.addAll(commandSet).addAll(getCustomCommandSet());
 		sCommandSet = commandSetBuilder.build();
+	}
+	
+	private static SortedSet<String> getCustomCommandSet() {
+		return ImmutableSortedSet.copyOf(Collections2.transform(CustomCommandDispatcher.getCustomCommandMap().values(),
+				new Function<CustomCommandInfo, String>() {
+			@Override
+			public String apply(CustomCommandInfo info) {
+				return info.getName();
+			}
+		}));
 	}
 	
 }

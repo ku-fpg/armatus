@@ -36,7 +36,9 @@ public class ParcelSparseBooleanArray extends SparseBooleanArray implements Parc
 	};
 
 	/** Constructs a new {@link ParcelSparseBooleanArray} with no mappings. */
-	public ParcelSparseBooleanArray() {}
+	public ParcelSparseBooleanArray() {
+		super();
+	}
 
 	/**
 	 * Constructs a new {@link ParcelSparseBooleanArray} instance containing the

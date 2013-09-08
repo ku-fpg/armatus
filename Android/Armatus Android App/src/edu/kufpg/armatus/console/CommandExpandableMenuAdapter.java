@@ -1,10 +1,13 @@
 package edu.kufpg.armatus.console;
 
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.HermitClient.CommandInfo;
+import edu.kufpg.armatus.dialog.CommandHelpDialog;
 import edu.kufpg.armatus.drag.DragIcon;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
@@ -15,20 +18,29 @@ import android.widget.TextView;
  * edu.kufpg.armatus.console.CustomCommandInfo.Command Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
-	private Context mContext;
+	private ConsoleActivity mConsole;
 	private LayoutInflater mInflater;
+	private OnClickListener mIconClickListener;
 
 	/**
 	 * Constructs a new instance and initializes the menu data if necessary.
-	 * @param context The {@link Context} to use.
+	 * @param console The {@link Context} to use.
 	 */
-	public CommandExpandableMenuAdapter(Context context) {
-		mContext = context;
-		mInflater = LayoutInflater.from(context);
+	public CommandExpandableMenuAdapter(ConsoleActivity console) {
+		mConsole = console;
+		mInflater = LayoutInflater.from(console);
+		mIconClickListener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CommandInfo info = ((DragIcon) v).getCommandInfo();
+				CommandHelpDialog helpDialog = CommandHelpDialog.newInstance(info);
+				helpDialog.show(mConsole.getFragmentManager(), "commandHelp");
+			}
+		};
 	}
 
 	@Override
-	public String getChild(int groupPosition, int childPosition) {
+	public CommandInfo getChild(int groupPosition, int childPosition) {
 		return Commands.getTagCommands(getGroup(groupPosition)).get(childPosition);
 	}
 
@@ -50,10 +62,11 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			item = (CommandExpandableMenuItem) view.getTag();
 		}
 
-		String commandName = getChild(groupPosition, childPosition);
-		item.icon.setText(commandName);
+		CommandInfo commandInfo = getChild(groupPosition, childPosition);
+		item.icon.setCommandInfo(commandInfo);
+		item.icon.setOnClickListener(mIconClickListener);
 		item.icon.setTypeface(ConsoleActivity.TYPEFACE);
-		int newWidth = mContext.getResources().getDrawable(R.drawable.template_white).getIntrinsicWidth();
+		int newWidth = mConsole.getResources().getDrawable(R.drawable.template_white).getIntrinsicWidth();
 		item.icon.getLayoutParams().width = newWidth;
 		return view;
 	}

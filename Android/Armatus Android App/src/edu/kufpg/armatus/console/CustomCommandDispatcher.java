@@ -1,11 +1,9 @@
 package edu.kufpg.armatus.console;
 
 import java.util.Map;
-import java.util.NavigableMap;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ListMultimap;
 
 import edu.kufpg.armatus.BaseActivity;
@@ -73,17 +71,16 @@ public class CustomCommandDispatcher {
 	};
 
 	private static final Map<String, CustomCommandInfo> CUSTOM_COMMAND_MAP = mapCustomCommands();
-	private static final ListMultimap<String, String> CUSTOM_COMMAND_TAGS_MAP = mapCustomCommandTags();
-	private static final NavigableMap<String, String> CUSTOM_COMMAND_HELP_MAP = mapCustomCommandHelp();
+	private static final ListMultimap<String, CustomCommandInfo> CUSTOM_COMMAND_TAG_MAP = mapCustomCommandTags();
 
 	private CustomCommandDispatcher() {}
-
-	static NavigableMap<String, String> getCommandInfoMap() {
-		return CUSTOM_COMMAND_HELP_MAP;
+	
+	static Map<String, CustomCommandInfo> getCustomCommandMap() {
+		return CUSTOM_COMMAND_MAP;
 	}
 	
-	static ListMultimap<String, String> getCommandTagsMap() {
-		return CUSTOM_COMMAND_TAGS_MAP;
+	static ListMultimap<String, CustomCommandInfo> getCommandTagsMap() {
+		return CUSTOM_COMMAND_TAG_MAP;
 	}
 	
 	/**
@@ -156,19 +153,9 @@ public class CustomCommandDispatcher {
 				.build();
 	}
 
-	private static ListMultimap<String, String> mapCustomCommandTags() {
-		ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
-		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_MAP.keySet()).build();
-	}
-
-	private static NavigableMap<String, String> mapCustomCommandHelp() {
-		ImmutableSortedMap.Builder<String, String> commandInfoBuilder = ImmutableSortedMap.naturalOrder();
-		return commandInfoBuilder.put(CLEAR.getName(), CLEAR.getHelp())
-				.put(CONNECT.getName(), CONNECT.getHelp())
-				.put(EXIT.getName(), EXIT.getHelp())
-				.put(TERMINAL.getName(), TERMINAL.getHelp())
-				.put(TOAST.getName(), TOAST.getHelp())
-				.build();
+	private static ListMultimap<String, CustomCommandInfo> mapCustomCommandTags() {
+		ImmutableListMultimap.Builder<String, CustomCommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
+		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_MAP.values()).build();
 	}
 
 }

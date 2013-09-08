@@ -21,9 +21,7 @@ import edu.kufpg.armatus.util.StringUtils;
  * parcel it and reload it later instead of recreating a new instance every time.
  */
 public class ConsoleWordCompleter implements Parcelable, TextWatcher {
-	
-	/** A subset of {@link #COMMAND_DICTIONARY} containing only those commands which
-	 * match the word to be completed. */
+
 	private SortedSet<String> mFilteredDictionary;
 	
 	/**
@@ -42,7 +40,7 @@ public class ConsoleWordCompleter implements Parcelable, TextWatcher {
 	 * in {@link CustomCommandDispatcher}.
 	 * @param console reference to the current console.
 	 */
-	public ConsoleWordCompleter(ConsoleActivity console, SortedSet<String> commandDictionary) {
+	public ConsoleWordCompleter(ConsoleActivity console) {
 		mConsole = console;
 		resetFilter("");
 	}
@@ -122,7 +120,7 @@ public class ConsoleWordCompleter implements Parcelable, TextWatcher {
 	 * @param curPartialWord The new word to considered for completion when
 	 * constructing {@code mFilteredDictionary}.
 	 */
-	private void resetFilter(String curPartialWord) {
+	public void resetFilter(String curPartialWord) {
 		mFilteredDictionary = new TreeSet<String>(Commands.getCommands());
 		mPrevPartialWord = "";
 		filterDictionary(curPartialWord);

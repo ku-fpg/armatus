@@ -3,9 +3,7 @@ package edu.kufpg.armatus.console;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,14 +81,14 @@ public class HermitClient implements Parcelable {
 		}
 	}
 
-	public static class CommandInfo {
+	public static class CommandInfo implements Parcelable {
 		private final String mHelp, mName;
 		private final List<String> mTags;
 
 		public CommandInfo(String help, String name, List<String> tags) {
 			mHelp = help;
 			mName = name;
-			mTags = tags;
+			mTags = ImmutableList.copyOf(tags);
 		}
 		
 		public String getHelp() {
@@ -103,6 +101,36 @@ public class HermitClient implements Parcelable {
 		
 		public List<String> getTags() {
 			return mTags;
+		}
+		
+		public static Parcelable.Creator<CommandInfo> CREATOR =
+				new Parcelable.Creator<CommandInfo>() {
+			@Override
+			public CommandInfo createFromParcel(Parcel source) {
+				String help = source.readString();
+				String name = source.readString();
+				@SuppressWarnings("unchecked")
+				List<String> tags = (List<String>) source.readSerializable();
+
+				return new CommandInfo(help, name, tags);
+			}
+
+			@Override
+			public CommandInfo[] newArray(int size) {
+				return new CommandInfo[size];
+			}
+		};
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeString(mHelp);
+			dest.writeString(mName);
+			dest.writeSerializable((Serializable) mTags);
 		}
 
 	}
@@ -390,24 +418,21 @@ public class HermitClient implements Parcelable {
 			protected void onPostExecute(List<CommandInfo> commands) {
 				super.onPostExecute(commands);
 				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
-				ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
-				//ImmutableMap.Builder<String, String> commandHelpBuilder = ImmutableMap.builder();
-				Map<String, String> commandHelpMap = new HashMap<String, String>();
+				ImmutableListMultimap.Builder<String, CommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
 				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
+				
 				for (CommandInfo cmdInfo : commands) {
 					commandSetBuilder.add(cmdInfo.getName());
-					commandHelpMap.put(cmdInfo.getName(), cmdInfo.getHelp());
-					//commandHelpBuilder.put(cmdInfo.getName(), cmdInfo.getHelp());
 					for (String tag : cmdInfo.getTags()) {
 						tagSetBuilder.add(tag);
-						tagMapBuilder.put(tag, cmdInfo.getName());
+						tagMapBuilder.put(tag, cmdInfo);
 					}
 				}
 
-				Commands.setCommandHelpMap(commandHelpMap);
 				Commands.setCommandSet(commandSetBuilder.build());
 				Commands.setTagList(ImmutableList.copyOf(tagSetBuilder.build()));
 				Commands.setTagMap(tagMapBuilder.build());
+				getActivity().getWordCompleter().resetFilter(getActivity().getInput());
 				getActivity().updateCommandExpandableMenu();
 				dismissProgressDialog();
 			}
