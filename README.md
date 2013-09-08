@@ -26,11 +26,10 @@ Software used
 —<a href="https://github.com/RyanGlScott/AsyncActivityTask">AsyncActivityTask</a>, a modification of <a href="https://github.com/callorico/CustomAsyncTask">CustomAsyncTask</a> by <a href="https://github.com/callorico">Ryan "callorico" Kaneshiro</a>.
 
 —<a href="https://github.com/jfeinstein10/SlidingMenu">SlidingMenu</a> by <a href="https://github.com/jfeinstein10">Jeremy "jfeinstein10" Feinstein</a> under the Apache License 2.0
-<<<<<<< HEAD
 
 —<a href="http://code.google.com/p/tree-view-list-android/">tree-view-list-android</a> by <a href="http://code.google.com/u/109485687940011053436/">Jarek Potiuk</a> under the New BSD License
-=======
->>>>>>> refs/remotes/origin/Test
+
+—<a href="https://github.com/SimonVT/android-numberpicker">android-numberpicker</a> (a backport of <a href="http://developer.android.com/reference/android/widget/NumberPicker.html">NumberPicker</a> class from th Android 4.2 API) by <a href="https://github.com/SimonVT">Simon Vig "SimonVT" Therkildsen</a> under the Apache License 2.0
 
 —<a href="https://github.com/iPaulPro/aFileChooser">aFileChooser</a> by <a href="https://github.com/iPaulPro">Paul "iPaulPro" Burke</a> under the Apache License 2.0
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <group android:id="@+id/console_input_group" >
+        <item
+            android:id="@+id/console_input_select"
+            android:orderInCategory="1"
+            android:showAsAction="always|withText"
+            android:title="Select text"
+            android:titleCondensed="Select"/>
+        <item
+            android:id="@+id/console_input_copy"
+            android:orderInCategory="2"
+            android:showAsAction="always|withText"
+            android:title="Copy all"
+            android:titleCondensed="Copy"/>
+        <item
+            android:id="@+id/console_input_paste_append"
+            android:orderInCategory="3"
+            android:showAsAction="always|withText"
+            android:title="Paste at end of input"
+            android:titleCondensed="Paste (append)"/>
+        <item
+            android:id="@+id/console_input_paste_replace"
+            android:orderInCategory="4"
+            android:showAsAction="always|withText"
+            android:title="Paste and replace input"
+            android:titleCondensed="Paste (replace)"/>
+    </group>
+
+</menu>

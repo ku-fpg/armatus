@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/copy"
+        android:id="@+id/console_list_view_copy"
         android:icon="?attr/actionCopy"
         android:orderInCategory="1"
         android:showAsAction="ifRoom|withText"
@@ -10,7 +10,7 @@
         android:titleCondensed="@string/copy">
     </item>
     <item
-        android:id="@+id/select"
+        android:id="@+id/console_list_view_select"
         android:icon="?attr/actionSelect"
         android:orderInCategory="2"
         android:showAsAction="ifRoom|withText"
@@ -18,7 +18,7 @@
         android:titleCondensed="@string/select">
     </item>
     <item
-        android:id="@+id/swap"
+        android:id="@+id/console_list_view_swap"
         android:icon="?attr/actionSwap"
         android:orderInCategory="3"
         android:showAsAction="ifRoom|withText"

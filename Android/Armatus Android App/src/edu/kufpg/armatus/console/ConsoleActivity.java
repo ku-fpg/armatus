@@ -17,6 +17,7 @@ import edu.kufpg.armatus.console.HermitClient.CommandResponse;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import edu.kufpg.armatus.dialog.GestureDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
+import edu.kufpg.armatus.dialog.ScrollEntriesDialog;
 import edu.kufpg.armatus.dialog.WordCompletionDialog;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
 import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
@@ -26,6 +27,9 @@ import edu.kufpg.armatus.util.StringUtils;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,17 +43,17 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
-import android.view.View.OnTouchListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
@@ -71,6 +75,7 @@ public class ConsoleActivity extends BaseActivity {
 	private static final int LONG_CLICKED_GROUP = 42;
 	private static final int DRAGGED_GROUP = 43;
 	private static final int SCROLL_DURATION = 500;
+	private static final String SCROLL_ENTRIES_TAG = "scrollentries";
 	private static final String SELECTION_TAG = "selection";
 	private static final String KEYWORD_SWAP_TAG = "keywordswap";
 	private static final String WORD_COMPLETION_TAG = "wordcomplete";
@@ -78,13 +83,15 @@ public class ConsoleActivity extends BaseActivity {
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
 	private HermitClient mHermitClient;
-	private RelativeLayout mConsoleInputLayout;
+	private RelativeLayout mConsoleInputLayout, mConsoleOptionsBar;
 	private ConsoleListView mConsoleListView;
 	private ExpandableListView mCommandExpandableMenuView;
 	private ConsoleEntryAdapter mConsoleListAdapter;
 	private ConsoleWordSearcher mSearcher;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
 	private List<ConsoleEntry> mConsoleEntries;
+	private List<String> mUserInputHistory;
+	private int mUserInputHistoryChoice;
 	private TextView mConsoleInputNumView, mSearchMatches;
 	private ConsoleInputEditText mConsoleInputEditText;
 	private View mConsoleEmptySpace;
@@ -93,7 +100,7 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleWordCompleter mCompleter;
 	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
 	private boolean mInputEnabled = true;
-	private boolean mSoftKeyboardVisibility = true;
+	private boolean mSoftKeyboardVisible = true;
 	private boolean mSearchEnabled = false;
 	private int mConsoleInputNum = 0;
 	private SharedPreferences mPrefs;
@@ -115,6 +122,11 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
 		mConsoleInputNumView = (TextView) mConsoleInputLayout.findViewById(R.id.console_input_num);
 		mConsoleInputEditText = (ConsoleInputEditText) mConsoleInputLayout.findViewById(R.id.console_input_edit_text);
+		mConsoleOptionsBar = (RelativeLayout) findViewById(R.id.console_options_bar);
+		final ImageButton nextEntryButton = (ImageButton) findViewById(R.id.console_input_next_entry);
+		final ImageButton scrollEntriesButton = (ImageButton) findViewById(R.id.console_input_scroll_entries);
+		final ImageButton prevEntryButton = (ImageButton) findViewById(R.id.console_input_previous_entry);
+		final ImageButton hideOptionsBarButton = (ImageButton) findViewById(R.id.console_options_hide_button);
 		mPrefs = PrefsActivity.getPrefs(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
@@ -126,10 +138,13 @@ public class ConsoleActivity extends BaseActivity {
 			mConsoleInputEditText.requestFocus();
 			mCompleter = new ConsoleWordCompleter(this);
 			mHermitClient = new HermitClient(this);
+			mUserInputHistory = new ArrayList<String>();
+			mUserInputHistory.add("");
+			mUserInputHistoryChoice = 0;
 		} else {
 			mConsoleInputEditText.setText(savedInstanceState.getString("consoleInput"));
-			mSoftKeyboardVisibility = savedInstanceState.getBoolean("softKeyboardVisibility");
-			setSoftKeyboardVisibility(mSoftKeyboardVisibility);
+			mSoftKeyboardVisible = savedInstanceState.getBoolean("softKeyboardVisibility");
+			setSoftKeyboardVisibility(mSoftKeyboardVisible);
 			mSearchEnabled = savedInstanceState.getBoolean("findTextEnabled");
 			if (mSearchEnabled) {
 				mSearchMatches.setVisibility(View.VISIBLE);
@@ -146,6 +161,8 @@ public class ConsoleActivity extends BaseActivity {
 			mCompleter.attachConsole(this);
 			mHermitClient = savedInstanceState.getParcelable("hermitClient");
 			mHermitClient.attachConsole(this);
+			mUserInputHistory = (List<String>) savedInstanceState.getSerializable("userInputHistory");
+			mUserInputHistoryChoice = savedInstanceState.getInt("userInputHistoryChoice");
 		}
 
 		rootView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -155,21 +172,31 @@ public class ConsoleActivity extends BaseActivity {
 				int rootHeight = rootView.getRootView().getHeight();
 				int heightDiff = rootHeight - rootView.getHeight();
 				if (heightDiff > rootHeight/3) { //This works on Nexus 7s, at the very least
-					mSoftKeyboardVisibility = true;
+					mSoftKeyboardVisible = true;
 				} else {
-					mSoftKeyboardVisibility = false;
+					mSoftKeyboardVisible = false;
 				}
 			}
 		});
 
-		mConsoleEmptySpace.setOnTouchListener(new OnTouchListener() {
+		registerForContextMenu(mConsoleEmptySpace);
+		mConsoleEmptySpace.setOnClickListener(new OnClickListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				/* Allows empty space to serve as "continuation" of the input EditText, so
-				 * if the user clicks or long-clicks the empty space, then the input
-				 * EditText will receive the touch event.
-				 */
-				return mConsoleInputEditText.dispatchTouchEvent(event);
+			public void onClick(View v) {
+				mConsoleInputEditText.setSelection(mConsoleInputEditText.length());
+				mConsoleInputEditText.requestFocus();
+				if (!mSoftKeyboardVisible) {
+					//setSoftKeyboardVisibility(true) doesn't work here for some weird reason
+					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
+					toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+				}
+			}
+		});
+		mConsoleEmptySpace.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				openContextMenu(mConsoleEmptySpace);
+				return true;
 			}
 		});
 		mConsoleEmptySpace.setOnDragListener(new OnDragListener() {
@@ -243,6 +270,16 @@ public class ConsoleActivity extends BaseActivity {
 						if (input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
 							addConsoleUserInputEntry(input);
 						} else {
+							int size = mUserInputHistory.size();
+							String trimput = input.trim();
+							if (size == 1 || (size > 1 &&
+									!mUserInputHistory.get(size - 2).equals(trimput))) {
+								mUserInputHistory.set(size - 1, trimput);
+								mUserInputHistory.add("");
+								mUserInputHistoryChoice = size;
+							} else {
+								mUserInputHistoryChoice = size - 1;
+							}
 							mHermitClient.runCommand(input);
 						}
 						mConsoleInputEditText.setText("");
@@ -251,6 +288,41 @@ public class ConsoleActivity extends BaseActivity {
 
 				}
 				return false;
+			}
+		});
+
+		nextEntryButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mUserInputHistoryChoice < mUserInputHistory.size() - 1) {
+					selectFromUserInputHistory(mUserInputHistoryChoice + 1);
+				}
+			}
+		});
+
+		scrollEntriesButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mUserInputHistory.size() > 1) {
+					showDialog(ScrollEntriesDialog.newInstance(mUserInputHistoryChoice, mUserInputHistory), SCROLL_ENTRIES_TAG);
+				}
+			}
+		});
+
+		prevEntryButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mUserInputHistoryChoice > 0) {
+					selectFromUserInputHistory(mUserInputHistoryChoice - 1);
+				}
+			}
+		});
+
+		hideOptionsBarButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mConsoleOptionsBar.setVisibility(View.GONE);
+				invalidateOptionsMenu();
 			}
 		});
 
@@ -270,11 +342,13 @@ public class ConsoleActivity extends BaseActivity {
 			outState.putString("searchInput", mSearchInputView.getText().toString());
 			outState.putString("prevSearchCriterion", mPrevSearchCriterion);
 		}
-		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisibility);
+		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
 		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
 		outState.putParcelable("wordCompleter", mCompleter);
 		outState.putParcelable("hermitClient", mHermitClient);
+		outState.putSerializable("userInputHistory", (Serializable) mUserInputHistory);
+		outState.putInt("userInputHistoryChoice", mUserInputHistoryChoice);
 	}
 
 	@Override
@@ -337,6 +411,7 @@ public class ConsoleActivity extends BaseActivity {
 		menu.setGroupVisible(R.id.history_group, true);
 		menu.findItem(R.id.find_text_option).setVisible(!mSearchEnabled);
 		menu.findItem(R.id.find_text_action).setVisible(mSearchEnabled);
+		menu.findItem(R.id.show_console_options_bar).setVisible(mConsoleOptionsBar.getVisibility() == View.GONE);
 
 		if (mSearchEnabled) {
 			View actionView = menu.findItem(R.id.find_text_action).getActionView();
@@ -414,6 +489,10 @@ public class ConsoleActivity extends BaseActivity {
 			mSearchEnabled = true;
 			invalidateOptionsMenu();
 			return true;
+		case R.id.show_console_options_bar:
+			mConsoleOptionsBar.setVisibility(View.VISIBLE);
+			invalidateOptionsMenu();
+			return true;
 		case R.id.save_history:
 			return true;
 		case R.id.load_history:
@@ -426,35 +505,44 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-		if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
-				!mConsoleEntries.get(info.position).getShortContents().toString().isEmpty()) { //To prevent empty lines
+		switch (v.getId()) {
+		case R.id.console_empty_space:
 			super.onCreateContextMenu(menu, v, menuInfo);
+			menu.setHeaderTitle("Input options");
+			getMenuInflater().inflate(R.menu.console_empty_space_context_menu, menu);
+			break;
+		case R.id.console_list_view:
+			if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
+			!mConsoleEntries.get(info.position).getShortContents().toString().isEmpty()) { //To prevent empty lines
+				super.onCreateContextMenu(menu, v, menuInfo);
 
-			//			final int group;
-			mTempCommand = ((ConsoleEntryHolder) info.targetView.getTag()).draggedOverCommand;
-			if (mTempCommand != null) { //If user dragged CommandIcon onto entry
-				menu.setHeaderTitle("Entry " + info.position + ": Execute " + mTempCommand + " on...");
-				//				group = DRAGGED_GROUP;
-			} else { //If user long-clicked entry
-				menu.setHeaderTitle("Entry " + info.position + ": Commands found");
-				menu.add(Menu.NONE, Menu.NONE, 1, "Sample transformation (does nothing)");
-				//				group = LONG_CLICKED_GROUP;
+				//			final int group;
+				mTempCommand = ((ConsoleEntryHolder) info.targetView.getTag()).draggedOverCommand;
+				if (mTempCommand != null) { //If user dragged CommandIcon onto entry
+					menu.setHeaderTitle("Entry " + info.position + ": Execute " + mTempCommand + " on...");
+					//				group = DRAGGED_GROUP;
+				} else { //If user long-clicked entry
+					menu.setHeaderTitle("Entry " + info.position + ": Commands found");
+					menu.add(Menu.NONE, Menu.NONE, 1, "Sample transformation (does nothing)");
+					//				group = LONG_CLICKED_GROUP;
+				}
+
+				//			int order = 2;
+				//			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
+				//				menu.add(group, v.getId(), order, keyword);
+				//				order++;
+				//			}
 			}
-
-			//			int order = 2;
-			//			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
-			//				menu.add(group, v.getId(), order, keyword);
-			//				order++;
-			//			}
+			break;
 		}
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item != null) {
-			String keywordNStr = item.getTitle().toString();
 			switch (item.getGroupId()) {
 			case DRAGGED_GROUP:
+				String keywordNStr = item.getTitle().toString();
 				if (mInputEnabled) {
 					CustomCommandDispatcher.runCustomCommand(this, mTempCommand, keywordNStr);
 				} else {
@@ -462,6 +550,39 @@ public class ConsoleActivity extends BaseActivity {
 				}
 				break;
 			case LONG_CLICKED_GROUP:
+				// Fill in with something useful later
+				break;
+			case R.id.console_input_group:
+				switch (item.getItemId()) {
+				case R.id.console_input_select:
+					mConsoleInputEditText.setSelection(0, mConsoleInputEditText.length());
+					break;
+				case R.id.console_input_copy: {
+					ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+					ClipData copiedText = ClipData.newPlainText("copiedText",
+							StringUtils.withoutCharWrap(mConsoleInputEditText.getText().toString()));
+					clipboard.setPrimaryClip(copiedText);
+					showToast("Selection copied to clipboard!");
+					break;
+				}
+				case R.id.console_input_paste_append:
+				case R.id.console_input_paste_replace: {
+					ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+					if (clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType("text/plain")) {
+						CharSequence pasteData = clipboard.getPrimaryClip().getItemAt(0).getText();
+						if (pasteData != null) {
+							String pastedText = StringUtils.withCharWrap(pasteData.toString());
+							if (item.getItemId() == R.id.console_input_paste_append) {
+								mConsoleInputEditText.append(pastedText);
+							} else {
+								mConsoleInputEditText.setText(pastedText);
+							}
+							mConsoleInputEditText.setSelection(mConsoleInputEditText.length());
+						}
+					}
+					break;
+				}
+				}
 				break;
 			}
 			mConsoleInputEditText.requestFocus(); //Prevents ListView from stealing focus
@@ -599,7 +720,14 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public boolean isSoftKeyboardVisible() {
-		return mSoftKeyboardVisibility;
+		return mSoftKeyboardVisible;
+	}
+
+	public void selectFromUserInputHistory(int choice) {
+		mUserInputHistoryChoice = choice;
+		mConsoleInputEditText.setText(mUserInputHistory.get(mUserInputHistoryChoice));
+		mConsoleInputEditText.setSelection(mConsoleInputEditText.length());
+		mConsoleInputEditText.requestFocus();
 	}
 
 	public void setInputEnabled(boolean enabled) {

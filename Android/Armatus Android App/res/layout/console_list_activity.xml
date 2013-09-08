@@ -1,45 +1,89 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/console_list_layout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/consoleBackgroundColor"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:weightSum="1" >
 
-    <edu.kufpg.armatus.drag.ListViewDragEdges
-        android:id="@+id/console_list_wrapper"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <edu.kufpg.armatus.console.ConsoleListView
-            android:id="@+id/console_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="multipleChoice"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:paddingTop="@dimen/entry_padding"
-            android:splitMotionEvents="false" />
-    </edu.kufpg.armatus.drag.ListViewDragEdges>
-
-    <View
-        android:id="@+id/console_empty_space"
+    <RelativeLayout
+        android:id="@+id/console_list_layout"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_alignParentBottom="true" />
+        android:layout_weight="1"
+        android:background="?attr/consoleBackgroundColor" >
 
-    <TextView
-        android:id="@+id/console_search_matches_indicator"
-        android:layout_width="wrap_content"
+        <edu.kufpg.armatus.drag.ListViewDragEdges
+            android:id="@+id/console_list_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <edu.kufpg.armatus.console.ConsoleListView
+                android:id="@+id/console_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:paddingTop="@dimen/entry_padding"
+                android:splitMotionEvents="false" />
+        </edu.kufpg.armatus.drag.ListViewDragEdges>
+
+        <View
+            android:id="@+id/console_empty_space"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_alignParentBottom="true" />
+
+        <TextView
+            android:id="@+id/console_search_matches_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/text_view_rounded_corners"
+            android:padding="5dp"
+            android:text="0 matches"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:textColor="@android:color/black"
+            android:textCursorDrawable="@null"
+            android:textIsSelectable="false"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/console_options_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/text_view_rounded_corners"
-        android:padding="5dp"
-        android:text="0 matches"
-        android:textAppearance="@android:style/TextAppearance.Small"
-        android:textColor="@android:color/black"
-        android:textCursorDrawable="@null"
-        android:textIsSelectable="false"
-        android:visibility="gone" />
+        android:background="@drawable/ab_bottom_solid_light_holo" >
 
-</RelativeLayout>
+        <ImageButton
+            android:id="@+id/console_input_next_entry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_action_find_next_light" />
+
+        <ImageButton
+            android:id="@+id/console_input_scroll_entries"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/console_input_next_entry"
+            android:src="@drawable/ic_action_find_scroll_light" />
+
+        <ImageButton
+            android:id="@+id/console_input_previous_entry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/console_input_scroll_entries"
+            android:src="@drawable/ic_action_find_previous_light" />
+
+        <ImageButton
+            android:id="@+id/console_options_hide_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/ic_action_cancel_light" />
+    </RelativeLayout>
+
+</LinearLayout>

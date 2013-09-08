@@ -85,19 +85,7 @@ public class ConsoleListView extends ListView {
 						showActionMode = false;
 					}
 					setActionModeVisible(showActionMode);
-
-					if (mActionModeVisible) {
-						switch (mPrevCheckedStates.size()) {
-						case 1:
-							mActionMode.setSubtitle("One entry selected");
-							mSwapItem.setVisible(true);
-							break;
-						default:
-							mActionMode.setSubtitle(mPrevCheckedStates.size() + " entries selected");
-							mSwapItem.setVisible(false);
-							break;
-						}
-					}
+					refreshActionMode();
 				}
 			}
 		});
@@ -138,6 +126,7 @@ public class ConsoleListView extends ListView {
 				setItemChecked(mPrevCheckedStates.keyAt(i), true);
 			}
 		}
+		refreshActionMode();
 	}
 
 	/**
@@ -170,6 +159,21 @@ public class ConsoleListView extends ListView {
 	public boolean isActionModeVisible() {
 		return mActionModeVisible;
 	}
+	
+	private void refreshActionMode() {
+		if (mActionModeVisible) {
+			switch (mPrevCheckedStates.size()) {
+			case 1:
+				mActionMode.setSubtitle("One entry selected");
+				mSwapItem.setVisible(true);
+				break;
+			default:
+				mActionMode.setSubtitle(mPrevCheckedStates.size() + " entries selected");
+				mSwapItem.setVisible(false);
+				break;
+			}
+		}
+	}
 
 	/**
 	 * Defines the behavior of {@code ConsoleListView}'s {@link ActionMode} callback,
@@ -181,7 +185,7 @@ public class ConsoleListView extends ListView {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.console_list_view_action_mode, menu);
 			mode.setTitle("Select entries");
-			mSwapItem = menu.findItem(R.id.swap);
+			mSwapItem = menu.findItem(R.id.console_list_view_swap);
 			return true;
 		}
 
@@ -194,7 +198,7 @@ public class ConsoleListView extends ListView {
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
-			case R.id.copy:
+			case R.id.console_list_view_copy:
 				StringBuilder copyBuilder = new StringBuilder();
 				for (int i = 0; i < mPrevCheckedStates.size(); i++) {
 					copyBuilder.append(((ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(i)))
@@ -208,7 +212,7 @@ public class ConsoleListView extends ListView {
 				mConsole.showToast((mPrevCheckedStates.size() == 1 ? "Entry" : "Entries") + " copied to clipboard!");
 				mode.finish();
 				return true;
-			case R.id.select:
+			case R.id.console_list_view_select:
 				int[] checkedEntries = new int[mPrevCheckedStates.size()];
 				for (int i = 0; i < mPrevCheckedStates.size(); i++) {
 					checkedEntries[i] = mPrevCheckedStates.keyAt(i);
@@ -216,7 +220,7 @@ public class ConsoleListView extends ListView {
 				mConsole.showEntrySelectionDialog(checkedEntries);
 				mode.finish();
 				return true;
-			case R.id.swap:
+			case R.id.console_list_view_swap:
 				if (mPrevCheckedStates.size() == 1) {
 					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
 					if (entry.getShortContents().toString().split(StringUtils.WHITESPACE).length > 1) {
