@@ -6,7 +6,6 @@ import edu.kufpg.armatus.util.StringUtils;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -89,18 +88,6 @@ public class ConsoleListView extends ListView {
 				}
 			}
 		});
-	}
-
-	@Override
-	protected void dispatchDraw(Canvas canvas) {
-		super.dispatchDraw(canvas);
-
-		final int overFooterBottom = getBottom() + getScrollY();
-		final int bottom = getChildAt(getChildCount() - 1).getBottom();
-		if (getFirstVisiblePosition() + getChildCount() == getCount() &&
-				overFooterBottom > bottom) {
-			mConsole.resizeEmptySpace(overFooterBottom - bottom);
-		}
 	}
 
 	@Override

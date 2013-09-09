@@ -33,7 +33,7 @@ import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient implements Parcelable {
 	public static int NO_TOKEN = -1;
-	
+
 	private ConsoleActivity mConsole;
 	private ProgressDialog mProgress;
 
@@ -71,7 +71,12 @@ public class HermitClient implements Parcelable {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				newRunCommandRequest().execute(mServerUrl + "/command", o.toString(), inputs[0]);
+
+				if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
+					newRunAbortResumeRequest().execute(mServerUrl + "/command", o.toString());
+				} else {
+					newRunCommandRequest().execute(mServerUrl + "/command", o.toString());
+				}
 			}
 
 		}
@@ -92,19 +97,19 @@ public class HermitClient implements Parcelable {
 			mName = name;
 			mTags = ImmutableList.copyOf(tags);
 		}
-		
+
 		public String getHelp() {
 			return mHelp;
 		}
-		
+
 		public String getName() {
 			return mName;
 		}
-		
+
 		public List<String> getTags() {
 			return mTags;
 		}
-		
+
 		public static Parcelable.Creator<CommandInfo> CREATOR =
 				new Parcelable.Creator<CommandInfo>() {
 			@Override
@@ -144,7 +149,7 @@ public class HermitClient implements Parcelable {
 		private static final String YELLOW = "#FDFD0D";
 		private static final String GREEN = "#1DDA1C";
 		private static final String CYAN = "#1BE0CC";
-		
+
 		private final int mAst;
 		private final List<Glyph> mGlyphs;
 
@@ -156,7 +161,7 @@ public class HermitClient implements Parcelable {
 			mAst = ast;
 			mGlyphs = glyphs;
 		}
-		
+
 		public CharSequence createPrettyText() {
 			SpannableStringBuilder builder = new SpannableStringBuilder();
 			for (Glyph glyph : mGlyphs) {
@@ -171,22 +176,22 @@ public class HermitClient implements Parcelable {
 					if (glyphColor != null) {
 						spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
 								0, glyph.getText().length(), 0);
-				}
-					
+					}
+
 				}
 				builder.append(spanWord);
 			}
 			return builder;
 		}
-		
+
 		public int getAst() {
 			return mAst;
 		}
-		
+
 		public List<Glyph> getGlyphs() {
 			return mGlyphs;
 		}
-		
+
 		private static String getGlyphColor(GlyphStyle style) {
 			switch (style) {
 			case KEYWORD:
@@ -219,7 +224,7 @@ public class HermitClient implements Parcelable {
 
 	public static class Glyph implements Serializable {
 		private static final long serialVersionUID = -7814082698884658726L;
-		
+
 		private final GlyphStyle mStyle;
 		private final String mText;
 
@@ -231,11 +236,11 @@ public class HermitClient implements Parcelable {
 			mStyle = style;
 			mText = text;
 		}
-		
+
 		public GlyphStyle getStyle() {
 			return mStyle;
 		}
-		
+
 		public String getText() {
 			return mText;
 		}
@@ -257,7 +262,7 @@ public class HermitClient implements Parcelable {
 		}
 
 	}
-	
+
 	public static enum GlyphStyle {
 		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING
 	}
@@ -275,15 +280,15 @@ public class HermitClient implements Parcelable {
 			mUser = user;
 			mAst = ast;
 		}
-		
+
 		public int getUser() {
 			return mUser;
 		}
-		
+
 		public int getAst() {
 			return mAst;
 		}
-		
+
 		public void setAst(int ast) {
 			mAst = ast;
 		}
@@ -423,7 +428,7 @@ public class HermitClient implements Parcelable {
 				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
 				ImmutableListMultimap.Builder<String, CommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
 				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
-				
+
 				for (CommandInfo cmdInfo : commands) {
 					commandSetBuilder.add(cmdInfo.getName());
 					for (String tag : cmdInfo.getTags()) {
@@ -445,16 +450,6 @@ public class HermitClient implements Parcelable {
 
 	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest() {
 		return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
-//			private String mmCommandName;
-//
-//			@Override
-//			protected CommandResponse doInBackground(String... params) {
-//				if (params.length > 2 && params[2] != null && !params[2].isEmpty()) {
-//					mmCommandName = params[2].split(StringUtils.WHITESPACE)[0];
-//				}
-//				return super.doInBackground(params);
-//			}
-
 			@Override
 			protected CommandResponse onResponse(String response) {
 				try {
@@ -470,6 +465,28 @@ public class HermitClient implements Parcelable {
 				super.onPostExecute(response);
 				mToken.setAst(response.getAst());
 				getActivity().appendCommandResponse(response);
+			}
+
+		};
+	}
+
+	private HermitHttpServerRequest<String> newRunAbortResumeRequest() {
+		return new HermitHttpServerRequest<String>(mConsole, HttpRequest.POST) {
+			@Override
+			protected String onResponse(String response) {
+				try {
+					return new JSONObject(response).getString("msg");
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(String response) {
+				super.onPostExecute(response);
+				mToken = null;
+				getActivity().appendErrorResponse(response);
 			}
 
 		};
@@ -500,11 +517,11 @@ public class HermitClient implements Parcelable {
 			mProgress.dismiss();
 		}
 	}
-	
+
 	public int getAst() {
 		return (mToken != null) ? mToken.getAst() : NO_TOKEN;
 	}
-	
+
 	private boolean isNetworkConnected(RequestName name) {
 		String server = PrefsActivity.getPrefs(mConsole).getString(
 				BaseActivity.NETWORK_SOURCE_KEY, null);
@@ -537,7 +554,7 @@ public class HermitClient implements Parcelable {
 	public boolean isRequestDelayed() {
 		return mDelayedRequestName != null;
 	}
-	
+
 	private boolean isTokenAcquired() {
 		if (mToken == null) {
 			mConsole.appendErrorResponse("ERROR: No token (connect to server first).");
@@ -553,7 +570,7 @@ public class HermitClient implements Parcelable {
 	public void notifyDelayedRequestFinished() {
 		mDelayedRequestName = null;
 	}
-	
+
 	private void showProgressDialog(Context context, String message) {
 		mProgress = new ProgressDialog(context);
 		mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);

@@ -1,9 +1,12 @@
 package edu.kufpg.armatus.console;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 
 import edu.kufpg.armatus.console.HermitClient.CommandResponse;
 import edu.kufpg.armatus.util.StringUtils;
@@ -110,12 +113,15 @@ public class ConsoleEntry implements Parcelable {
 	}
 
 	public SpannableStringBuilder getFullContentsPrefix() {
-		SpannableStringBuilder prefix;
+		SpannableStringBuilder prefix = new SpannableStringBuilder(StringUtils.NBSP);
 		if (mAst != HermitClient.NO_TOKEN) {
-			prefix = new SpannableStringBuilder("hermit<").append(""+mAst).append(">");
+			prefix = prefix.append("hermit<" + mAst + ">");
 		} else {
-			prefix = new SpannableStringBuilder("armatus:");
+			prefix = prefix.append("armatus");
 		}
+		prefix = prefix.append(StringUtils.NBSP);
+		prefix.setSpan(new BackgroundColorSpan(Color.DKGRAY), 0, prefix.length(), 0);
+		prefix.setSpan(new ForegroundColorSpan(Color.WHITE), 0, prefix.length(), 0);
 		return prefix.append(StringUtils.NBSP);
 	}
 
