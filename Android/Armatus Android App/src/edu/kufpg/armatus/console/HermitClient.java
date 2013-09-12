@@ -1,7 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,13 +9,8 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -29,6 +22,10 @@ import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
 import edu.kufpg.armatus.networking.InternetUtils;
+import edu.kufpg.armatus.networking.data.Command;
+import edu.kufpg.armatus.networking.data.CommandInfo;
+import edu.kufpg.armatus.networking.data.CommandResponse;
+import edu.kufpg.armatus.networking.data.Token;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient implements Parcelable {
@@ -64,18 +61,11 @@ public class HermitClient implements Parcelable {
 			}
 		} else {
 			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired()) {
-				JSONObject o = new JSONObject();
-				try {
-					o.put("token", mToken.toJSONObject());
-					o.put("cmd", StringUtils.withoutCharWrap(input));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
+				Command command = new Command(mToken, StringUtils.withoutCharWrap(input));
 				if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
-					newRunAbortResumeRequest().execute(mServerUrl + "/command", o.toString());
+					newRunAbortResumeRequest().execute(mServerUrl + "/command", command.toString());
 				} else {
-					newRunCommandRequest().execute(mServerUrl + "/command", o.toString());
+					newRunCommandRequest().execute(mServerUrl + "/command", command.toString());
 				}
 			}
 
@@ -85,277 +75,6 @@ public class HermitClient implements Parcelable {
 	public void fetchCommands() {
 		if (isNetworkConnected(RequestName.COMMANDS)) {
 			newFetchCommandsRequest().execute(mServerUrl + "/commands");
-		}
-	}
-
-	public static class CommandInfo implements Parcelable {
-		private final String mHelp, mName;
-		private final List<String> mTags;
-
-		public CommandInfo(String help, String name, List<String> tags) {
-			mHelp = help;
-			mName = name;
-			mTags = ImmutableList.copyOf(tags);
-		}
-
-		public String getHelp() {
-			return mHelp;
-		}
-
-		public String getName() {
-			return mName;
-		}
-
-		public List<String> getTags() {
-			return mTags;
-		}
-
-		public static Parcelable.Creator<CommandInfo> CREATOR =
-				new Parcelable.Creator<CommandInfo>() {
-			@Override
-			public CommandInfo createFromParcel(Parcel source) {
-				String help = source.readString();
-				String name = source.readString();
-				@SuppressWarnings("unchecked")
-				List<String> tags = (List<String>) source.readSerializable();
-
-				return new CommandInfo(help, name, tags);
-			}
-
-			@Override
-			public CommandInfo[] newArray(int size) {
-				return new CommandInfo[size];
-			}
-		};
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeString(mHelp);
-			dest.writeString(mName);
-			dest.writeSerializable((Serializable) mTags);
-		}
-
-	}
-
-	public static class CommandResponse implements Serializable {
-		private static final long serialVersionUID = 6457446122656522614L;
-		private static final String BLUE = "#0090D3";
-		private static final String RED = "#CC060B";
-		private static final String YELLOW = "#FDFD0D";
-		private static final String GREEN = "#1DDA1C";
-		private static final String CYAN = "#1BE0CC";
-
-		private final int mAst;
-		private final List<Glyph> mGlyphs;
-
-		public CommandResponse(JSONObject o) throws JSONException {
-			this(o.getInt("ast"), jsonToGlyphs(o.getJSONArray("glyphs")));
-		}
-
-		public CommandResponse(int ast, List<Glyph> glyphs) {
-			mAst = ast;
-			mGlyphs = glyphs;
-		}
-
-		public CharSequence createPrettyText() {
-			SpannableStringBuilder builder = new SpannableStringBuilder();
-			for (Glyph glyph : mGlyphs) {
-				SpannableString spanWord = new SpannableString(glyph.getText());
-				if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
-					spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
-							0, glyph.getText().length(), 0);
-					spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
-							0, glyph.getText().length(), 0);
-				} else {
-					String glyphColor = getGlyphColor(glyph.getStyle());
-					if (glyphColor != null) {
-						spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
-								0, glyph.getText().length(), 0);
-					}
-
-				}
-				builder.append(spanWord);
-			}
-			return builder;
-		}
-
-		public int getAst() {
-			return mAst;
-		}
-
-		public List<Glyph> getGlyphs() {
-			return mGlyphs;
-		}
-
-		private static String getGlyphColor(GlyphStyle style) {
-			switch (style) {
-			case KEYWORD:
-				return BLUE;
-			case SYNTAX:
-				return RED;
-			case COERCION:
-				return YELLOW;
-			case TYPE:
-				return GREEN;
-			case LIT:
-				return CYAN;
-			default:
-				return null;
-			}
-		}
-
-		private static List<Glyph> jsonToGlyphs(JSONArray a) {
-			ImmutableList.Builder<Glyph> builder = ImmutableList.builder();
-			for (int i = 0; i < a.length(); i++) {
-				try {
-					builder.add(new Glyph(a.getJSONObject(i)));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			return builder.build();
-		}
-	}
-
-	public static class Glyph implements Serializable {
-		private static final long serialVersionUID = -7814082698884658726L;
-
-		private final GlyphStyle mStyle;
-		private final List<Crumb> mPath;
-		private final String mText;
-
-		public Glyph(GlyphStyle style, List<Crumb> path, String text) {
-			mStyle = style;
-			mPath = path;
-			mText = text;
-		}
-		
-		public Glyph(JSONObject o) throws JSONException {
-			this(jsonToStyle(o), jsonToCrumbs(o.getJSONArray("path")), o.getString("text"));
-		}
-
-		public GlyphStyle getStyle() {
-			return mStyle;
-		}
-		
-		public List<Crumb> getPath() {
-			return mPath;
-		}
-
-		public String getText() {
-			return mText;
-		}
-		
-		private static List<Crumb> jsonToCrumbs(JSONArray a) {
-			ImmutableList.Builder<Crumb> builder = ImmutableList.builder();
-			for (int i = 0; i < a.length(); i++) {
-				try {
-					builder.add(new Crumb(a.getJSONObject(i)));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			return builder.build();
-		}
-
-		private static GlyphStyle jsonToStyle(JSONObject o) {
-			if (o.has("style")) {
-				GlyphStyle glyphStyle = null;
-				try {
-					glyphStyle = GlyphStyle.valueOf(o.getString("style"));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				return glyphStyle;
-			} else {
-				return GlyphStyle.NORMAL;
-			}
-
-		}
-
-	}
-
-	public static enum GlyphStyle {
-		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING
-	}
-	
-	public static class Crumb implements Serializable {
-		private static final long serialVersionUID = 2053543270858395622L;
-		private final int mNum;
-		private final String mCrumb;
-		
-		public Crumb(int num, String crumb) {
-			mNum = num;
-			mCrumb = crumb;
-		}
-		
-		public Crumb(JSONObject o) throws JSONException {
-			this(jsonToNum(o), o.getString("crumb"));
-		}
-		
-		public int getNum() {
-			return mNum;
-		}
-		
-		public String getCrumb() {
-			return mCrumb;
-		}
-		
-		private static int jsonToNum(JSONObject o) {
-			int num = -1;
-			if (o.has("num")) {
-				try {
-					num = o.getInt("style");
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			return num;
-		}
-	}
-
-	public static class Token implements Serializable {
-		private static final long serialVersionUID = -8737445107687286266L;
-		private final int mUser;
-		private int mAst;
-
-		public Token(JSONObject o) throws JSONException {
-			this(o.getInt("user"), o.getInt("ast"));
-		}
-
-		public Token(int user, int ast) {
-			mUser = user;
-			mAst = ast;
-		}
-
-		public int getUser() {
-			return mUser;
-		}
-
-		public int getAst() {
-			return mAst;
-		}
-
-		public void setAst(int ast) {
-			mAst = ast;
-		}
-
-		public JSONObject toJSONObject() {
-			JSONObject o = new JSONObject();
-			try {
-				o.put("user", mUser);
-				o.put("ast", mAst);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-			return o;
 		}
 	}
 
@@ -449,20 +168,11 @@ public class HermitClient implements Parcelable {
 				}
 				try {
 					JSONArray cmds = insertNameHere.getJSONArray("cmds");
-					List<CommandInfo> commandList = new ArrayList<CommandInfo>();
+					ImmutableList.Builder<CommandInfo> commandListBuilder = ImmutableList.builder();
 					for (int i = 0; i < cmds.length(); i++) {
-						JSONObject cmdInfo = cmds.getJSONObject(i);
-						String name = cmdInfo.getString("name");
-						String help = cmdInfo.getString("help");
-						JSONArray tags = cmdInfo.getJSONArray("tags");
-						List<String> tagList = new ArrayList<String>();
-						for (int j = 0; j < tags.length(); j++) {
-							tagList.add(tags.getString(j));
-							commandList.add(new CommandInfo(help, name, tagList));
-						}
+						commandListBuilder.add(new CommandInfo(cmds.getJSONObject(i)));
 					}
-
-					return commandList;
+					return commandListBuilder.build();
 				} catch (JSONException e) {
 					e.printStackTrace();
 					return null;
@@ -650,7 +360,7 @@ public class HermitClient implements Parcelable {
 	private HermitClient(Parcel in) {
 		mDelayedRequestName = (RequestName) in.readSerializable();
 		mServerUrl = in.readString();
-		mToken = (Token) in.readSerializable();
+		mToken = in.readParcelable(HermitClient.class.getClassLoader());
 	}
 
 
@@ -663,7 +373,7 @@ public class HermitClient implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeSerializable(mDelayedRequestName);
 		dest.writeString(mServerUrl);
-		dest.writeSerializable(mToken);
+		dest.writeParcelable(mToken, flags);
 	}
 
 }

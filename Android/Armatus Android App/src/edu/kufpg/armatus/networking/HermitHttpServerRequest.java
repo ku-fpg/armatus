@@ -92,7 +92,7 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 					responseStr = entity;
 				}
 			} else {
-				throw new HttpException(httpResponse.getStatusLine().getStatusCode()+"");
+				throw new HttpException("Error code " + httpResponse.getStatusLine().getStatusCode());
 			}
 		} catch (HttpException e) {
 			return cancelResult(e, "ERROR: server problem (" + httpResponse.getStatusLine().getStatusCode() + ").");

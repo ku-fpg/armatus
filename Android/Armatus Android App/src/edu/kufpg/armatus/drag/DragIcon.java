@@ -1,6 +1,6 @@
 package edu.kufpg.armatus.drag;
 
-import edu.kufpg.armatus.console.HermitClient.CommandInfo;
+import edu.kufpg.armatus.networking.data.CommandInfo;
 import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * A draggable image associated with a {@link edu.kufpg.armatus.console.CustomCommandInfo.Command
+ * A draggable image associated with a {@link edu.kufpg.armatus.console.CustomCommandInfo.CommandInfo
  * Command} that can be run on {@link edu.kufpg.armatus.console.ConsoleEntry ConsoleEntry} {@link
  * edu.kufpg.armatus.command.CustomCommandDispatcher.Keyword Keywords}.
  */

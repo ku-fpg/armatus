@@ -1,7 +1,7 @@
 package edu.kufpg.armatus.dialog;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.HermitClient.CommandInfo;
+import edu.kufpg.armatus.networking.data.CommandInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -18,10 +18,10 @@ public class CommandHelpDialog extends ConsiderateDialog {
 	private CommandInfo mCommandInfo;
 	private CharSequence mTagBoxes;
 
-	public static CommandHelpDialog newInstance(CommandInfo info) {
+	public static CommandHelpDialog newInstance(CommandInfo commandInfo) {
 		CommandHelpDialog hd = new CommandHelpDialog();
 		Bundle args = new Bundle();
-		args.putParcelable("info", info);
+		args.putParcelable("commandInfo", commandInfo);
 		hd.setArguments(args);
 		return hd;
 	}
@@ -29,7 +29,7 @@ public class CommandHelpDialog extends ConsiderateDialog {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mCommandInfo = (CommandInfo) getArguments().getParcelable("info");
+		mCommandInfo = (CommandInfo) getArguments().getParcelable("commandInfo");
 	}
 
 	@Override

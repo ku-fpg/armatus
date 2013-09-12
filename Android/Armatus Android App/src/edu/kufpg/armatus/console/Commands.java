@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 
-import edu.kufpg.armatus.console.HermitClient.CommandInfo;
+import edu.kufpg.armatus.networking.data.CommandInfo;
 
 public class Commands {
 	private static List<String> sTagList = ImmutableList.of(CustomCommandDispatcher.CLIENT_COMMANDS_TAG);

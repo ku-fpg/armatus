@@ -1,9 +1,9 @@
 package edu.kufpg.armatus.console;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.HermitClient.CommandInfo;
 import edu.kufpg.armatus.dialog.CommandHelpDialog;
 import edu.kufpg.armatus.drag.DragIcon;
+import edu.kufpg.armatus.networking.data.CommandInfo;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 /**
  * {@link android.widget.ExpandableListAdapter ExpandableListAdapter} for a menu containing
  * {@link DragIcon}s representing various console {@link
- * edu.kufpg.armatus.console.CustomCommandInfo.Command Command}s.
+ * edu.kufpg.armatus.console.CustomCommandInfo.CommandInfo Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 	private ConsoleActivity mConsole;

@@ -273,7 +273,7 @@ public class ConsoleWordSearcher implements Parcelable {
 		mSearchOffsetsMap = (SortedSetMultimap<String, Integer>) in.readSerializable();
 		mPreviousMatches = (Stack<MatchParams>) in.readSerializable();
 		mNextMatches = (Stack<MatchParams>) in.readSerializable();
-		mSelectedMatch = (MatchParams) in.readSerializable();
+		mSelectedMatch = in.readParcelable(ConsoleWordSearcher.class.getClassLoader());
 		mMatchCount = in.readInt();
 	}
 
@@ -289,14 +289,12 @@ public class ConsoleWordSearcher implements Parcelable {
 		dest.writeSerializable((Serializable) mSearchOffsetsMap);
 		dest.writeSerializable(mPreviousMatches);
 		dest.writeSerializable(mNextMatches);
-		dest.writeSerializable(mSelectedMatch);
+		dest.writeParcelable(mSelectedMatch, flags);
 		dest.writeInt(mMatchCount);
 	}
 
 	/** The parameters of a search match index. */
-	public static class MatchParams implements Serializable {
-		private static final long serialVersionUID = 2976454656462329956L;
-		
+	public static class MatchParams implements Parcelable {
 		/** The index in the {@link android.widget.ListView ListView} where the
 		 * match occurs. */
 		public final int listIndex;
@@ -323,6 +321,32 @@ public class ConsoleWordSearcher implements Parcelable {
 		public MatchParams(MatchParams params) {
 			listIndex = params.listIndex;
 			textViewOffset = params.textViewOffset;
+		}
+		
+		public static Parcelable.Creator<MatchParams> CREATOR =
+				new Parcelable.Creator<MatchParams>() {
+			@Override
+			public MatchParams createFromParcel(Parcel source) {
+				int listIndex = source.readInt();
+				int textViewOffset = source.readInt();
+				return new MatchParams(listIndex, textViewOffset);
+			}
+
+			@Override
+			public MatchParams[] newArray(int size) {
+				return new MatchParams[size];
+			}
+		};
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeInt(listIndex);
+			dest.writeInt(textViewOffset);
 		}
 	}
 

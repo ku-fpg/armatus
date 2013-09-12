@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
-import edu.kufpg.armatus.console.HermitClient.CommandResponse;
+import edu.kufpg.armatus.networking.data.CommandResponse;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -164,7 +164,7 @@ public class ConsoleEntry implements Parcelable {
 			int entryNum = in.readInt();
 			int ast = in.readInt();
 			String userInput = in.readString();
-			CommandResponse commandResponse = (CommandResponse) in.readSerializable();
+			CommandResponse commandResponse = in.readParcelable(ConsoleEntry.class.getClassLoader());
 			String errorResponse = in.readString();
 			CharSequence shortContents = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
 			return new ConsoleEntry(entryNum, ast, userInput, commandResponse, errorResponse, shortContents);
@@ -185,7 +185,7 @@ public class ConsoleEntry implements Parcelable {
 		dest.writeInt(mEntryNum);
 		dest.writeInt(mAst);
 		dest.writeString(mUserInput);
-		dest.writeSerializable(mCommandResponse);
+		dest.writeParcelable(mCommandResponse, flags);
 		dest.writeString(mErrorResponse);
 		TextUtils.writeToParcel(mShortContents, dest, 0);
 	}

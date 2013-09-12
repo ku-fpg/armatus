@@ -2,8 +2,7 @@ package edu.kufpg.armatus.console;
 
 import java.util.Arrays;
 
-import edu.kufpg.armatus.console.HermitClient.CommandInfo;
-
+import edu.kufpg.armatus.networking.data.CommandInfo;
 
 public abstract class CustomCommandInfo extends CommandInfo {
 	/** The number of arguments that this {@link CustomCommandInfo} takes. If {@link
