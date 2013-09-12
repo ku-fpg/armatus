@@ -7,25 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
 
 import com.google.common.collect.ImmutableList;
 
-import edu.kufpg.armatus.networking.data.Glyph.GlyphStyle;
-
 public class CommandResponse implements Parcelable {
-	private static final String BLUE = "#0090D3";
-	private static final String RED = "#CC060B";
-	private static final String YELLOW = "#FDFD0D";
-	private static final String GREEN = "#1DDA1C";
-	private static final String CYAN = "#1BE0CC";
-
 	private final int mAst;
 	private final List<Glyph> mGlyphs;
 	private final String mMessage;
@@ -37,29 +24,8 @@ public class CommandResponse implements Parcelable {
 	}
 	
 	public CommandResponse(JSONObject o) throws JSONException {
-		this(o.getInt("ast"), jsonToGlyphs(o.getJSONArray("glyphs")), o.getString("msg"));
-	}
-
-	public CharSequence createPrettyText() {
-		SpannableStringBuilder builder = new SpannableStringBuilder();
-		for (Glyph glyph : mGlyphs) {
-			SpannableString spanWord = new SpannableString(glyph.getText());
-			if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
-				spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
-						0, glyph.getText().length(), 0);
-				spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
-						0, glyph.getText().length(), 0);
-			} else {
-				String glyphColor = getGlyphColor(glyph.getStyle());
-				if (glyphColor != null) {
-					spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
-							0, glyph.getText().length(), 0);
-				}
-
-			}
-			builder.append(spanWord);
-		}
-		return builder;
+		this(o.getInt("ast"), (o.has("glyphs") ? jsonToGlyphs(o.getJSONArray("glyphs")) : null),
+				(o.has("msg") ? o.getString("msg") : null));
 	}
 
 	public int getAst() {
@@ -72,23 +38,6 @@ public class CommandResponse implements Parcelable {
 	
 	public String getMessage() {
 		return mMessage;
-	}
-
-	private static String getGlyphColor(GlyphStyle style) {
-		switch (style) {
-		case KEYWORD:
-			return BLUE;
-		case SYNTAX:
-			return RED;
-		case COERCION:
-			return YELLOW;
-		case TYPE:
-			return GREEN;
-		case LIT:
-			return CYAN;
-		default:
-			return null;
-		}
 	}
 
 	private static List<Glyph> jsonToGlyphs(JSONArray a) {

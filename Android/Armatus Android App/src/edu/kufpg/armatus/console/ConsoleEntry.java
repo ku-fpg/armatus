@@ -1,14 +1,19 @@
 package edu.kufpg.armatus.console;
 
+import java.util.List;
+
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
 import edu.kufpg.armatus.networking.data.CommandResponse;
+import edu.kufpg.armatus.networking.data.Glyph;
+import edu.kufpg.armatus.networking.data.Glyph.GlyphStyle;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -139,14 +144,14 @@ public class ConsoleEntry implements Parcelable {
 		mUserInput = userInput;
 		mShortContents = buildShortContents(mUserInput, mCommandResponse, mErrorResponse);
 	}
-	
+
 	private CharSequence buildShortContents(String userInput, CommandResponse commandResponse, String errorResponse) {
 		SpannableStringBuilder builder = new SpannableStringBuilder();
 		if (userInput != null) {
 			builder.append(userInput).append("\n");
 		}
 		if (commandResponse != null) {
-			builder.append(commandResponse.createPrettyText()).append("\n");
+			builder.append(createPrettyText(commandResponse.getGlyphs())).append("\n");
 		}
 		if (errorResponse != null) {
 			builder.append(errorResponse).append("\n");
@@ -154,6 +159,30 @@ public class ConsoleEntry implements Parcelable {
 
 		if (builder.length() > 0) {
 			builder = builder.delete(builder.length()-1, builder.length());
+		}
+		return builder;
+	}
+
+	private CharSequence createPrettyText(List<Glyph> glyphs) {
+		SpannableStringBuilder builder = new SpannableStringBuilder();
+		if (glyphs != null) {
+			for (Glyph glyph : glyphs) {
+				SpannableString spanWord = new SpannableString(glyph.getText());
+				if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
+					spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
+							0, glyph.getText().length(), 0);
+					spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
+							0, glyph.getText().length(), 0);
+				} else {
+					String glyphColor = glyph.getColor();
+					if (glyphColor != null) {
+						spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
+								0, glyph.getText().length(), 0);
+					}
+
+				}
+				builder.append(spanWord);
+			}
 		}
 		return builder;
 	}

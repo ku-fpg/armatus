@@ -13,6 +13,12 @@ import android.os.Parcelable;
 import com.google.common.collect.ImmutableList;
 
 public class Glyph implements Parcelable {
+	private static final String BLUE = "#0090D3";
+	private static final String RED = "#CC060B";
+	private static final String YELLOW = "#FDFD0D";
+	private static final String GREEN = "#1DDA1C";
+	private static final String CYAN = "#1BE0CC";
+	
 	private final GlyphStyle mStyle;
 	private final List<Crumb> mPath;
 	private final String mText;
@@ -37,6 +43,23 @@ public class Glyph implements Parcelable {
 
 	public String getText() {
 		return mText;
+	}
+	
+	public String getColor() {
+		switch (mStyle) {
+		case KEYWORD:
+			return BLUE;
+		case SYNTAX:
+			return RED;
+		case COERCION:
+			return YELLOW;
+		case TYPE:
+			return GREEN;
+		case LIT:
+			return CYAN;
+		default:
+			return null;
+		}
 	}
 
 	private static List<Crumb> jsonToCrumbs(JSONArray a) {
