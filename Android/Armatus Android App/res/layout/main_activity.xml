@@ -50,19 +50,19 @@
             android:text="Tree test" />
 
         <Button
-            android:id="@+id/pinchzoom_button"
+            android:id="@+id/radialmenu_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tree_button"
-            android:text="Launch pinch-zoom test" />
+            android:text="Launch Radial Menu test" />
 
         <Button
             android:id="@+id/test_activity_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/pinchzoom_button"
+            android:layout_below="@+id/radialmenu_button"
             android:text="Launch TestActivity" />
 
         <Button

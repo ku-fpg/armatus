@@ -34,7 +34,7 @@ public class MainActivity extends BaseActivity {
 		mUnstickButton = (Button) findViewById(R.id.unlock_button);
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
-		mPinchZoomButton = (Button) findViewById(R.id.pinchzoom_button);
+		mPinchZoomButton = (Button) findViewById(R.id.radialmenu_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 		
 		mStickyButton.setOnClickListener(new OnClickListener() {
@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity {
 		mPinchZoomButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, TextSizePinchZoomActivity.class));
+				startActivity(new Intent(MainActivity.this, RadialMenuActivity.class));
 			}
 		});
 
