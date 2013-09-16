@@ -2,34 +2,30 @@ package edu.kufpg.armatus;
 
 import java.util.ArrayList;
 
-import com.touchmenotapps.radialdemo.RadialMenuAboutFragment;
-import com.touchmenotapps.radialdemo.RadialMenuContactFragment;
-import com.touchmenotapps.radialdemo.RadialMenuMainFragment;
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuItem;
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuRenderer;
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuRenderer.OnRadailMenuClick;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-public class RadialMenuActivity extends FragmentActivity {
+public class RadialMenuActivity extends Activity {
 
 	//Variable declarations
 	private RadialMenuRenderer mRenderer;
-	private FrameLayout mHolderLayout;
+	private RelativeLayout mHolderLayout;
 	public RadialMenuItem menuContactItem, menuMainItem, menuAboutItem, menuTest1Item, menuTest2Item, menuTest3Item, menuTest4Item, menuTest5Item, menuTest6Item, menuTest7Item;
 	private ArrayList<RadialMenuItem> mMenuItems = new ArrayList<RadialMenuItem>(0);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.radial_menu);
+		setContentView(R.layout.radial_menu_activity);
 		
-		//Init the frame layout
-		mHolderLayout = (FrameLayout) findViewById(R.id.fragment_container);
 		// Init the Radial Menu and menu items
+		mHolderLayout = (RelativeLayout) findViewById(R.id.radial_menu_layout);
 		mRenderer = new RadialMenuRenderer(mHolderLayout, true, 40, 180);		
 		menuContactItem = new RadialMenuItem(getResources().getString(R.string.contact),getResources().getString(R.string.contact));
 		menuMainItem = new RadialMenuItem(getResources().getString(R.string.main_menu), getResources().getString(R.string.main_menu));
@@ -54,40 +50,16 @@ public class RadialMenuActivity extends FragmentActivity {
 		mMenuItems.add(menuTest7Item);
 		mRenderer.setRadialMenuContent(mMenuItems);
 		mHolderLayout.addView(mRenderer.renderView());
-		//Handle the menu item interactions
-		menuContactItem.setOnRadialMenuClickListener(new OnRadailMenuClick() {
-			@Override
-			public void onRadailMenuClickedListener(String id) {
-				//Can edit based on preference. Also can add animations here.
-				getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-				getSupportFragmentManager().beginTransaction().replace(mHolderLayout.getId(), new RadialMenuContactFragment()).commit();
-			}
-		});
 		
-		menuMainItem.setOnRadialMenuClickListener(new OnRadailMenuClick() {
+		OnRadailMenuClick listener = new OnRadailMenuClick() {
 			@Override
 			public void onRadailMenuClickedListener(String id) {
-				//Can edit based on preference. Also can add animations here.
-				getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-				getSupportFragmentManager().beginTransaction().replace(mHolderLayout.getId(), new RadialMenuMainFragment()).commit();
+				Toast.makeText(RadialMenuActivity.this, id, Toast.LENGTH_SHORT).show();
 			}
-		});
+		};
 		
-		menuAboutItem.setOnRadialMenuClickListener(new OnRadailMenuClick() {
-			@Override
-			public void onRadailMenuClickedListener(String id) {
-				//Can edit based on preference. Also can add animations here.
-				getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-				getSupportFragmentManager().beginTransaction().replace(mHolderLayout.getId(), new RadialMenuAboutFragment()).commit();
-			}
-		});
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		//Init with home fragment
-		getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-		getSupportFragmentManager().beginTransaction().replace(mHolderLayout.getId(), new RadialMenuMainFragment()).commit();
+		for (RadialMenuItem item : mMenuItems) {
+			item.setOnRadialMenuClickListener(listener);
+		}
 	}
 }

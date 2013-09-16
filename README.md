@@ -31,6 +31,8 @@ Software used
 
 —<a href="https://github.com/SimonVT/android-numberpicker">android-numberpicker</a> (a backport of <a href="http://developer.android.com/reference/android/widget/NumberPicker.html">NumberPicker</a> class from th Android 4.2 API) by <a href="https://github.com/SimonVT">Simon Vig "SimonVT" Therkildsen</a> under the Apache License 2.0
 
+—<a href="http://code.google.com/p/radial-menu-widget/">radial-menu-widget</a> by <a href="http://code.google.com/u/102658065252479412870/">Jason "valestin" Valestin</a> under the New BSD License
+
 —<a href="https://github.com/iPaulPro/aFileChooser">aFileChooser</a> by <a href="https://github.com/iPaulPro">Paul "iPaulPro" Burke</a> under the Apache License 2.0
 
 —<a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> by <a href="https://github.com/jackpal">Jack "jackpal" Palevich</a> under the Apache Licence 2.0

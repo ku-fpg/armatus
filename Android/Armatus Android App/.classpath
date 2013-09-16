@@ -10,5 +10,6 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/xnux/Desktop/guava-14.0.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/radial-menu-v4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
