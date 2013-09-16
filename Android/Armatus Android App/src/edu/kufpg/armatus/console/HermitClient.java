@@ -34,7 +34,7 @@ public class HermitClient implements Parcelable {
 	private ConsoleActivity mConsole;
 	private ProgressDialog mProgress;
 
-	private RequestName mDelayedRequestName;
+	private RequestName mDelayedRequestName = RequestName.NULL;
 	private String mServerUrl;
 	private Token mToken;
 
@@ -267,6 +267,8 @@ public class HermitClient implements Parcelable {
 			case COMMANDS:
 				fetchCommands();
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -315,7 +317,7 @@ public class HermitClient implements Parcelable {
 	}
 
 	public boolean isRequestDelayed() {
-		return mDelayedRequestName != null;
+		return !mDelayedRequestName.equals(RequestName.NULL);
 	}
 
 	private boolean isTokenAcquired() {
@@ -331,7 +333,7 @@ public class HermitClient implements Parcelable {
 	}
 
 	public void notifyDelayedRequestFinished() {
-		mDelayedRequestName = null;
+		mDelayedRequestName = RequestName.NULL;
 	}
 
 	private void showProgressDialog(Context context, String message) {
@@ -343,7 +345,7 @@ public class HermitClient implements Parcelable {
 	}
 
 	private enum RequestName {
-		CONNECT, COMMAND, COMMANDS
+		CONNECT, COMMAND, COMMANDS, NULL
 	};
 
 	public static final Parcelable.Creator<HermitClient> CREATOR
@@ -358,7 +360,7 @@ public class HermitClient implements Parcelable {
 	};
 
 	private HermitClient(Parcel in) {
-		mDelayedRequestName = (RequestName) in.readSerializable();
+		mDelayedRequestName = RequestName.values()[in.readInt()];
 		mServerUrl = in.readString();
 		mToken = in.readParcelable(HermitClient.class.getClassLoader());
 	}
@@ -371,7 +373,7 @@ public class HermitClient implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable(mDelayedRequestName);
+		dest.writeInt(mDelayedRequestName.ordinal());
 		dest.writeString(mServerUrl);
 		dest.writeParcelable(mToken, flags);
 	}

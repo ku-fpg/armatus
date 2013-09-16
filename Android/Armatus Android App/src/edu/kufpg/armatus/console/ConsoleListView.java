@@ -1,7 +1,6 @@
 package edu.kufpg.armatus.console;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.util.ParcelSparseBooleanArray;
 import edu.kufpg.armatus.util.StringUtils;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -41,7 +40,7 @@ public class ConsoleListView extends ListView {
 	/** Tracks which {@link ConsoleEntry ConsoleEntries} are currently checked, since
 	 * {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE CHOICE_MODE_MULTIPLE}'s
 	 * checking behavior is not desirable. */
-	private SparseBooleanArray mPrevCheckedStates = new ParcelSparseBooleanArray();
+	private SparseBooleanArray mPrevCheckedStates = new SparseBooleanArray();
 
 	/** Tracks if {@link #mActionMode} is visible. */
 	private boolean mActionModeVisible = false;
@@ -94,7 +93,7 @@ public class ConsoleListView extends ListView {
 	public Parcelable onSaveInstanceState() {
 		Parcelable superState = super.onSaveInstanceState();
 		SavedState ss = new SavedState(superState);
-		ss.checkedStates = (ParcelSparseBooleanArray) mPrevCheckedStates;
+		ss.checkedStates = mPrevCheckedStates;
 		return ss;
 	}
 
@@ -231,7 +230,7 @@ public class ConsoleListView extends ListView {
 	}
 
 	protected static class SavedState extends BaseSavedState {
-		ParcelSparseBooleanArray checkedStates;
+		SparseBooleanArray checkedStates;
 
 		SavedState(Parcelable superState) {
 			super(superState);
@@ -240,7 +239,7 @@ public class ConsoleListView extends ListView {
 		@Override
 		public void writeToParcel(Parcel dest, int flags) {
 			super.writeToParcel(dest, flags);
-			dest.writeParcelable(checkedStates, flags);
+			dest.writeSparseBooleanArray(checkedStates);
 		}
 
 		public static final Parcelable.Creator<SavedState> CREATOR
@@ -256,7 +255,7 @@ public class ConsoleListView extends ListView {
 
 		private SavedState(Parcel in) {
 			super(in);
-			checkedStates = in.readParcelable(ConsoleListView.class.getClassLoader());
+			checkedStates = in.readSparseBooleanArray();
 		}
 	}
 

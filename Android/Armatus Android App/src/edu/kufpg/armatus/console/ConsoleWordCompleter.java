@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +11,7 @@ import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 
+import edu.kufpg.armatus.util.ParcelUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -22,7 +22,7 @@ import edu.kufpg.armatus.util.StringUtils;
  */
 public class ConsoleWordCompleter implements Parcelable, TextWatcher {
 
-	private SortedSet<String> mFilteredDictionary;
+	private SortedSet<String> mFilteredDictionary = new TreeSet<String>();;
 	
 	/**
 	 * The previous word that was used to filter the dictionary. Comparing this to the
@@ -151,9 +151,8 @@ public class ConsoleWordCompleter implements Parcelable, TextWatcher {
 		}
 	};
 
-	@SuppressWarnings("unchecked")
 	private ConsoleWordCompleter(Parcel in) {
-		mFilteredDictionary = (SortedSet<String>) in.readSerializable();
+		ParcelUtils.readSet(mFilteredDictionary, in, ConsoleWordCompleter.class.getClassLoader());
 		mPrevPartialWord = in.readString();
 	}
 
@@ -164,7 +163,7 @@ public class ConsoleWordCompleter implements Parcelable, TextWatcher {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable((Serializable) mFilteredDictionary);
+		ParcelUtils.writeSetToParcel(mFilteredDictionary, dest);
 		dest.writeString(mPrevPartialWord);
 	}
 

@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,9 +90,9 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleEntryAdapter mConsoleListAdapter;
 	private ConsoleWordSearcher mSearcher;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
-	private List<ConsoleEntry> mConsoleEntries;
+	private ArrayList<ConsoleEntry> mConsoleEntries;
 	private ConsoleEntry mNextConsoleEntry;
-	private List<String> mUserInputHistory;
+	private ArrayList<String> mUserInputHistory;
 	private int mUserInputHistoryChoice;
 	private TextView mConsoleInputNumView, mSearchMatches;
 	private ConsoleInputEditText mConsoleInputEditText;
@@ -109,7 +108,6 @@ public class ConsoleActivity extends BaseActivity {
 	private int mConsoleEntriesHeight, mConsoleInputHeight, mScreenHeight, mConsoleWidth;
 	private SharedPreferences mPrefs;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_PROGRESS);
@@ -161,12 +159,12 @@ public class ConsoleActivity extends BaseActivity {
 			}
 
 			mConsoleInputNum = savedInstanceState.getInt("consoleInputNum");
-			mConsoleEntries = (List<ConsoleEntry>) savedInstanceState.getSerializable("consoleEntries");
+			mConsoleEntries = savedInstanceState.getParcelableArrayList("consoleEntries");
 			mCompleter = (ConsoleWordCompleter) savedInstanceState.getParcelable("wordCompleter");
 			mCompleter.attachConsole(this);
 			mHermitClient = savedInstanceState.getParcelable("hermitClient");
 			mHermitClient.attachConsole(this);
-			mUserInputHistory = (List<String>) savedInstanceState.getSerializable("userInputHistory");
+			mUserInputHistory = savedInstanceState.getStringArrayList("userInputHistory");
 			mUserInputHistoryChoice = savedInstanceState.getInt("userInputHistoryChoice");
 		}
 
@@ -388,10 +386,10 @@ public class ConsoleActivity extends BaseActivity {
 		}
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
-		outState.putSerializable("consoleEntries", (Serializable) mConsoleEntries);
+		outState.putParcelableArrayList("consoleEntries", mConsoleEntries);
 		outState.putParcelable("wordCompleter", mCompleter);
 		outState.putParcelable("hermitClient", mHermitClient);
-		outState.putSerializable("userInputHistory", (Serializable) mUserInputHistory);
+		outState.putStringArrayList("userInputHistory", mUserInputHistory);
 		outState.putInt("userInputHistoryChoice", mUserInputHistoryChoice);
 	}
 

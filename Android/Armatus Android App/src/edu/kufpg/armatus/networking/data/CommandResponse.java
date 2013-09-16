@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.networking.data;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -12,20 +11,26 @@ import android.os.Parcelable;
 
 import com.google.common.collect.ImmutableList;
 
+import edu.kufpg.armatus.util.ParcelUtils;
+
 public class CommandResponse implements Parcelable {
 	private final int mAst;
 	private final List<Glyph> mGlyphs;
 	private final String mMessage;
 
 	public CommandResponse(int ast, List<Glyph> glyphs, String message) {
-		mAst = ast;
-		mGlyphs = glyphs;
-		mMessage = message;
+		this(ast, ImmutableList.copyOf(glyphs), message);
 	}
 	
 	public CommandResponse(JSONObject o) throws JSONException {
 		this(o.getInt("ast"), (o.has("glyphs") ? jsonToGlyphs(o.getJSONArray("glyphs")) : null),
 				(o.has("msg") ? o.getString("msg") : null));
+	}
+	
+	private CommandResponse(int ast, ImmutableList<Glyph> glyphs, String message) {
+		mAst = ast;
+		mGlyphs = glyphs;
+		mMessage = message;
 	}
 
 	public int getAst() {
@@ -40,7 +45,7 @@ public class CommandResponse implements Parcelable {
 		return mMessage;
 	}
 
-	private static List<Glyph> jsonToGlyphs(JSONArray a) {
+	private static ImmutableList<Glyph> jsonToGlyphs(JSONArray a) {
 		ImmutableList.Builder<Glyph> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
 			try {
@@ -57,8 +62,8 @@ public class CommandResponse implements Parcelable {
 		@Override
 		public CommandResponse createFromParcel(Parcel source) {
 			int ast = source.readInt();
-			@SuppressWarnings("unchecked")
-			List<Glyph> glyphs = (List<Glyph>) source.readSerializable();
+			ImmutableList<Glyph> glyphs = ParcelUtils.readImmutableList
+					(source, CommandResponse.class.getClassLoader());
 			String message = source.readString();
 			return new CommandResponse(ast, glyphs, message);
 		}
@@ -77,7 +82,7 @@ public class CommandResponse implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mAst);
-		dest.writeSerializable((Serializable) mGlyphs);
+		dest.writeList(mGlyphs);
 		dest.writeString(mMessage);
 	}
 }

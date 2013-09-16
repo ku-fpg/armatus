@@ -1,9 +1,7 @@
 package edu.kufpg.armatus.dialog;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.google.common.collect.Lists;
 import edu.kufpg.armatus.R;
@@ -25,7 +23,7 @@ public class KeywordSwapDialog extends ConsiderateDialog {
 
 	private int mEntryNum;
 	private String mEntryContents;
-	private List<String> mEntryWords;
+	private ArrayList<String> mEntryWords;
 	private ListView mKeywordListView;
 	private KeywordSwapAdapter mKeywordAdapter;
 	private Button mResetButton, mToastButton;
@@ -54,7 +52,6 @@ public class KeywordSwapDialog extends ConsiderateDialog {
 		mEntryContents = getArguments().getString("entryContents");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -67,7 +64,7 @@ public class KeywordSwapDialog extends ConsiderateDialog {
 		if (savedInstanceState == null) {
 			mEntryWords = Lists.newArrayList(mEntryContents.split(StringUtils.WHITESPACE));
 		} else {
-			mEntryWords = (List<String>) savedInstanceState.getSerializable("entryWords");
+			mEntryWords = savedInstanceState.getStringArrayList("entryWords");
 		}
 		mKeywordAdapter = new KeywordSwapAdapter(getActivity(), mEntryWords);
 		mKeywordListView.setAdapter(mKeywordAdapter);
@@ -100,7 +97,7 @@ public class KeywordSwapDialog extends ConsiderateDialog {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putSerializable("entryWords", (Serializable) mEntryWords);
+		outState.putStringArrayList("entryWords", mEntryWords);
 		super.onSaveInstanceState(outState);
 	}
 

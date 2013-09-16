@@ -9,23 +9,10 @@ import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuItem;
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuRenderer;
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuRenderer.OnRadailMenuClick;
 
-import edu.kufpg.armatus.console.ConsoleActivity;
-
 import android.os.Bundle;
-import android.app.Activity;
-import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 
 public class RadialMenuActivity extends FragmentActivity {
 

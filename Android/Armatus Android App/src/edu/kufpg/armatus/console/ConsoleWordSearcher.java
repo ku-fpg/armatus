@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.SortedSet;
@@ -9,6 +8,8 @@ import java.util.TreeSet;
 
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
+
+import edu.kufpg.armatus.util.ParcelUtils;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -267,12 +268,11 @@ public class ConsoleWordSearcher implements Parcelable {
 		}
 	};
 
-	@SuppressWarnings("unchecked")
 	private ConsoleWordSearcher(Parcel in) {
 		mCriterion = in.readString();
-		mSearchOffsetsMap = (SortedSetMultimap<String, Integer>) in.readSerializable();
-		mPreviousMatches = (Stack<MatchParams>) in.readSerializable();
-		mNextMatches = (Stack<MatchParams>) in.readSerializable();
+		ParcelUtils.readMultimap(mSearchOffsetsMap, in, ConsoleWordSearcher.class.getClassLoader());
+		in.readList(mPreviousMatches, ConsoleWordSearcher.class.getClassLoader());
+		in.readList(mNextMatches, ConsoleWordSearcher.class.getClassLoader());
 		mSelectedMatch = in.readParcelable(ConsoleWordSearcher.class.getClassLoader());
 		mMatchCount = in.readInt();
 	}
@@ -286,9 +286,9 @@ public class ConsoleWordSearcher implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(mCriterion);
-		dest.writeSerializable((Serializable) mSearchOffsetsMap);
-		dest.writeSerializable(mPreviousMatches);
-		dest.writeSerializable(mNextMatches);
+		ParcelUtils.writeMultimap(mSearchOffsetsMap, dest);
+		dest.writeList(mPreviousMatches);
+		dest.writeList(mNextMatches);
 		dest.writeParcelable(mSelectedMatch, flags);
 		dest.writeInt(mMatchCount);
 	}

@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.networking.data;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -11,6 +10,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.common.collect.ImmutableList;
+
+import edu.kufpg.armatus.util.ParcelUtils;
 
 public class Glyph implements Parcelable {
 	private static final String BLUE = "#0090D3";
@@ -24,13 +25,17 @@ public class Glyph implements Parcelable {
 	private final String mText;
 
 	public Glyph(GlyphStyle style, List<Crumb> path, String text) {
-		mStyle = style;
-		mPath = path;
-		mText = text;
+		this(style, ImmutableList.copyOf(path), text);
 	}
 
 	public Glyph(JSONObject o) throws JSONException {
 		this(jsonToStyle(o), jsonToCrumbs(o.getJSONArray("path")), o.getString("text"));
+	}
+	
+	private Glyph(GlyphStyle style, ImmutableList<Crumb> path, String text) {
+		mStyle = style;
+		mPath = path;
+		mText = text;
 	}
 
 	public GlyphStyle getStyle() {
@@ -62,7 +67,7 @@ public class Glyph implements Parcelable {
 		}
 	}
 
-	private static List<Crumb> jsonToCrumbs(JSONArray a) {
+	private static ImmutableList<Crumb> jsonToCrumbs(JSONArray a) {
 		ImmutableList.Builder<Crumb> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
 			try {
@@ -91,16 +96,16 @@ public class Glyph implements Parcelable {
 	}
 	
 	public static enum GlyphStyle {
-		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING
+		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING;
 	}
 	
 	public static Parcelable.Creator<Glyph> CREATOR =
 			new Parcelable.Creator<Glyph>() {
 		@Override
 		public Glyph createFromParcel(Parcel source) {
-			GlyphStyle style = (GlyphStyle) source.readSerializable();
-			@SuppressWarnings("unchecked")
-			List<Crumb> path = (List<Crumb>) source.readSerializable();
+			GlyphStyle style = GlyphStyle.values()[source.readInt()];
+			ImmutableList<Crumb> path = ParcelUtils.readImmutableList
+					(source, Glyph.class.getClassLoader());
 			String text = source.readString();
 			return new Glyph(style, path, text);
 		}
@@ -118,8 +123,8 @@ public class Glyph implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable(mStyle);
-		dest.writeSerializable((Serializable) mPath);
+		dest.writeInt(mStyle.ordinal());
+		dest.writeList(mPath);
 		dest.writeString(mText);
 	}
 }

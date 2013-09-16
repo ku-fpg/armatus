@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.networking.data;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -12,18 +11,24 @@ import android.os.Parcelable;
 
 import com.google.common.collect.ImmutableList;
 
+import edu.kufpg.armatus.util.ParcelUtils;
+
 public class CommandInfo implements Parcelable {
 	private final String mHelp, mName;
 	private final List<String> mTags;
 
 	public CommandInfo(String help, String name, List<String> tags) {
+		this(help, name, ImmutableList.copyOf(tags));
+	}
+
+	public CommandInfo(JSONObject o) throws JSONException {
+		this(o.getString("help"), o.getString("name"), jsonToTags(o.getJSONArray("tags")));
+	}
+
+	private CommandInfo(String help, String name, ImmutableList<String> tags) {
 		mHelp = help;
 		mName = name;
 		mTags = tags;
-	}
-	
-	public CommandInfo(JSONObject o) throws JSONException {
-		this(o.getString("help"), o.getString("name"), jsonToTags(o.getJSONArray("tags")));
 	}
 
 	public String getHelp() {
@@ -37,8 +42,8 @@ public class CommandInfo implements Parcelable {
 	public List<String> getTags() {
 		return mTags;
 	}
-	
-	private static List<String> jsonToTags(JSONArray a) {
+
+	private static ImmutableList<String> jsonToTags(JSONArray a) {
 		ImmutableList.Builder<String> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
 			try {
@@ -56,8 +61,8 @@ public class CommandInfo implements Parcelable {
 		public CommandInfo createFromParcel(Parcel source) {
 			String help = source.readString();
 			String name = source.readString();
-			@SuppressWarnings("unchecked")
-			List<String> tags = (List<String>) source.readSerializable();
+			ImmutableList<String> tags = ParcelUtils.readImmutableList
+					(source, CommandInfo.class.getClassLoader());
 			return new CommandInfo(help, name, tags);
 		}
 
@@ -76,7 +81,7 @@ public class CommandInfo implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(mHelp);
 		dest.writeString(mName);
-		dest.writeSerializable((Serializable) mTags);
+		dest.writeList(mTags);
 	}
 
 }

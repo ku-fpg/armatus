@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.networking.data;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -12,17 +11,23 @@ import android.os.Parcelable;
 
 import com.google.common.collect.ImmutableList;
 
+import edu.kufpg.armatus.util.ParcelUtils;
+
 public class History implements Parcelable {
 	private final List<HistoryCommand> mCommands;
 	private final List<HistoryTag> mTags;
 	
 	public History(List<HistoryCommand> commands, List<HistoryTag> tags) {
-		mCommands = commands;
-		mTags = tags;
+		this(ImmutableList.copyOf(commands), ImmutableList.copyOf(tags));
 	}
 	
 	public History(JSONObject o) throws JSONException {
 		this(jsonToHistoryCommands(o.getJSONArray("cmds")), jsonToHistoryTags(o.getJSONArray("tags")));
+	}
+	
+	private History(ImmutableList<HistoryCommand> commands, ImmutableList<HistoryTag> tags) {
+		mCommands = commands;
+		mTags = tags;
 	}
 	
 	public List<HistoryCommand> getCommands() {
@@ -33,7 +38,7 @@ public class History implements Parcelable {
 		return mTags;
 	}
 	
-	private static List<HistoryCommand> jsonToHistoryCommands(JSONArray a) {
+	private static ImmutableList<HistoryCommand> jsonToHistoryCommands(JSONArray a) {
 		ImmutableList.Builder<HistoryCommand> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
 			try {
@@ -45,7 +50,7 @@ public class History implements Parcelable {
 		return builder.build();
 	}
 	
-	private static List<HistoryTag> jsonToHistoryTags(JSONArray a) {
+	private static ImmutableList<HistoryTag> jsonToHistoryTags(JSONArray a) {
 		ImmutableList.Builder<HistoryTag> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
 			try {
@@ -59,11 +64,12 @@ public class History implements Parcelable {
 
 	public static Parcelable.Creator<History> CREATOR =
 			new Parcelable.Creator<History>() {
-		@SuppressWarnings("unchecked")
 		@Override
 		public History createFromParcel(Parcel source) {
-			List<HistoryCommand> commands = (List<HistoryCommand>) source.readSerializable();
-			List<HistoryTag> tags = (List<HistoryTag>) source.readSerializable();
+			ImmutableList<HistoryCommand> commands = ParcelUtils.readImmutableList
+					(source, History.class.getClassLoader());
+			List<HistoryTag> tags = ParcelUtils.readImmutableList
+					(source, History.class.getClassLoader());
 			return new History(commands, tags);
 		}
 
@@ -80,7 +86,7 @@ public class History implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable((Serializable) mCommands);
-		dest.writeSerializable((Serializable) mTags);
+		dest.writeList(mCommands);
+		dest.writeList(mTags);
 	}
 }

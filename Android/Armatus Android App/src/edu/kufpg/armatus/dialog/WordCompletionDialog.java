@@ -1,6 +1,6 @@
 package edu.kufpg.armatus.dialog;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.kufpg.armatus.R;
@@ -22,7 +22,7 @@ import android.widget.TextView;
  */
 public class WordCompletionDialog extends ConsiderateDialog {
 
-	private List<String> mWords;
+	private ArrayList<String> mWords;
 
 	/**
 	 * WordCompletionDialog Instance Function. This function creates a new instance for the word completion that returns an argument.
@@ -33,20 +33,18 @@ public class WordCompletionDialog extends ConsiderateDialog {
 		WordCompletionDialog wcd = new WordCompletionDialog();
 
 		Bundle args = new Bundle();
-		args.putSerializable("words", (Serializable) words);
+		args.putStringArrayList("words", new ArrayList<String>(words));
 		wcd.setArguments(args);
 
 		return wcd;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mWords = (List<String>) getArguments().getSerializable("words");
+		mWords = getArguments().getStringArrayList("words");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
@@ -55,7 +53,7 @@ public class WordCompletionDialog extends ConsiderateDialog {
 
 		getDialog().setTitle("Word completion");
 		if (savedInstanceState != null) {
-			mWords = (List<String>) savedInstanceState.getSerializable("words");
+			mWords = savedInstanceState.getStringArrayList("words");
 		}
 
 		ListView listView = (ListView) v.findViewById(R.id.word_suggestions_list);
@@ -74,7 +72,7 @@ public class WordCompletionDialog extends ConsiderateDialog {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putSerializable("words", (Serializable) mWords);
+		outState.putStringArrayList("words", mWords);
 	}
 
 }

@@ -61,8 +61,8 @@ public class TreeListViewDemo extends BaseActivity {
 		} else {
 			mManager = (TreeStateManager<Long>) savedInstanceState
 					.getSerializable("treeManager");
-			newTreeType = (TreeType) savedInstanceState
-					.getSerializable("treeType");
+			newTreeType = TreeType.values()[savedInstanceState
+					.getInt("treeType")];
 			newCollapsible = savedInstanceState.getBoolean("collapsible");
 			mRecursive = savedInstanceState.getBoolean("recursive");
 		}
@@ -80,7 +80,7 @@ public class TreeListViewDemo extends BaseActivity {
 	@Override
 	protected void onSaveInstanceState(final Bundle outState) {
 		outState.putSerializable("treeManager", mManager);
-		outState.putSerializable("treeType", mTreeType);
+		outState.putInt("treeType", mTreeType.ordinal());
 		outState.putBoolean("collapsible", mCollapsible);
 		super.onSaveInstanceState(outState);
 	}
