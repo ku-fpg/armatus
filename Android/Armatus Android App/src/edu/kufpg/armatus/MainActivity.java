@@ -2,6 +2,7 @@ package edu.kufpg.armatus;
 
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
+import edu.kufpg.armatus.radialmenu.RadialMenuActivity;
 import edu.kufpg.armatus.treelistview.TreeListViewDemo;
 import edu.kufpg.armatus.util.StickyButton;
 
