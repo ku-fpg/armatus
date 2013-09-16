@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.util.StringUtils;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -60,8 +59,7 @@ public class InputCompletionDialog extends ConsiderateDialog {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				getConsole().setInputText(mReplaceIndex, getConsole().getInputLength(),
-						((TextView) view).getText().toString() + StringUtils.NBSP);
+				getConsole().completeInput(mReplaceIndex, ((TextView) view).getText().toString());
 				dismiss();
 			}
 		});

@@ -98,5 +98,20 @@ public class StringUtils {
 		}
 		return editable;
 	}
+	
+	public static String trim(String str) {
+        int start = 0, last = str.length() - 1;
+        int end = last;
+        while ((start <= end) && (str.charAt(start) <= ' ' || str.charAt(start) == NBSP_CHAR)) {
+            start++;
+        }
+        while ((end >= start) && (str.charAt(end) <= ' ' || str.charAt(end) == NBSP_CHAR)) {
+            end--;
+        }
+        if (start == 0 && end == last) {
+            return str;
+        }
+        return str.substring(start, end + 1);
+    }
 
 }

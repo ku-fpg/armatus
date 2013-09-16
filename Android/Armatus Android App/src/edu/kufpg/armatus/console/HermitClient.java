@@ -85,7 +85,7 @@ public class HermitClient implements Parcelable {
 
 	public void runCommand(String input) {
 		String[] inputs = input.trim().split(StringUtils.WHITESPACE);
-		mConsole.addConsoleUserInputEntry(input);
+		mConsole.addUserInputEntry(input);
 		if (CustomCommandDispatcher.isCustomCommand(inputs[0])) {
 			if (inputs.length == 1) {
 				CustomCommandDispatcher.runCustomCommand(mConsole, inputs[0]);
@@ -135,6 +135,17 @@ public class HermitClient implements Parcelable {
 					e.printStackTrace();
 					return null;
 				}
+			}
+			
+			@Override
+			protected void onCancelled() {
+				String newErrorMessage = getErrorMessage();
+				setErrorMessage(null);
+				if (newErrorMessage != null && getActivity() != null) {
+					getActivity().addErrorResponseEntry(newErrorMessage);
+				}
+				
+				super.onCancelled();
 			}
 
 			@Override

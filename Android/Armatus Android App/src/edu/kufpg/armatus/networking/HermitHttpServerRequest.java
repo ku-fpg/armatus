@@ -147,6 +147,14 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 	}
 
 	protected abstract Result onResponse(String response);
+	
+	protected String getErrorMessage() {
+		return mErrorMessage;
+	}
+	
+	protected void setErrorMessage(String message) {
+		mErrorMessage = message;
+	}
 
 	public enum HttpRequest { GET, POST };
 

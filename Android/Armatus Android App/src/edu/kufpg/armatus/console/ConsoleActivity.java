@@ -299,7 +299,7 @@ public class ConsoleActivity extends BaseActivity {
 					if (mInputEnabled) {
 						String input = mConsoleInputEditText.getText().toString();
 						if (input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
-							addConsoleUserInputEntry(input);
+							addUserInputEntry(input);
 						} else {
 							int size = mUserInputHistory.size();
 							String trimput = input.trim();
@@ -523,7 +523,7 @@ public class ConsoleActivity extends BaseActivity {
 			gd.show(getFragmentManager(), "gesture");
 			return true;
 		case R.id.complete:
-			mHermitClient.completeInput(mConsoleInputEditText.getText().toString());
+			mHermitClient.completeInput(getInput());
 			return true;
 		case R.id.find_text_option:
 			mSearchEnabled = true;
@@ -644,25 +644,25 @@ public class ConsoleActivity extends BaseActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_TAB:
-			mHermitClient.completeInput(mConsoleInputEditText.getText().toString());
+			mHermitClient.completeInput(getInput());
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
 
-	public void addConsoleUserInputEntry(String userInput) {
-		addConsoleEntry(userInput, null, null);
+	public void addUserInputEntry(String userInput) {
+		addEntry(userInput, null, null);
 	}
 
-	public void addConsoleCommandResponseEntry(CommandResponse commandResponse) {
-		addConsoleEntry(null, commandResponse, null);
+	public void addCommandResponseEntry(CommandResponse commandResponse) {
+		addEntry(null, commandResponse, null);
 	}
 
-	public void addConsoleErrorResponseEntry(String errorResponse) {
-		addConsoleEntry(null, null, errorResponse);
+	public void addErrorResponseEntry(String errorResponse) {
+		addEntry(null, null, errorResponse);
 	}
 
-	private void addConsoleEntry(String userInput, CommandResponse commandResponse, String errorResponse) {
+	private void addEntry(String userInput, CommandResponse commandResponse, String errorResponse) {
 		if (userInput != null) {
 			mNextConsoleEntry.setUserInput(userInput);
 		}
@@ -696,10 +696,10 @@ public class ConsoleActivity extends BaseActivity {
 				updateConsoleEntries();
 				scrollToBottom();
 			} else {
-				addConsoleErrorResponseEntry(errorResponse);
+				addErrorResponseEntry(errorResponse);
 			}
 		} else {
-			addConsoleErrorResponseEntry(errorResponse);
+			addErrorResponseEntry(errorResponse);
 		}
 	}
 
@@ -711,10 +711,10 @@ public class ConsoleActivity extends BaseActivity {
 				updateConsoleEntries();
 				scrollToBottom();
 			} else {
-				addConsoleCommandResponseEntry(commandResponse);
+				addCommandResponseEntry(commandResponse);
 			}
 		} else {
-			addConsoleCommandResponseEntry(commandResponse);
+			addCommandResponseEntry(commandResponse);
 		}
 	}
 
@@ -827,16 +827,21 @@ public class ConsoleActivity extends BaseActivity {
 		ft.commit();
 	}
 
-	void attemptInputCompletion(Collection<String> existingSuggestions) {
+	public void attemptInputCompletion(Collection<String> existingSuggestions) {
 		SortedSet<String> suggestions = new TreeSet<String>();
 		if (existingSuggestions != null) {
 			suggestions.addAll(existingSuggestions);
 		}
 
 		final String input = mConsoleInputEditText.getText().toString();
-		int lastWordIndex = StringUtils.findLastWordIndex(input);
-		if (lastWordIndex == StringUtils.findFirstWordIndex(input)) {
-			final String trimput = input.trim();
+		int replaceIndex = Math.max(0, input.length() - 1);
+		if (input.length() > 0 &&
+				!String.valueOf(input.charAt(replaceIndex)).matches(StringUtils.WHITESPACE)) {
+			replaceIndex = StringUtils.findLastWordIndex(input);
+		}
+		if (replaceIndex == StringUtils.findFirstWordIndex(input)
+				|| input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
+			final String trimput = StringUtils.trim(input);
 			suggestions.addAll(Collections2.filter(CustomCommandDispatcher.getCustomCommandSet(),
 					new Predicate<String>() {
 				@Override
@@ -847,13 +852,22 @@ public class ConsoleActivity extends BaseActivity {
 		}
 
 		if (suggestions.size() == 1) {
-			for (String suggestion : suggestions) {
-				setInputText(lastWordIndex, getInputLength(), suggestion + StringUtils.NBSP);
+			for (String completion : suggestions) {
+				completeInput(replaceIndex, completion);
 				break;
 			}
 		} else if (suggestions.size() > 1) {
-			showInputCompletionDialog(lastWordIndex, suggestions);
+			showInputCompletionDialog(replaceIndex, suggestions);
 		}
+	}
+	
+	public void completeInput(int replaceIndex, String completion) {
+		String input = getInput();
+		if (input.length() > 0 &&
+				String.valueOf(input.charAt(input.length() - 1)).matches(StringUtils.WHITESPACE)) {
+			completion = StringUtils.NBSP + completion;
+		}
+		setInputText(replaceIndex, getInputLength(), completion + StringUtils.NBSP);
 	}
 
 	ListView getListView() {
