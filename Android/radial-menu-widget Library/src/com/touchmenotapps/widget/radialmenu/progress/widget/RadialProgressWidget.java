@@ -16,51 +16,29 @@ import android.view.View;
 public class RadialProgressWidget extends View {
 	private RectF mRadialScoreRect;
 	private int mCurrentValue = 15;
-
 	private int mMaxValue = 100;
-
 	private float mRadius = 0.0F;
-
 	private int mDiameter = 200;
-
 	private int mMaxSweepAngle = 360;
 	private int[] mScoreColorRange;
 	private Paint mRadialWidgetPaint = new Paint(1);
-
 	private int mCurrentScoreColorPointer = 0;
-
 	private int mBaseColor = Color.parseColor("#FF636363");
-
 	private int mBorderColor = -3355444;
-
 	private int mCenterTextColor = -1;
-
 	private int mSecondaryTextColor = -1;
-
 	private int mShadowColor = -16777216;
-
 	private float mBorderStrokeThickness = 5.0F;
-
 	private float mShadowRadius = 4.0F;
-
 	private String mSecondaryText = null;
-
-	private boolean isShowPercentText = true;
-
-	private boolean isTouchEnabled = true;
-
+	private boolean mIsShowPercentText = true;
+	private boolean mIsTouchEnabled = true;
 	private float mCenterTextSize = 0.0F;
-
 	private float mSecondaryTextSize = 0.0F;
-
-	private int readingValuePer = 0;
-
-	private int angle = 0;
-
+	private int mReadingValuePer = 0;
+	private int mAngle = 0;
 	private int mMinChangeValue = 0;
-
-	private int mMaxChangeValue = this.mMaxValue;
-
+	private int mMaxChangeValue = mMaxValue;
 	private String mFontName = null;
 	private OnRadialViewValueChanged mCallback;
 
@@ -81,93 +59,93 @@ public class RadialProgressWidget extends View {
 	}
 
 	private void initView() {
-		Rect rect = new Rect(0, 0, this.mDiameter, this.mDiameter);
-		this.mRadialScoreRect = new RectF(rect);
-		this.mScoreColorRange = new int[] { -3407872, -48060, -30720,
+		Rect rect = new Rect(0, 0, mDiameter, mDiameter);
+		mRadialScoreRect = new RectF(rect);
+		mScoreColorRange = new int[] { -3407872, -48060, -30720,
 				-13388315, -6697984 };
 	}
 
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		this.mRadialWidgetPaint.setStyle(Paint.Style.STROKE);
-		this.mRadialWidgetPaint.setStrokeWidth(this.mBorderStrokeThickness
+		mRadialWidgetPaint.setStyle(Paint.Style.STROKE);
+		mRadialWidgetPaint.setStrokeWidth(mBorderStrokeThickness
 				* getResources().getDisplayMetrics().density);
-		this.mRadialWidgetPaint.setColor(this.mBorderColor);
-		canvas.drawCircle(getWidth() / 2, getHeight() / 2, this.mRadius,
-				this.mRadialWidgetPaint);
-		this.mRadialWidgetPaint.setStyle(Paint.Style.FILL);
+		mRadialWidgetPaint.setColor(mBorderColor);
+		canvas.drawCircle(getWidth() / 2, getHeight() / 2, mRadius,
+				mRadialWidgetPaint);
+		mRadialWidgetPaint.setStyle(Paint.Style.FILL);
 
-		if (this.mCurrentValue <= this.mMaxValue) {
-			double sweepAngle = this.mCurrentValue * this.mMaxSweepAngle
-					/ this.mMaxValue;
+		if (mCurrentValue <= mMaxValue) {
+			double sweepAngle = mCurrentValue * mMaxSweepAngle
+					/ mMaxValue;
 
-			this.readingValuePer = (this.mCurrentValue * 100 / this.mMaxValue);
-			for (int counter = 1; counter <= this.mScoreColorRange.length; counter++) {
-				int colorPer = counter * 100 / this.mScoreColorRange.length;
-				if (this.readingValuePer <= colorPer) {
-					this.mCurrentScoreColorPointer = (counter - 1);
+			mReadingValuePer = (mCurrentValue * 100 / mMaxValue);
+			for (int counter = 1; counter <= mScoreColorRange.length; counter++) {
+				int colorPer = counter * 100 / mScoreColorRange.length;
+				if (mReadingValuePer <= colorPer) {
+					mCurrentScoreColorPointer = (counter - 1);
 					break;
 				}
 			}
 
-			this.mRadialWidgetPaint
-					.setColor(this.mScoreColorRange[this.mCurrentScoreColorPointer]);
-			canvas.drawArc(this.mRadialScoreRect, 270.0F, (float) sweepAngle,
-					true, this.mRadialWidgetPaint);
-			this.mRadialWidgetPaint.setShadowLayer(this.mShadowRadius / 2.0F
+			mRadialWidgetPaint
+					.setColor(mScoreColorRange[mCurrentScoreColorPointer]);
+			canvas.drawArc(mRadialScoreRect, 270.0F, (float) sweepAngle,
+					true, mRadialWidgetPaint);
+			mRadialWidgetPaint.setShadowLayer(mShadowRadius / 2.0F
 					* getResources().getDisplayMetrics().density, 0.0F, 0.0F,
-					this.mShadowColor);
-			canvas.drawArc(this.mRadialScoreRect, 270.0F, (float) sweepAngle,
-					true, this.mRadialWidgetPaint);
-			this.mRadialWidgetPaint.setShadowLayer(this.mShadowRadius, 0.0F,
+					mShadowColor);
+			canvas.drawArc(mRadialScoreRect, 270.0F, (float) sweepAngle,
+					true, mRadialWidgetPaint);
+			mRadialWidgetPaint.setShadowLayer(mShadowRadius, 0.0F,
 					0.0F, 0);
 		} else {
 			Log.e(getClass().getName(),
-					"Current value " + String.valueOf(this.mCurrentValue)
+					"Current value " + String.valueOf(mCurrentValue)
 							+ " greater that maximum value "
-							+ String.valueOf(this.mMaxValue));
+							+ String.valueOf(mMaxValue));
 		}
-		this.mRadialWidgetPaint.setColor(this.mBaseColor);
+		mRadialWidgetPaint.setColor(mBaseColor);
 		canvas.drawCircle(getWidth() / 2, getHeight() / 2,
-				(float) (this.mRadius * 0.8D), this.mRadialWidgetPaint);
-		this.mRadialWidgetPaint.setShadowLayer(this.mShadowRadius
+				(float) (mRadius * 0.8D), mRadialWidgetPaint);
+		mRadialWidgetPaint.setShadowLayer(mShadowRadius
 				* getResources().getDisplayMetrics().density, 0.0F, 0.0F,
-				this.mShadowColor);
+				mShadowColor);
 		canvas.drawCircle(getWidth() / 2, getHeight() / 2,
-				(float) (this.mRadius * 0.8D), this.mRadialWidgetPaint);
-		this.mRadialWidgetPaint.setShadowLayer(this.mShadowRadius, 0.0F, 0.0F,
+				(float) (mRadius * 0.8D), mRadialWidgetPaint);
+		mRadialWidgetPaint.setShadowLayer(mShadowRadius, 0.0F, 0.0F,
 				0);
 
-		this.mRadialWidgetPaint.setColor(this.mCenterTextColor);
-		this.mRadialWidgetPaint.setTextSize(this.mCenterTextSize);
-		if (this.mFontName != null)
-			this.mRadialWidgetPaint.setTypeface(Typeface.createFromAsset(
-					getContext().getAssets(), this.mFontName));
+		mRadialWidgetPaint.setColor(mCenterTextColor);
+		mRadialWidgetPaint.setTextSize(mCenterTextSize);
+		if (mFontName != null)
+			mRadialWidgetPaint.setTypeface(Typeface.createFromAsset(
+					getContext().getAssets(), mFontName));
 		float textWidth = 0.0F;
 
-		if (this.isShowPercentText) {
-			textWidth = this.mRadialWidgetPaint.measureText(String
-					.valueOf(this.readingValuePer) + "%");
-			canvas.drawText(String.valueOf(this.readingValuePer) + "%",
+		if (mIsShowPercentText) {
+			textWidth = mRadialWidgetPaint.measureText(String
+					.valueOf(mReadingValuePer) + "%");
+			canvas.drawText(String.valueOf(mReadingValuePer) + "%",
 					getWidth() / 2 - textWidth / 2.0F, getHeight() / 2
-							+ this.mRadius / 8.0F, this.mRadialWidgetPaint);
+							+ mRadius / 8.0F, mRadialWidgetPaint);
 		} else {
-			textWidth = this.mRadialWidgetPaint.measureText(String
-					.valueOf(this.mCurrentValue));
-			canvas.drawText(String.valueOf(this.mCurrentValue), getWidth() / 2
-					- textWidth / 2.0F, getHeight() / 2 + this.mRadius / 8.0F,
-					this.mRadialWidgetPaint);
+			textWidth = mRadialWidgetPaint.measureText(String
+					.valueOf(mCurrentValue));
+			canvas.drawText(String.valueOf(mCurrentValue), getWidth() / 2
+					- textWidth / 2.0F, getHeight() / 2 + mRadius / 8.0F,
+					mRadialWidgetPaint);
 		}
 
-		if (this.mSecondaryText != null) {
-			this.mRadialWidgetPaint.setColor(this.mSecondaryTextColor);
-			textWidth = this.mRadialWidgetPaint
-					.measureText(this.mSecondaryText);
-			this.mRadialWidgetPaint.setTextSize(this.mSecondaryTextSize);
-			canvas.drawText(this.mSecondaryText, getWidth() / 2 - textWidth
-					/ 5.0F, getHeight() / 2 + this.mRadius / 3.0F,
-					this.mRadialWidgetPaint);
+		if (mSecondaryText != null) {
+			mRadialWidgetPaint.setColor(mSecondaryTextColor);
+			textWidth = mRadialWidgetPaint
+					.measureText(mSecondaryText);
+			mRadialWidgetPaint.setTextSize(mSecondaryTextSize);
+			canvas.drawText(mSecondaryText, getWidth() / 2 - textWidth
+					/ 5.0F, getHeight() / 2 + mRadius / 3.0F,
+					mRadialWidgetPaint);
 		}
 	}
 
@@ -175,38 +153,38 @@ public class RadialProgressWidget extends View {
 		super.onSizeChanged(w, h, oldw, oldh);
 
 		if (w > h) {
-			this.mDiameter = h;
-			this.mRadius = (this.mDiameter / 2 - (getPaddingTop() + getPaddingBottom()));
+			mDiameter = h;
+			mRadius = (mDiameter / 2 - (getPaddingTop() + getPaddingBottom()));
 		} else {
-			this.mDiameter = w;
-			this.mRadius = (this.mDiameter / 2 - (getPaddingLeft() + getPaddingRight()));
+			mDiameter = w;
+			mRadius = (mDiameter / 2 - (getPaddingLeft() + getPaddingRight()));
 		}
 
-		int left = getWidth() / 2 - (int) this.mRadius + getPaddingLeft();
-		int right = getWidth() / 2 + (int) this.mRadius - getPaddingRight();
-		int top = getHeight() / 2 - (int) this.mRadius + getPaddingTop();
-		int bottom = getHeight() / 2 + (int) this.mRadius - getPaddingBottom();
+		int left = getWidth() / 2 - (int) mRadius + getPaddingLeft();
+		int right = getWidth() / 2 + (int) mRadius - getPaddingRight();
+		int top = getHeight() / 2 - (int) mRadius + getPaddingTop();
+		int bottom = getHeight() / 2 + (int) mRadius - getPaddingBottom();
 		Rect rect = new Rect(left, top, right, bottom);
-		this.mRadialScoreRect = new RectF(rect);
+		mRadialScoreRect = new RectF(rect);
 
-		this.mCenterTextSize = (this.mRadius / 2.0F);
-		this.mSecondaryTextSize = (this.mRadius / 5.0F);
+		mCenterTextSize = (mRadius / 2.0F);
+		mSecondaryTextSize = (mRadius / 5.0F);
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
-		if (this.isTouchEnabled) {
+		if (mIsTouchEnabled) {
 			switch (event.getAction()) {
 			case 2:
-				this.angle = getAngleABC(new Point(getWidth() / 2, 0),
+				mAngle = getAngleABC(new Point(getWidth() / 2, 0),
 						new Point(getWidth() / 2, getHeight() / 2), new Point(
 								(int) event.getX(), (int) event.getY()));
-				Log.d("Test", "Angle " + this.angle);
-				if ((this.angle * this.mMaxValue / this.mMaxSweepAngle > this.mMinChangeValue)
-						&& (this.angle * this.mMaxValue / this.mMaxSweepAngle < this.mMaxChangeValue)) {
-					setCurrentValue(this.angle * this.mMaxValue
-							/ this.mMaxSweepAngle);
-					if (this.mCallback != null)
-						this.mCallback.onValueChanged(getCurrentValue());
+				Log.d("Test", "Angle " + mAngle);
+				if ((mAngle * mMaxValue / mMaxSweepAngle > mMinChangeValue)
+						&& (mAngle * mMaxValue / mMaxSweepAngle < mMaxChangeValue)) {
+					setCurrentValue(mAngle * mMaxValue
+							/ mMaxSweepAngle);
+					if (mCallback != null)
+						mCallback.onValueChanged(getCurrentValue());
 					invalidate();
 				}
 				break;
@@ -229,147 +207,147 @@ public class RadialProgressWidget extends View {
 	}
 
 	public int getCurrentValue() {
-		return this.mCurrentValue;
+		return mCurrentValue;
 	}
 
 	public void setOnRadialViewValueChanged(OnRadialViewValueChanged callback) {
-		this.mCallback = callback;
+		mCallback = callback;
 	}
 
-	public void setCurrentValue(int mCurrentValue) {
-		this.mCurrentValue = mCurrentValue;
+	public void setCurrentValue(int currentValue) {
+		mCurrentValue = currentValue;
 	}
 
 	public int getMaxValue() {
-		return this.mMaxValue;
+		return mMaxValue;
 	}
 
-	public void setMaxValue(int mMaxValue) {
-		this.mMaxValue = mMaxValue;
+	public void setMaxValue(int maxValue) {
+		mMaxValue = maxValue;
 	}
 
 	public int[] getScoreColorRange() {
-		return this.mScoreColorRange;
+		return mScoreColorRange;
 	}
 
-	public void setScoreColorRange(int[] mScoreColorRange) {
-		this.mScoreColorRange = mScoreColorRange;
+	public void setScoreColorRange(int[] scoreColorRange) {
+		mScoreColorRange = scoreColorRange;
 	}
 
 	public int getBaseColor() {
-		return this.mBaseColor;
+		return mBaseColor;
 	}
 
-	public void setBaseColor(int mBaseColor) {
-		this.mBaseColor = mBaseColor;
+	public void setBaseColor(int baseColor) {
+		mBaseColor = baseColor;
 	}
 
 	public int getBorderColor() {
-		return this.mBorderColor;
+		return mBorderColor;
 	}
 
-	public void setBorderColor(int mBorderColor) {
-		this.mBorderColor = mBorderColor;
+	public void setBorderColor(int borderColor) {
+		mBorderColor = borderColor;
 	}
 
 	public int getCenterTextColor() {
-		return this.mCenterTextColor;
+		return mCenterTextColor;
 	}
 
-	public void setCenterTextColor(int mCenterTextColor) {
-		this.mCenterTextColor = mCenterTextColor;
+	public void setCenterTextColor(int centerTextColor) {
+		mCenterTextColor = centerTextColor;
 	}
 
 	public int getSecondaryTextColor() {
-		return this.mSecondaryTextColor;
+		return mSecondaryTextColor;
 	}
 
-	public void setSecondaryTextColor(int mSecondaryTextColor) {
-		this.mSecondaryTextColor = mSecondaryTextColor;
+	public void setSecondaryTextColor(int secondaryTextColor) {
+		mSecondaryTextColor = secondaryTextColor;
 	}
 
 	public int getShadowColor() {
-		return this.mShadowColor;
+		return mShadowColor;
 	}
 
-	public void setShadowColor(int mShadowColor) {
-		this.mShadowColor = mShadowColor;
+	public void setShadowColor(int shadowColor) {
+		mShadowColor = shadowColor;
 	}
 
 	public float getBorderStrokeThickness() {
-		return this.mBorderStrokeThickness;
+		return mBorderStrokeThickness;
 	}
 
-	public void setBorderStrokeThickness(float mBorderStrokeThickness) {
-		this.mBorderStrokeThickness = mBorderStrokeThickness;
+	public void setBorderStrokeThickness(float borderStrokeThickness) {
+		mBorderStrokeThickness = borderStrokeThickness;
 	}
 
 	public float getShadowRadius() {
-		return this.mShadowRadius;
+		return mShadowRadius;
 	}
 
-	public void setShadowRadius(float mShadowRadius) {
-		this.mShadowRadius = mShadowRadius;
+	public void setShadowRadius(float shadowRadius) {
+		mShadowRadius = shadowRadius;
 	}
 
 	public String getSecondaryText() {
-		return this.mSecondaryText;
+		return mSecondaryText;
 	}
 
-	public void setSecondaryText(String mSecondaryText) {
-		this.mSecondaryText = mSecondaryText;
+	public void setSecondaryText(String secondaryText) {
+		mSecondaryText = secondaryText;
 	}
 
 	public boolean isShowPercentText() {
-		return this.isShowPercentText;
+		return mIsShowPercentText;
 	}
 
 	public void setShowPercentText(boolean isShowPercentText) {
-		this.isShowPercentText = isShowPercentText;
+		mIsShowPercentText = isShowPercentText;
 	}
 
 	public float getCenterTextSize() {
-		return this.mCenterTextSize;
+		return mCenterTextSize;
 	}
 
-	public void setCenterTextSize(float mCenterTextSize) {
-		this.mCenterTextSize = mCenterTextSize;
+	public void setCenterTextSize(float centerTextSize) {
+		mCenterTextSize = centerTextSize;
 	}
 
 	public float getSecondaryTextSize() {
-		return this.mSecondaryTextSize;
+		return mSecondaryTextSize;
 	}
 
-	public void setSecondaryTextSize(float mSecondaryTextSize) {
-		this.mSecondaryTextSize = mSecondaryTextSize;
+	public void setSecondaryTextSize(float secondaryTextSize) {
+		mSecondaryTextSize = secondaryTextSize;
 	}
 
 	public boolean isTouchEnabled() {
-		return this.isTouchEnabled;
+		return mIsTouchEnabled;
 	}
 
 	public void setTouchEnabled(boolean isTouchEnabled) {
-		this.isTouchEnabled = isTouchEnabled;
+		mIsTouchEnabled = isTouchEnabled;
 	}
 
 	public int getMinChangeValue() {
-		return this.mMinChangeValue;
+		return mMinChangeValue;
 	}
 
-	public void setMinChangeValue(int mMinChangeValue) {
-		this.mMinChangeValue = mMinChangeValue;
+	public void setMinChangeValue(int minChangeValue) {
+		mMinChangeValue = minChangeValue;
 	}
 
 	public int getMaxChangeValue() {
-		return this.mMaxChangeValue;
+		return mMaxChangeValue;
 	}
 
-	public void setMaxChangeValue(int mMaxChangeValue) {
-		this.mMaxChangeValue = mMaxChangeValue;
+	public void setMaxChangeValue(int maxChangeValue) {
+		mMaxChangeValue = maxChangeValue;
 	}
 
 	public void setFontName(String mFont) {
-		this.mFontName = mFont;
+		mFontName = mFont;
 	}
 
 	public static abstract interface OnRadialViewValueChanged {

@@ -13,10 +13,10 @@ import android.view.animation.TranslateAnimation;
 import android.widget.PopupWindow;
 
 public class RadialMenuHelper {
-	private RotateAnimation rotate;
-	private ScaleAnimation scale;
-	private TranslateAnimation move;
-	private long animationSpeed = 0L;
+	private RotateAnimation mRotate;
+	private ScaleAnimation mScale;
+	private TranslateAnimation mMove;
+	private long mAnimationSpeed = 0L;
 
 	protected PopupWindow initPopup(Context context) {
 		PopupWindow window = new PopupWindow(context);
@@ -31,35 +31,35 @@ public class RadialMenuHelper {
 
 	protected void onOpenAnimation(View view, int xPosition, int yPosition,
 			int xSource, int ySource) {
-		this.rotate = new RotateAnimation(0.0F, 360.0F, xPosition, yPosition);
-		this.scale = new ScaleAnimation(0.0F, 1.0F, 0.0F, 1.0F, xPosition,
+		this.mRotate = new RotateAnimation(0.0F, 360.0F, xPosition, yPosition);
+		this.mScale = new ScaleAnimation(0.0F, 1.0F, 0.0F, 1.0F, xPosition,
 				yPosition);
-		this.scale.setInterpolator(new DecelerateInterpolator());
-		this.move = new TranslateAnimation(xSource - xPosition, 0.0F, ySource
+		this.mScale.setInterpolator(new DecelerateInterpolator());
+		this.mMove = new TranslateAnimation(xSource - xPosition, 0.0F, ySource
 				- yPosition, 0.0F);
 
 		AnimationSet spriteAnimation = new AnimationSet(true);
-		spriteAnimation.addAnimation(this.rotate);
-		spriteAnimation.addAnimation(this.scale);
-		spriteAnimation.addAnimation(this.move);
-		spriteAnimation.setDuration(this.animationSpeed);
+		spriteAnimation.addAnimation(this.mRotate);
+		spriteAnimation.addAnimation(this.mScale);
+		spriteAnimation.addAnimation(this.mMove);
+		spriteAnimation.setDuration(this.mAnimationSpeed);
 
 		view.startAnimation(spriteAnimation);
 	}
 
 	protected void onOpenAnimation(View view, int xPosition, int yPosition,
 			int xSource, int ySource, long animTime) {
-		this.rotate = new RotateAnimation(0.0F, 360.0F, xPosition, yPosition);
-		this.scale = new ScaleAnimation(0.0F, 1.0F, 0.0F, 1.0F, xPosition,
+		this.mRotate = new RotateAnimation(0.0F, 360.0F, xPosition, yPosition);
+		this.mScale = new ScaleAnimation(0.0F, 1.0F, 0.0F, 1.0F, xPosition,
 				yPosition);
-		this.scale.setInterpolator(new DecelerateInterpolator());
-		this.move = new TranslateAnimation(xSource - xPosition, 0.0F, ySource
+		this.mScale.setInterpolator(new DecelerateInterpolator());
+		this.mMove = new TranslateAnimation(xSource - xPosition, 0.0F, ySource
 				- yPosition, 0.0F);
 
 		AnimationSet spriteAnimation = new AnimationSet(true);
-		spriteAnimation.addAnimation(this.rotate);
-		spriteAnimation.addAnimation(this.scale);
-		spriteAnimation.addAnimation(this.move);
+		spriteAnimation.addAnimation(this.mRotate);
+		spriteAnimation.addAnimation(this.mScale);
+		spriteAnimation.addAnimation(this.mMove);
 		spriteAnimation.setDuration(animTime);
 
 		view.startAnimation(spriteAnimation);
@@ -67,35 +67,35 @@ public class RadialMenuHelper {
 
 	protected void onCloseAnimation(View view, int xPosition, int yPosition,
 			int xSource, int ySource) {
-		this.rotate = new RotateAnimation(360.0F, 0.0F, xPosition, yPosition);
-		this.scale = new ScaleAnimation(1.0F, 0.0F, 1.0F, 0.0F, xPosition,
+		this.mRotate = new RotateAnimation(360.0F, 0.0F, xPosition, yPosition);
+		this.mScale = new ScaleAnimation(1.0F, 0.0F, 1.0F, 0.0F, xPosition,
 				yPosition);
-		this.scale.setInterpolator(new AccelerateInterpolator());
-		this.move = new TranslateAnimation(0.0F, xSource - xPosition, 0.0F,
+		this.mScale.setInterpolator(new AccelerateInterpolator());
+		this.mMove = new TranslateAnimation(0.0F, xSource - xPosition, 0.0F,
 				ySource - yPosition);
 
 		AnimationSet spriteAnimation = new AnimationSet(true);
-		spriteAnimation.addAnimation(this.rotate);
-		spriteAnimation.addAnimation(this.scale);
-		spriteAnimation.addAnimation(this.move);
-		spriteAnimation.setDuration(this.animationSpeed);
+		spriteAnimation.addAnimation(this.mRotate);
+		spriteAnimation.addAnimation(this.mScale);
+		spriteAnimation.addAnimation(this.mMove);
+		spriteAnimation.setDuration(this.mAnimationSpeed);
 
 		view.startAnimation(spriteAnimation);
 	}
 
 	protected void onCloseAnimation(View view, int xPosition, int yPosition,
 			int xSource, int ySource, long animTime) {
-		this.rotate = new RotateAnimation(360.0F, 0.0F, xPosition, yPosition);
-		this.scale = new ScaleAnimation(1.0F, 0.0F, 1.0F, 0.0F, xPosition,
+		this.mRotate = new RotateAnimation(360.0F, 0.0F, xPosition, yPosition);
+		this.mScale = new ScaleAnimation(1.0F, 0.0F, 1.0F, 0.0F, xPosition,
 				yPosition);
-		this.scale.setInterpolator(new AccelerateInterpolator());
-		this.move = new TranslateAnimation(0.0F, xSource - xPosition, 0.0F,
+		this.mScale.setInterpolator(new AccelerateInterpolator());
+		this.mMove = new TranslateAnimation(0.0F, xSource - xPosition, 0.0F,
 				ySource - yPosition);
 
 		AnimationSet spriteAnimation = new AnimationSet(true);
-		spriteAnimation.addAnimation(this.rotate);
-		spriteAnimation.addAnimation(this.scale);
-		spriteAnimation.addAnimation(this.move);
+		spriteAnimation.addAnimation(this.mRotate);
+		spriteAnimation.addAnimation(this.mScale);
+		spriteAnimation.addAnimation(this.mMove);
 		spriteAnimation.setDuration(animTime);
 
 		view.startAnimation(spriteAnimation);

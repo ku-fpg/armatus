@@ -4,24 +4,24 @@ import android.graphics.Path;
 import android.graphics.RectF;
 
 public class RadialMenuWedge extends Path {
-	private int x;
-	private int y;
-	private int InnerSize;
-	private int OuterSize;
-	private float StartArc;
-	private float ArcWidth;
+	private int mX;
+	private int mY;
+	private int mInnerSize;
+	private int mOuterSize;
+	private float mStartArc;
+	private float mArcWidth;
 
-	protected RadialMenuWedge(int x, int y, int InnerSize, int OuterSize,
-			float StartArc, float ArcWidth) {
-		if (StartArc >= 360.0F) {
-			StartArc -= 360.0F;
+	protected RadialMenuWedge(int x, int y, int innerSize, int outerSize,
+			float startArc, float arcWidth) {
+		if (startArc >= 360.0F) {
+			startArc -= 360.0F;
 		}
-		this.x = x;
-		this.y = y;
-		this.InnerSize = InnerSize;
-		this.OuterSize = OuterSize;
-		this.StartArc = StartArc;
-		this.ArcWidth = ArcWidth;
+		mX = x;
+		mY = y;
+		mInnerSize = innerSize;
+		mOuterSize = outerSize;
+		mStartArc = startArc;
+		mArcWidth = arcWidth;
 		buildPath();
 	}
 
@@ -29,14 +29,14 @@ public class RadialMenuWedge extends Path {
 		RectF rect = new RectF();
 		RectF rect2 = new RectF();
 
-		rect.set(this.x - this.InnerSize, this.y - this.InnerSize, this.x
-				+ this.InnerSize, this.y + this.InnerSize);
-		rect2.set(this.x - this.OuterSize, this.y - this.OuterSize, this.x
-				+ this.OuterSize, this.y + this.OuterSize);
+		rect.set(mX - mInnerSize, mY - mInnerSize, mX
+				+ mInnerSize, mY + mInnerSize);
+		rect2.set(mX - mOuterSize, mY - mOuterSize, mX
+				+ mOuterSize, mY + mOuterSize);
 		reset();
 
-		arcTo(rect2, this.StartArc, this.ArcWidth);
-		arcTo(rect, this.StartArc + this.ArcWidth, -this.ArcWidth);
+		arcTo(rect2, mStartArc, mArcWidth);
+		arcTo(rect, mStartArc + mArcWidth, -mArcWidth);
 		close();
 	}
 }

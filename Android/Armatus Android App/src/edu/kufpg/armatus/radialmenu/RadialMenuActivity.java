@@ -3,8 +3,8 @@ package edu.kufpg.armatus.radialmenu;
 import java.util.ArrayList;
 
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuItem;
+import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuItem.OnClickListener;
 import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuRenderer;
-import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuRenderer.OnRadialMenuClickListener;
 
 import edu.kufpg.armatus.R;
 
@@ -53,15 +53,15 @@ public class RadialMenuActivity extends Activity {
 		mRenderer.setRadialMenuContent(mMenuItems);
 		mHolderLayout.addView(mRenderer.renderView());
 		
-		OnRadialMenuClickListener listener = new OnRadialMenuClickListener() {
+		OnClickListener listener = new OnClickListener() {
 			@Override
-			public void onRadialMenuClick(String id) {
+			public void onClick(String id) {
 				Toast.makeText(RadialMenuActivity.this, id, Toast.LENGTH_SHORT).show();
 			}
 		};
 		
 		for (RadialMenuItem item : mMenuItems) {
-			item.setOnRadialMenuClickListener(listener);
+			item.setOnClickListener(listener);
 		}
 	}
 }

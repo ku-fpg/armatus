@@ -4,53 +4,53 @@ import android.util.Log;
 import java.util.List;
 
 public class RadialMenuItem implements RadialMenuInterface {
-	private String menuName = "Empty";
-	private String menuLabel = null;
-	private int menuIcon = 0;
-	private List<RadialMenuItem> menuChildren = null;
-	private RadialMenuItemClickListener menuListener = null;
+	private String mMenuName = "Empty";
+	private String mMenuLabel = null;
+	private int mMenuIcon = 0;
+	private List<RadialMenuItem> mMenuChildren = null;
+	private OnClickListener mListener = null;
 
 	public RadialMenuItem(String name, String displayName) {
 		if (name != null)
-			this.menuName = name;
-		this.menuLabel = displayName;
+			mMenuName = name;
+		mMenuLabel = displayName;
 	}
 
 	public void setDisplayIcon(int displayIcon) {
-		this.menuIcon = displayIcon;
+		mMenuIcon = displayIcon;
 	}
 
-	public void setOnMenuItemPressed(RadialMenuItemClickListener listener) {
-		this.menuListener = listener;
+	public void setOnClickListener(OnClickListener listener) {
+		mListener = listener;
 	}
 
 	public void setMenuChildren(List<RadialMenuItem> childItems) {
-		this.menuChildren = childItems;
+		mMenuChildren = childItems;
 	}
 
 	public String getName() {
-		return this.menuName;
+		return mMenuName;
 	}
 
 	public String getLabel() {
-		return this.menuLabel;
+		return mMenuLabel;
 	}
 
 	public int getIcon() {
-		return this.menuIcon;
+		return mMenuIcon;
 	}
 
 	public List<RadialMenuItem> getChildren() {
-		return this.menuChildren;
+		return mMenuChildren;
 	}
 
 	public void menuActiviated() {
-		Log.i(getClass().getName(), this.menuName + " menu pressed.");
-		if (this.menuListener != null)
-			this.menuListener.execute();
+		Log.i(getClass().getName(), mMenuName + " menu pressed.");
+		if (mListener != null)
+			mListener.onClick();
 	}
 
-	public static abstract interface RadialMenuItemClickListener {
-		public abstract void execute();
+	public static abstract interface OnClickListener {
+		public abstract void onClick();
 	}
 }

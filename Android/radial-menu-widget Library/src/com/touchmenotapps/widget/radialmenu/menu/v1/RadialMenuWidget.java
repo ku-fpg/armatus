@@ -14,102 +14,71 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RadialMenuWidget extends View {
-	private RadialMenuHelper helper;
-	private List<RadialMenuItem> menuEntries = new ArrayList<RadialMenuItem>();
-	private RadialMenuItem centerCircle = null;
-
-	private float screen_density = getContext().getResources()
+	private RadialMenuHelper mHelper;
+	private List<RadialMenuItem> mMenuEntries = new ArrayList<RadialMenuItem>();
+	private RadialMenuItem mCenterCircle = null;
+	private float mScreenDensity = getContext().getResources()
 			.getDisplayMetrics().density;
-
-	private int defaultColor = Color.rgb(34, 96, 120);
-
-	private int defaultAlpha = 180;
-
-	private int wedge2Color = Color.rgb(50, 50, 50);
-
-	private int wedge2Alpha = 210;
-	private int outlineColor = Color.rgb(150, 150, 150);
-	private int outlineAlpha = 255;
-	private int selectedColor = Color.rgb(70, 130, 180);
-
-	private int selectedAlpha = 210;
-
-	private int disabledColor = Color.rgb(34, 96, 120);
-
-	private int disabledAlpha = 100;
-
-	private int pictureAlpha = 255;
-
-	private int textColor = Color.rgb(255, 255, 255);
-
-	private int textAlpha = 255;
-
-	private int headerTextColor = Color.rgb(255, 255, 255);
-
-	private int headerTextAlpha = 255;
-	private int headerBackgroundColor = Color.rgb(0, 0, 0);
-
-	private int headerBackgroundAlpha = 180;
-
-	private int wedgeQty = 1;
-	private RadialMenuWedge[] Wedges = new RadialMenuWedge[this.wedgeQty];
-	private RadialMenuWedge selected = null;
-
-	private RadialMenuWedge enabled = null;
-
-	private Rect[] iconRect = new Rect[this.wedgeQty];
-
-	private int wedgeQty2 = 1;
-	private RadialMenuWedge[] Wedges2 = new RadialMenuWedge[this.wedgeQty2];
-	private RadialMenuWedge selected2 = null;
-
-	private Rect[] iconRect2 = new Rect[this.wedgeQty2];
-	private RadialMenuInterface wedge2Data = null;
-
-	private int MinSize = scalePX(35);
-	private int MaxSize = scalePX(90);
-	private int r2MinSize = this.MaxSize + scalePX(5);
-
-	private int r2MaxSize = this.r2MinSize + scalePX(45);
-
-	private int MinIconSize = scalePX(15);
-	private int MaxIconSize = scalePX(35);
-
-	private int cRadius = this.MinSize - scalePX(7);
-	private int textSize = scalePX(15);
-	private int animateTextSize = this.textSize;
-
-	private int xPosition = scalePX(120);
-	private int yPosition = scalePX(120);
-
-	private int xSource = 0;
-	private int ySource = 0;
-	private boolean showSource = false;
-
-	private boolean inWedge = false;
-
-	private boolean inWedge2 = false;
-
-	private boolean inCircle = false;
-
-	private boolean Wedge2Shown = false;
-	private boolean HeaderBoxBounded = false;
-
-	private String headerString = null;
-	private int headerTextSize = this.textSize;
-	private int headerBuffer = scalePX(8);
-	private Rect textRect = new Rect();
-	private RectF textBoxRect = new RectF();
-	private int headerTextLeft;
-	private int headerTextBottom;
+	private int mDefaultColor = Color.rgb(34, 96, 120);
+	private int mDefaultAlpha = 180;
+	private int mWedge2Color = Color.rgb(50, 50, 50);
+	private int mWedge2Alpha = 210;
+	private int mOutlineColor = Color.rgb(150, 150, 150);
+	private int mOutlineAlpha = 255;
+	private int mSelectedColor = Color.rgb(70, 130, 180);
+	private int mSelectedAlpha = 210;
+	private int mDisabledColor = Color.rgb(34, 96, 120);
+	private int mDisabledAlpha = 100;
+	private int mPictureAlpha = 255;
+	private int mTextColor = Color.rgb(255, 255, 255);
+	private int mTextAlpha = 255;
+	private int mHeaderTextColor = Color.rgb(255, 255, 255);
+	private int mHeaderTextAlpha = 255;
+	private int mHeaderBackgroundColor = Color.rgb(0, 0, 0);
+	private int mHeaderBackgroundAlpha = 180;
+	private int mWedgeQty = 1;
+	private RadialMenuWedge[] mWedges = new RadialMenuWedge[mWedgeQty];
+	private RadialMenuWedge mSelected = null;
+	private RadialMenuWedge mEnabled = null;
+	private Rect[] mIconRect = new Rect[mWedgeQty];
+	private int mWedgeQty2 = 1;
+	private RadialMenuWedge[] mWedges2 = new RadialMenuWedge[mWedgeQty2];
+	private RadialMenuWedge mSelected2 = null;
+	private Rect[] mIconRect2 = new Rect[mWedgeQty2];
+	private RadialMenuInterface mWedge2Data = null;
+	private int mMinSize = scalePx(35);
+	private int mMaxSize = scalePx(90);
+	private int mR2MinSize = mMaxSize + scalePx(5);
+	private int mR2MaxSize = mR2MinSize + scalePx(45);
+	private int mMinIconSize = scalePx(15);
+	private int mMaxIconSize = scalePx(35);
+	private int mCRadius = mMinSize - scalePx(7);
+	private int mTextSize = scalePx(15);
+	private int mAnimateTextSize = mTextSize;
+	private int mXPosition = scalePx(120);
+	private int mYPosition = scalePx(120);
+	private int mXSource = 0;
+	private int mYSource = 0;
+	private boolean mShowSource = false;
+	private boolean mInWedge = false;
+	private boolean mInWedge2 = false;
+	private boolean mInCircle = false;
+	private boolean mWedge2Shown = false;
+	private boolean mHeaderBoxBounded = false;
+	private String mHeaderString = null;
+	private int mHeaderTextSize = mTextSize;
+	private int mHeaderBuffer = scalePx(8);
+	private Rect mTextRect = new Rect();
+	private RectF mTextBoxRect = new RectF();
+	private int mHeaderTextLeft;
+	private int mHeaderTextBottom;
 	//private static final int ANIMATE_IN = 1;
 	//private static final int ANIMATE_OUT = 2;
-	private int animateSections = 4;
-	private int r2VariableSize;
-	private boolean animateOuterIn = false;
-	private boolean animateOuterOut = false;
+	private int mAnimateSections = 4;
+	private int mR2VariableSize;
+	private boolean mAnimateOuterIn = false;
+	private boolean mAnimateOuterOut = false;
 	private PopupWindow mWindow;
-	
 	private Paint mPaint = new Paint();
 	private Rect mRect1 = new Rect();
 	private Rect mRect2 = new Rect();
@@ -118,15 +87,15 @@ public class RadialMenuWidget extends View {
 
 	public RadialMenuWidget(Context context) {
 		super(context);
-		this.helper = new RadialMenuHelper();
-		this.mWindow = this.helper.initPopup(context);
+		mHelper = new RadialMenuHelper();
+		mWindow = mHelper.initPopup(context);
 
-		this.xPosition = (getResources().getDisplayMetrics().widthPixels / 2);
-		this.yPosition = (getResources().getDisplayMetrics().heightPixels / 2);
+		mXPosition = (getResources().getDisplayMetrics().widthPixels / 2);
+		mYPosition = (getResources().getDisplayMetrics().heightPixels / 2);
 
 		determineWedges();
-		this.helper.onOpenAnimation(this, this.xPosition, this.yPosition,
-				this.xSource, this.ySource);
+		mHelper.onOpenAnimation(this, mXPosition, mYPosition,
+				mXSource, mYSource);
 	}
 
 	public boolean onTouchEvent(MotionEvent e) {
@@ -134,38 +103,38 @@ public class RadialMenuWidget extends View {
 		int eventX = (int) e.getX();
 		int eventY = (int) e.getY();
 		if (state == 0) {
-			this.inWedge = false;
-			this.inWedge2 = false;
-			this.inCircle = false;
+			mInWedge = false;
+			mInWedge2 = false;
+			mInCircle = false;
 
-			for (int i = 0; i < this.Wedges.length; i++) {
-				RadialMenuWedge f = this.Wedges[i];
-				double slice = 6.283185307179586D / this.wedgeQty;
+			for (int i = 0; i < mWedges.length; i++) {
+				RadialMenuWedge f = mWedges[i];
+				double slice = 6.283185307179586D / mWedgeQty;
 				double start = 4.71238898038469D - slice / 2.0D;
 
-				this.inWedge = this.helper.pntInWedge(eventX, eventY,
-						this.xPosition, this.yPosition, this.MinSize,
-						this.MaxSize, i * slice + start, slice);
+				mInWedge = mHelper.pntInWedge(eventX, eventY,
+						mXPosition, mYPosition, mMinSize,
+						mMaxSize, i * slice + start, slice);
 
-				if (this.inWedge) {
-					this.selected = f;
+				if (mInWedge) {
+					mSelected = f;
 					break;
 				}
 
 			}
 
-			if (this.Wedge2Shown) {
-				for (int i = 0; i < this.Wedges2.length; i++) {
-					RadialMenuWedge f = this.Wedges2[i];
-					double slice = 6.283185307179586D / this.wedgeQty2;
+			if (mWedge2Shown) {
+				for (int i = 0; i < mWedges2.length; i++) {
+					RadialMenuWedge f = mWedges2[i];
+					double slice = 6.283185307179586D / mWedgeQty2;
 					double start = 4.71238898038469D - slice / 2.0D;
 
-					this.inWedge2 = this.helper.pntInWedge(eventX, eventY,
-							this.xPosition, this.yPosition, this.r2MinSize,
-							this.r2MaxSize, i * slice + start, slice);
+					mInWedge2 = mHelper.pntInWedge(eventX, eventY,
+							mXPosition, mYPosition, mR2MinSize,
+							mR2MaxSize, i * slice + start, slice);
 
-					if (this.inWedge2) {
-						this.selected2 = f;
+					if (mInWedge2) {
+						mSelected2 = f;
 						break;
 					}
 
@@ -173,50 +142,50 @@ public class RadialMenuWidget extends View {
 
 			}
 
-			if (this.centerCircle != null) {
-				this.inCircle = this.helper.pntInCircle(eventX, eventY,
-						this.xPosition, this.yPosition, this.cRadius);
+			if (mCenterCircle != null) {
+				mInCircle = mHelper.pntInCircle(eventX, eventY,
+						mXPosition, mYPosition, mCRadius);
 			}
 		} else if (state == 1) {
-			if (this.inCircle) {
-				if (this.Wedge2Shown) {
-					this.enabled = null;
-					this.animateOuterIn = true;
+			if (mInCircle) {
+				if (mWedge2Shown) {
+					mEnabled = null;
+					mAnimateOuterIn = true;
 				}
-				this.selected = null;
-				this.centerCircle.menuActiviated();
-			} else if (this.selected != null) {
-				for (int i = 0; i < this.Wedges.length; i++) {
-					RadialMenuWedge f = this.Wedges[i];
-					if (f == this.selected) {
-						if (this.enabled != null) {
-							this.enabled = null;
-							this.animateOuterIn = true;
+				mSelected = null;
+				mCenterCircle.menuActiviated();
+			} else if (mSelected != null) {
+				for (int i = 0; i < mWedges.length; i++) {
+					RadialMenuWedge f = mWedges[i];
+					if (f == mSelected) {
+						if (mEnabled != null) {
+							mEnabled = null;
+							mAnimateOuterIn = true;
 						} else {
-							((RadialMenuItem) this.menuEntries.get(i))
+							((RadialMenuItem) mMenuEntries.get(i))
 									.menuActiviated();
 
-							if (((RadialMenuItem) this.menuEntries.get(i))
+							if (((RadialMenuItem) mMenuEntries.get(i))
 									.getChildren() != null) {
-								determineOuterWedges((RadialMenuItem) this.menuEntries
+								determineOuterWedges((RadialMenuItem) mMenuEntries
 										.get(i));
-								this.enabled = f;
-								this.animateOuterOut = true;
+								mEnabled = f;
+								mAnimateOuterOut = true;
 							} else {
-								this.Wedge2Shown = false;
+								mWedge2Shown = false;
 							}
 						}
-						this.selected = null;
+						mSelected = null;
 					}
 				}
-			} else if (this.selected2 != null) {
-				for (int i = 0; i < this.Wedges2.length; i++) {
-					RadialMenuWedge f = this.Wedges2[i];
-					if (f == this.selected2) {
-						this.animateOuterIn = true;
-						this.enabled = null;
-						this.selected = null;
-						((RadialMenuItem) this.wedge2Data.getChildren().get(i))
+			} else if (mSelected2 != null) {
+				for (int i = 0; i < mWedges2.length; i++) {
+					RadialMenuWedge f = mWedges2[i];
+					if (f == mSelected2) {
+						mAnimateOuterIn = true;
+						mEnabled = null;
+						mSelected = null;
+						((RadialMenuItem) mWedge2Data.getChildren().get(i))
 								.menuActiviated();
 					}
 				}
@@ -224,8 +193,8 @@ public class RadialMenuWidget extends View {
 				dismiss();
 			}
 
-			this.selected2 = null;
-			this.inCircle = false;
+			mSelected2 = null;
+			mInCircle = false;
 		}
 		invalidate();
 		return true;
@@ -236,67 +205,67 @@ public class RadialMenuWidget extends View {
 		mPaint.setAntiAlias(true);
 		mPaint.setStrokeWidth(3.0F);
 
-		if (this.showSource) {
-			mPaint.setColor(this.outlineColor);
-			mPaint.setAlpha(this.outlineAlpha);
+		if (mShowSource) {
+			mPaint.setColor(mOutlineColor);
+			mPaint.setAlpha(mOutlineAlpha);
 			mPaint.setStyle(Paint.Style.STROKE);
-			c.drawCircle(this.xSource, this.ySource, this.cRadius / 10, mPaint);
+			c.drawCircle(mXSource, mYSource, mCRadius / 10, mPaint);
 
-			mPaint.setColor(this.selectedColor);
-			mPaint.setAlpha(this.selectedAlpha);
+			mPaint.setColor(mSelectedColor);
+			mPaint.setAlpha(mSelectedAlpha);
 			mPaint.setStyle(Paint.Style.FILL);
-			c.drawCircle(this.xSource, this.ySource, this.cRadius / 10, mPaint);
+			c.drawCircle(mXSource, mYSource, mCRadius / 10, mPaint);
 		}
 
-		for (int i = 0; i < this.Wedges.length; i++) {
-			RadialMenuWedge f = this.Wedges[i];
-			mPaint.setColor(this.outlineColor);
-			mPaint.setAlpha(this.outlineAlpha);
+		for (int i = 0; i < mWedges.length; i++) {
+			RadialMenuWedge f = mWedges[i];
+			mPaint.setColor(mOutlineColor);
+			mPaint.setAlpha(mOutlineAlpha);
 			mPaint.setStyle(Paint.Style.STROKE);
 			c.drawPath(f, mPaint);
-			if ((f == this.enabled) && (this.Wedge2Shown)) {
-				mPaint.setColor(this.wedge2Color);
-				mPaint.setAlpha(this.wedge2Alpha);
+			if ((f == mEnabled) && (mWedge2Shown)) {
+				mPaint.setColor(mWedge2Color);
+				mPaint.setAlpha(mWedge2Alpha);
 				mPaint.setStyle(Paint.Style.FILL);
 				c.drawPath(f, mPaint);
-			} else if ((f != this.enabled) && (this.Wedge2Shown)) {
-				mPaint.setColor(this.disabledColor);
-				mPaint.setAlpha(this.disabledAlpha);
+			} else if ((f != mEnabled) && (mWedge2Shown)) {
+				mPaint.setColor(mDisabledColor);
+				mPaint.setAlpha(mDisabledAlpha);
 				mPaint.setStyle(Paint.Style.FILL);
 				c.drawPath(f, mPaint);
-			} else if ((f == this.enabled) && (!this.Wedge2Shown)) {
-				mPaint.setColor(this.wedge2Color);
-				mPaint.setAlpha(this.wedge2Alpha);
+			} else if ((f == mEnabled) && (!mWedge2Shown)) {
+				mPaint.setColor(mWedge2Color);
+				mPaint.setAlpha(mWedge2Alpha);
 				mPaint.setStyle(Paint.Style.FILL);
 				c.drawPath(f, mPaint);
-			} else if (f == this.selected) {
-				mPaint.setColor(this.wedge2Color);
-				mPaint.setAlpha(this.wedge2Alpha);
+			} else if (f == mSelected) {
+				mPaint.setColor(mWedge2Color);
+				mPaint.setAlpha(mWedge2Alpha);
 				mPaint.setStyle(Paint.Style.FILL);
 				c.drawPath(f, mPaint);
 			} else {
-				mPaint.setColor(this.defaultColor);
-				mPaint.setAlpha(this.defaultAlpha);
+				mPaint.setColor(mDefaultColor);
+				mPaint.setAlpha(mDefaultAlpha);
 				mPaint.setStyle(Paint.Style.FILL);
 				c.drawPath(f, mPaint);
 			}
 
-			Rect rf = this.iconRect[i];
+			Rect rf = mIconRect[i];
 
-			if ((((RadialMenuItem) this.menuEntries.get(i)).getIcon() != 0)
-					&& (((RadialMenuItem) this.menuEntries.get(i)).getLabel() != null)) {
-				String menuItemName = ((RadialMenuItem) this.menuEntries.get(i))
+			if ((((RadialMenuItem) mMenuEntries.get(i)).getIcon() != 0)
+					&& (((RadialMenuItem) mMenuEntries.get(i)).getLabel() != null)) {
+				String menuItemName = ((RadialMenuItem) mMenuEntries.get(i))
 						.getLabel();
 				String[] stringArray = menuItemName.split("\n");
 
-				mPaint.setColor(this.textColor);
-				if ((f != this.enabled) && (this.Wedge2Shown))
-					mPaint.setAlpha(this.disabledAlpha);
+				mPaint.setColor(mTextColor);
+				if ((f != mEnabled) && (mWedge2Shown))
+					mPaint.setAlpha(mDisabledAlpha);
 				else {
-					mPaint.setAlpha(this.textAlpha);
+					mPaint.setAlpha(mTextAlpha);
 				}
 				mPaint.setStyle(Paint.Style.FILL);
-				mPaint.setTextSize(this.textSize);
+				mPaint.setTextSize(mTextSize);
 
 				mRect1.setEmpty();
 				float textHeight = 0.0F;
@@ -321,35 +290,35 @@ public class RadialMenuWidget extends View {
 				}
 
 				Drawable drawable = getResources().getDrawable(
-						((RadialMenuItem) this.menuEntries.get(i)).getIcon());
+						((RadialMenuItem) mMenuEntries.get(i)).getIcon());
 				drawable.setBounds(mRect2);
-				if ((f != this.enabled) && (this.Wedge2Shown))
-					drawable.setAlpha(this.disabledAlpha);
+				if ((f != mEnabled) && (mWedge2Shown))
+					drawable.setAlpha(mDisabledAlpha);
 				else {
-					drawable.setAlpha(this.pictureAlpha);
+					drawable.setAlpha(mPictureAlpha);
 				}
 				drawable.draw(c);
-			} else if (((RadialMenuItem) this.menuEntries.get(i)).getIcon() != 0) {
+			} else if (((RadialMenuItem) mMenuEntries.get(i)).getIcon() != 0) {
 				Drawable drawable = getResources().getDrawable(
-						((RadialMenuItem) this.menuEntries.get(i)).getIcon());
+						((RadialMenuItem) mMenuEntries.get(i)).getIcon());
 				drawable.setBounds(rf);
-				if ((f != this.enabled) && (this.Wedge2Shown))
-					drawable.setAlpha(this.disabledAlpha);
+				if ((f != mEnabled) && (mWedge2Shown))
+					drawable.setAlpha(mDisabledAlpha);
 				else {
-					drawable.setAlpha(this.pictureAlpha);
+					drawable.setAlpha(mPictureAlpha);
 				}
 				drawable.draw(c);
 			} else {
-				mPaint.setColor(this.textColor);
-				if ((f != this.enabled) && (this.Wedge2Shown))
-					mPaint.setAlpha(this.disabledAlpha);
+				mPaint.setColor(mTextColor);
+				if ((f != mEnabled) && (mWedge2Shown))
+					mPaint.setAlpha(mDisabledAlpha);
 				else {
-					mPaint.setAlpha(this.textAlpha);
+					mPaint.setAlpha(mTextAlpha);
 				}
 				mPaint.setStyle(Paint.Style.FILL);
-				mPaint.setTextSize(this.textSize);
+				mPaint.setTextSize(mTextSize);
 
-				String menuItemName = ((RadialMenuItem) this.menuEntries.get(i))
+				String menuItemName = ((RadialMenuItem) mMenuEntries.get(i))
 						.getLabel();
 				String[] stringArray = menuItemName.split("\n");
 
@@ -375,44 +344,44 @@ public class RadialMenuWidget extends View {
 
 		}
 
-		if (this.animateOuterIn)
+		if (mAnimateOuterIn)
 			animateOuterWedges(1);
-		else if (this.animateOuterOut) {
+		else if (mAnimateOuterOut) {
 			animateOuterWedges(2);
 		}
 
-		if (this.Wedge2Shown) {
-			for (int i = 0; i < this.Wedges2.length; i++) {
-				RadialMenuWedge f = this.Wedges2[i];
-				mPaint.setColor(this.outlineColor);
-				mPaint.setAlpha(this.outlineAlpha);
+		if (mWedge2Shown) {
+			for (int i = 0; i < mWedges2.length; i++) {
+				RadialMenuWedge f = mWedges2[i];
+				mPaint.setColor(mOutlineColor);
+				mPaint.setAlpha(mOutlineAlpha);
 				mPaint.setStyle(Paint.Style.STROKE);
 				c.drawPath(f, mPaint);
-				if (f == this.selected2) {
-					mPaint.setColor(this.selectedColor);
-					mPaint.setAlpha(this.selectedAlpha);
+				if (f == mSelected2) {
+					mPaint.setColor(mSelectedColor);
+					mPaint.setAlpha(mSelectedAlpha);
 					mPaint.setStyle(Paint.Style.FILL);
 					c.drawPath(f, mPaint);
 				} else {
-					mPaint.setColor(this.wedge2Color);
-					mPaint.setAlpha(this.wedge2Alpha);
+					mPaint.setColor(mWedge2Color);
+					mPaint.setAlpha(mWedge2Alpha);
 					mPaint.setStyle(Paint.Style.FILL);
 					c.drawPath(f, mPaint);
 				}
 
-				Rect rf = this.iconRect2[i];
-				if ((((RadialMenuItem) this.wedge2Data.getChildren().get(i))
+				Rect rf = mIconRect2[i];
+				if ((((RadialMenuItem) mWedge2Data.getChildren().get(i))
 						.getIcon() != 0)
-						&& (((RadialMenuItem) this.wedge2Data.getChildren()
+						&& (((RadialMenuItem) mWedge2Data.getChildren()
 								.get(i)).getLabel() != null)) {
-					String menuItemName = ((RadialMenuItem) this.wedge2Data
+					String menuItemName = ((RadialMenuItem) mWedge2Data
 							.getChildren().get(i)).getLabel();
 					String[] stringArray = menuItemName.split("\n");
 
-					mPaint.setColor(this.textColor);
-					mPaint.setAlpha(this.textAlpha);
+					mPaint.setColor(mTextColor);
+					mPaint.setAlpha(mTextAlpha);
 					mPaint.setStyle(Paint.Style.FILL);
-					mPaint.setTextSize(this.animateTextSize);
+					mPaint.setTextSize(mAnimateTextSize);
 
 					mRect1.setEmpty();
 					float textHeight = 0.0F;
@@ -437,26 +406,26 @@ public class RadialMenuWidget extends View {
 					}
 
 					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) this.wedge2Data.getChildren()
+							((RadialMenuItem) mWedge2Data.getChildren()
 									.get(i)).getIcon());
 					drawable.setBounds(mRect2);
-					drawable.setAlpha(this.pictureAlpha);
+					drawable.setAlpha(mPictureAlpha);
 					drawable.draw(c);
-				} else if (((RadialMenuItem) this.wedge2Data.getChildren().get(
+				} else if (((RadialMenuItem) mWedge2Data.getChildren().get(
 						i)).getIcon() != 0) {
 					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) this.wedge2Data.getChildren()
+							((RadialMenuItem) mWedge2Data.getChildren()
 									.get(i)).getIcon());
 					drawable.setBounds(rf);
-					drawable.setAlpha(this.pictureAlpha);
+					drawable.setAlpha(mPictureAlpha);
 					drawable.draw(c);
 				} else {
-					mPaint.setColor(this.textColor);
-					mPaint.setAlpha(this.textAlpha);
+					mPaint.setColor(mTextColor);
+					mPaint.setAlpha(mTextAlpha);
 					mPaint.setStyle(Paint.Style.FILL);
-					mPaint.setTextSize(this.animateTextSize);
+					mPaint.setTextSize(mAnimateTextSize);
 
-					String menuItemName = ((RadialMenuItem) this.wedge2Data
+					String menuItemName = ((RadialMenuItem) mWedge2Data
 							.getChildren().get(i)).getLabel();
 					String[] stringArray = menuItemName.split("\n");
 
@@ -482,48 +451,48 @@ public class RadialMenuWidget extends View {
 
 		}
 
-		if (this.centerCircle != null) {
-			mPaint.setColor(this.outlineColor);
-			mPaint.setAlpha(this.outlineAlpha);
+		if (mCenterCircle != null) {
+			mPaint.setColor(mOutlineColor);
+			mPaint.setAlpha(mOutlineAlpha);
 			mPaint.setStyle(Paint.Style.STROKE);
-			c.drawCircle(this.xPosition, this.yPosition, this.cRadius, mPaint);
-			if (this.inCircle) {
-				mPaint.setColor(this.selectedColor);
-				mPaint.setAlpha(this.selectedAlpha);
+			c.drawCircle(mXPosition, mYPosition, mCRadius, mPaint);
+			if (mInCircle) {
+				mPaint.setColor(mSelectedColor);
+				mPaint.setAlpha(mSelectedAlpha);
 				mPaint.setStyle(Paint.Style.FILL);
-				c.drawCircle(this.xPosition, this.yPosition, this.cRadius,
+				c.drawCircle(mXPosition, mYPosition, mCRadius,
 						mPaint);
-				this.helper.onCloseAnimation(this, this.xPosition,
-						this.yPosition, this.xSource, this.ySource);
+				mHelper.onCloseAnimation(this, mXPosition,
+						mYPosition, mXSource, mYSource);
 			} else {
-				mPaint.setColor(this.defaultColor);
-				mPaint.setAlpha(this.defaultAlpha);
+				mPaint.setColor(mDefaultColor);
+				mPaint.setAlpha(mDefaultAlpha);
 				mPaint.setStyle(Paint.Style.FILL);
-				c.drawCircle(this.xPosition, this.yPosition, this.cRadius,
+				c.drawCircle(mXPosition, mYPosition, mCRadius,
 						mPaint);
 			}
 
-			if ((this.centerCircle.getIcon() != 0)
-					&& (this.centerCircle.getLabel() != null)) {
-				String menuItemName = this.centerCircle.getLabel();
+			if ((mCenterCircle.getIcon() != 0)
+					&& (mCenterCircle.getLabel() != null)) {
+				String menuItemName = mCenterCircle.getLabel();
 				String[] stringArray = menuItemName.split("\n");
 
-				mPaint.setColor(this.textColor);
-				mPaint.setAlpha(this.textAlpha);
+				mPaint.setColor(mTextColor);
+				mPaint.setAlpha(mTextAlpha);
 				mPaint.setStyle(Paint.Style.FILL);
-				mPaint.setTextSize(this.textSize);
+				mPaint.setTextSize(mTextSize);
 
 				mRectIcon.setEmpty();
 				mRectText.setEmpty();
 				Drawable drawable = getResources().getDrawable(
-						this.centerCircle.getIcon());
+						mCenterCircle.getIcon());
 
 				int h = getIconSize(drawable.getIntrinsicHeight(),
-						this.MinIconSize, this.MaxIconSize);
+						mMinIconSize, mMaxIconSize);
 				int w = getIconSize(drawable.getIntrinsicWidth(),
-						this.MinIconSize, this.MaxIconSize);
-				mRectIcon.set(this.xPosition - w / 2, this.yPosition - h / 2,
-						this.xPosition + w / 2, this.yPosition + h / 2);
+						mMinIconSize, mMaxIconSize);
+				mRectIcon.set(mXPosition - w / 2, mYPosition - h / 2,
+						mXPosition + w / 2, mYPosition + h / 2);
 
 				float textHeight = 0.0F;
 				for (int j = 0; j < stringArray.length; j++) {
@@ -540,38 +509,38 @@ public class RadialMenuWidget extends View {
 				for (int j = 0; j < stringArray.length; j++) {
 					mPaint.getTextBounds(stringArray[j], 0,
 							stringArray[j].length(), mRectText);
-					float textLeft = this.xPosition - mRectText.width() / 2;
+					float textLeft = mXPosition - mRectText.width() / 2;
 					textBottom += mRectText.height() + 3;
 					c.drawText(stringArray[j], textLeft - mRectText.left,
 							textBottom - mRectText.bottom, mPaint);
 				}
 
 				drawable.setBounds(mRectIcon);
-				drawable.setAlpha(this.pictureAlpha);
+				drawable.setAlpha(mPictureAlpha);
 				drawable.draw(c);
-			} else if (this.centerCircle.getIcon() != 0) {
+			} else if (mCenterCircle.getIcon() != 0) {
 				mRect1.setEmpty();
 
 				Drawable drawable = getResources().getDrawable(
-						this.centerCircle.getIcon());
+						mCenterCircle.getIcon());
 
 				int h = getIconSize(drawable.getIntrinsicHeight(),
-						this.MinIconSize, this.MaxIconSize);
+						mMinIconSize, mMaxIconSize);
 				int w = getIconSize(drawable.getIntrinsicWidth(),
-						this.MinIconSize, this.MaxIconSize);
-				mRect1.set(this.xPosition - w / 2, this.yPosition - h / 2,
-						this.xPosition + w / 2, this.yPosition + h / 2);
+						mMinIconSize, mMaxIconSize);
+				mRect1.set(mXPosition - w / 2, mYPosition - h / 2,
+						mXPosition + w / 2, mYPosition + h / 2);
 
 				drawable.setBounds(mRect1);
-				drawable.setAlpha(this.pictureAlpha);
+				drawable.setAlpha(mPictureAlpha);
 				drawable.draw(c);
 			} else {
-				mPaint.setColor(this.textColor);
-				mPaint.setAlpha(this.textAlpha);
+				mPaint.setColor(mTextColor);
+				mPaint.setAlpha(mTextAlpha);
 				mPaint.setStyle(Paint.Style.FILL);
-				mPaint.setTextSize(this.textSize);
+				mPaint.setTextSize(mTextSize);
 
-				String menuItemName = this.centerCircle.getLabel();
+				String menuItemName = mCenterCircle.getLabel();
 				String[] stringArray = menuItemName.split("\n");
 
 				mRect1.setEmpty();
@@ -582,11 +551,11 @@ public class RadialMenuWidget extends View {
 					textHeight += mRect1.height() + 3;
 				}
 
-				float textBottom = this.yPosition - textHeight / 2.0F;
+				float textBottom = mYPosition - textHeight / 2.0F;
 				for (int j = 0; j < stringArray.length; j++) {
 					mPaint.getTextBounds(stringArray[j], 0,
 							stringArray[j].length(), mRect1);
-					float textLeft = this.xPosition - mRect1.width() / 2;
+					float textLeft = mXPosition - mRect1.width() / 2;
 					textBottom += mRect1.height() + 3;
 					c.drawText(stringArray[j], textLeft - mRect1.left, textBottom
 							- mRect1.bottom, mPaint);
@@ -596,36 +565,36 @@ public class RadialMenuWidget extends View {
 
 		}
 
-		if (this.headerString != null) {
-			mPaint.setTextSize(this.headerTextSize);
-			mPaint.getTextBounds(this.headerString, 0,
-					this.headerString.length(), this.textRect);
-			if (!this.HeaderBoxBounded) {
+		if (mHeaderString != null) {
+			mPaint.setTextSize(mHeaderTextSize);
+			mPaint.getTextBounds(mHeaderString, 0,
+					mHeaderString.length(), mTextRect);
+			if (!mHeaderBoxBounded) {
 				determineHeaderBox();
-				this.HeaderBoxBounded = true;
+				mHeaderBoxBounded = true;
 			}
 
-			mPaint.setColor(this.outlineColor);
-			mPaint.setAlpha(this.outlineAlpha);
+			mPaint.setColor(mOutlineColor);
+			mPaint.setAlpha(mOutlineAlpha);
 			mPaint.setStyle(Paint.Style.STROKE);
-			c.drawRoundRect(this.textBoxRect, scalePX(5), scalePX(5), mPaint);
-			mPaint.setColor(this.headerBackgroundColor);
-			mPaint.setAlpha(this.headerBackgroundAlpha);
+			c.drawRoundRect(mTextBoxRect, scalePx(5), scalePx(5), mPaint);
+			mPaint.setColor(mHeaderBackgroundColor);
+			mPaint.setAlpha(mHeaderBackgroundAlpha);
 			mPaint.setStyle(Paint.Style.FILL);
-			c.drawRoundRect(this.textBoxRect, scalePX(5), scalePX(5), mPaint);
+			c.drawRoundRect(mTextBoxRect, scalePx(5), scalePx(5), mPaint);
 
-			mPaint.setColor(this.headerTextColor);
-			mPaint.setAlpha(this.headerTextAlpha);
+			mPaint.setColor(mHeaderTextColor);
+			mPaint.setAlpha(mHeaderTextAlpha);
 			mPaint.setStyle(Paint.Style.FILL);
-			mPaint.setTextSize(this.headerTextSize);
-			c.drawText(this.headerString, this.headerTextLeft,
-					this.headerTextBottom, mPaint);
+			mPaint.setTextSize(mHeaderTextSize);
+			c.drawText(mHeaderString, mHeaderTextLeft,
+					mHeaderTextBottom, mPaint);
 		}
 	}
 
-	private int scalePX(int dp_size) {
-		int px_size = (int) (dp_size * this.screen_density + 0.5F);
-		return px_size;
+	private int scalePx(int dpSize) {
+		int pxSize = (int) (dpSize * mScreenDensity + 0.5F);
+		return pxSize;
 	}
 
 	private int getIconSize(int iconSize, int minSize, int maxSize) {
@@ -639,166 +608,166 @@ public class RadialMenuWidget extends View {
 		return minSize;
 	}
 
-	private void animateOuterWedges(int animation_direction) {
+	private void animateOuterWedges(int animationDirection) {
 		boolean animationComplete = false;
 
-		float slice2 = 360 / this.wedgeQty2;
-		float start_slice2 = 270.0F - slice2 / 2.0F;
+		float slice2 = 360 / mWedgeQty2;
+		float startSlice2 = 270.0F - slice2 / 2.0F;
 
-		double rSlice2 = 6.283185307179586D / this.wedgeQty2;
+		double rSlice2 = 6.283185307179586D / mWedgeQty2;
 		double rStart2 = 4.71238898038469D - rSlice2 / 2.0D;
 
-		this.Wedges2 = new RadialMenuWedge[this.wedgeQty2];
-		this.iconRect2 = new Rect[this.wedgeQty2];
+		mWedges2 = new RadialMenuWedge[mWedgeQty2];
+		mIconRect2 = new Rect[mWedgeQty2];
 
-		this.Wedge2Shown = true;
+		mWedge2Shown = true;
 
-		int wedgeSizeChange = (this.r2MaxSize - this.r2MinSize)
-				/ this.animateSections;
+		int wedgeSizeChange = (mR2MaxSize - mR2MinSize)
+				/ mAnimateSections;
 
-		if (animation_direction == 2) {
-			if (this.r2MinSize + this.r2VariableSize + wedgeSizeChange < this.r2MaxSize) {
-				this.r2VariableSize += wedgeSizeChange;
+		if (animationDirection == 2) {
+			if (mR2MinSize + mR2VariableSize + wedgeSizeChange < mR2MaxSize) {
+				mR2VariableSize += wedgeSizeChange;
 			} else {
-				this.animateOuterOut = false;
-				this.r2VariableSize = (this.r2MaxSize - this.r2MinSize);
+				mAnimateOuterOut = false;
+				mR2VariableSize = (mR2MaxSize - mR2MinSize);
 				animationComplete = true;
 			}
 
-			this.animateTextSize = (this.textSize / this.animateSections * (this.r2VariableSize / wedgeSizeChange));
+			mAnimateTextSize = (mTextSize / mAnimateSections * (mR2VariableSize / wedgeSizeChange));
 
-			for (int i = 0; i < this.Wedges2.length; i++) {
-				this.Wedges2[i] = new RadialMenuWedge(this.xPosition,
-						this.yPosition, this.r2MinSize, this.r2MinSize
-								+ this.r2VariableSize, i * slice2
-								+ start_slice2, slice2);
+			for (int i = 0; i < mWedges2.length; i++) {
+				mWedges2[i] = new RadialMenuWedge(mXPosition,
+						mYPosition, mR2MinSize, mR2MinSize
+								+ mR2VariableSize, i * slice2
+								+ startSlice2, slice2);
 				float xCenter = (float) (Math.cos(rSlice2 * i + rSlice2 * 0.5D
 						+ rStart2)
-						* (this.r2MinSize + this.r2VariableSize + this.r2MinSize) / 2.0D)
-						+ this.xPosition;
+						* (mR2MinSize + mR2VariableSize + mR2MinSize) / 2.0D)
+						+ mXPosition;
 				float yCenter = (float) (Math.sin(rSlice2 * i + rSlice2 * 0.5D
 						+ rStart2)
-						* (this.r2MinSize + this.r2VariableSize + this.r2MinSize) / 2.0D)
-						+ this.yPosition;
+						* (mR2MinSize + mR2VariableSize + mR2MinSize) / 2.0D)
+						+ mYPosition;
 
-				int h = this.MaxIconSize;
-				int w = this.MaxIconSize;
-				if (((RadialMenuItem) this.wedge2Data.getChildren().get(i))
+				int h = mMaxIconSize;
+				int w = mMaxIconSize;
+				if (((RadialMenuItem) mWedge2Data.getChildren().get(i))
 						.getIcon() != 0) {
 					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) this.wedge2Data.getChildren()
+							((RadialMenuItem) mWedge2Data.getChildren()
 									.get(i)).getIcon());
 					h = getIconSize(drawable.getIntrinsicHeight(),
-							this.MinIconSize, this.MaxIconSize);
+							mMinIconSize, mMaxIconSize);
 					w = getIconSize(drawable.getIntrinsicWidth(),
-							this.MinIconSize, this.MaxIconSize);
+							mMinIconSize, mMaxIconSize);
 				}
 
-				if (this.r2VariableSize < h) {
-					h = this.r2VariableSize;
+				if (mR2VariableSize < h) {
+					h = mR2VariableSize;
 				}
-				if (this.r2VariableSize < w) {
-					w = this.r2VariableSize;
+				if (mR2VariableSize < w) {
+					w = mR2VariableSize;
 				}
 
-				this.iconRect2[i] = new Rect((int) xCenter - w / 2,
+				mIconRect2[i] = new Rect((int) xCenter - w / 2,
 						(int) yCenter - h / 2, (int) xCenter + w / 2,
 						(int) yCenter + h / 2);
 
-				int widthOffset = this.MaxSize;
-				if (widthOffset < this.textRect.width() / 2) {
-					widthOffset = this.textRect.width() / 2 + scalePX(3);
+				int widthOffset = mMaxSize;
+				if (widthOffset < mTextRect.width() / 2) {
+					widthOffset = mTextRect.width() / 2 + scalePx(3);
 				}
-				this.textBoxRect.set(this.xPosition - widthOffset,
-						this.yPosition - (this.r2MinSize + this.r2VariableSize)
-								- this.headerBuffer - this.textRect.height()
-								- scalePX(3), this.xPosition + widthOffset,
-						this.yPosition - (this.r2MinSize + this.r2VariableSize)
-								- this.headerBuffer + scalePX(3));
-				this.headerTextBottom = (this.yPosition
-						- (this.r2MinSize + this.r2VariableSize)
-						- this.headerBuffer - this.textRect.bottom);
+				mTextBoxRect.set(mXPosition - widthOffset,
+						mYPosition - (mR2MinSize + mR2VariableSize)
+								- mHeaderBuffer - mTextRect.height()
+								- scalePx(3), mXPosition + widthOffset,
+						mYPosition - (mR2MinSize + mR2VariableSize)
+								- mHeaderBuffer + scalePx(3));
+				mHeaderTextBottom = (mYPosition
+						- (mR2MinSize + mR2VariableSize)
+						- mHeaderBuffer - mTextRect.bottom);
 			}
 
-		} else if (animation_direction == 1) {
-			if (this.r2MinSize < this.r2MaxSize - this.r2VariableSize
+		} else if (animationDirection == 1) {
+			if (mR2MinSize < mR2MaxSize - mR2VariableSize
 					- wedgeSizeChange) {
-				this.r2VariableSize += wedgeSizeChange;
+				mR2VariableSize += wedgeSizeChange;
 			} else {
-				this.animateOuterIn = false;
-				this.r2VariableSize = this.r2MaxSize;
+				mAnimateOuterIn = false;
+				mR2VariableSize = mR2MaxSize;
 				animationComplete = true;
 			}
 
-			this.animateTextSize = (this.textSize - this.textSize
-					/ this.animateSections
-					* (this.r2VariableSize / wedgeSizeChange));
+			mAnimateTextSize = (mTextSize - mTextSize
+					/ mAnimateSections
+					* (mR2VariableSize / wedgeSizeChange));
 
-			for (int i = 0; i < this.Wedges2.length; i++) {
-				this.Wedges2[i] = new RadialMenuWedge(this.xPosition,
-						this.yPosition, this.r2MinSize, this.r2MaxSize
-								- this.r2VariableSize, i * slice2
-								+ start_slice2, slice2);
+			for (int i = 0; i < mWedges2.length; i++) {
+				mWedges2[i] = new RadialMenuWedge(mXPosition,
+						mYPosition, mR2MinSize, mR2MaxSize
+								- mR2VariableSize, i * slice2
+								+ startSlice2, slice2);
 
 				float xCenter = (float) (Math.cos(rSlice2 * i + rSlice2 * 0.5D
 						+ rStart2)
-						* (this.r2MaxSize - this.r2VariableSize + this.r2MinSize) / 2.0D)
-						+ this.xPosition;
+						* (mR2MaxSize - mR2VariableSize + mR2MinSize) / 2.0D)
+						+ mXPosition;
 				float yCenter = (float) (Math.sin(rSlice2 * i + rSlice2 * 0.5D
 						+ rStart2)
-						* (this.r2MaxSize - this.r2VariableSize + this.r2MinSize) / 2.0D)
-						+ this.yPosition;
+						* (mR2MaxSize - mR2VariableSize + mR2MinSize) / 2.0D)
+						+ mYPosition;
 
-				int h = this.MaxIconSize;
-				int w = this.MaxIconSize;
-				if (((RadialMenuItem) this.wedge2Data.getChildren().get(i))
+				int h = mMaxIconSize;
+				int w = mMaxIconSize;
+				if (((RadialMenuItem) mWedge2Data.getChildren().get(i))
 						.getIcon() != 0) {
 					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) this.wedge2Data.getChildren()
+							((RadialMenuItem) mWedge2Data.getChildren()
 									.get(i)).getIcon());
 					h = getIconSize(drawable.getIntrinsicHeight(),
-							this.MinIconSize, this.MaxIconSize);
+							mMinIconSize, mMaxIconSize);
 					w = getIconSize(drawable.getIntrinsicWidth(),
-							this.MinIconSize, this.MaxIconSize);
+							mMinIconSize, mMaxIconSize);
 				}
 
-				if (this.r2MaxSize - this.r2MinSize - this.r2VariableSize < h) {
-					h = this.r2MaxSize - this.r2MinSize - this.r2VariableSize;
+				if (mR2MaxSize - mR2MinSize - mR2VariableSize < h) {
+					h = mR2MaxSize - mR2MinSize - mR2VariableSize;
 				}
-				if (this.r2MaxSize - this.r2MinSize - this.r2VariableSize < w) {
-					w = this.r2MaxSize - this.r2MinSize - this.r2VariableSize;
+				if (mR2MaxSize - mR2MinSize - mR2VariableSize < w) {
+					w = mR2MaxSize - mR2MinSize - mR2VariableSize;
 				}
 
-				this.iconRect2[i] = new Rect((int) xCenter - w / 2,
+				mIconRect2[i] = new Rect((int) xCenter - w / 2,
 						(int) yCenter - h / 2, (int) xCenter + w / 2,
 						(int) yCenter + h / 2);
 
-				int heightOffset = this.r2MaxSize - this.r2VariableSize;
-				int widthOffset = this.MaxSize;
-				if (this.MaxSize > this.r2MaxSize - this.r2VariableSize) {
-					heightOffset = this.MaxSize;
+				int heightOffset = mR2MaxSize - mR2VariableSize;
+				int widthOffset = mMaxSize;
+				if (mMaxSize > mR2MaxSize - mR2VariableSize) {
+					heightOffset = mMaxSize;
 				}
-				if (widthOffset < this.textRect.width() / 2) {
-					widthOffset = this.textRect.width() / 2 + scalePX(3);
+				if (widthOffset < mTextRect.width() / 2) {
+					widthOffset = mTextRect.width() / 2 + scalePx(3);
 				}
-				this.textBoxRect
-						.set(this.xPosition - widthOffset, this.yPosition
-								- heightOffset - this.headerBuffer
-								- this.textRect.height() - scalePX(3),
-								this.xPosition + widthOffset, this.yPosition
-										- heightOffset - this.headerBuffer
-										+ scalePX(3));
-				this.headerTextBottom = (this.yPosition - heightOffset
-						- this.headerBuffer - this.textRect.bottom);
+				mTextBoxRect
+						.set(mXPosition - widthOffset, mYPosition
+								- heightOffset - mHeaderBuffer
+								- mTextRect.height() - scalePx(3),
+								mXPosition + widthOffset, mYPosition
+										- heightOffset - mHeaderBuffer
+										+ scalePx(3));
+				mHeaderTextBottom = (mYPosition - heightOffset
+						- mHeaderBuffer - mTextRect.bottom);
 			}
 
 		}
 
 		if (animationComplete) {
-			this.r2VariableSize = 0;
-			this.animateTextSize = this.textSize;
-			if (animation_direction == 1) {
-				this.Wedge2Shown = false;
+			mR2VariableSize = 0;
+			mAnimateTextSize = mTextSize;
+			if (animationDirection == 1) {
+				mWedge2Shown = false;
 			}
 		}
 
@@ -806,45 +775,45 @@ public class RadialMenuWidget extends View {
 	}
 
 	private void determineWedges() {
-		int entriesQty = this.menuEntries.size();
+		int entriesQty = mMenuEntries.size();
 		if (entriesQty > 0) {
-			this.wedgeQty = entriesQty;
+			mWedgeQty = entriesQty;
 
-			float degSlice = 360 / this.wedgeQty;
-			float start_degSlice = 270.0F - degSlice / 2.0F;
+			float degSlice = 360 / mWedgeQty;
+			float startDegSlice = 270.0F - degSlice / 2.0F;
 
-			double rSlice = 6.283185307179586D / this.wedgeQty;
+			double rSlice = 6.283185307179586D / mWedgeQty;
 			double rStart = 4.71238898038469D - rSlice / 2.0D;
 
-			this.Wedges = new RadialMenuWedge[this.wedgeQty];
-			this.iconRect = new Rect[this.wedgeQty];
+			mWedges = new RadialMenuWedge[mWedgeQty];
+			mIconRect = new Rect[mWedgeQty];
 
-			for (int i = 0; i < this.Wedges.length; i++) {
-				this.Wedges[i] = new RadialMenuWedge(this.xPosition,
-						this.yPosition, this.MinSize, this.MaxSize, i
-								* degSlice + start_degSlice, degSlice);
+			for (int i = 0; i < mWedges.length; i++) {
+				mWedges[i] = new RadialMenuWedge(mXPosition,
+						mYPosition, mMinSize, mMaxSize, i
+								* degSlice + startDegSlice, degSlice);
 				float xCenter = (float) (Math.cos(rSlice * i + rSlice * 0.5D
 						+ rStart)
-						* (this.MaxSize + this.MinSize) / 2.0D)
-						+ this.xPosition;
+						* (mMaxSize + mMinSize) / 2.0D)
+						+ mXPosition;
 				float yCenter = (float) (Math.sin(rSlice * i + rSlice * 0.5D
 						+ rStart)
-						* (this.MaxSize + this.MinSize) / 2.0D)
-						+ this.yPosition;
+						* (mMaxSize + mMinSize) / 2.0D)
+						+ mYPosition;
 
-				int h = this.MaxIconSize;
-				int w = this.MaxIconSize;
-				if (((RadialMenuItem) this.menuEntries.get(i)).getIcon() != 0) {
+				int h = mMaxIconSize;
+				int w = mMaxIconSize;
+				if (((RadialMenuItem) mMenuEntries.get(i)).getIcon() != 0) {
 					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) this.menuEntries.get(i))
+							((RadialMenuItem) mMenuEntries.get(i))
 									.getIcon());
 					h = getIconSize(drawable.getIntrinsicHeight(),
-							this.MinIconSize, this.MaxIconSize);
+							mMinIconSize, mMaxIconSize);
 					w = getIconSize(drawable.getIntrinsicWidth(),
-							this.MinIconSize, this.MaxIconSize);
+							mMinIconSize, mMaxIconSize);
 				}
 
-				this.iconRect[i] = new Rect((int) xCenter - w / 2,
+				mIconRect[i] = new Rect((int) xCenter - w / 2,
 						(int) yCenter - h / 2, (int) xCenter + w / 2,
 						(int) yCenter + h / 2);
 			}
@@ -855,188 +824,187 @@ public class RadialMenuWidget extends View {
 
 	private void determineOuterWedges(RadialMenuItem entry) {
 		int entriesQty = entry.getChildren().size();
-		this.wedgeQty2 = entriesQty;
+		mWedgeQty2 = entriesQty;
 
-		float degSlice2 = 360 / this.wedgeQty2;
-		float start_degSlice2 = 270.0F - degSlice2 / 2.0F;
+		float degSlice2 = 360 / mWedgeQty2;
+		float startDegSlice2 = 270.0F - degSlice2 / 2.0F;
 
-		double rSlice2 = 6.283185307179586D / this.wedgeQty2;
+		double rSlice2 = 6.283185307179586D / mWedgeQty2;
 		double rStart2 = 4.71238898038469D - rSlice2 / 2.0D;
 
-		this.Wedges2 = new RadialMenuWedge[this.wedgeQty2];
-		this.iconRect2 = new Rect[this.wedgeQty2];
+		mWedges2 = new RadialMenuWedge[mWedgeQty2];
+		mIconRect2 = new Rect[mWedgeQty2];
 
-		for (int i = 0; i < this.Wedges2.length; i++) {
-			this.Wedges2[i] = new RadialMenuWedge(this.xPosition,
-					this.yPosition, this.r2MinSize, this.r2MaxSize, i
-							* degSlice2 + start_degSlice2, degSlice2);
+		for (int i = 0; i < mWedges2.length; i++) {
+			mWedges2[i] = new RadialMenuWedge(mXPosition,
+					mYPosition, mR2MinSize, mR2MaxSize, i
+							* degSlice2 + startDegSlice2, degSlice2);
 			float xCenter = (float) (Math.cos(rSlice2 * i + rSlice2 * 0.5D
 					+ rStart2)
-					* (this.r2MaxSize + this.r2MinSize) / 2.0D)
-					+ this.xPosition;
+					* (mR2MaxSize + mR2MinSize) / 2.0D)
+					+ mXPosition;
 			float yCenter = (float) (Math.sin(rSlice2 * i + rSlice2 * 0.5D
 					+ rStart2)
-					* (this.r2MaxSize + this.r2MinSize) / 2.0D)
-					+ this.yPosition;
+					* (mR2MaxSize + mR2MinSize) / 2.0D)
+					+ mYPosition;
 
-			int h = this.MaxIconSize;
-			int w = this.MaxIconSize;
+			int h = mMaxIconSize;
+			int w = mMaxIconSize;
 			if (((RadialMenuItem) entry.getChildren().get(i)).getIcon() != 0) {
 				Drawable drawable = getResources()
 						.getDrawable(
 								((RadialMenuItem) entry.getChildren().get(i))
 										.getIcon());
 				h = getIconSize(drawable.getIntrinsicHeight(),
-						this.MinIconSize, this.MaxIconSize);
-				w = getIconSize(drawable.getIntrinsicWidth(), this.MinIconSize,
-						this.MaxIconSize);
+						mMinIconSize, mMaxIconSize);
+				w = getIconSize(drawable.getIntrinsicWidth(), mMinIconSize,
+						mMaxIconSize);
 			}
-			this.iconRect2[i] = new Rect((int) xCenter - w / 2, (int) yCenter
+			mIconRect2[i] = new Rect((int) xCenter - w / 2, (int) yCenter
 					- h / 2, (int) xCenter + w / 2, (int) yCenter + h / 2);
 		}
-		this.wedge2Data = entry;
+		mWedge2Data = entry;
 		invalidate();
 	}
 
 	private void determineHeaderBox() {
-		this.headerTextLeft = (this.xPosition - this.textRect.width() / 2);
-		this.headerTextBottom = (this.yPosition - this.MaxSize
-				- this.headerBuffer - this.textRect.bottom);
-		int offset = this.MaxSize;
-		if (offset < this.textRect.width() / 2) {
-			offset = this.textRect.width() / 2 + scalePX(3);
+		mHeaderTextLeft = (mXPosition - mTextRect.width() / 2);
+		mHeaderTextBottom = (mYPosition - mMaxSize
+				- mHeaderBuffer - mTextRect.bottom);
+		int offset = mMaxSize;
+		if (offset < mTextRect.width() / 2) {
+			offset = mTextRect.width() / 2 + scalePx(3);
 		}
-		this.textBoxRect.set(this.xPosition - offset, this.yPosition
-				- this.MaxSize - this.headerBuffer - this.textRect.height()
-				- scalePX(3), this.xPosition + offset, this.yPosition
-				- this.MaxSize - this.headerBuffer + scalePX(3));
+		mTextBoxRect.set(mXPosition - offset, mYPosition
+				- mMaxSize - mHeaderBuffer - mTextRect.height()
+				- scalePx(3), mXPosition + offset, mYPosition
+				- mMaxSize - mHeaderBuffer + scalePx(3));
 	}
 
 	public void addMenuEntry(List<RadialMenuItem> menuItems) {
-		this.menuEntries.addAll(menuItems);
+		mMenuEntries.addAll(menuItems);
 		determineWedges();
 	}
 
 	public void addMenuEntry(RadialMenuItem menuItem) {
-		this.menuEntries.add(menuItem);
+		mMenuEntries.add(menuItem);
 		determineWedges();
 	}
 
 	public void setCenterCircle(RadialMenuItem menuItem) {
-		this.centerCircle = menuItem;
+		mCenterCircle = menuItem;
 	}
 
-	public void setInnerRingRadius(int InnerRadius, int OuterRadius) {
-		this.MinSize = scalePX(InnerRadius);
-		this.MaxSize = scalePX(OuterRadius);
+	public void setInnerRingRadius(int innerRadius, int outerRadius) {
+		mMinSize = scalePx(innerRadius);
+		mMaxSize = scalePx(outerRadius);
 		determineWedges();
 	}
 
-	public void setOuterRingRadius(int InnerRadius, int OuterRadius) {
-		this.r2MinSize = scalePX(InnerRadius);
-		this.r2MaxSize = scalePX(OuterRadius);
+	public void setOuterRingRadius(int innerRadius, int outerRadius) {
+		mR2MinSize = scalePx(innerRadius);
+		mR2MaxSize = scalePx(outerRadius);
 		determineWedges();
 	}
 
 	public void setCenterCircleRadius(int centerRadius) {
-		this.cRadius = scalePX(centerRadius);
+		mCRadius = scalePx(centerRadius);
 		determineWedges();
 	}
 
-	public void setTextSize(int TextSize) {
-		this.textSize = scalePX(TextSize);
-		this.animateTextSize = this.textSize;
+	public void setTextSize(int textSize) {
+		mTextSize = scalePx(textSize);
+		mAnimateTextSize = mTextSize;
 	}
 
 	public void setIconSize(int minIconSize, int maxIconSize) {
-		this.MinIconSize = scalePX(minIconSize);
-		this.MaxIconSize = scalePX(maxIconSize);
+		mMinIconSize = scalePx(minIconSize);
+		mMaxIconSize = scalePx(maxIconSize);
 		determineWedges();
 	}
 
 	public void setCenterLocation(int x, int y) {
-		this.xPosition = x;
-		this.yPosition = y;
+		mXPosition = x;
+		mYPosition = y;
 		determineWedges();
-		this.helper.onOpenAnimation(this, this.xPosition, this.yPosition,
-				this.xSource, this.ySource);
+		mHelper.onOpenAnimation(this, mXPosition, mYPosition,
+				mXSource, mYSource);
 	}
 
 	public void setSourceLocation(int x, int y) {
-		this.xSource = x;
-		this.ySource = y;
-		this.helper.onOpenAnimation(this, this.xPosition, this.yPosition,
-				this.xSource, this.ySource);
+		mXSource = x;
+		mYSource = y;
+		mHelper.onOpenAnimation(this, mXPosition, mYPosition,
+				mXSource, mYSource);
 	}
 
 	/** @deprecated */
 	public void setShowSourceLocation(boolean showSourceLocation) {
-		this.showSource = showSourceLocation;
-		this.helper.onOpenAnimation(this, this.xPosition, this.yPosition,
-				this.xSource, this.ySource);
+		mShowSource = showSourceLocation;
+		mHelper.onOpenAnimation(this, mXPosition, mYPosition,
+				mXSource, mYSource);
 	}
 
 	public void setAnimationSpeed(long millis) {
-		this.helper.onOpenAnimation(this, this.xPosition, this.yPosition,
-				this.xSource, this.ySource, millis);
+		mHelper.onOpenAnimation(this, mXPosition, mYPosition,
+				mXSource, mYSource, millis);
 	}
 
 	public void setInnerRingColor(int color, int alpha) {
-		this.defaultColor = color;
-		this.defaultAlpha = alpha;
+		mDefaultColor = color;
+		mDefaultAlpha = alpha;
 	}
 
 	public void setOuterRingColor(int color, int alpha) {
-		this.wedge2Color = color;
-		this.wedge2Alpha = alpha;
+		mWedge2Color = color;
+		mWedge2Alpha = alpha;
 	}
 
 	public void setOutlineColor(int color, int alpha) {
-		this.outlineColor = color;
-		this.outlineAlpha = alpha;
+		mOutlineColor = color;
+		mOutlineAlpha = alpha;
 	}
 
 	public void setSelectedColor(int color, int alpha) {
-		this.selectedColor = color;
-		this.selectedAlpha = alpha;
+		mSelectedColor = color;
+		mSelectedAlpha = alpha;
 	}
 
 	public void setDisabledColor(int color, int alpha) {
-		this.disabledColor = color;
-		this.disabledAlpha = alpha;
+		mDisabledColor = color;
+		mDisabledAlpha = alpha;
 	}
 
 	public void setTextColor(int color, int alpha) {
-		this.textColor = color;
-		this.textAlpha = alpha;
+		mTextColor = color;
+		mTextAlpha = alpha;
 	}
 
 	public void setHeader(String header, int TextSize) {
-		this.headerString = header;
-		this.headerTextSize = scalePX(TextSize);
-		this.HeaderBoxBounded = false;
+		mHeaderString = header;
+		mHeaderTextSize = scalePx(TextSize);
+		mHeaderBoxBounded = false;
 	}
 
-	public void setHeaderColors(int TextColor, int TextAlpha, int BgColor,
-			int BgAlpha) {
-		this.headerTextColor = TextColor;
-		this.headerTextAlpha = TextAlpha;
-		this.headerBackgroundColor = BgColor;
-		this.headerBackgroundAlpha = BgAlpha;
+	public void setHeaderColors(int textColor, int textAlpha, int bgColor, int bgAlpha) {
+		mHeaderTextColor = textColor;
+		mHeaderTextAlpha = textAlpha;
+		mHeaderBackgroundColor = bgColor;
+		mHeaderBackgroundAlpha = bgAlpha;
 	}
 
 	public void show(View anchor, int posX, int posY) {
-		this.mWindow.setContentView(this);
-		this.mWindow.showAtLocation(anchor, 0, posX, posY);
+		mWindow.setContentView(this);
+		mWindow.showAtLocation(anchor, 0, posX, posY);
 	}
 
 	public void show(View anchor) {
-		this.mWindow.setContentView(this);
-		this.mWindow.showAtLocation(anchor, 0, this.xSource, this.ySource);
+		mWindow.setContentView(this);
+		mWindow.showAtLocation(anchor, 0, mXSource, mYSource);
 	}
 
 	public void dismiss() {
-		if (this.mWindow != null)
-			this.mWindow.dismiss();
+		if (mWindow != null)
+			mWindow.dismiss();
 	}
 }
