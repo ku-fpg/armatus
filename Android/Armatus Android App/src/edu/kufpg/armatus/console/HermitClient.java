@@ -2,6 +2,8 @@ package edu.kufpg.armatus.console;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,9 +11,12 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -25,6 +30,9 @@ import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.networking.data.Command;
 import edu.kufpg.armatus.networking.data.CommandInfo;
 import edu.kufpg.armatus.networking.data.CommandResponse;
+import edu.kufpg.armatus.networking.data.Complete;
+import edu.kufpg.armatus.networking.data.Completion;
+import edu.kufpg.armatus.networking.data.History;
 import edu.kufpg.armatus.networking.data.Token;
 import edu.kufpg.armatus.util.StringUtils;
 
@@ -36,16 +44,42 @@ public class HermitClient implements Parcelable {
 
 	private RequestName mDelayedRequestName = RequestName.NULL;
 	private String mServerUrl;
+	private Bundle mTempBundle = new Bundle();
 	private Token mToken;
 
 	public HermitClient(ConsoleActivity console) {
 		mConsole = console;
 	}
 
+	public void completeInput(final String input) {
+		if (isTokenAcquired(false)) {
+			if (isNetworkConnected(RequestName.COMPLETE)) {
+				Complete complete = new Complete(mToken.getUser(), input);
+				newCompleteInputRequest().execute(mServerUrl + "/complete", complete.toString());
+			} else {
+				mTempBundle.putString("input", input);
+			}
+		} else {
+			mConsole.attemptInputCompletion(null);
+		}
+	}
+
 	public void connect(String serverUrl) {
 		mServerUrl = serverUrl;
 		if (isNetworkConnected(RequestName.CONNECT)) {
 			newConnectRequest().execute(mServerUrl + "/connect");
+		}
+	}
+
+	public void fetchCommands() {
+		if (isNetworkConnected(RequestName.COMMANDS) && isTokenAcquired(true)) {
+			newFetchCommandsRequest().execute(mServerUrl + "/commands");
+		}
+	}
+
+	public void fetchHistory() {
+		if (isNetworkConnected(RequestName.HISTORY) && isTokenAcquired(true)) {
+			newFetchHistoryRequest().execute(mServerUrl + "/history", mToken.toString());
 		}
 	}
 
@@ -60,22 +94,62 @@ public class HermitClient implements Parcelable {
 						Arrays.copyOfRange(inputs, 1, inputs.length));
 			}
 		} else {
-			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired()) {
+			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired(true)) {
 				Command command = new Command(mToken, StringUtils.withoutCharWrap(input));
 				if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
 					newRunAbortResumeRequest().execute(mServerUrl + "/command", command.toString());
 				} else {
 					newRunCommandRequest().execute(mServerUrl + "/command", command.toString());
 				}
+			} else {
+				mTempBundle.putString("input", input);
 			}
-
 		}
 	}
 
-	public void fetchCommands() {
-		if (isNetworkConnected(RequestName.COMMANDS)) {
-			newFetchCommandsRequest().execute(mServerUrl + "/commands");
-		}
+	private HermitHttpServerRequest<List<Completion>> newCompleteInputRequest() {
+		return new HermitHttpServerRequest<List<Completion>>(mConsole, HttpRequest.POST) {
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+				getActivity().disableInput(false);
+			}
+			
+			@Override
+			protected List<Completion> onResponse(String response) {
+				JSONObject insertNameHere = null;
+				try {
+					insertNameHere = new JSONObject(response);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+				try {
+					JSONArray completions = insertNameHere.getJSONArray("completions");
+					ImmutableList.Builder<Completion> completionsBuilder = ImmutableList.builder();
+					for (int i = 0; i < completions.length(); i++) {
+						completionsBuilder.add(new Completion(completions.getJSONObject(i)));
+					}
+					return completionsBuilder.build();
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(List<Completion> completions) {
+				super.onPostExecute(completions);
+				SortedSet<String> suggestions = new TreeSet<String>();
+				suggestions.addAll(Collections2.transform(completions, new Function<Completion, String>() {
+					@Override
+					public String apply(Completion input) {
+						return input.getReplacement();
+					}
+				}));
+				getActivity().attemptInputCompletion(suggestions);
+			}
+		};
 	}
 
 	private HermitHttpServerRequest<Token> newConnectRequest() {
@@ -190,24 +264,40 @@ public class HermitClient implements Parcelable {
 				super.onPostExecute(commands);
 				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
 				ImmutableListMultimap.Builder<String, CommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
-				ImmutableSortedSet.Builder<String> commandSetBuilder = ImmutableSortedSet.naturalOrder();
 
 				for (CommandInfo cmdInfo : commands) {
-					commandSetBuilder.add(cmdInfo.getName());
 					for (String tag : cmdInfo.getTags()) {
 						tagSetBuilder.add(tag);
 						tagMapBuilder.put(tag, cmdInfo);
 					}
 				}
 
-				Commands.setCommandSet(commandSetBuilder.build());
-				Commands.setTagList(ImmutableList.copyOf(tagSetBuilder.build()));
-				Commands.setTagMap(tagMapBuilder.build());
-				getActivity().getWordCompleter().resetFilter(getActivity().getInput());
+				CommandHolder.setTagList(ImmutableList.copyOf(tagSetBuilder.build()));
+				CommandHolder.setTagMap(tagMapBuilder.build());
 				getActivity().updateCommandExpandableMenu();
 				dismissProgressDialog();
 			}
 
+		};
+	}
+
+	private HermitHttpServerRequest<History> newFetchHistoryRequest() {
+		return new HermitHttpServerRequest<History>(mConsole, HttpRequest.GET) {
+			@Override
+			protected History onResponse(String response) {
+				try {
+					return new History(new JSONObject(response));
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(History history) {
+				super.onPostExecute(history);
+				//Do cool stuff
+			}
 		};
 	}
 
@@ -246,10 +336,10 @@ public class HermitClient implements Parcelable {
 			}
 
 			@Override
-			protected void onPostExecute(String response) {
-				super.onPostExecute(response);
+			protected void onPostExecute(String message) {
+				super.onPostExecute(message);
 				mToken = null;
-				getActivity().appendErrorResponse(response);
+				getActivity().appendErrorResponse(message);
 			}
 
 		};
@@ -258,15 +348,30 @@ public class HermitClient implements Parcelable {
 	public void runDelayedRequest() {
 		if (mDelayedRequestName != null) {
 			switch (mDelayedRequestName) {
-			case CONNECT:
+			case COMMAND: {
+				String input = mTempBundle.getString("input");
+				runCommand(input);
+				mTempBundle.remove("input");
+				break;
+			}
+			case COMMANDS: {
+				fetchCommands();
+				break;
+			}
+			case COMPLETE: {
+				String input = mTempBundle.getString("input");
+				completeInput(input);
+				mTempBundle.remove("input");
+				break;
+			}
+			case CONNECT: {
 				connect(mServerUrl);
 				break;
-			case COMMAND:
-				fetchCommands();
+			}
+			case HISTORY: {
+				fetchHistory();
 				break;
-			case COMMANDS:
-				fetchCommands();
-				break;
+			}
 			default:
 				break;
 			}
@@ -320,9 +425,11 @@ public class HermitClient implements Parcelable {
 		return !mDelayedRequestName.equals(RequestName.NULL);
 	}
 
-	private boolean isTokenAcquired() {
+	private boolean isTokenAcquired(boolean complainIfNot) {
 		if (mToken == null) {
-			mConsole.appendErrorResponse("ERROR: No token (connect to server first).");
+			if (complainIfNot) {
+				mConsole.appendErrorResponse("ERROR: No token (connect to server first).");
+			}
 			return false;
 		}
 		return true;
@@ -345,7 +452,7 @@ public class HermitClient implements Parcelable {
 	}
 
 	private enum RequestName {
-		CONNECT, COMMAND, COMMANDS, NULL
+		COMMAND, COMMANDS, COMPLETE, CONNECT, HISTORY, NULL
 	};
 
 	public static final Parcelable.Creator<HermitClient> CREATOR
@@ -362,6 +469,7 @@ public class HermitClient implements Parcelable {
 	private HermitClient(Parcel in) {
 		mDelayedRequestName = RequestName.values()[in.readInt()];
 		mServerUrl = in.readString();
+		mTempBundle = in.readBundle();
 		mToken = in.readParcelable(HermitClient.class.getClassLoader());
 	}
 
@@ -375,6 +483,7 @@ public class HermitClient implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mDelayedRequestName.ordinal());
 		dest.writeString(mServerUrl);
+		dest.writeBundle(mTempBundle);
 		dest.writeParcelable(mToken, flags);
 	}
 

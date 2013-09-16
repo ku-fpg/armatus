@@ -1,9 +1,13 @@
 package edu.kufpg.armatus.console;
 
 import java.util.Map;
+import java.util.SortedSet;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.ListMultimap;
 
 import edu.kufpg.armatus.BaseActivity;
@@ -70,16 +74,21 @@ public class CustomCommandDispatcher {
 		}
 	};
 
-	private static final Map<String, CustomCommandInfo> CUSTOM_COMMAND_MAP = mapCustomCommands();
+	private static final Map<String, CustomCommandInfo> CUSTOM_COMMAND_NAME_MAP = mapCustomCommands();
 	private static final ListMultimap<String, CustomCommandInfo> CUSTOM_COMMAND_TAG_MAP = mapCustomCommandTags();
+	private static final SortedSet<String> CUSTOM_COMMAND_NAME_SET = createCustomCommandNameSet();
 
 	private CustomCommandDispatcher() {}
 	
-	static Map<String, CustomCommandInfo> getCustomCommandMap() {
-		return CUSTOM_COMMAND_MAP;
+	static Map<String, CustomCommandInfo> getCustomCommandNameMap() {
+		return CUSTOM_COMMAND_NAME_MAP;
 	}
 	
-	static ListMultimap<String, CustomCommandInfo> getCommandTagsMap() {
+	static SortedSet<String> getCustomCommandSet() {
+		return CUSTOM_COMMAND_NAME_SET;
+	}
+	
+	static ListMultimap<String, CustomCommandInfo> getCustomCommandTagMap() {
 		return CUSTOM_COMMAND_TAG_MAP;
 	}
 	
@@ -90,7 +99,7 @@ public class CustomCommandDispatcher {
 	 * @param args The parameters of the {@code Command}.
 	 */
 	public static void runCustomCommand(ConsoleActivity console, String commandName, String... args) {
-		CustomCommandInfo command = CUSTOM_COMMAND_MAP.get(commandName);
+		CustomCommandInfo command = CUSTOM_COMMAND_NAME_MAP.get(commandName);
 		if (command != null) {
 			runCustomCommand(console, command, args);
 		}
@@ -122,11 +131,11 @@ public class CustomCommandDispatcher {
 	}
 
 	public static CustomCommandInfo getCustomCommand(String commandName) {
-		return CUSTOM_COMMAND_MAP.get(commandName);
+		return CUSTOM_COMMAND_NAME_MAP.get(commandName);
 	}
 
 	public static boolean isCustomCommand(String commandName) {
-		return CUSTOM_COMMAND_MAP.containsKey(commandName);
+		return CUSTOM_COMMAND_NAME_MAP.containsKey(commandName);
 	}
 
 	/**
@@ -142,6 +151,16 @@ public class CustomCommandDispatcher {
 		}
 		return builder.toString().trim();
 	}
+	
+	private static SortedSet<String> createCustomCommandNameSet() {
+		return ImmutableSortedSet.copyOf(Collections2.transform(CustomCommandDispatcher.getCustomCommandNameMap().values(),
+				new Function<CustomCommandInfo, String>() {
+			@Override
+			public String apply(CustomCommandInfo info) {
+				return info.getName();
+			}
+		}));
+	}
 
 	private static Map<String, CustomCommandInfo> mapCustomCommands() {
 		ImmutableMap.Builder<String, CustomCommandInfo> commandBuilder = ImmutableMap.builder();
@@ -155,7 +174,7 @@ public class CustomCommandDispatcher {
 
 	private static ListMultimap<String, CustomCommandInfo> mapCustomCommandTags() {
 		ImmutableListMultimap.Builder<String, CustomCommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
-		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_MAP.values()).build();
+		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_NAME_MAP.values()).build();
 	}
 
 }

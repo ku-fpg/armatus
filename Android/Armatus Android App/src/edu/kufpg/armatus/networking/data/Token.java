@@ -42,6 +42,11 @@ public class Token implements Parcelable {
 		return o;
 	}
 	
+	@Override
+	public String toString() {
+		return toJSONObject().toString();
+	}
+	
 	public static Parcelable.Creator<Token> CREATOR =
 			new Parcelable.Creator<Token>() {
 		@Override

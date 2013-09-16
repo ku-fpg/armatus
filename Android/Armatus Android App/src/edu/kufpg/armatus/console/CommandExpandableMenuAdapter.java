@@ -41,7 +41,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public CommandInfo getChild(int groupPosition, int childPosition) {
-		return Commands.getTagCommands(getGroup(groupPosition)).get(childPosition);
+		return CommandHolder.getTagCommands(getGroup(groupPosition)).get(childPosition);
 	}
 
 	@Override
@@ -73,17 +73,17 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return Commands.getTagCommands(getGroup(groupPosition)).size();
+		return CommandHolder.getTagCommands(getGroup(groupPosition)).size();
 	}
 
 	@Override
 	public String getGroup(int groupPosition) {
-		return Commands.getTag(groupPosition);
+		return CommandHolder.getTag(groupPosition);
 	}
 
 	@Override
 	public int getGroupCount() {
-		return Commands.getTagCount();
+		return CommandHolder.getTagCount();
 	}
 
 	@Override

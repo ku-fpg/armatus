@@ -26,7 +26,7 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
 		super.onPreExecute();
 
 		getActivity().setProgressBarVisibility(true);
-		getActivity().disableInput();
+		getActivity().disableInput(true);
 		mAdapter = BluetoothUtils.getBluetoothAdapter(getActivity());
 		mDevice = BluetoothUtils.getBluetoothDevice(getActivity());
 		mSocket = BluetoothUtils.getBluetoothSocket(getActivity());

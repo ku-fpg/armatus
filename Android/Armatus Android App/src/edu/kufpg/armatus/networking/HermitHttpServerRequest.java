@@ -49,7 +49,7 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 		super.onPreExecute();
 
 		getActivity().setProgressBarVisibility(true);
-		getActivity().disableInput();
+		getActivity().disableInput(true);
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 	protected void onCancelled() {
 		super.onCancelled();
 
-		if (mErrorMessage != null) {
+		if (mErrorMessage != null && getActivity() != null) {
 			getActivity().appendErrorResponse(mErrorMessage);
 		}
 		end();

@@ -12,51 +12,46 @@ public class StringUtils {
 	 * {@link #NBSP} and newlines.
 	 */
 	public static final String WHITESPACE = "\\s+";
-	
+
 	/**
 	 * A non-breaking space string. Using this instead of a regular space string (" ") will
 	 * prevent {@link android.widget.TextView TextViews} from applying their normal
 	 * line-breaking behavior.
 	 */
 	public static final String NBSP = "\u00A0";
-	
+
 	/**
 	 * A non-breaking space character. Using this instead of a regular space character (' ')
 	 * will prevent {@link android.widget.TextView TextViews} from applying their normal
 	 * line-breaking behavior.
 	 */
 	public static final char NBSP_CHAR = '\u00A0';
-	
+
 	private StringUtils() {}
-
-	/**
-	 * Returns the whitespace characters at the beginning of a string.
-	 * @param str The string whose leading whitespace should be found.
-	 * @return a string containing the characters making up the leading whitespace of the
-	 * string. If there is no whitespace there, the empty string ("") is returned.
-	 */
-	public static String getLeadingWhitespace(String str) {
-		int index = 0;
-		while (index < str.length() && str.substring(index, index+1).matches(WHITESPACE)) {
-			index++;
-		}
-		return str.substring(0, index);
-	}
-
-	/**
-	 * Returns the whitespace characters at the end of a string.
-	 * @param str The string whose trailing whitespace should be found.
-	 * @return a string containing the characters making up the trailing whitespace of the
-	 * string. If there is no whitespace there, the empty string ("") is returned.
-	 */
-	public static String getTrailingWhitespace(String str) {
-		int index = str.length();
-		while (index > 0 && str.substring(index-1, index).matches(WHITESPACE)) {
-			index--;
-		}
-		return str.substring(index);
-	}
 	
+	public static int findFirstWordIndex(CharSequence sentence) {
+		for (int i = 0; i < sentence.length(); i++) {
+			if (!String.valueOf(sentence.charAt(i)).matches(WHITESPACE)) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
+	public static int findLastWordIndex(CharSequence sentence) {
+		boolean lastWordFound = false;
+		for (int i = sentence.length() - 1; i >= 0; i--) {
+			if (String.valueOf(sentence.charAt(i)).matches(WHITESPACE)) {
+				if (lastWordFound) {
+					return i + 1;
+				}
+			} else {
+				lastWordFound = true;
+			}
+		}
+		return 0;
+	}
+
 	/**
 	 * Returns a string with all regular spaces replaced by non-breaking spaces.
 	 * @param str The string to apply character wrap to.
