@@ -85,8 +85,7 @@ public class RadialMenuView extends View {
 		mBorderPaint.setStrokeWidth(mThickness);
 
 		for (int counter = 0; counter < tot; counter++) {
-			if (!((RadialMenuItem) mRadialMenuContent.get(counter))
-					.equals("HOLLOW")) {
+			if (!mRadialMenuContent.get(counter).equals("HOLLOW")) {
 				if (mAlt)
 					canvas.drawArc(mRectF, 360 / tot * counter - 90 - 360 / tot
 							/ 2, 360 / tot, false,
@@ -101,8 +100,8 @@ public class RadialMenuView extends View {
 			}
 		}
 		for (int counter = 0; counter < tot; counter++) {
-			if (!((RadialMenuItem) mRadialMenuContent.get(counter))
-					.equals("HOLLOW")) {
+			RadialMenuItem item =mRadialMenuContent.get(counter);
+			if (!item.equals("HOLLOW")) {
 				mArc.reset();
 				if (mAlt) {
 					mArc.addArc(mRectF, 360 / tot * counter - 90 - 360 / tot / 2
@@ -114,9 +113,7 @@ public class RadialMenuView extends View {
 				} else {
 					mArc.addArc(mRectF, 360 / tot * counter - 90 + 10.0F,
 							360 / tot - 10.0F);
-					canvas.drawTextOnPath(
-							((RadialMenuItem) mRadialMenuContent
-									.get(counter)).getMenuName(), mArc, 0.0F,
+					canvas.drawTextOnPath(item.getMenuName(), mArc, 0.0F,
 									-mThickness / 8.0F, mTextPaint);
 				}
 			}
@@ -125,8 +122,7 @@ public class RadialMenuView extends View {
 
 		if (tot > 1) {
 			for (int counter = 0; counter < tot; counter++) {
-				if (!((RadialMenuItem) mRadialMenuContent.get(counter))
-						.equals("HOLLOW")) {
+				if (!mRadialMenuContent.get(counter).equals("HOLLOW")) {
 					if (mAlt) {
 						canvas.drawArc(mRectF, 360 / tot * counter - 91 - 360
 								/ tot / 2, 2.0F, false, mBorderPaint);
@@ -148,8 +144,7 @@ public class RadialMenuView extends View {
 				mHeight + mRadius + mThickness / 2.0F);
 
 		for (int counter = 0; counter < tot; counter++) {
-			if (!((RadialMenuItem) mRadialMenuContent.get(counter))
-					.equals("HOLLOW")) {
+			if (!mRadialMenuContent.get(counter).equals("HOLLOW")) {
 				if (mAlt)
 					canvas.drawArc(mRectF, 360 / tot * counter - 91 - 360 / tot
 							/ 2, 360 / tot + 2.0F, false, mBorderPaint);
@@ -165,8 +160,7 @@ public class RadialMenuView extends View {
 				mHeight + mRadius - mThickness / 2.0F);
 
 		for (int counter = 0; counter < tot; counter++)
-			if (!((RadialMenuItem) mRadialMenuContent.get(counter))
-					.equals("HOLLOW"))
+			if (!mRadialMenuContent.get(counter).equals("HOLLOW"))
 				if (mAlt)
 					canvas.drawArc(mRectF, 360 / tot * counter - 91 - 360 / tot
 							/ 2, 360 / tot + 1.0F, false, mBorderPaint);
@@ -182,16 +176,13 @@ public class RadialMenuView extends View {
 			mSelected = -1;
 			return false;
 		}
-		if (((RadialMenuItem) mRadialMenuContent.get(e)).getMenuName()
-				.equals("HOLLOW")) {
+		RadialMenuItem item = mRadialMenuContent.get(e);
+		if (item.getMenuName().equals("HOLLOW")) {
 			mSelected = -1;
 			invalidate();
 			return false;
 		}
-		((RadialMenuItem) mRadialMenuContent.get(e))
-		.getOnClickListener().onClick(
-				((RadialMenuItem) mRadialMenuContent.get(e))
-				.getMenuID());
+		item.getOnClickListener().onClick(item.getMenuId(), item.getMenuName());
 		mSelected = -1;
 		invalidate();
 		return true;
@@ -208,8 +199,7 @@ public class RadialMenuView extends View {
 			invalidate();
 			return;
 		}
-		if (((RadialMenuItem) mRadialMenuContent.get(e)).getMenuName()
-				.equals("HOLLOW")) {
+		if (mRadialMenuContent.get(e).getMenuName().equals("HOLLOW")) {
 			mSelected = -1;
 			invalidate();
 			return;

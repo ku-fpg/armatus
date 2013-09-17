@@ -1,13 +1,17 @@
 package edu.kufpg.armatus;
 
+import java.util.Random;
+
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 import edu.kufpg.armatus.radialmenu.RadialMenuActivity;
 import edu.kufpg.armatus.treelistview.TreeListViewDemo;
 import edu.kufpg.armatus.util.StickyButton;
+import edu.kufpg.armatus.util.TextDrawable;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -120,15 +124,23 @@ public class MainActivity extends BaseActivity {
 			}
 		});
 		
+		Random rand = new Random();
 		int length = 5;
 		for (int i = 0; i < length; i++) {
 			mGlyphSpanTextView.append(" ");
 		}
 		Spannable textSpans = new SpannableString(mGlyphSpanTextView.getText());
-		for (int i = 0; i < length; i++) {
-			Drawable d = getResources().getDrawable(R.drawable.ic_launcher);
-			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-			ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
+		for (int i = 0; i < length; i++) {		
+			int r = rand.nextInt(256);
+			int g = rand.nextInt(256);
+			int b = rand.nextInt(256);
+			TextDrawable drawable = new TextDrawable(this);
+			drawable.setText("Test ");
+			drawable.setTextColor(Color.rgb(r, g, b));
+			drawable.setTextSize(25f);
+			drawable.setTypeface(Typeface.MONOSPACE);
+			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
 			textSpans.setSpan(span, i, i + 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		}
 		mGlyphSpanTextView.setText(textSpans);

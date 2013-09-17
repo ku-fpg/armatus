@@ -68,8 +68,8 @@ public class RadialMenuActivity extends Activity {
 
 		OnClickListener listener = new OnClickListener() {
 			@Override
-			public void onClick(String id) {
-				Toast.makeText(RadialMenuActivity.this, id, Toast.LENGTH_SHORT).show();
+			public void onClick(String menuId, String menuName) {
+				Toast.makeText(RadialMenuActivity.this, menuId, Toast.LENGTH_SHORT).show();
 			}
 		};
 		for (RadialMenuItem item : mAllItems) {

@@ -164,13 +164,11 @@ public class RadialMenuWidget extends View {
 							mEnabled = null;
 							mAnimateOuterIn = true;
 						} else {
-							((RadialMenuItem) mMenuEntries.get(i))
-							.menuActiviated();
+							RadialMenuItem item = mMenuEntries.get(i);
+							item.menuActiviated();
 
-							if (((RadialMenuItem) mMenuEntries.get(i))
-									.getChildren() != null) {
-								determineOuterWedges((RadialMenuItem) mMenuEntries
-										.get(i));
+							if (item.getChildren() != null) {
+								determineOuterWedges(item);
 								mEnabled = f;
 								mAnimateOuterOut = true;
 							} else {
@@ -187,8 +185,7 @@ public class RadialMenuWidget extends View {
 						mAnimateOuterIn = true;
 						mEnabled = null;
 						mSelected = null;
-						((RadialMenuItem) mWedge2Data.getChildren().get(i))
-						.menuActiviated();
+						mWedge2Data.getChildren().get(i).menuActiviated();
 					}
 				}
 			} else {
@@ -255,8 +252,8 @@ public class RadialMenuWidget extends View {
 
 			Rect rf = mIconRect[i];
 
-			if ((((RadialMenuItem) mMenuEntries.get(i)).getIcon() != 0)
-					&& (((RadialMenuItem) mMenuEntries.get(i)).getLabel() != null)) {
+			RadialMenuItem item = mMenuEntries.get(i);
+			if ((item.getIcon() != 0) && (item.getLabel() != null)) {
 				String menuItemName = ((RadialMenuItem) mMenuEntries.get(i))
 						.getLabel();
 				String[] stringArray = menuItemName.split("\n");
@@ -321,8 +318,7 @@ public class RadialMenuWidget extends View {
 				mPaint.setStyle(Paint.Style.FILL);
 				mPaint.setTextSize(mTextSize);
 
-				String menuItemName = ((RadialMenuItem) mMenuEntries.get(i))
-						.getLabel();
+				String menuItemName = item.getLabel();
 				String[] stringArray = menuItemName.split("\n");
 
 				mRect1.setEmpty();
@@ -373,12 +369,9 @@ public class RadialMenuWidget extends View {
 				}
 
 				Rect rf = mIconRect2[i];
-				if ((((RadialMenuItem) mWedge2Data.getChildren().get(i))
-						.getIcon() != 0)
-						&& (((RadialMenuItem) mWedge2Data.getChildren()
-								.get(i)).getLabel() != null)) {
-					String menuItemName = ((RadialMenuItem) mWedge2Data
-							.getChildren().get(i)).getLabel();
+				RadialMenuItem childItem = mWedge2Data.getChildren().get(i);
+				if ((childItem.getIcon() != 0) && (childItem.getLabel() != null)) {
+					String menuItemName = childItem.getLabel();
 					String[] stringArray = menuItemName.split("\n");
 
 					mPaint.setColor(mTextColor);
@@ -408,17 +401,12 @@ public class RadialMenuWidget extends View {
 								textBottom - mRect1.bottom, mPaint);
 					}
 
-					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) mWedge2Data.getChildren()
-									.get(i)).getIcon());
+					Drawable drawable = getResources().getDrawable(childItem.getIcon());
 					drawable.setBounds(mRect2);
 					drawable.setAlpha(mPictureAlpha);
 					drawable.draw(c);
-				} else if (((RadialMenuItem) mWedge2Data.getChildren().get(
-						i)).getIcon() != 0) {
-					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) mWedge2Data.getChildren()
-									.get(i)).getIcon());
+				} else if (childItem.getIcon() != 0) {
+					Drawable drawable = getResources().getDrawable(childItem.getIcon());
 					drawable.setBounds(rf);
 					drawable.setAlpha(mPictureAlpha);
 					drawable.draw(c);
@@ -428,8 +416,7 @@ public class RadialMenuWidget extends View {
 					mPaint.setStyle(Paint.Style.FILL);
 					mPaint.setTextSize(mAnimateTextSize);
 
-					String menuItemName = ((RadialMenuItem) mWedge2Data
-							.getChildren().get(i)).getLabel();
+					String menuItemName = childItem.getLabel();
 					String[] stringArray = menuItemName.split("\n");
 
 					mRect1.setEmpty();
@@ -655,8 +642,7 @@ public class RadialMenuWidget extends View {
 
 				int h = mMaxIconSize;
 				int w = mMaxIconSize;
-				if (((RadialMenuItem) mWedge2Data.getChildren().get(i))
-						.getIcon() != 0) {
+				if (mWedge2Data.getChildren().get(i).getIcon() != 0) {
 					Drawable drawable = getResources().getDrawable(
 							((RadialMenuItem) mWedge2Data.getChildren()
 									.get(i)).getIcon());
@@ -723,11 +709,9 @@ public class RadialMenuWidget extends View {
 
 				int h = mMaxIconSize;
 				int w = mMaxIconSize;
-				if (((RadialMenuItem) mWedge2Data.getChildren().get(i))
-						.getIcon() != 0) {
-					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) mWedge2Data.getChildren()
-									.get(i)).getIcon());
+				RadialMenuItem childItem = mWedge2Data.getChildren().get(i);
+				if (childItem.getIcon() != 0) {
+					Drawable drawable = getResources().getDrawable(childItem.getIcon());
 					h = getIconSize(drawable.getIntrinsicHeight(),
 							mMinIconSize, mMaxIconSize);
 					w = getIconSize(drawable.getIntrinsicWidth(),
@@ -806,10 +790,9 @@ public class RadialMenuWidget extends View {
 
 				int h = mMaxIconSize;
 				int w = mMaxIconSize;
-				if (((RadialMenuItem) mMenuEntries.get(i)).getIcon() != 0) {
-					Drawable drawable = getResources().getDrawable(
-							((RadialMenuItem) mMenuEntries.get(i))
-							.getIcon());
+				RadialMenuItem item = mMenuEntries.get(i);
+				if (item.getIcon() != 0) {
+					Drawable drawable = getResources().getDrawable(item.getIcon());
 					h = getIconSize(drawable.getIntrinsicHeight(),
 							mMinIconSize, mMaxIconSize);
 					w = getIconSize(drawable.getIntrinsicWidth(),
@@ -853,11 +836,10 @@ public class RadialMenuWidget extends View {
 
 			int h = mMaxIconSize;
 			int w = mMaxIconSize;
-			if (((RadialMenuItem) entry.getChildren().get(i)).getIcon() != 0) {
+			RadialMenuItem childItem = entry.getChildren().get(i);
+			if (childItem.getIcon() != 0) {
 				Drawable drawable = getResources()
-						.getDrawable(
-								((RadialMenuItem) entry.getChildren().get(i))
-								.getIcon());
+						.getDrawable(childItem.getIcon());
 				h = getIconSize(drawable.getIntrinsicHeight(),
 						mMinIconSize, mMaxIconSize);
 				w = getIconSize(drawable.getIntrinsicWidth(), mMinIconSize,

@@ -1,17 +1,17 @@
 package com.touchmenotapps.widget.radialmenu.menu.v2;
 
 public class RadialMenuItem {
-	private String mMenuID;
+	private String mMenuId;
 	private String mMenuName;
 	private OnClickListener mCallback;
 
-	public RadialMenuItem(String menuID, String menuName) {
-		mMenuID = menuID;
+	public RadialMenuItem(String menuId, String menuName) {
+		mMenuId = menuId;
 		mMenuName = menuName;
 	}
 
-	public String getMenuID() {
-		return mMenuID;
+	public String getMenuId() {
+		return mMenuId;
 	}
 
 	public String getMenuName() {
@@ -27,6 +27,6 @@ public class RadialMenuItem {
 	}
 	
 	public static abstract interface OnClickListener {
-		public abstract void onClick(String paramString);
+		public abstract void onClick(String menuId, String menuName);
 	}
 }

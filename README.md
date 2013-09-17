@@ -33,6 +33,8 @@ Software used
 
 —<a href="http://code.google.com/p/radial-menu-widget/">radial-menu-widget</a> by <a href="http://code.google.com/u/102658065252479412870/">Jason "valestin" Valestin</a> under the New BSD License
 
+—<a href="https://github.com/devunwired/textdrawable">textdrawable</a> by <a href="https://github.com/devunwired">Dave "devunwired" Smith</a> under the MIT License
+
 —<a href="https://github.com/iPaulPro/aFileChooser">aFileChooser</a> by <a href="https://github.com/iPaulPro">Paul "iPaulPro" Burke</a> under the Apache License 2.0
 
 —<a href="https://github.com/jackpal/Android-Terminal-Emulator">Android Terminal Emulator</a> by <a href="https://github.com/jackpal">Jack "jackpal" Palevich</a> under the Apache Licence 2.0
