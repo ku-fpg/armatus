@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import com.google.common.collect.ImmutableList;
 
 import edu.kufpg.armatus.util.ParcelUtils;
+import edu.kufpg.armatus.util.StringUtils;
 
 public class CommandResponse implements Parcelable {
 	private final int mAst;
@@ -24,7 +25,7 @@ public class CommandResponse implements Parcelable {
 	
 	public CommandResponse(JSONObject o) throws JSONException {
 		this(o.getInt("ast"), (o.has("glyphs") ? jsonToGlyphs(o.getJSONArray("glyphs")) : null),
-				(o.has("msg") ? o.getString("msg") : null));
+				(o.has("msg") ? StringUtils.tightenSpacing(o.getString("msg")) : null));
 	}
 	
 	private CommandResponse(int ast, ImmutableList<Glyph> glyphs, String message) {

@@ -534,6 +534,7 @@ public class ConsoleActivity extends BaseActivity {
 			invalidateOptionsMenu();
 			return true;
 		case R.id.save_history:
+			mHermitClient.fetchHistory();
 			return true;
 		case R.id.load_history:
 			return true;

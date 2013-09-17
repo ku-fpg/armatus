@@ -14,6 +14,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -33,6 +34,8 @@ import edu.kufpg.armatus.networking.data.CommandResponse;
 import edu.kufpg.armatus.networking.data.Complete;
 import edu.kufpg.armatus.networking.data.Completion;
 import edu.kufpg.armatus.networking.data.History;
+import edu.kufpg.armatus.networking.data.HistoryCommand;
+import edu.kufpg.armatus.networking.data.HistoryTag;
 import edu.kufpg.armatus.networking.data.Token;
 import edu.kufpg.armatus.util.StringUtils;
 
@@ -293,7 +296,13 @@ public class HermitClient implements Parcelable {
 	}
 
 	private HermitHttpServerRequest<History> newFetchHistoryRequest() {
-		return new HermitHttpServerRequest<History>(mConsole, HttpRequest.GET) {
+		return new HermitHttpServerRequest<History>(mConsole, HttpRequest.POST) {
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+				getActivity().disableInput(false);
+			}
+			
 			@Override
 			protected History onResponse(String response) {
 				try {
@@ -303,11 +312,32 @@ public class HermitClient implements Parcelable {
 					return null;
 				}
 			}
+			
+			@Override
+			protected void onCancelled() {
+				String newErrorMessage = getErrorMessage();
+				setErrorMessage(null);
+				if (newErrorMessage != null && getActivity() != null) {
+					getActivity().addErrorResponseEntry(newErrorMessage);
+				}
+				
+				super.onCancelled();
+			}
 
 			@Override
 			protected void onPostExecute(History history) {
 				super.onPostExecute(history);
-				//Do cool stuff
+				getActivity().showToast("Check the LogCat, yo");
+				final String TAG = "HermitClient";
+				Log.d(TAG, "History commands");
+				for (HistoryCommand command : history.getCommands()) {
+					Log.d(TAG, "Command: (" + command.getFrom() + ", " + command.getCommand()
+							+ ", " + command.getTo() + ")");
+				}
+				Log.d(TAG, "History tags");
+				for (HistoryTag tag : history.getTags()) {
+					Log.d(TAG, "Tag: " + tag.getTag() + ", " + tag.getAst());
+				}
 			}
 		};
 	}

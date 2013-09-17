@@ -99,6 +99,15 @@ public class StringUtils {
 		return editable;
 	}
 	
+	public static String tightenSpacing(String str) {
+		for (int i = 0; i < str.length(); i++) {
+			while (i < str.length() - 1 && str.charAt(i) == '\n' && str.charAt(i+1) == '\n') {
+				str = str.substring(0, i) + str.substring(i+1, str.length());
+			}
+		}
+		return str.trim();
+	}
+	
 	public static String trim(String str) {
         int start = 0, last = str.length() - 1;
         int end = last;

@@ -151,7 +151,12 @@ public class ConsoleEntry implements Parcelable {
 			builder.append(userInput).append("\n");
 		}
 		if (commandResponse != null) {
-			builder.append(createPrettyText(commandResponse.getGlyphs())).append("\n");
+			if (commandResponse.getGlyphs() != null) {
+				builder.append(createPrettyText(commandResponse.getGlyphs())).append("\n");
+			}
+			if (commandResponse.getMessage() != null) {
+				builder.append(commandResponse.getMessage()).append("\n");
+			}
 		}
 		if (errorResponse != null) {
 			builder.append(errorResponse).append("\n");
@@ -165,24 +170,22 @@ public class ConsoleEntry implements Parcelable {
 
 	private CharSequence createPrettyText(List<Glyph> glyphs) {
 		SpannableStringBuilder builder = new SpannableStringBuilder();
-		if (glyphs != null) {
-			for (Glyph glyph : glyphs) {
-				SpannableString spanWord = new SpannableString(glyph.getText());
-				if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
-					spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
+		for (Glyph glyph : glyphs) {
+			SpannableString spanWord = new SpannableString(glyph.getText());
+			if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
+				spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
+						0, glyph.getText().length(), 0);
+				spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
+						0, glyph.getText().length(), 0);
+			} else {
+				String glyphColor = glyph.getColor();
+				if (glyphColor != null) {
+					spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
 							0, glyph.getText().length(), 0);
-					spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
-							0, glyph.getText().length(), 0);
-				} else {
-					String glyphColor = glyph.getColor();
-					if (glyphColor != null) {
-						spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
-								0, glyph.getText().length(), 0);
-					}
-
 				}
-				builder.append(spanWord);
+
 			}
+			builder.append(spanWord);
 		}
 		return builder;
 	}
