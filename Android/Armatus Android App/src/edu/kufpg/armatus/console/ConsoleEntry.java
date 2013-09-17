@@ -216,7 +216,7 @@ public class ConsoleEntry implements Parcelable {
 		dest.writeString(mUserInput);
 		dest.writeParcelable(mCommandResponse, flags);
 		dest.writeString(mErrorResponse);
-		TextUtils.writeToParcel(mShortContents, dest, 0);
+		TextUtils.writeToParcel(mShortContents, dest, flags);
 	}
 
 }

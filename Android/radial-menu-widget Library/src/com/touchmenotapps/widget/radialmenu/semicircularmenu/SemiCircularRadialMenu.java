@@ -17,9 +17,10 @@ public class SemiCircularRadialMenu extends View {
 	public static final int VERTICAL_LEFT = 1;
 	public static final int HORIZONTAL_TOP = 2;
 	public static final int HORIZONTAL_BOTTOM = 3;
-	private boolean isMenuVisible = false;
-	private boolean isMenuTogglePressed = false;
-	private boolean isMenuItemPressed = false;
+	
+	private boolean mIsMenuVisible = false;
+	private boolean mIsMenuTogglePressed = false;
+	private boolean mIsMenuItemPressed = false;
 	private String mPressedMenuItemID = null;
 	private int mDiameter = 0;
 	private float mRadius = 0.0F;
@@ -31,15 +32,15 @@ public class SemiCircularRadialMenu extends View {
 	private HashMap<String, SemiCircularRadialMenuItem> mMenuItems = new HashMap<String, SemiCircularRadialMenuItem>();
 
 	private float mShadowRadius = 5.0F * getResources().getDisplayMetrics().density;
-	private boolean isShowMenuText = false;
+	private boolean mIsShowMenuText = false;
 	private int mOrientation = 3;
-	private int centerRadialColor = -1;
+	private int mCenterRadialColor = -1;
 	private int mShadowColor = -7829368;
-	private String openMenuText = "Open";
-	private String closeMenuText = "Close";
-	private String centerMenuText = this.openMenuText;
+	private String mOpenMenuText = "Open";
+	private String mCloseMenuText = "Close";
+	private String mCenterMenuText = mOpenMenuText;
 	private int mToggleMenuTextColor = -12303292;
-	private float textSize = 12.0F * getResources().getDisplayMetrics().density;
+	private float mTextSize = 12.0F * getResources().getDisplayMetrics().density;
 	private int mOpenButtonScaleFactor = 3;
 
 	public SemiCircularRadialMenu(Context context) {
@@ -59,53 +60,53 @@ public class SemiCircularRadialMenu extends View {
 	}
 
 	private void init() {
-		this.mRadialMenuPaint.setTextSize(this.textSize);
-		this.mRadialMenuPaint.setColor(-1);
+		mRadialMenuPaint.setTextSize(mTextSize);
+		mRadialMenuPaint.setColor(-1);
 	}
 
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		this.mRadialMenuPaint.setShadowLayer(this.mShadowRadius, 0.0F, 0.0F,
-				this.mShadowColor);
+		mRadialMenuPaint.setShadowLayer(mShadowRadius, 0.0F, 0.0F,
+				mShadowColor);
 
-		if (this.isMenuVisible) {
-			canvas.drawArc(this.mMenuRect, this.mStartAngle, 180.0F, true,
-					this.mRadialMenuPaint);
+		if (mIsMenuVisible) {
+			canvas.drawArc(mMenuRect, mStartAngle, 180.0F, true,
+					mRadialMenuPaint);
 
-			if (this.mMenuItems.size() > 0) {
-				float mStart = this.mStartAngle;
+			if (mMenuItems.size() > 0) {
+				float mStart = mStartAngle;
 
-				float mSweep = 180 / this.mMenuItems.size();
-				for (SemiCircularRadialMenuItem item : this.mMenuItems.values()) {
-					this.mRadialMenuPaint.setColor(item.getBackgroundColor());
-					item.setMenuPath(this.mMenuCenterButtonRect,
-							this.mMenuRect, mStart, mSweep, this.mRadius,
-							this.mViewAnchorPoints);
-					canvas.drawPath(item.getMenuPath(), this.mRadialMenuPaint);
-					if (this.isShowMenuText) {
-						this.mRadialMenuPaint.setShadowLayer(
-								this.mShadowRadius, 0.0F, 0.0F, 0);
-						this.mRadialMenuPaint.setColor(item.getTextColor());
+				float mSweep = 180 / mMenuItems.size();
+				for (SemiCircularRadialMenuItem item : mMenuItems.values()) {
+					mRadialMenuPaint.setColor(item.getBackgroundColor());
+					item.setMenuPath(mMenuCenterButtonRect,
+							mMenuRect, mStart, mSweep, mRadius,
+							mViewAnchorPoints);
+					canvas.drawPath(item.getMenuPath(), mRadialMenuPaint);
+					if (mIsShowMenuText) {
+						mRadialMenuPaint.setShadowLayer(
+								mShadowRadius, 0.0F, 0.0F, 0);
+						mRadialMenuPaint.setColor(item.getTextColor());
 						canvas.drawTextOnPath(item.getText(),
-								item.getMenuPath(), 5.0F, this.textSize,
-								this.mRadialMenuPaint);
-						this.mRadialMenuPaint.setShadowLayer(
-								this.mShadowRadius, 0.0F, 0.0F,
-								this.mShadowColor);
+								item.getMenuPath(), 5.0F, mTextSize,
+								mRadialMenuPaint);
+						mRadialMenuPaint.setShadowLayer(
+								mShadowRadius, 0.0F, 0.0F,
+								mShadowColor);
 					}
 					item.getIcon().draw(canvas);
 					mStart += mSweep;
 				}
-				this.mRadialMenuPaint.setStyle(Paint.Style.FILL);
+				mRadialMenuPaint.setStyle(Paint.Style.FILL);
 			}
 		}
 
-		this.mRadialMenuPaint.setColor(this.centerRadialColor);
-		canvas.drawArc(this.mMenuCenterButtonRect, this.mStartAngle, 180.0F,
-				true, this.mRadialMenuPaint);
-		this.mRadialMenuPaint.setShadowLayer(this.mShadowRadius, 0.0F, 0.0F, 0);
+		mRadialMenuPaint.setColor(mCenterRadialColor);
+		canvas.drawArc(mMenuCenterButtonRect, mStartAngle, 180.0F,
+				true, mRadialMenuPaint);
+		mRadialMenuPaint.setShadowLayer(mShadowRadius, 0.0F, 0.0F, 0);
 
-		drawCenterText(canvas, this.mRadialMenuPaint);
+		drawCenterText(canvas, mRadialMenuPaint);
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
@@ -113,56 +114,56 @@ public class SemiCircularRadialMenu extends View {
 		int y = (int) event.getY();
 
 		switch (event.getAction()) {
-		case 0:
-			if (this.mMenuCenterButtonRect.contains(x, y)) {
-				this.centerRadialColor = -13388315;
-				this.isMenuTogglePressed = true;
+		case MotionEvent.ACTION_DOWN:
+			if (mMenuCenterButtonRect.contains(x, y)) {
+				mCenterRadialColor = -13388315;
+				mIsMenuTogglePressed = true;
 				invalidate();
-			} else if ((this.isMenuVisible) && (this.mMenuItems.size() > 0)) {
-				for (SemiCircularRadialMenuItem item : this.mMenuItems.values()) {
-					if ((this.mMenuRect.contains(x, y))
+			} else if ((mIsMenuVisible) && (mMenuItems.size() > 0)) {
+				for (SemiCircularRadialMenuItem item : mMenuItems.values()) {
+					if ((mMenuRect.contains(x, y))
 							&& (item.getBounds().contains(x, y))) {
-						this.isMenuItemPressed = true;
-						this.mPressedMenuItemID = item.getMenuID();
+						mIsMenuItemPressed = true;
+						mPressedMenuItemID = item.getMenuID();
 						break;
 					}
 				}
-				((SemiCircularRadialMenuItem) this.mMenuItems
-						.get(this.mPressedMenuItemID))
-						.setBackgroundColor(((SemiCircularRadialMenuItem) this.mMenuItems
-								.get(this.mPressedMenuItemID))
+				((SemiCircularRadialMenuItem) mMenuItems
+						.get(mPressedMenuItemID))
+						.setBackgroundColor(((SemiCircularRadialMenuItem) mMenuItems
+								.get(mPressedMenuItemID))
 								.getMenuSelectedColor());
 				invalidate();
 			}
 
 			break;
-		case 1:
-			if (this.isMenuTogglePressed) {
-				this.centerRadialColor = -1;
-				if (this.isMenuVisible) {
-					this.isMenuVisible = false;
-					this.centerMenuText = this.openMenuText;
+		case MotionEvent.ACTION_UP:
+			if (mIsMenuTogglePressed) {
+				mCenterRadialColor = -1;
+				if (mIsMenuVisible) {
+					mIsMenuVisible = false;
+					mCenterMenuText = mOpenMenuText;
 				} else {
-					this.isMenuVisible = true;
-					this.centerMenuText = this.closeMenuText;
+					mIsMenuVisible = true;
+					mCenterMenuText = mCloseMenuText;
 				}
-				this.isMenuTogglePressed = false;
+				mIsMenuTogglePressed = false;
 				invalidate();
 			}
 
-			if (this.isMenuItemPressed) {
-				if (((SemiCircularRadialMenuItem) this.mMenuItems
-						.get(this.mPressedMenuItemID)).getCallback() != null) {
-					((SemiCircularRadialMenuItem) this.mMenuItems
-							.get(this.mPressedMenuItemID)).getCallback()
+			if (mIsMenuItemPressed) {
+				if (((SemiCircularRadialMenuItem) mMenuItems
+						.get(mPressedMenuItemID)).getCallback() != null) {
+					((SemiCircularRadialMenuItem) mMenuItems
+							.get(mPressedMenuItemID)).getCallback()
 							.onMenuItemPressed();
 				}
-				((SemiCircularRadialMenuItem) this.mMenuItems
-						.get(this.mPressedMenuItemID))
-						.setBackgroundColor(((SemiCircularRadialMenuItem) this.mMenuItems
-								.get(this.mPressedMenuItemID))
+				((SemiCircularRadialMenuItem) mMenuItems
+						.get(mPressedMenuItemID))
+						.setBackgroundColor(((SemiCircularRadialMenuItem) mMenuItems
+								.get(mPressedMenuItemID))
 								.getMenuNormalColor());
-				this.isMenuItemPressed = false;
+				mIsMenuItemPressed = false;
 				invalidate();
 			}
 			break;
@@ -175,37 +176,37 @@ public class SemiCircularRadialMenu extends View {
 		super.onSizeChanged(w, h, oldw, oldh);
 
 		if (w > h) {
-			this.mDiameter = h;
-			this.mRadius = (this.mDiameter / 2 - (getPaddingTop() + getPaddingBottom()));
+			mDiameter = h;
+			mRadius = (mDiameter / 2 - (getPaddingTop() + getPaddingBottom()));
 		} else {
-			this.mDiameter = w;
-			this.mRadius = (this.mDiameter / 2 - (getPaddingLeft() + getPaddingRight()));
+			mDiameter = w;
+			mRadius = (mDiameter / 2 - (getPaddingLeft() + getPaddingRight()));
 		}
 
-		this.mMenuRect = getRadialMenuRect(false);
-		this.mMenuCenterButtonRect = getRadialMenuRect(true);
+		mMenuRect = getRadialMenuRect(false);
+		mMenuCenterButtonRect = getRadialMenuRect(true);
 	}
 
 	private void drawCenterText(Canvas canvas, Paint paint) {
-		paint.setColor(this.mToggleMenuTextColor);
-		switch (this.mOrientation) {
+		paint.setColor(mToggleMenuTextColor);
+		switch (mOrientation) {
 		case 0:
-			canvas.drawText(this.centerMenuText,
-					getWidth() - paint.measureText(this.centerMenuText),
+			canvas.drawText(mCenterMenuText,
+					getWidth() - paint.measureText(mCenterMenuText),
 					getHeight() / 2, paint);
 			break;
 		case 1:
-			canvas.drawText(this.centerMenuText, 2.0F, getHeight() / 2, paint);
+			canvas.drawText(mCenterMenuText, 2.0F, getHeight() / 2, paint);
 			break;
 		case 2:
-			canvas.drawText(this.centerMenuText,
-					getWidth() / 2 - paint.measureText(this.centerMenuText)
-							/ 2.0F, this.textSize, paint);
+			canvas.drawText(mCenterMenuText,
+					getWidth() / 2 - paint.measureText(mCenterMenuText)
+							/ 2.0F, mTextSize, paint);
 			break;
 		case 3:
-			canvas.drawText(this.centerMenuText,
-					getWidth() / 2 - paint.measureText(this.centerMenuText)
-							/ 2.0F, getHeight() - this.textSize, paint);
+			canvas.drawText(mCenterMenuText,
+					getWidth() / 2 - paint.measureText(mCenterMenuText)
+							/ 2.0F, getHeight() - mTextSize, paint);
 		}
 	}
 
@@ -214,78 +215,78 @@ public class SemiCircularRadialMenu extends View {
 		int top;
 		int right;
 		int left = right = top = bottom = 0;
-		switch (this.mOrientation) {
+		switch (mOrientation) {
 		case 0:
 			if (isCenterButton) {
 				left = getWidth()
-						- (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						- (int) (mRadius / mOpenButtonScaleFactor);
 				right = getWidth()
-						+ (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						+ (int) (mRadius / mOpenButtonScaleFactor);
 				top = getHeight() / 2
-						- (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						- (int) (mRadius / mOpenButtonScaleFactor);
 				bottom = getHeight() / 2
-						+ (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						+ (int) (mRadius / mOpenButtonScaleFactor);
 			} else {
-				left = getWidth() - (int) this.mRadius;
-				right = getWidth() + (int) this.mRadius;
-				top = getHeight() / 2 - (int) this.mRadius;
-				bottom = getHeight() / 2 + (int) this.mRadius;
+				left = getWidth() - (int) mRadius;
+				right = getWidth() + (int) mRadius;
+				top = getHeight() / 2 - (int) mRadius;
+				bottom = getHeight() / 2 + (int) mRadius;
 			}
-			this.mStartAngle = 90;
-			this.mViewAnchorPoints = new Point(getWidth(), getHeight() / 2);
+			mStartAngle = 90;
+			mViewAnchorPoints = new Point(getWidth(), getHeight() / 2);
 			break;
 		case 1:
 			if (isCenterButton) {
-				left = -(int) (this.mRadius / this.mOpenButtonScaleFactor);
-				right = (int) (this.mRadius / this.mOpenButtonScaleFactor);
+				left = -(int) (mRadius / mOpenButtonScaleFactor);
+				right = (int) (mRadius / mOpenButtonScaleFactor);
 				top = getHeight() / 2
-						- (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						- (int) (mRadius / mOpenButtonScaleFactor);
 				bottom = getHeight() / 2
-						+ (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						+ (int) (mRadius / mOpenButtonScaleFactor);
 			} else {
-				left = -(int) this.mRadius;
-				right = (int) this.mRadius;
-				top = getHeight() / 2 - (int) this.mRadius;
-				bottom = getHeight() / 2 + (int) this.mRadius;
+				left = -(int) mRadius;
+				right = (int) mRadius;
+				top = getHeight() / 2 - (int) mRadius;
+				bottom = getHeight() / 2 + (int) mRadius;
 			}
-			this.mStartAngle = 270;
-			this.mViewAnchorPoints = new Point(0, getHeight() / 2);
+			mStartAngle = 270;
+			mViewAnchorPoints = new Point(0, getHeight() / 2);
 			break;
 		case 2:
 			if (isCenterButton) {
 				left = getWidth() / 2
-						- (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						- (int) (mRadius / mOpenButtonScaleFactor);
 				right = getWidth() / 2
-						+ (int) (this.mRadius / this.mOpenButtonScaleFactor);
-				top = -(int) (this.mRadius / this.mOpenButtonScaleFactor);
-				bottom = (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						+ (int) (mRadius / mOpenButtonScaleFactor);
+				top = -(int) (mRadius / mOpenButtonScaleFactor);
+				bottom = (int) (mRadius / mOpenButtonScaleFactor);
 			} else {
-				left = getWidth() / 2 - (int) this.mRadius;
-				right = getWidth() / 2 + (int) this.mRadius;
-				top = -(int) this.mRadius;
-				bottom = (int) this.mRadius;
+				left = getWidth() / 2 - (int) mRadius;
+				right = getWidth() / 2 + (int) mRadius;
+				top = -(int) mRadius;
+				bottom = (int) mRadius;
 			}
-			this.mStartAngle = 0;
-			this.mViewAnchorPoints = new Point(getWidth() / 2, 0);
+			mStartAngle = 0;
+			mViewAnchorPoints = new Point(getWidth() / 2, 0);
 			break;
 		case 3:
 			if (isCenterButton) {
 				left = getWidth() / 2
-						- (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						- (int) (mRadius / mOpenButtonScaleFactor);
 				right = getWidth() / 2
-						+ (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						+ (int) (mRadius / mOpenButtonScaleFactor);
 				top = getHeight()
-						- (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						- (int) (mRadius / mOpenButtonScaleFactor);
 				bottom = getHeight()
-						+ (int) (this.mRadius / this.mOpenButtonScaleFactor);
+						+ (int) (mRadius / mOpenButtonScaleFactor);
 			} else {
-				left = getWidth() / 2 - (int) this.mRadius;
-				right = getWidth() / 2 + (int) this.mRadius;
-				top = getHeight() - (int) this.mRadius;
-				bottom = getHeight() + (int) this.mRadius;
+				left = getWidth() / 2 - (int) mRadius;
+				right = getWidth() / 2 + (int) mRadius;
+				top = getHeight() - (int) mRadius;
+				bottom = getHeight() + (int) mRadius;
 			}
-			this.mStartAngle = 180;
-			this.mViewAnchorPoints = new Point(getWidth() / 2, getHeight());
+			mStartAngle = 180;
+			mViewAnchorPoints = new Point(getWidth() / 2, getHeight());
 		}
 
 		Rect rect = new Rect(left, top, right, bottom);
@@ -295,121 +296,121 @@ public class SemiCircularRadialMenu extends View {
 	}
 
 	public void setOrientation(int orientation) {
-		this.mOrientation = orientation;
-		this.mMenuRect = getRadialMenuRect(false);
-		this.mMenuCenterButtonRect = getRadialMenuRect(true);
+		mOrientation = orientation;
+		mMenuRect = getRadialMenuRect(false);
+		mMenuCenterButtonRect = getRadialMenuRect(true);
 		invalidate();
 	}
 
-	public void addMenuItem(String idTag, SemiCircularRadialMenuItem mMenuItem) {
-		this.mMenuItems.put(idTag, mMenuItem);
+	public void addMenuItem(String idTag, SemiCircularRadialMenuItem menuItem) {
+		mMenuItems.put(idTag, menuItem);
 		invalidate();
 	}
 
 	public void removeMenuItemById(String idTag) {
-		this.mMenuItems.remove(idTag);
+		mMenuItems.remove(idTag);
 		invalidate();
 	}
 
 	public void removeAllMenuItems() {
-		this.mMenuItems.clear();
+		mMenuItems.clear();
 		invalidate();
 	}
 
 	public void dismissMenu() {
-		this.isMenuVisible = false;
-		this.centerMenuText = this.openMenuText;
+		mIsMenuVisible = false;
+		mCenterMenuText = mOpenMenuText;
 		invalidate();
 	}
 
 	public float getShadowRadius() {
-		return this.mShadowRadius;
+		return mShadowRadius;
 	}
 
-	public void setShadowRadius(int mShadowRadius) {
-		this.mShadowRadius = (mShadowRadius * getResources()
+	public void setShadowRadius(int shadowRadius) {
+		mShadowRadius = (shadowRadius * getResources()
 				.getDisplayMetrics().density);
 		invalidate();
 	}
 
 	public boolean isShowMenuText() {
-		return this.isShowMenuText;
+		return mIsShowMenuText;
 	}
 
 	public void setShowMenuText(boolean isShowMenuText) {
-		this.isShowMenuText = isShowMenuText;
+		mIsShowMenuText = isShowMenuText;
 		invalidate();
 	}
 
 	public int getOrientation() {
-		return this.mOrientation;
+		return mOrientation;
 	}
 
 	public int getCenterRadialColor() {
-		return this.centerRadialColor;
+		return mCenterRadialColor;
 	}
 
 	public void setCenterRadialColor(int centerRadialColor) {
-		this.centerRadialColor = centerRadialColor;
+		mCenterRadialColor = centerRadialColor;
 		invalidate();
 	}
 
 	public int getShadowColor() {
-		return this.mShadowColor;
+		return mShadowColor;
 	}
 
-	public void setShadowColor(int mShadowColor) {
-		this.mShadowColor = mShadowColor;
+	public void setShadowColor(int shadowColor) {
+		mShadowColor = shadowColor;
 		invalidate();
 	}
 
 	public String getOpenMenuText() {
-		return this.openMenuText;
+		return mOpenMenuText;
 	}
 
 	public void setOpenMenuText(String openMenuText) {
-		this.openMenuText = openMenuText;
-		if (!this.isMenuTogglePressed)
-			this.centerMenuText = openMenuText;
+		mOpenMenuText = openMenuText;
+		if (!mIsMenuTogglePressed)
+			mCenterMenuText = openMenuText;
 		invalidate();
 	}
 
 	public String getCloseMenuText() {
-		return this.closeMenuText;
+		return mCloseMenuText;
 	}
 
 	public void setCloseMenuText(String closeMenuText) {
-		this.closeMenuText = closeMenuText;
-		if (this.isMenuTogglePressed)
-			this.centerMenuText = closeMenuText;
+		mCloseMenuText = closeMenuText;
+		if (mIsMenuTogglePressed)
+			mCenterMenuText = closeMenuText;
 		invalidate();
 	}
 
 	public int getToggleMenuTextColor() {
-		return this.mToggleMenuTextColor;
+		return mToggleMenuTextColor;
 	}
 
-	public void setToggleMenuTextColor(int mToggleMenuTextColor) {
-		this.mToggleMenuTextColor = mToggleMenuTextColor;
+	public void setToggleMenuTextColor(int toggleMenuTextColor) {
+		mToggleMenuTextColor = toggleMenuTextColor;
 		invalidate();
 	}
 
 	public float getTextSize() {
-		return this.textSize;
+		return mTextSize;
 	}
 
 	public void setTextSize(int textSize) {
-		this.textSize = (textSize * getResources().getDisplayMetrics().density);
-		this.mRadialMenuPaint.setTextSize(this.textSize);
+		mTextSize = (textSize * getResources().getDisplayMetrics().density);
+		mRadialMenuPaint.setTextSize(mTextSize);
 		invalidate();
 	}
 
 	public int getOpenButtonScaleFactor() {
-		return this.mOpenButtonScaleFactor;
+		return mOpenButtonScaleFactor;
 	}
 
-	public void setOpenButtonScaleFactor(int mOpenButtonScaleFactor) {
-		this.mOpenButtonScaleFactor = mOpenButtonScaleFactor;
+	public void setOpenButtonScaleFactor(int openButtonScaleFactor) {
+		mOpenButtonScaleFactor = openButtonScaleFactor;
 		invalidate();
 	}
 }

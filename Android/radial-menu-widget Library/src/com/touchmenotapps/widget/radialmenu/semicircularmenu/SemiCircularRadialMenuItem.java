@@ -6,7 +6,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
 public class SemiCircularRadialMenuItem {
-	private String mMenuID;
+	private String mMenuId;
 	private Drawable mIcon;
 	private String mText;
 	private int mBackgroundColor;
@@ -18,63 +18,63 @@ public class SemiCircularRadialMenuItem {
 	private OnSemiCircularRadialMenuPressed mCallback;
 	private int mIconDimen;
 
-	public SemiCircularRadialMenuItem(String id, Drawable mIcon, String mText) {
-		this.mMenuID = id;
-		this.mIcon = mIcon;
-		this.mText = mText;
-		this.mMenuNormalColor = -1;
-		this.mMenuSelectedColor = -3355444;
-		this.mBackgroundColor = this.mMenuNormalColor;
-		this.mTextColor = -16777216;
-		this.mIconDimen = 64;
-		this.mPath = new Path();
-		this.mBounds = new RectF();
+	public SemiCircularRadialMenuItem(String id, Drawable icon, String text) {
+		mMenuId = id;
+		mIcon = icon;
+		mText = text;
+		mMenuNormalColor = -1;
+		mMenuSelectedColor = -3355444;
+		mBackgroundColor = mMenuNormalColor;
+		mTextColor = -16777216;
+		mIconDimen = 64;
+		mPath = new Path();
+		mBounds = new RectF();
 	}
 
 	public int getTextColor() {
-		return this.mTextColor;
+		return mTextColor;
 	}
 
-	public void setTextColor(int mTextColor) {
-		this.mTextColor = mTextColor;
+	public void setTextColor(int textColor) {
+		mTextColor = textColor;
 	}
 
 	public String getMenuID() {
-		return this.mMenuID;
+		return mMenuId;
 	}
 
 	public int getIconDimen() {
-		return this.mIconDimen;
+		return mIconDimen;
 	}
 
-	public void setIconDimen(int mIconDimen) {
-		this.mIconDimen = mIconDimen;
+	public void setIconDimen(int iconDimen) {
+		mIconDimen = iconDimen;
 	}
 
 	public Path getMenuPath() {
-		return this.mPath;
+		return mPath;
 	}
 
 	public RectF getBounds() {
-		return this.mBounds;
+		return mBounds;
 	}
 
 	public void setMenuPath(RectF menuButtonRect, RectF menuRect,
-			float StartArc, float ArcWidth, float radius, Point anchorPoint) {
+			float startArc, float arcWidth, float radius, Point anchorPoint) {
 		int left = 0;
 
-		this.mPath.arcTo(menuRect, StartArc, ArcWidth);
-		this.mPath.arcTo(menuButtonRect, StartArc + ArcWidth, -ArcWidth);
-		this.mPath.close();
-		this.mPath.computeBounds(this.mBounds, true);
+		mPath.arcTo(menuRect, startArc, arcWidth);
+		mPath.arcTo(menuButtonRect, startArc + arcWidth, -arcWidth);
+		mPath.close();
+		mPath.computeBounds(mBounds, true);
 
-		Point drawableCenter = pointOnCircle(radius - radius / 5.0F, StartArc
-				+ ArcWidth / 2.0F, anchorPoint);
-		left = drawableCenter.x - this.mIconDimen / 2;
-		int top = drawableCenter.y - this.mIconDimen / 2;
-		int right = left + this.mIconDimen;
-		int bottom = top + this.mIconDimen;
-		this.mIcon.setBounds(left, top, right, bottom);
+		Point drawableCenter = pointOnCircle(radius - radius / 5.0F, startArc
+				+ arcWidth / 2.0F, anchorPoint);
+		left = drawableCenter.x - mIconDimen / 2;
+		int top = drawableCenter.y - mIconDimen / 2;
+		int right = left + mIconDimen;
+		int bottom = top + mIconDimen;
+		mIcon.setBounds(left, top, right, bottom);
 	}
 
 	private Point pointOnCircle(float radius, float angleInDegrees, Point origin) {
@@ -86,44 +86,43 @@ public class SemiCircularRadialMenuItem {
 	}
 
 	public Drawable getIcon() {
-		return this.mIcon;
+		return mIcon;
 	}
 
 	public String getText() {
-		return this.mText;
+		return mText;
 	}
 
-	public void setOnSemiCircularRadialMenuPressed(
-			OnSemiCircularRadialMenuPressed mCallback) {
-		this.mCallback = mCallback;
+	public void setOnSemiCircularRadialMenuPressed(OnSemiCircularRadialMenuPressed callback) {
+		mCallback = callback;
 	}
 
 	public OnSemiCircularRadialMenuPressed getCallback() {
-		return this.mCallback;
+		return mCallback;
 	}
 
 	public int getBackgroundColor() {
-		return this.mBackgroundColor;
+		return mBackgroundColor;
 	}
 
 	public void setBackgroundColor(int color) {
-		this.mBackgroundColor = color;
+		mBackgroundColor = color;
 	}
 
 	public int getMenuNormalColor() {
-		return this.mMenuNormalColor;
+		return mMenuNormalColor;
 	}
 
-	public void setMenuNormalColor(int mMenuNormalColor) {
-		this.mMenuNormalColor = mMenuNormalColor;
+	public void setMenuNormalColor(int menuNormalColor) {
+		mMenuNormalColor = menuNormalColor;
 	}
 
 	public int getMenuSelectedColor() {
-		return this.mMenuSelectedColor;
+		return mMenuSelectedColor;
 	}
 
-	public void setMenuSelectedColor(int mMenuSelectedColor) {
-		this.mMenuSelectedColor = mMenuSelectedColor;
+	public void setMenuSelectedColor(int menuSelectedColor) {
+		mMenuSelectedColor = menuSelectedColor;
 	}
 
 	public static abstract interface OnSemiCircularRadialMenuPressed {

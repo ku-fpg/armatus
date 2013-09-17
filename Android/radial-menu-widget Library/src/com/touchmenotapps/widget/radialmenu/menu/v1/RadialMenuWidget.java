@@ -99,10 +99,11 @@ public class RadialMenuWidget extends View {
 	}
 
 	public boolean onTouchEvent(MotionEvent e) {
-		int state = e.getAction();
 		int eventX = (int) e.getX();
 		int eventY = (int) e.getY();
-		if (state == 0) {
+
+		switch (e.getAction()) {
+		case MotionEvent.ACTION_DOWN:
 			mInWedge = false;
 			mInWedge2 = false;
 			mInCircle = false;
@@ -146,7 +147,8 @@ public class RadialMenuWidget extends View {
 				mInCircle = mHelper.pntInCircle(eventX, eventY,
 						mXPosition, mYPosition, mCRadius);
 			}
-		} else if (state == 1) {
+			break;
+		case MotionEvent.ACTION_UP:
 			if (mInCircle) {
 				if (mWedge2Shown) {
 					mEnabled = null;
@@ -163,7 +165,7 @@ public class RadialMenuWidget extends View {
 							mAnimateOuterIn = true;
 						} else {
 							((RadialMenuItem) mMenuEntries.get(i))
-									.menuActiviated();
+							.menuActiviated();
 
 							if (((RadialMenuItem) mMenuEntries.get(i))
 									.getChildren() != null) {
@@ -186,7 +188,7 @@ public class RadialMenuWidget extends View {
 						mEnabled = null;
 						mSelected = null;
 						((RadialMenuItem) mWedge2Data.getChildren().get(i))
-								.menuActiviated();
+						.menuActiviated();
 					}
 				}
 			} else {
@@ -195,6 +197,7 @@ public class RadialMenuWidget extends View {
 
 			mSelected2 = null;
 			mInCircle = false;
+			break;
 		}
 		invalidate();
 		return true;
@@ -639,8 +642,8 @@ public class RadialMenuWidget extends View {
 			for (int i = 0; i < mWedges2.length; i++) {
 				mWedges2[i] = new RadialMenuWedge(mXPosition,
 						mYPosition, mR2MinSize, mR2MinSize
-								+ mR2VariableSize, i * slice2
-								+ startSlice2, slice2);
+						+ mR2VariableSize, i * slice2
+						+ startSlice2, slice2);
 				float xCenter = (float) (Math.cos(rSlice2 * i + rSlice2 * 0.5D
 						+ rStart2)
 						* (mR2MinSize + mR2VariableSize + mR2MinSize) / 2.0D)
@@ -680,10 +683,10 @@ public class RadialMenuWidget extends View {
 				}
 				mTextBoxRect.set(mXPosition - widthOffset,
 						mYPosition - (mR2MinSize + mR2VariableSize)
-								- mHeaderBuffer - mTextRect.height()
-								- scalePx(3), mXPosition + widthOffset,
+						- mHeaderBuffer - mTextRect.height()
+						- scalePx(3), mXPosition + widthOffset,
 						mYPosition - (mR2MinSize + mR2VariableSize)
-								- mHeaderBuffer + scalePx(3));
+						- mHeaderBuffer + scalePx(3));
 				mHeaderTextBottom = (mYPosition
 						- (mR2MinSize + mR2VariableSize)
 						- mHeaderBuffer - mTextRect.bottom);
@@ -706,8 +709,8 @@ public class RadialMenuWidget extends View {
 			for (int i = 0; i < mWedges2.length; i++) {
 				mWedges2[i] = new RadialMenuWedge(mXPosition,
 						mYPosition, mR2MinSize, mR2MaxSize
-								- mR2VariableSize, i * slice2
-								+ startSlice2, slice2);
+						- mR2VariableSize, i * slice2
+						+ startSlice2, slice2);
 
 				float xCenter = (float) (Math.cos(rSlice2 * i + rSlice2 * 0.5D
 						+ rStart2)
@@ -751,12 +754,12 @@ public class RadialMenuWidget extends View {
 					widthOffset = mTextRect.width() / 2 + scalePx(3);
 				}
 				mTextBoxRect
-						.set(mXPosition - widthOffset, mYPosition
-								- heightOffset - mHeaderBuffer
-								- mTextRect.height() - scalePx(3),
-								mXPosition + widthOffset, mYPosition
-										- heightOffset - mHeaderBuffer
-										+ scalePx(3));
+				.set(mXPosition - widthOffset, mYPosition
+						- heightOffset - mHeaderBuffer
+						- mTextRect.height() - scalePx(3),
+						mXPosition + widthOffset, mYPosition
+						- heightOffset - mHeaderBuffer
+						+ scalePx(3));
 				mHeaderTextBottom = (mYPosition - heightOffset
 						- mHeaderBuffer - mTextRect.bottom);
 			}
@@ -791,7 +794,7 @@ public class RadialMenuWidget extends View {
 			for (int i = 0; i < mWedges.length; i++) {
 				mWedges[i] = new RadialMenuWedge(mXPosition,
 						mYPosition, mMinSize, mMaxSize, i
-								* degSlice + startDegSlice, degSlice);
+						* degSlice + startDegSlice, degSlice);
 				float xCenter = (float) (Math.cos(rSlice * i + rSlice * 0.5D
 						+ rStart)
 						* (mMaxSize + mMinSize) / 2.0D)
@@ -806,7 +809,7 @@ public class RadialMenuWidget extends View {
 				if (((RadialMenuItem) mMenuEntries.get(i)).getIcon() != 0) {
 					Drawable drawable = getResources().getDrawable(
 							((RadialMenuItem) mMenuEntries.get(i))
-									.getIcon());
+							.getIcon());
 					h = getIconSize(drawable.getIntrinsicHeight(),
 							mMinIconSize, mMaxIconSize);
 					w = getIconSize(drawable.getIntrinsicWidth(),
@@ -838,7 +841,7 @@ public class RadialMenuWidget extends View {
 		for (int i = 0; i < mWedges2.length; i++) {
 			mWedges2[i] = new RadialMenuWedge(mXPosition,
 					mYPosition, mR2MinSize, mR2MaxSize, i
-							* degSlice2 + startDegSlice2, degSlice2);
+					* degSlice2 + startDegSlice2, degSlice2);
 			float xCenter = (float) (Math.cos(rSlice2 * i + rSlice2 * 0.5D
 					+ rStart2)
 					* (mR2MaxSize + mR2MinSize) / 2.0D)
@@ -854,7 +857,7 @@ public class RadialMenuWidget extends View {
 				Drawable drawable = getResources()
 						.getDrawable(
 								((RadialMenuItem) entry.getChildren().get(i))
-										.getIcon());
+								.getIcon());
 				h = getIconSize(drawable.getIntrinsicHeight(),
 						mMinIconSize, mMaxIconSize);
 				w = getIconSize(drawable.getIntrinsicWidth(), mMinIconSize,

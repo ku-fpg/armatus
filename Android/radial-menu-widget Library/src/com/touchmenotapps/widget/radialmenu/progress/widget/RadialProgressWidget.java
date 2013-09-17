@@ -174,7 +174,7 @@ public class RadialProgressWidget extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		if (mIsTouchEnabled) {
 			switch (event.getAction()) {
-			case 2:
+			case MotionEvent.ACTION_MOVE:
 				mAngle = getAngleABC(new Point(getWidth() / 2, 0),
 						new Point(getWidth() / 2, getHeight() / 2), new Point(
 								(int) event.getX(), (int) event.getY()));

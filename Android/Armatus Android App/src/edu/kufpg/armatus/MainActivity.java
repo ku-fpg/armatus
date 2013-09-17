@@ -7,7 +7,11 @@ import edu.kufpg.armatus.treelistview.TreeListViewDemo;
 import edu.kufpg.armatus.util.StickyButton;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -19,9 +23,10 @@ import android.widget.TextView;
  * final Armatus app.
  */
 public class MainActivity extends BaseActivity {
-	private TextView mButtonsView;
+	private TextView mButtonsView, mGlyphSpanTextView;
 	private StickyButton mStickyButton;
-	private Button mUnstickButton, mTreeButton, mConsoleButton, mPinchZoomButton, mTerminalButton;
+	private Button mUnstickButton, mTreeButton, mConsoleButton,
+	mPinchZoomButton, mTerminalButton, mGlyphSpanButton;
 	private int mNumTextChanges = 0;
 
 	@Override
@@ -37,6 +42,8 @@ public class MainActivity extends BaseActivity {
 		mConsoleButton = (Button) findViewById(R.id.console_button);
 		mPinchZoomButton = (Button) findViewById(R.id.radialmenu_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
+		mGlyphSpanButton = (Button) findViewById(R.id.glyph_span_button);
+		mGlyphSpanTextView = (TextView) findViewById(R.id.glyph_span_text_view);
 		
 		mStickyButton.setOnClickListener(new OnClickListener() {
 
@@ -94,6 +101,37 @@ public class MainActivity extends BaseActivity {
 				}
 			}
 		});
+		
+		mGlyphSpanButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int selectionStart = mGlyphSpanTextView.getSelectionStart();
+				int selectionEnd = mGlyphSpanTextView.getSelectionEnd();
+				
+				if (selectionEnd - selectionStart != 0) {
+					String toastMe = "";
+					for (int i = selectionStart; i < selectionEnd; i++) {
+						toastMe += i;
+					}
+					showToast(toastMe);
+				} else {
+					showToast("No selection!");
+				}
+			}
+		});
+		
+		int length = 5;
+		for (int i = 0; i < length; i++) {
+			mGlyphSpanTextView.append(" ");
+		}
+		Spannable textSpans = new SpannableString(mGlyphSpanTextView.getText());
+		for (int i = 0; i < length; i++) {
+			Drawable d = getResources().getDrawable(R.drawable.ic_launcher);
+			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+			ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
+			textSpans.setSpan(span, i, i + 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		}
+		mGlyphSpanTextView.setText(textSpans);
 	}
 	
 	@Override

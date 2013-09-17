@@ -3,10 +3,11 @@ package com.touchmenotapps.widget.radialmenu.menu.v2;
 import android.view.MotionEvent;
 import android.view.View;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RadialMenuRenderer {
 	public static final String RADIAL_NO_TEXT = "HOLLOW";
-	private ArrayList<RadialMenuItem> mRadialMenuContent = new ArrayList<RadialMenuItem>(0);
+	private List<RadialMenuItem> mRadialMenuContent = new ArrayList<RadialMenuItem>(0);
 	private boolean mAlt = false;
 	private float mThickness = 30.0F;
 	private float mRadius = 60.0F;
@@ -23,22 +24,22 @@ public class RadialMenuRenderer {
 		mRadius = radius;
 	}
 
-	public void setRadialMenuContent(ArrayList<RadialMenuItem> radialMenuContent) {
+	public void setRadialMenuContent(List<RadialMenuItem> radialMenuContent) {
 		mRadialMenuContent = radialMenuContent;
 	}
 
-	public View renderView() {
+	public RadialMenuView renderView() {
 		final RadialMenuView menu = new RadialMenuView(
 				mParentView.getContext(), this);
 		mParentView.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
-				return menu.gestureHandler(event, true);
+				return menu.gestureHandler(event);
 			}
 		});
 		return menu;
 	}
 
-	public ArrayList<RadialMenuItem> getRadialMenuContent() {
+	public List<RadialMenuItem> getRadialMenuContent() {
 		return mRadialMenuContent;
 	}
 

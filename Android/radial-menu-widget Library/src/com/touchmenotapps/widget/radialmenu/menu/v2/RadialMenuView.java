@@ -9,9 +9,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RadialMenuView extends View {
-	private ArrayList<RadialMenuItem> mRadialMenuContent = new ArrayList<RadialMenuItem>(0);
+	private List<RadialMenuItem> mRadialMenuContent = new ArrayList<RadialMenuItem>(0);
 	private boolean mAlt;
 	private float mWidth = -1.0F;
 	private float mHeight = -1.0F;
@@ -217,27 +218,28 @@ public class RadialMenuView extends View {
 		invalidate();
 	}
 
-	public boolean gestureHandler(MotionEvent event, boolean eat) {
-		if (event.getAction() == 1) {
+	public boolean gestureHandler(MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			mWidth = event.getX();
+			mHeight = event.getY();
+			setVisibility(VISIBLE);
+			invalidate();
+			return false;
+		case MotionEvent.ACTION_UP:
 			mEndTouch = new float[] { event.getX(), event.getY() };
 			if (distance(mWidth, mHeight,
 					mEndTouch[0], mEndTouch[1]) > mRadius
 					- mThickness / 2.0F) {
-				setVisibility(8);
+				setVisibility(GONE);
 				return handleEvent((int) angle(
 						mWidth, mHeight, mEndTouch[0],
 						mEndTouch[1], mAlt,
 						mRadialMenuContent.size()));
 			}
-			setVisibility(8);
-			return handleEvent(-1);
-		}
-		if (event.getAction() == 0) {
-			mWidth = event.getX();
-			mHeight = event.getY();
-			setVisibility(0);
-			invalidate();
-		} else if (event.getAction() == 2) {
+			setVisibility(GONE);
+			return true;
+		case MotionEvent.ACTION_MOVE:
 			mEndTouch = new float[] { event.getX(), event.getY() };
 			if (distance(mWidth, mHeight,
 					mEndTouch[0], mEndTouch[1]) > mRadius
@@ -248,9 +250,13 @@ public class RadialMenuView extends View {
 			else {
 				preEvent(-1);
 			}
+			return false;
 		}
-
-		return eat;
+		return true;
+	}
+	
+	public void setMenuContent(List<RadialMenuItem> menuContent) {
+		mRadialMenuContent = menuContent;
 	}
 
 	private static float distance(float width, float height, float x2, float y2) {
