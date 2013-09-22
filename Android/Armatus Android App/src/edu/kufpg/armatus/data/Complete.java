@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.networking.data;
+package edu.kufpg.armatus.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,36 +6,28 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Token implements Parcelable {
+public class Complete implements Parcelable {
 	private final int mUser;
-	private int mAst;
-
-	public Token(int user, int ast) {
+	private final String mCommand;
+	
+	public Complete(int user, String command) {
 		mUser = user;
-		mAst = ast;
+		mCommand = command;
 	}
 	
-	public Token(JSONObject o) throws JSONException {
-		this(o.getInt("user"), o.getInt("ast"));
-	}
-
 	public int getUser() {
 		return mUser;
 	}
-
-	public int getAst() {
-		return mAst;
+	
+	public String getCommand() {
+		return mCommand;
 	}
-
-	public void setAst(int ast) {
-		mAst = ast;
-	}
-
+	
 	public JSONObject toJSONObject() {
 		JSONObject o = new JSONObject();
 		try {
 			o.put("user", mUser);
-			o.put("ast", mAst);
+			o.put("cmd", mCommand);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -46,19 +38,19 @@ public class Token implements Parcelable {
 	public String toString() {
 		return toJSONObject().toString();
 	}
-	
-	public static Parcelable.Creator<Token> CREATOR =
-			new Parcelable.Creator<Token>() {
+
+	public static Parcelable.Creator<Complete> CREATOR =
+			new Parcelable.Creator<Complete>() {
 		@Override
-		public Token createFromParcel(Parcel source) {
+		public Complete createFromParcel(Parcel source) {
 			int user = source.readInt();
-			int ast = source.readInt();
-			return new Token(user, ast);
+			String command = source.readString();
+			return new Complete(user, command);
 		}
 
 		@Override
-		public Token[] newArray(int size) {
-			return new Token[size];
+		public Complete[] newArray(int size) {
+			return new Complete[size];
 		}
 	};
 
@@ -70,6 +62,6 @@ public class Token implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mUser);
-		dest.writeInt(mAst);
+		dest.writeString(mCommand);
 	}
 }

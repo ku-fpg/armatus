@@ -1,7 +1,7 @@
 package edu.kufpg.armatus.dialog;
 
 import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.networking.data.CommandInfo;
+import edu.kufpg.armatus.data.CommandInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;

@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.networking.data;
+package edu.kufpg.armatus.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.networking.data;
+package edu.kufpg.armatus.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,27 +6,19 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Complete implements Parcelable {
-	private final int mUser;
+public class Command implements Parcelable {
+	private final Token mToken;
 	private final String mCommand;
 	
-	public Complete(int user, String command) {
-		mUser = user;
+	public Command(Token token, String command) {
+		mToken = token;
 		mCommand = command;
-	}
-	
-	public int getUser() {
-		return mUser;
-	}
-	
-	public String getCommand() {
-		return mCommand;
 	}
 	
 	public JSONObject toJSONObject() {
 		JSONObject o = new JSONObject();
 		try {
-			o.put("user", mUser);
+			o.put("token", mToken.toJSONObject());
 			o.put("cmd", mCommand);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -38,19 +30,19 @@ public class Complete implements Parcelable {
 	public String toString() {
 		return toJSONObject().toString();
 	}
-
-	public static Parcelable.Creator<Complete> CREATOR =
-			new Parcelable.Creator<Complete>() {
+	
+	public static Parcelable.Creator<Command> CREATOR =
+			new Parcelable.Creator<Command>() {
 		@Override
-		public Complete createFromParcel(Parcel source) {
-			int user = source.readInt();
+		public Command createFromParcel(Parcel source) {
+			Token token = source.readParcelable(Command.class.getClassLoader());
 			String command = source.readString();
-			return new Complete(user, command);
+			return new Command(token, command);
 		}
 
 		@Override
-		public Complete[] newArray(int size) {
-			return new Complete[size];
+		public Command[] newArray(int size) {
+			return new Command[size];
 		}
 	};
 
@@ -61,7 +53,8 @@ public class Complete implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(mUser);
+		dest.writeParcelable(mToken, flags);
 		dest.writeString(mCommand);
 	}
+
 }

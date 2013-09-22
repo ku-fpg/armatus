@@ -13,6 +13,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -102,6 +103,8 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 			return cancelResult(e, "ERROR: client protocol problem.");
 		} catch (NoHttpResponseException e) {
 			return cancelResult(e, "ERROR: the target server failed to respond.");
+		} catch (ConnectTimeoutException e) {
+			return cancelResult(e, "ERROR: the server connection timed out.");
 		} catch (SocketTimeoutException e) {
 			return cancelResult(e, "ERROR: the server connection timed out.");
 		} catch (IOException e) {

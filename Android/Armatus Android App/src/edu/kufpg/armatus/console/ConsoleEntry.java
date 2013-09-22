@@ -11,9 +11,9 @@ import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
-import edu.kufpg.armatus.networking.data.CommandResponse;
-import edu.kufpg.armatus.networking.data.Glyph;
-import edu.kufpg.armatus.networking.data.Glyph.GlyphStyle;
+import edu.kufpg.armatus.data.CommandResponse;
+import edu.kufpg.armatus.data.Glyph;
+import edu.kufpg.armatus.data.Glyph.GlyphStyle;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**

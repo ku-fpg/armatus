@@ -48,7 +48,7 @@ public class MainActivity extends BaseActivity {
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 		mGlyphSpanButton = (Button) findViewById(R.id.glyph_span_button);
 		mGlyphSpanTextView = (TextView) findViewById(R.id.glyph_span_text_view);
-		
+
 		mStickyButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity {
 				mNumTextChanges++;
 				setCodeText(mNumTextChanges);
 			}
-			
+
 		});
 
 		mUnstickButton.setOnClickListener(new OnClickListener() {
@@ -105,13 +105,13 @@ public class MainActivity extends BaseActivity {
 				}
 			}
 		});
-		
+
 		mGlyphSpanButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				int selectionStart = mGlyphSpanTextView.getSelectionStart();
 				int selectionEnd = mGlyphSpanTextView.getSelectionEnd();
-				
+
 				if (selectionEnd - selectionStart != 0) {
 					String toastMe = "";
 					for (int i = selectionStart; i < selectionEnd; i++) {
@@ -123,35 +123,39 @@ public class MainActivity extends BaseActivity {
 				}
 			}
 		});
-		
+
 		Random rand = new Random();
-		int length = 5;
-		for (int i = 0; i < length; i++) {
-			mGlyphSpanTextView.append(" ");
+		String copiedWord = "Test ";
+		int words = 5;
+		for (int i = 0; i < words; i++) {
+			for (int j = 0; j < copiedWord.length(); j++) {
+				mGlyphSpanTextView.append("a");
+			}
+			mGlyphSpanTextView.append("\n\t");
 		}
 		Spannable textSpans = new SpannableString(mGlyphSpanTextView.getText());
-		for (int i = 0; i < length; i++) {		
+		for (int i = 0; i < words*(copiedWord.length() + 2); i += (copiedWord.length() + 2)) {		
 			int r = rand.nextInt(256);
 			int g = rand.nextInt(256);
 			int b = rand.nextInt(256);
 			TextDrawable drawable = new TextDrawable(this);
-			drawable.setText("Test ");
+			drawable.setText(copiedWord);
 			drawable.setTextColor(Color.rgb(r, g, b));
-			drawable.setTextSize(25f);
+			drawable.setTextSize(17f);
 			drawable.setTypeface(Typeface.MONOSPACE);
 			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
 			ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
-			textSpans.setSpan(span, i, i + 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			textSpans.setSpan(span, i, i + copiedWord.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		}
 		mGlyphSpanTextView.setText(textSpans);
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putInt("numTextChanges", mNumTextChanges);
 	}
-	
+
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);

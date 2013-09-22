@@ -86,8 +86,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/glyph_span_button"
-            android:gravity="center"
-            android:textIsSelectable="true" />
+            android:paddingTop="5dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textIsSelectable="true"
+            android:typeface="monospace" />
     </RelativeLayout>
 
 </ScrollView>

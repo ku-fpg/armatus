@@ -20,6 +20,7 @@
         <attr name="expanderClose" format="reference" />
         <attr name="expanderGroup" format="reference" />
         <attr name="expanderOpen" format="reference" />
+        <attr name="plus" format="reference" />
     </declare-styleable>
 
 </resources>

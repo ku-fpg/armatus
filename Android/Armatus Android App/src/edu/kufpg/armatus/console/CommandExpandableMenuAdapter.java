@@ -1,9 +1,9 @@
 package edu.kufpg.armatus.console;
 
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.data.CommandInfo;
 import edu.kufpg.armatus.dialog.CommandHelpDialog;
 import edu.kufpg.armatus.drag.DragIcon;
-import edu.kufpg.armatus.networking.data.CommandInfo;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +56,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		if (view == null) {
 			view = mInflater.inflate(R.layout.command_expandable_child, null);
 			item = new CommandExpandableMenuItem();
-			item.icon = (DragIcon) view.findViewById(R.id.drag_icon);
+			item.icon = (DragIcon) view.findViewById(R.id.command_drag_icon);
 			view.setTag(item);
 		} else {
 			item = (CommandExpandableMenuItem) view.getTag();

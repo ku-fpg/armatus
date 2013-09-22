@@ -19,6 +19,7 @@
         <item name="expanderGroup">@drawable/expander_group_holo_dark</item>
         <item name="expanderOpen">@drawable/expander_open_holo_dark</item>
         <item name="numberPickerStyle">@style/NPWidget.Holo.NumberPicker</item>
+        <item name="plus">@drawable/ic_plus_dark</item>
     </style>
 
     <style name="ThemeLight" parent="android:Theme.Holo.Light">
@@ -40,6 +41,7 @@
         <item name="expanderGroup">@drawable/expander_group_holo_light</item>
         <item name="expanderOpen">@drawable/expander_open_holo_light</item>
         <item name="numberPickerStyle">@style/NPWidget.Holo.Light.NumberPicker</item>
+        <item name="plus">@drawable/ic_plus_light</item>
     </style>
 
 </resources>

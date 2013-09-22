@@ -42,7 +42,7 @@ public class CustomCommandDispatcher {
 	private static final CustomCommandInfo EXIT = new CustomCommandInfo(EXIT_INFO, "exit", 0) {
 		@Override
 		protected void run(ConsoleActivity console, String... args) {
-			console.exit();
+			console.exit(false);
 		}
 	};
 	private static final CustomCommandInfo TOAST = new CustomCommandInfo(TOAST_INFO, "toast", 0, true) {

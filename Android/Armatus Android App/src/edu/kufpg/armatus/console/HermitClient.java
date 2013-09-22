@@ -1,5 +1,7 @@
 package edu.kufpg.armatus.console;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
@@ -11,10 +13,10 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -24,23 +26,24 @@ import com.google.common.collect.ImmutableSortedSet;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.PrefsActivity;
+import edu.kufpg.armatus.data.Command;
+import edu.kufpg.armatus.data.CommandInfo;
+import edu.kufpg.armatus.data.CommandResponse;
+import edu.kufpg.armatus.data.Complete;
+import edu.kufpg.armatus.data.Completion;
+import edu.kufpg.armatus.data.History;
+import edu.kufpg.armatus.data.HistoryCommand;
+import edu.kufpg.armatus.data.Token;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
 import edu.kufpg.armatus.networking.InternetUtils;
-import edu.kufpg.armatus.networking.data.Command;
-import edu.kufpg.armatus.networking.data.CommandInfo;
-import edu.kufpg.armatus.networking.data.CommandResponse;
-import edu.kufpg.armatus.networking.data.Complete;
-import edu.kufpg.armatus.networking.data.Completion;
-import edu.kufpg.armatus.networking.data.History;
-import edu.kufpg.armatus.networking.data.HistoryCommand;
-import edu.kufpg.armatus.networking.data.HistoryTag;
-import edu.kufpg.armatus.networking.data.Token;
+import edu.kufpg.armatus.util.JsonUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient implements Parcelable {
 	public static int NO_TOKEN = -1;
+	private static final String HISTORY_FILENAME = "/history.txt";
 
 	private ConsoleActivity mConsole;
 	private ProgressDialog mProgress;
@@ -82,7 +85,36 @@ public class HermitClient implements Parcelable {
 
 	public void fetchHistory() {
 		if (isNetworkConnected(RequestName.HISTORY) && isTokenAcquired(true)) {
-			newFetchHistoryRequest().execute(mServerUrl + "/history", mToken.toString());
+			newSaveHistoryRequest().execute(mServerUrl + "/history", mToken.toString());
+		}
+	}
+	
+	public void loadHistory() {
+		if (isNetworkConnected(RequestName.HISTORY) && isTokenAcquired(false)) {
+			String path = "";
+			SharedPreferences prefs = PrefsActivity.getPrefs(mConsole);
+			if (prefs.getBoolean(BaseActivity.IS_HISTORY_DIR_CUSTOM_KEY, true)) {
+				path = prefs.getString(BaseActivity.HISTORY_DIR_KEY, null);
+			} else {
+				path = BaseActivity.CACHE_DIR;
+			}
+
+			final File file = new File(path + HISTORY_FILENAME);
+			if (file.exists()) {
+				try {
+					History history = new History(JsonUtils.openJsonFile(file.getAbsolutePath()));
+					loadHistoryCommands(history.getCommands());
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					mConsole.appendErrorResponse("ERROR: saved history corrupted.");
+					e.printStackTrace();
+				}
+			} else {
+				mConsole.appendErrorResponse("ERROR: no saved history exists.");
+			}
+		} else {
+			mConsole.appendErrorResponse("ERROR: connect before attempting to load history.");
 		}
 	}
 
@@ -98,11 +130,12 @@ public class HermitClient implements Parcelable {
 			}
 		} else {
 			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired(true)) {
-				Command command = new Command(mToken, StringUtils.withoutCharWrap(input));
+				String cleanInput = StringUtils.withoutCharWrap(input);
+				Command command = new Command(mToken, cleanInput);
 				if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
 					newRunAbortResumeRequest().execute(mServerUrl + "/command", command.toString());
 				} else {
-					newRunCommandRequest().execute(mServerUrl + "/command", command.toString());
+					newRunCommandRequest(cleanInput).execute(mServerUrl + "/command", command.toString());
 				}
 			} else {
 				mTempBundle.putString("input", input);
@@ -117,7 +150,7 @@ public class HermitClient implements Parcelable {
 				super.onPreExecute();
 				getActivity().disableInput(false);
 			}
-			
+
 			@Override
 			protected List<Completion> onResponse(String response) {
 				JSONObject insertNameHere = null;
@@ -139,7 +172,7 @@ public class HermitClient implements Parcelable {
 					return null;
 				}
 			}
-			
+
 			@Override
 			protected void onCancelled() {
 				String newErrorMessage = getErrorMessage();
@@ -147,7 +180,7 @@ public class HermitClient implements Parcelable {
 				if (newErrorMessage != null && getActivity() != null) {
 					getActivity().addErrorResponseEntry(newErrorMessage);
 				}
-				
+
 				super.onCancelled();
 			}
 
@@ -295,24 +328,40 @@ public class HermitClient implements Parcelable {
 		};
 	}
 
-	private HermitHttpServerRequest<History> newFetchHistoryRequest() {
-		return new HermitHttpServerRequest<History>(mConsole, HttpRequest.POST) {
+	private HermitHttpServerRequest<Void> newSaveHistoryRequest() {
+		return new HermitHttpServerRequest<Void>(mConsole, HttpRequest.POST) {
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
 				getActivity().disableInput(false);
 			}
-			
+
 			@Override
-			protected History onResponse(String response) {
+			protected Void onResponse(String response) {
+				JSONObject history = null;
 				try {
-					return new History(new JSONObject(response));
+					history = new JSONObject(response);
 				} catch (JSONException e) {
 					e.printStackTrace();
-					return null;
 				}
+
+				String path = "";
+				SharedPreferences prefs = PrefsActivity.getPrefs(getActivity());
+				if (prefs.getBoolean(BaseActivity.IS_HISTORY_DIR_CUSTOM_KEY, true)) {
+					path = prefs.getString(BaseActivity.HISTORY_DIR_KEY, null);
+				} else {
+					path = BaseActivity.CACHE_DIR;
+				}
+
+				final File file = new File(path + HISTORY_FILENAME);
+				if (file.exists()) {
+					JsonUtils.saveJsonFile(history, file.getAbsolutePath());
+				} else {
+					cancel(true);
+				}
+				return null;
 			}
-			
+
 			@Override
 			protected void onCancelled() {
 				String newErrorMessage = getErrorMessage();
@@ -320,30 +369,76 @@ public class HermitClient implements Parcelable {
 				if (newErrorMessage != null && getActivity() != null) {
 					getActivity().addErrorResponseEntry(newErrorMessage);
 				}
-				
+
 				super.onCancelled();
 			}
 
 			@Override
-			protected void onPostExecute(History history) {
-				super.onPostExecute(history);
-				getActivity().showToast("Check the LogCat, yo");
-				final String TAG = "HermitClient";
-				Log.d(TAG, "History commands");
-				for (HistoryCommand command : history.getCommands()) {
-					Log.d(TAG, "Command: (" + command.getFrom() + ", " + command.getCommand()
-							+ ", " + command.getTo() + ")");
-				}
-				Log.d(TAG, "History tags");
-				for (HistoryTag tag : history.getTags()) {
-					Log.d(TAG, "Tag: " + tag.getTag() + ", " + tag.getAst());
-				}
+			protected void onPostExecute(Void nothing) {
+				super.onPostExecute(nothing);
+				getActivity().showToast("History saved successfully!");
 			}
 		};
 	}
 
-	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest() {
+	private void loadHistoryCommands(final List<HistoryCommand> historyCommands) {
+		loadHistoryCommands(historyCommands, 0);
+	}
+	
+	private void loadHistoryCommands(final List<HistoryCommand> historyCommands, final int index) {
+		if (!historyCommands.isEmpty()) {
+			Command tokenCommand = new Command(mToken, historyCommands.get(index).getCommand());
+			new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
+				@Override
+				protected void onPreExecute() {
+					super.onPreExecute();
+					getActivity().disableInput(false);
+				}
+				
+				@Override
+				protected CommandResponse onResponse(String response) {
+					try {
+						return new CommandResponse(new JSONObject(response));
+					} catch (JSONException e) {
+						e.printStackTrace();
+						return null;
+					}
+				}
+				
+				@Override
+				protected void onCancelled() {
+					String newErrorMessage = getErrorMessage();
+					setErrorMessage(null);
+					if (newErrorMessage != null && getActivity() != null) {
+						getActivity().addErrorResponseEntry(newErrorMessage);
+					}
+
+					super.onCancelled();
+				}
+
+				@Override
+				protected void onPostExecute(CommandResponse response) {
+					super.onPostExecute(response);
+					mToken.setAst(response.getAst());
+					if (index < historyCommands.size() - 1) {
+						loadHistoryCommands(historyCommands, index + 1);
+					} else {
+						getActivity().setCommandHistory(historyCommands);
+						getActivity().addErrorResponseEntry("Session loaded successfully!");
+					}
+				}
+			}.execute(mServerUrl + "/command", tokenCommand.toString());
+		}
+	}
+
+	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest(final String command) {
 		return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
+			
+			@Override
+			protected CommandResponse doInBackground(String... params) {
+				return super.doInBackground(params);
+			}
+			
 			@Override
 			protected CommandResponse onResponse(String response) {
 				try {
@@ -357,7 +452,10 @@ public class HermitClient implements Parcelable {
 			@Override
 			protected void onPostExecute(CommandResponse response) {
 				super.onPostExecute(response);
-				mToken.setAst(response.getAst());
+				int fromAst = mToken.getAst();
+				int toAst = response.getAst();
+				mToken.setAst(toAst);
+				getActivity().addCommandHistoryEntry(fromAst, command, toAst);
 				getActivity().appendCommandResponse(response);
 			}
 
@@ -380,9 +478,9 @@ public class HermitClient implements Parcelable {
 			protected void onPostExecute(String message) {
 				super.onPostExecute(message);
 				mToken = null;
+				getActivity().clearCommandHistory();
 				getActivity().appendErrorResponse(message);
 			}
-
 		};
 	}
 
@@ -464,6 +562,10 @@ public class HermitClient implements Parcelable {
 
 	public boolean isRequestDelayed() {
 		return !mDelayedRequestName.equals(RequestName.NULL);
+	}
+	
+	public boolean isTokenAcquired() {
+		return isTokenAcquired(false);
 	}
 
 	private boolean isTokenAcquired(boolean complainIfNot) {

@@ -1,6 +1,6 @@
 package edu.kufpg.armatus.drag;
 
-import edu.kufpg.armatus.networking.data.CommandInfo;
+import edu.kufpg.armatus.data.CommandInfo;
 import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;

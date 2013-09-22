@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 
-import edu.kufpg.armatus.networking.data.CommandInfo;
+import edu.kufpg.armatus.data.CommandInfo;
 
 public class CommandHolder {
 	private static List<String> sTagList = ImmutableList.of(CustomCommandDispatcher.CLIENT_COMMANDS_TAG);

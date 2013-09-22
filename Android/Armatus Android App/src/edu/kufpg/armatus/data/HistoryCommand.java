@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.networking.data;
+package edu.kufpg.armatus.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class HistoryCommand implements Parcelable {
+public class HistoryCommand implements Comparable<HistoryCommand>, Parcelable {
 	private final int mFrom, mTo;
 	private final String mCommand;
 	
@@ -58,6 +58,11 @@ public class HistoryCommand implements Parcelable {
 		dest.writeInt(mFrom);
 		dest.writeString(mCommand);
 		dest.writeInt(mTo);
+	}
+
+	@Override
+	public int compareTo(HistoryCommand another) {
+		return Integer.valueOf(getFrom()).compareTo(another.getFrom());
 	}
 
 }
