@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </TabWidget>
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ScrollView
+                android:id="@+id/console_entry_transform_selection_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <TextView
+                    android:id="@+id/console_entry_transform_selection_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/entry_padding"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textIsSelectable="true"
+                    android:typeface="monospace" />
+            </ScrollView>
+
+            <ScrollView
+                android:id="@+id/console_entry_transform_longclick_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <TextView
+                    android:id="@+id/console_entry_transform_longclick_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/entry_padding"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:typeface="monospace" />
+            </ScrollView>
+
+            <ScrollView
+                android:id="@+id/console_entry_transform_radial_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <RelativeLayout
+                    android:id="@+id/console_entry_transform_radial_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/console_entry_transform_radial_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/entry_padding"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:typeface="monospace" />
+                </RelativeLayout>
+            </ScrollView>
+        </FrameLayout>
+    </LinearLayout>
+
+</TabHost>

@@ -14,11 +14,11 @@ import com.google.common.collect.ImmutableList;
 import edu.kufpg.armatus.util.ParcelUtils;
 
 public class Glyph implements Parcelable {
-	private static final String BLUE = "#0090D3";
-	private static final String RED = "#CC060B";
-	private static final String YELLOW = "#FDFD0D";
-	private static final String GREEN = "#1DDA1C";
-	private static final String CYAN = "#1BE0CC";
+	public static final String BLUE = "#0090D3";
+	public static final String RED = "#CC060B";
+	public static final String YELLOW = "#FDFD0D";
+	public static final String GREEN = "#1DDA1C";
+	public static final String CYAN = "#1BE0CC";
 	
 	private final GlyphStyle mStyle;
 	private final List<Crumb> mPath;

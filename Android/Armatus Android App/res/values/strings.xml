@@ -10,8 +10,10 @@
     <string name="title_preference_screen">Armatus preferences</string>
     <string name="default_pref_message">Are you sure you want to restore the default settings?</string>
     <string name="popup_text">Font size:</string>
-    <string name="copy">COPY</string>
-    <string name="select">SELECT</string>
+    <string name="copy">Copy</string>
+    <string name="select">Select</string>
+    <string name="swap">Swap</string>
+    <string name="transform">Transform</string>
     <string name="enable_wifi_title">Wi-Fi permission request</string>
     <string name="enable_wifi_message">Armatus is requesting permission to turn on Wi-Fi. Do you want to do this?</string>
     <string name="terminal_not_installed_title">Error: ATE not installed</string>
@@ -21,9 +23,8 @@
     <string name="console_load_history_title">Are you sure you want to load session history?</string>
     <string name="console_load_history_message">All unsaved progress will be lost. Do you still want to load session history?</string>
     <string name="gesture_dialog_message">Move your finger to perform a gesture.</string>
-    <string name="swap">swap</string>
-    
-    <!--  SharedPreferences -->
+
+    <!-- SharedPreferences -->
     <string name="pref_is_history_dir_custom">IS_HISTORY_DIR_CUSTOM</string>
     <string name="pref_history_dir">HISTORY_DIR</string>
     <string name="pref_edit_mode">EDIT_MODE</string>
@@ -45,16 +46,16 @@
     <string name="bluetooth_other_devices_heading">Other Available Devices</string>
     <string name="bluetooth_button_scan">Scan for devices</string>
     <string name="bluetooth_button_cancel">Cancel scan</string>
-    
+
     <!-- radial-menu-widget Demo -->
     <string name="about">About</string>
-	<string name="main_menu">Home</string>
-	<string name="contact">Contact</string>
+    <string name="main_menu">Home</string>
+    <string name="contact">Contact</string>
     <string name="test0">Test0</string>
-	<string name="test1">Test1</string>
-	<string name="test2">Test2</string>
-	<string name="test3">Test3</string>
-	<string name="test4">Test4</string>
+    <string name="test1">Test1</string>
+    <string name="test2">Test2</string>
+    <string name="test3">Test3</string>
+    <string name="test4">Test4</string>
 
     <string-array name="command_groups">
         <item>Alpha Conversation</item>

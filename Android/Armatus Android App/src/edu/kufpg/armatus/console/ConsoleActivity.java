@@ -23,6 +23,7 @@ import edu.kufpg.armatus.data.CommandInfo;
 import edu.kufpg.armatus.data.CommandResponse;
 import edu.kufpg.armatus.data.HistoryCommand;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
+import edu.kufpg.armatus.dialog.ConsoleEntryTransformDialog;
 import edu.kufpg.armatus.dialog.GestureDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
 import edu.kufpg.armatus.dialog.ScrollEntriesDialog;
@@ -87,6 +88,7 @@ public class ConsoleActivity extends BaseActivity {
 	private static final String SCROLL_ENTRIES_TAG = "scrollentries";
 	private static final String SELECTION_TAG = "selection";
 	private static final String KEYWORD_SWAP_TAG = "keywordswap";
+	private static final String TRANSFORM_TAG = "transform";
 	private static final String WORD_COMPLETION_TAG = "wordcomplete";
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
@@ -847,6 +849,10 @@ public class ConsoleActivity extends BaseActivity {
 
 	public void showEntrySelectionDialog(int... entries) {
 		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
+	}
+	
+	public void showEntryTransformDialog(ConsoleEntry entry) {
+		showDialog(ConsoleEntryTransformDialog.newInstance(entry), TRANSFORM_TAG);
 	}
 
 	public void showKeywordSwapDialog(int entryNum, String entryContents) {

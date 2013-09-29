@@ -246,7 +246,7 @@ public class BaseActivity extends Activity {
 	 * {@code ThemeDark}.
 	 * @return the current app theme's resource ID.
 	 */
-	protected static int getThemePrefId() {
+	public static int getThemePrefId() {
 		String theme = sPrefs.getString(APP_THEME_KEY, null);
 		if (theme.equals(APP_THEME_LIGHT)) {
 			return R.style.ThemeLight;

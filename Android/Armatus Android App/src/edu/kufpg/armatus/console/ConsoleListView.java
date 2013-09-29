@@ -37,6 +37,8 @@ public class ConsoleListView extends ListView {
 	 * keywords. */
 	private MenuItem mSwapItem;
 
+	private MenuItem mTransformItem;
+
 	/** Tracks which {@link ConsoleEntry ConsoleEntries} are currently checked, since
 	 * {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE CHOICE_MODE_MULTIPLE}'s
 	 * checking behavior is not desirable. */
@@ -145,17 +147,19 @@ public class ConsoleListView extends ListView {
 	public boolean isActionModeVisible() {
 		return mActionModeVisible;
 	}
-	
+
 	private void refreshActionMode() {
 		if (mActionModeVisible) {
 			switch (mPrevCheckedStates.size()) {
 			case 1:
 				mActionMode.setSubtitle("One entry selected");
 				mSwapItem.setVisible(true);
+				mTransformItem.setVisible(true);
 				break;
 			default:
 				mActionMode.setSubtitle(mPrevCheckedStates.size() + " entries selected");
 				mSwapItem.setVisible(false);
+				mTransformItem.setVisible(false);
 				break;
 			}
 		}
@@ -172,6 +176,7 @@ public class ConsoleListView extends ListView {
 			inflater.inflate(R.menu.console_list_view_action_mode, menu);
 			mode.setTitle("Select entries");
 			mSwapItem = menu.findItem(R.id.console_list_view_swap);
+			mTransformItem = menu.findItem(R.id.console_list_view_transform);
 			return true;
 		}
 
@@ -211,6 +216,15 @@ public class ConsoleListView extends ListView {
 					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
 					if (entry.getShortContents().toString().split(StringUtils.WHITESPACE).length > 1) {
 						mConsole.showKeywordSwapDialog(entry.getEntryNum(), entry.getShortContents().toString());
+					}
+					mode.finish();
+				}
+				return true;
+			case R.id.console_list_view_transform:
+				if (mPrevCheckedStates.size() == 1) {
+					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+					if (entry.getShortContents().toString().split(StringUtils.WHITESPACE).length > 1) {
+						mConsole.showEntryTransformDialog(entry);
 					}
 					mode.finish();
 				}

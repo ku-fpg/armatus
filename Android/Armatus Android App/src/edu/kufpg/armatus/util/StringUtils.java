@@ -28,7 +28,11 @@ public class StringUtils {
 	public static final char NBSP_CHAR = '\u00A0';
 
 	private StringUtils() {}
-	
+
+	public static int countOccurrences(String haystack, String needle) {
+		return haystack.length() - haystack.replace(needle, "").length();
+	}
+
 	public static int findFirstWordIndex(CharSequence sentence) {
 		for (int i = 0; i < sentence.length(); i++) {
 			if (!String.valueOf(sentence.charAt(i)).matches(WHITESPACE)) {
@@ -99,6 +103,10 @@ public class StringUtils {
 		return editable;
 	}
 	
+	public static String withoutFirstLine(String str) {
+		return str.substring(str.indexOf('\n') + 1);
+	}
+
 	public static String tightenSpacing(String str) {
 		for (int i = 0; i < str.length(); i++) {
 			while (i < str.length() - 1 && str.charAt(i) == '\n' && str.charAt(i+1) == '\n') {
@@ -107,20 +115,20 @@ public class StringUtils {
 		}
 		return str.trim();
 	}
-	
+
 	public static String trim(String str) {
-        int start = 0, last = str.length() - 1;
-        int end = last;
-        while ((start <= end) && (str.charAt(start) <= ' ' || str.charAt(start) == NBSP_CHAR)) {
-            start++;
-        }
-        while ((end >= start) && (str.charAt(end) <= ' ' || str.charAt(end) == NBSP_CHAR)) {
-            end--;
-        }
-        if (start == 0 && end == last) {
-            return str;
-        }
-        return str.substring(start, end + 1);
-    }
+		int start = 0, last = str.length() - 1;
+		int end = last;
+		while ((start <= end) && (str.charAt(start) <= ' ' || str.charAt(start) == NBSP_CHAR)) {
+			start++;
+		}
+		while ((end >= start) && (str.charAt(end) <= ' ' || str.charAt(end) == NBSP_CHAR)) {
+			end--;
+		}
+		if (start == 0 && end == last) {
+			return str;
+		}
+		return str.substring(start, end + 1);
+	}
 
 }

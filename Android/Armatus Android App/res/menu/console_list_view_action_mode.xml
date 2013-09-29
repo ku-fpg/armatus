@@ -25,5 +25,13 @@
         android:title="@string/swap"
         android:titleCondensed="@string/swap">
     </item>
+    <item
+        android:id="@+id/console_list_view_transform"
+        android:icon="?attr/actionSelect"
+        android:orderInCategory="4"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/transform"
+        android:titleCondensed="@string/transform">
+    </item>
 
 </menu>

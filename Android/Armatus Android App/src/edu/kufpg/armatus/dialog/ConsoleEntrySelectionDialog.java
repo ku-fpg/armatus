@@ -57,7 +57,7 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 			mContents = contentsBuilder;
 		} else {
 			
-			mContents = savedInstanceState.getParcelable("contents");
+			mContents = savedInstanceState.getCharSequence("contents");
 		}
 
 		mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
