@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-
 import edu.kufpg.armatus.data.CommandInfo;
 
 public class CommandHolder {
@@ -29,7 +28,7 @@ public class CommandHolder {
 	
 	static void setTagList(Iterable<? extends String> tagList) {
 		ImmutableList.Builder<String> tagListBuilder = ImmutableList.builder();
-		tagListBuilder.addAll(tagList).add(CustomCommandDispatcher.CLIENT_COMMANDS_TAG);
+		tagListBuilder.add("Commonly Used").addAll(tagList).add(CustomCommandDispatcher.CLIENT_COMMANDS_TAG);
 		sTagList = tagListBuilder.build();
 	}
 	

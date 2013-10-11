@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,6 +24,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.PrefsActivity;
@@ -44,6 +46,7 @@ import edu.kufpg.armatus.util.StringUtils;
 public class HermitClient implements Parcelable {
 	public static int NO_TOKEN = -1;
 	private static final String HISTORY_FILENAME = "/history.txt";
+	private static Set<String> cuTagList = Sets.newHashSet("alpha","alpha-alt","alpha-case","alpha-case-binder","alpha-lam","alpha-let","alpha-top","info","top","bash","simplify","unshadow","{","}","set-pp","set-pp-coerion","set-pp-renderer","set-pp-type","set-pp-width");
 
 	private ConsoleActivity mConsole;
 	private ProgressDialog mProgress;
@@ -313,6 +316,10 @@ public class HermitClient implements Parcelable {
 				ImmutableListMultimap.Builder<String, CommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
 
 				for (CommandInfo cmdInfo : commands) {
+					if(cuTagList.contains(cmdInfo.getName()))
+					{
+						tagMapBuilder.put("Commonly Used", cmdInfo);
+					}
 					for (String tag : cmdInfo.getTags()) {
 						tagSetBuilder.add(tag);
 						tagMapBuilder.put(tag, cmdInfo);
