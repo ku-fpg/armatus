@@ -73,25 +73,36 @@
             android:layout_below="@+id/test_activity_button"
             android:text="Launch terminal emulator" />
 
-        <Button
-            android:id="@+id/glyph_span_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/terminal_activity_button"
-            android:text="Get glyph span selection" />
-
-        <TextView
-            android:id="@+id/glyph_span_text_view"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/glyph_span_button"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textIsSelectable="true"
-            android:typeface="monospace" />
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/terminal_activity_button" >
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="Launch terminal emulator" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/separator"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="Launch terminal emulator" />
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_toRightOf="@+id/button1"
+                android:background="@android:color/white" />
+        </RelativeLayout>
     </RelativeLayout>
 
 </ScrollView>

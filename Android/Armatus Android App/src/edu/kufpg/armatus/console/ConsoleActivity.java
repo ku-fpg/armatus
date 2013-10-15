@@ -7,9 +7,54 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.DragEvent;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
+import android.view.View.OnLayoutChangeListener;
+import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.meetme.android.horizontallistview.HorizontalListView;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.BaseApplication;
@@ -25,54 +70,15 @@ import edu.kufpg.armatus.data.HistoryCommand;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import edu.kufpg.armatus.dialog.ConsoleEntryTransformDialog;
 import edu.kufpg.armatus.dialog.GestureDialog;
+import edu.kufpg.armatus.dialog.InputCompletionDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
 import edu.kufpg.armatus.dialog.ScrollEntriesDialog;
-import edu.kufpg.armatus.dialog.InputCompletionDialog;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
+import edu.kufpg.armatus.input.SpecialKeyAdapter;
 import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.StringUtils;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Typeface;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.ContextMenu;
-import android.view.DragEvent;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
-import android.view.View.OnDragListener;
-import android.view.View.OnLayoutChangeListener;
-import android.view.View.OnLongClickListener;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.EditText;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 /**
  * Activity that displays an interactive, feature-rich
@@ -143,6 +149,7 @@ public class ConsoleActivity extends BaseActivity {
 		final ImageButton scrollEntriesButton = (ImageButton) findViewById(R.id.console_input_scroll_entries);
 		final ImageButton prevEntryButton = (ImageButton) findViewById(R.id.console_input_previous_entry);
 		final ImageButton hideOptionsBarButton = (ImageButton) findViewById(R.id.console_options_hide_button);
+		final HorizontalListView specialKeyRow = (HorizontalListView) findViewById(R.id.console_special_key_list);
 		mPrefs = PrefsActivity.getPrefs(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
@@ -201,6 +208,8 @@ public class ConsoleActivity extends BaseActivity {
 				} else {
 					mSoftKeyboardVisible = false;
 				}
+				
+				specialKeyRow.setVisibility(mSoftKeyboardVisible ? View.VISIBLE : View.GONE);
 			}
 		});
 
@@ -391,6 +400,29 @@ public class ConsoleActivity extends BaseActivity {
 			}
 		});
 
+		final SpecialKeyAdapter ska = new SpecialKeyAdapter(this, Lists.newArrayList("|", "[", "]", "{", "}", "∀", "#", "→", "△", "▲", "λ"));
+		ska.setTypeface(TYPEFACE);
+		specialKeyRow.setAdapter(ska);
+		specialKeyRow.post(new Runnable() {
+			@Override
+			public void run() {
+				View charView = ska.getView(0, null, specialKeyRow);
+				charView.measure(MeasureSpec.makeMeasureSpec(mConsoleWidth, MeasureSpec.AT_MOST),
+						MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+				specialKeyRow.getLayoutParams().height = charView.getMeasuredHeight();
+				specialKeyRow.requestLayout();
+			}
+		});
+		specialKeyRow.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				if (getCurrentFocus() instanceof EditText) {
+					EditText et = (EditText) getCurrentFocus();
+					et.getText().insert(et.getSelectionStart(), ska.getItem(position));
+				}
+			}
+		});
+		
 		updateConsoleEntries();
 		resizeSlidingMenu();
 	}
