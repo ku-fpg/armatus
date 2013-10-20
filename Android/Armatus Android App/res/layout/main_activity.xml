@@ -66,43 +66,20 @@
             android:text="Launch TestActivity" />
 
         <Button
-            android:id="@+id/terminal_activity_button"
+            android:id="@+id/scope_test_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/test_activity_button"
-            android:text="Launch terminal emulator" />
+            android:text="Launch scoping test" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/terminal_activity_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/terminal_activity_button" >
-
-            <Button
-                android:id="@+id/button1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Launch terminal emulator" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/separator"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Launch terminal emulator" />
-
-            <View
-                android:id="@+id/separator"
-                android:layout_width="2dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
-                android:layout_toRightOf="@+id/button1"
-                android:background="@android:color/white" />
-        </RelativeLayout>
+            android:layout_below="@+id/scope_test_button"
+            android:text="Launch terminal emulator" />
     </RelativeLayout>
 
 </ScrollView>

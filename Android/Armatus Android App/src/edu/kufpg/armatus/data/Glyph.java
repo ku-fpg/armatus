@@ -124,7 +124,7 @@ public class Glyph implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mStyle.ordinal());
-		dest.writeList(mPath);
+		dest.writeTypedList(mPath);
 		dest.writeString(mText);
 	}
 }

@@ -81,7 +81,7 @@ public class CommandInfo implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(mHelp);
 		dest.writeString(mName);
-		dest.writeList(mTags);
+		dest.writeStringList(mTags);
 	}
 
 }

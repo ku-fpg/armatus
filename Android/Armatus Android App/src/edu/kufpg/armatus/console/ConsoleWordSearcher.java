@@ -271,8 +271,8 @@ public class ConsoleWordSearcher implements Parcelable {
 	private ConsoleWordSearcher(Parcel in) {
 		mCriterion = in.readString();
 		ParcelUtils.readMultimap(mSearchOffsetsMap, in, ConsoleWordSearcher.class.getClassLoader());
-		in.readList(mPreviousMatches, ConsoleWordSearcher.class.getClassLoader());
-		in.readList(mNextMatches, ConsoleWordSearcher.class.getClassLoader());
+		in.readTypedList(mPreviousMatches, MatchParams.CREATOR);
+		in.readTypedList(mNextMatches, MatchParams.CREATOR);
 		mSelectedMatch = in.readParcelable(ConsoleWordSearcher.class.getClassLoader());
 		mMatchCount = in.readInt();
 	}
@@ -287,8 +287,8 @@ public class ConsoleWordSearcher implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(mCriterion);
 		ParcelUtils.writeMultimap(mSearchOffsetsMap, dest);
-		dest.writeList(mPreviousMatches);
-		dest.writeList(mNextMatches);
+		dest.writeTypedList(mPreviousMatches);
+		dest.writeTypedList(mNextMatches);
 		dest.writeParcelable(mSelectedMatch, flags);
 		dest.writeInt(mMatchCount);
 	}

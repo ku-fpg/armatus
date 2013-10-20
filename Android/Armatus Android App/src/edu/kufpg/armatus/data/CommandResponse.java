@@ -83,7 +83,7 @@ public class CommandResponse implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mAst);
-		dest.writeList(mGlyphs);
+		dest.writeTypedList(mGlyphs);
 		dest.writeString(mMessage);
 	}
 }

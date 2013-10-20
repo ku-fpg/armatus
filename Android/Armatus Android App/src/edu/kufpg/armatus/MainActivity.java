@@ -22,7 +22,7 @@ public class MainActivity extends BaseActivity {
 	private TextView mButtonsView;
 	private StickyButton mStickyButton;
 	private Button mUnstickButton, mTreeButton, mConsoleButton,
-	mPinchZoomButton, mTerminalButton;
+	mRadialMenuButton, mScopeTestButton, mTerminalButton;
 	private int mNumTextChanges = 0;
 
 	@Override
@@ -36,7 +36,8 @@ public class MainActivity extends BaseActivity {
 		mUnstickButton = (Button) findViewById(R.id.unlock_button);
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
-		mPinchZoomButton = (Button) findViewById(R.id.radialmenu_button);
+		mRadialMenuButton = (Button) findViewById(R.id.radialmenu_button);
+		mScopeTestButton = (Button) findViewById(R.id.scope_test_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 
 		mStickyButton.setOnClickListener(new OnClickListener() {
@@ -69,10 +70,17 @@ public class MainActivity extends BaseActivity {
 			}
 		});
 
-		mPinchZoomButton.setOnClickListener(new OnClickListener() {
+		mRadialMenuButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(MainActivity.this, RadialMenuActivity.class));
+			}
+		});
+
+		mScopeTestButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(MainActivity.this, LineTestActivity.class));
 			}
 		});
 
