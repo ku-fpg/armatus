@@ -130,6 +130,7 @@ public class ConsoleActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		super.onCreate(savedInstanceState);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.console_sliding_menu_activity);
 		setProgressBarIndeterminate(true);
 
@@ -567,6 +568,9 @@ public class ConsoleActivity extends BaseActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			exit(false);
+			return true;
 		case R.id.gestures:
 			GestureDialog gd = new GestureDialog();
 			gd.show(getFragmentManager(), "gesture");
