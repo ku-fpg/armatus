@@ -109,7 +109,7 @@ public class LineTestActivity extends BaseActivity {
 		parentTextViewRect.bottom += parentTextViewTopAndBottomOffset;
 
 		// In the case of multi line text, we have to choose what rectangle take
-		if (keywordIsInMultiLine){
+		if (keywordIsInMultiLine) {
 
 			Point size = new Point();
 			getWindowManager().getDefaultDisplay().getSize(size);
@@ -119,17 +119,15 @@ public class LineTestActivity extends BaseActivity {
 			int dyBottom = screenHeight - parentTextViewRect.bottom;
 			boolean onTop = dyTop > dyBottom;
 
-			if (onTop){
+			if (onTop) {
 				endXCoordinatesOfClickedText = textViewLayout.getLineRight(currentLineStartOffset);
-			}
-			else{
+			} else {
 				parentTextViewRect = new Rect();
 				textViewLayout.getLineBounds(currentLineEndOffset, parentTextViewRect);
 				parentTextViewRect.top += parentTextViewTopAndBottomOffset;
 				parentTextViewRect.bottom += parentTextViewTopAndBottomOffset;
 				startXCoordinatesOfClickedText = textViewLayout.getLineLeft(currentLineEndOffset);
 			}
-
 		}
 
 		parentTextViewRect.left += (
