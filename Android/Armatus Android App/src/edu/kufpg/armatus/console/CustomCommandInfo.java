@@ -2,6 +2,8 @@ package edu.kufpg.armatus.console;
 
 import java.util.Arrays;
 
+import com.google.common.collect.Lists;
+
 import edu.kufpg.armatus.data.CommandInfo;
 
 public abstract class CustomCommandInfo extends CommandInfo {
@@ -16,7 +18,7 @@ public abstract class CustomCommandInfo extends CommandInfo {
 
 	
 	public CustomCommandInfo(String help, String name, int argsCount) {
-		super(help, name, Arrays.asList(CustomCommandDispatcher.CLIENT_COMMANDS_TAG));
+		super(help, name, Arrays.asList(CustomCommandDispatcher.CLIENT_COMMANDS_TAG), Lists.newArrayList("String"), "()");
 		mArgsCount = argsCount;
 	}
 

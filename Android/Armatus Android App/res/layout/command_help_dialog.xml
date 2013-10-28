@@ -8,7 +8,7 @@
         style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Info" />
+        android:text="INFO" />
 
     <TextView
         android:id="@+id/command_help_info_text"
@@ -18,12 +18,27 @@
         android:padding="5dp" />
 
     <TextView
-        android:id="@+id/command_help_tags_title"
+        android:id="@+id/command_help_types_title"
         style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/command_help_info_text"
-        android:text="Tags" />
+        android:text="TYPES" />
+
+    <TextView
+        android:id="@+id/command_help_types_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/command_help_types_title"
+        android:padding="5dp" />
+
+    <TextView
+        android:id="@+id/command_help_tags_title"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/command_help_types_text"
+        android:text="TAGS" />
 
     <TextView
         android:id="@+id/command_help_tags_text"

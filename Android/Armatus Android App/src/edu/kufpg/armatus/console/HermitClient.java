@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -22,9 +21,9 @@ import android.os.Parcelable;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.SortedSetMultimap;
+import com.google.common.collect.TreeMultimap;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.PrefsActivity;
@@ -46,8 +45,6 @@ import edu.kufpg.armatus.util.StringUtils;
 public class HermitClient implements Parcelable {
 	public static int NO_TOKEN = -1;
 	private static final String HISTORY_FILENAME = "/history.txt";
-	private static Set<String> cuTagList = Sets.newHashSet("alpha","alpha-alt","alpha-case","alpha-case-binder","alpha-lam","alpha-let","alpha-top","info","top","bash","simplify","unshadow","{","}","set-pp","set-pp-coerion","set-pp-renderer","set-pp-type","set-pp-width");
-
 	private ConsoleActivity mConsole;
 	private ProgressDialog mProgress;
 
@@ -91,7 +88,7 @@ public class HermitClient implements Parcelable {
 			newSaveHistoryRequest().execute(mServerUrl + "/history", mToken.toString());
 		}
 	}
-	
+
 	public void loadHistory() {
 		if (isNetworkConnected(RequestName.HISTORY) && isTokenAcquired(false)) {
 			String path = "";
@@ -312,22 +309,26 @@ public class HermitClient implements Parcelable {
 			@Override
 			protected void onPostExecute(List<CommandInfo> commands) {
 				super.onPostExecute(commands);
-				ImmutableSortedSet.Builder<String> tagSetBuilder = ImmutableSortedSet.naturalOrder();
-				ImmutableListMultimap.Builder<String, CommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
+				ImmutableSortedSet.Builder<String> tags = ImmutableSortedSet.naturalOrder();
+				SortedSetMultimap<String, String> tagCommandNames = TreeMultimap.create();
+				SortedSetMultimap<String, CommandInfo> commandNameInfos = TreeMultimap.create();
 
+				tags.add(CommandHolder.COMMONLY_USED_COMMANDS_TAG);
 				for (CommandInfo cmdInfo : commands) {
-					if(cuTagList.contains(cmdInfo.getName()))
-					{
-						tagMapBuilder.put("Commonly Used", cmdInfo);
+					String cmdName = cmdInfo.getName();
+					if (CommandHolder.isCommonlyUsedCommand(cmdName)) {
+						tagCommandNames.put(CommandHolder.COMMONLY_USED_COMMANDS_TAG, cmdName);
 					}
 					for (String tag : cmdInfo.getTags()) {
-						tagSetBuilder.add(tag);
-						tagMapBuilder.put(tag, cmdInfo);
+						tags.add(tag);
+						tagCommandNames.put(tag, cmdName);
 					}
+					commandNameInfos.put(cmdName, cmdInfo);
 				}
 
-				CommandHolder.setTagList(ImmutableList.copyOf(tagSetBuilder.build()));
-				CommandHolder.setTagMap(tagMapBuilder.build());
+				CommandHolder.setTags(tags.build());
+				CommandHolder.setTagCommandNames(tagCommandNames);
+				CommandHolder.setCommandInfos(commandNameInfos);
 				getActivity().updateCommandExpandableMenu();
 				dismissProgressDialog();
 			}
@@ -391,7 +392,7 @@ public class HermitClient implements Parcelable {
 	private void loadHistoryCommands(final List<HistoryCommand> historyCommands) {
 		loadHistoryCommands(historyCommands, 0);
 	}
-	
+
 	private void loadHistoryCommands(final List<HistoryCommand> historyCommands, final int index) {
 		if (!historyCommands.isEmpty()) {
 			Command tokenCommand = new Command(mToken, historyCommands.get(index).getCommand());
@@ -401,7 +402,7 @@ public class HermitClient implements Parcelable {
 					super.onPreExecute();
 					getActivity().disableInput(false);
 				}
-				
+
 				@Override
 				protected CommandResponse onResponse(String response) {
 					try {
@@ -411,7 +412,7 @@ public class HermitClient implements Parcelable {
 						return null;
 					}
 				}
-				
+
 				@Override
 				protected void onCancelled() {
 					String newErrorMessage = getErrorMessage();
@@ -440,12 +441,12 @@ public class HermitClient implements Parcelable {
 
 	private HermitHttpServerRequest<CommandResponse> newRunCommandRequest(final String command) {
 		return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
-			
+
 			@Override
 			protected CommandResponse doInBackground(String... params) {
 				return super.doInBackground(params);
 			}
-			
+
 			@Override
 			protected CommandResponse onResponse(String response) {
 				try {
@@ -487,6 +488,11 @@ public class HermitClient implements Parcelable {
 				mToken = null;
 				getActivity().clearCommandHistory();
 				getActivity().appendErrorResponse(message);
+				
+				CommandHolder.setTags(null);
+				CommandHolder.setTagCommandNames(null);
+				CommandHolder.setCommandInfos(null);
+				getActivity().updateCommandExpandableMenu();
 			}
 		};
 	}
@@ -570,7 +576,7 @@ public class HermitClient implements Parcelable {
 	public boolean isRequestDelayed() {
 		return !mDelayedRequestName.equals(RequestName.NULL);
 	}
-	
+
 	public boolean isTokenAcquired() {
 		return isTokenAcquired(false);
 	}

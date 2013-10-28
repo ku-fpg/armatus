@@ -64,7 +64,6 @@ import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.SearchDirection;
-import edu.kufpg.armatus.data.CommandInfo;
 import edu.kufpg.armatus.data.CommandResponse;
 import edu.kufpg.armatus.data.HistoryCommand;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
@@ -296,8 +295,8 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandExpandableMenuView.setOnChildClickListener(new OnChildClickListener() {
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				CommandInfo cmdInfo = mCommandExpandableMenuAdapter.getChild(groupPosition, childPosition);
-				setInputText(cmdInfo.getName() + StringUtils.NBSP);
+				String cmdName = mCommandExpandableMenuAdapter.getChild(groupPosition, childPosition);
+				setInputText(cmdName + StringUtils.NBSP);
 				return true;
 			}
 		});
@@ -927,7 +926,7 @@ public class ConsoleActivity extends BaseActivity {
 		if (replaceIndex == StringUtils.findFirstWordIndex(input)
 				|| input.isEmpty() || input.matches(StringUtils.WHITESPACE)) {
 			final String trimput = StringUtils.trim(input);
-			suggestions.addAll(Collections2.filter(CustomCommandDispatcher.getCustomCommandSet(),
+			suggestions.addAll(Collections2.filter(CustomCommandDispatcher.getCommandSet(),
 					new Predicate<String>() {
 				@Override
 				public boolean apply(String suggestion) {

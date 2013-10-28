@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.drag;
 
-import edu.kufpg.armatus.data.CommandInfo;
 import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,7 +12,7 @@ import android.widget.TextView;
  * edu.kufpg.armatus.command.CustomCommandDispatcher.Keyword Keywords}.
  */
 public class DragIcon extends TextView {
-	private CommandInfo mCommandInfo;
+	private String mCommandName;
 	
 	public DragIcon(Context context) {
 		super(context);
@@ -43,12 +42,12 @@ public class DragIcon extends TextView {
 		});
 	}
 	
-	public CommandInfo getCommandInfo() {
-		return mCommandInfo;
+	public String getCommandName() {
+		return mCommandName;
 	}
 	
-	public void setCommandInfo(CommandInfo commandInfo) {
-		mCommandInfo = commandInfo;
-		setText(commandInfo.getName());
+	public void setCommandInfo(String commandName) {
+		mCommandName = commandName;
+		setText(commandName);
 	}
 }

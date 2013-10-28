@@ -1,9 +1,7 @@
 package edu.kufpg.armatus.console;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.data.CommandInfo;
-import edu.kufpg.armatus.dialog.CommandHelpDialog;
-import edu.kufpg.armatus.drag.DragIcon;
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +9,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.data.CommandInfo;
+import edu.kufpg.armatus.dialog.CommandHelpDialog;
+import edu.kufpg.armatus.drag.DragIcon;
 
 /**
  * {@link android.widget.ExpandableListAdapter ExpandableListAdapter} for a menu containing
@@ -32,16 +34,17 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 		mIconClickListener = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				CommandInfo info = ((DragIcon) v).getCommandInfo();
-				CommandHelpDialog helpDialog = CommandHelpDialog.newInstance(info);
+				String commandName = ((DragIcon) v).getCommandName();
+				List<? extends CommandInfo> commandInfos = CommandHolder.getCommandsFromName(commandName);
+				CommandHelpDialog helpDialog = CommandHelpDialog.newInstance(commandInfos.get(0));
 				helpDialog.show(mConsole.getFragmentManager(), "commandHelp");
 			}
 		};
 	}
 
 	@Override
-	public CommandInfo getChild(int groupPosition, int childPosition) {
-		return CommandHolder.getTagCommands(getGroup(groupPosition)).get(childPosition);
+	public String getChild(int groupPosition, int childPosition) {
+		return CommandHolder.getCommandNamesFromTag(getGroup(groupPosition)).get(childPosition);
 	}
 
 	@Override
@@ -62,8 +65,8 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			item = (CommandExpandableMenuItem) view.getTag();
 		}
 
-		CommandInfo commandInfo = getChild(groupPosition, childPosition);
-		item.icon.setCommandInfo(commandInfo);
+		String commandName = getChild(groupPosition, childPosition);
+		item.icon.setCommandInfo(commandName);
 		item.icon.setOnClickListener(mIconClickListener);
 		item.icon.setTypeface(ConsoleActivity.TYPEFACE);
 		int newWidth = mConsole.getResources().getDrawable(R.drawable.template_white).getIntrinsicWidth();
@@ -73,7 +76,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		return CommandHolder.getTagCommands(getGroup(groupPosition)).size();
+		return CommandHolder.getCommandNamesFromTag(getGroup(groupPosition)).size();
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package edu.kufpg.armatus.dialog;
 
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.data.CommandInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,6 +42,13 @@ public class CommandHelpDialog extends ConsiderateDialog {
 
 		TextView commandInfoView = (TextView) v.findViewById(R.id.command_help_info_text);
 		commandInfoView.setText(mCommandInfo.getHelp());
+		
+		TextView commandTypesView = (TextView) v.findViewById(R.id.command_help_types_text);
+		commandTypesView.setTypeface(ConsoleActivity.TYPEFACE);
+		for (String type : mCommandInfo.getArgTypes()) {
+			commandTypesView.append(type + " → ");
+		}
+		commandTypesView.append(mCommandInfo.getResultType());
 		
 		TextView commandTagsView = (TextView) v.findViewById(R.id.command_help_tags_text);
 		if (savedInstanceState == null) {

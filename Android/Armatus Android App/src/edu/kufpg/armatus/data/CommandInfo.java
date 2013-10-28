@@ -13,22 +13,25 @@ import com.google.common.collect.ImmutableList;
 
 import edu.kufpg.armatus.util.ParcelUtils;
 
-public class CommandInfo implements Parcelable {
-	private final String mHelp, mName;
-	private final List<String> mTags;
+public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
+	private final String mHelp, mName, mResultType;
+	private final List<String> mTags, mArgTypes;
+	
 
-	public CommandInfo(String help, String name, List<String> tags) {
-		this(help, name, ImmutableList.copyOf(tags));
+	public CommandInfo(String help, String name, List<String> tags, List<String> argTypes, String resultType) {
+		this(help, name, ImmutableList.copyOf(tags), ImmutableList.copyOf(argTypes), resultType);
 	}
 
 	public CommandInfo(JSONObject o) throws JSONException {
-		this(o.getString("help"), o.getString("name"), jsonToTags(o.getJSONArray("tags")));
+		this(o.getString("help"), o.getString("name"), jsonToList(o.getJSONArray("tags")), jsonToList(o.getJSONArray("argTys")), o.getString("resTy"));
 	}
 
-	private CommandInfo(String help, String name, ImmutableList<String> tags) {
+	private CommandInfo(String help, String name, ImmutableList<String> tags, ImmutableList<String> argTypes, String resultType) {
 		mHelp = help;
 		mName = name;
 		mTags = tags;
+		mArgTypes = argTypes;
+		mResultType = resultType;
 	}
 
 	public String getHelp() {
@@ -42,8 +45,16 @@ public class CommandInfo implements Parcelable {
 	public List<String> getTags() {
 		return mTags;
 	}
+	
+	public List<String> getArgTypes() {
+		return mArgTypes;
+	}
+	
+	public String getResultType() {
+		return mResultType;
+	}
 
-	private static ImmutableList<String> jsonToTags(JSONArray a) {
+	private static ImmutableList<String> jsonToList(JSONArray a) {
 		ImmutableList.Builder<String> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
 			try {
@@ -54,6 +65,16 @@ public class CommandInfo implements Parcelable {
 		}
 		return builder.build();
 	}
+	
+	@Override
+	public int compareTo(CommandInfo another) {
+		int nameComp = getName().compareTo(another.getName());
+		if (nameComp == 0) {
+			return Integer.valueOf(getArgTypes().size()).compareTo(another.getArgTypes().size());
+		} else {
+			return nameComp;
+		}
+	}
 
 	public static Parcelable.Creator<CommandInfo> CREATOR =
 			new Parcelable.Creator<CommandInfo>() {
@@ -63,7 +84,10 @@ public class CommandInfo implements Parcelable {
 			String name = source.readString();
 			ImmutableList<String> tags = ParcelUtils.readImmutableList
 					(source, CommandInfo.class.getClassLoader());
-			return new CommandInfo(help, name, tags);
+			ImmutableList<String> argTypes = ParcelUtils.readImmutableList
+					(source, CommandInfo.class.getClassLoader());
+			String resultType = source.readString();
+			return new CommandInfo(help, name, tags, argTypes, resultType);
 		}
 
 		@Override
@@ -82,6 +106,8 @@ public class CommandInfo implements Parcelable {
 		dest.writeString(mHelp);
 		dest.writeString(mName);
 		dest.writeStringList(mTags);
+		dest.writeStringList(mArgTypes);
+		dest.writeString(mResultType);
 	}
 
 }
