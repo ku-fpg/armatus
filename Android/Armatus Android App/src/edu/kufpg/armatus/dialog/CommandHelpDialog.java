@@ -1,78 +1,70 @@
 package edu.kufpg.armatus.dialog;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-import edu.kufpg.armatus.data.CommandInfo;
-import android.graphics.Color;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.LocalActivityManager;
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.activity.CommandHelpActivity;
+import edu.kufpg.armatus.data.CommandInfo;
 
+@SuppressWarnings("deprecation")
 public class CommandHelpDialog extends ConsiderateDialog {
 
-	private CommandInfo mCommandInfo;
-	private CharSequence mTagBoxes;
-
-	public static CommandHelpDialog newInstance(CommandInfo commandInfo) {
+	private List<CommandInfo> mCommandInfos;
+	
+	public static CommandHelpDialog newInstance(List<? extends CommandInfo> commandInfos) {
 		CommandHelpDialog hd = new CommandHelpDialog();
 		Bundle args = new Bundle();
-		args.putParcelable("commandInfo", commandInfo);
+		args.putInt("commandInfosSize", commandInfos.size());
+		for (int i = 0; i < commandInfos.size(); i++) {
+			args.putParcelable("commandInfo"+i, commandInfos.get(i));
+		}
 		hd.setArguments(args);
 		return hd;
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mCommandInfo = (CommandInfo) getArguments().getParcelable("commandInfo");
+		int commandInfosSize = getArguments().getInt("commandInfosSize");
+		mCommandInfos = new ArrayList<CommandInfo>(commandInfosSize);
+		for (int i = 0; i < commandInfosSize; i++) {
+			mCommandInfos.add(i, (CommandInfo) getArguments().getParcelable("commandInfo"+i));
+		}
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View v = inflater.inflate(R.layout.command_help_dialog, container, false);
-		getDialog().setTitle(mCommandInfo.getName());
+		getDialog().setTitle(mCommandInfos.get(0).getName());
 		setCancelable(true);
-
-		TextView commandInfoView = (TextView) v.findViewById(R.id.command_help_info_text);
-		commandInfoView.setText(mCommandInfo.getHelp());
 		
-		TextView commandTypesView = (TextView) v.findViewById(R.id.command_help_types_text);
-		commandTypesView.setTypeface(ConsoleActivity.TYPEFACE);
-		for (String type : mCommandInfo.getArgTypes()) {
-			commandTypesView.append(type + " → ");
-		}
-		commandTypesView.append(mCommandInfo.getResultType());
+		TabHost th = (TabHost) v.findViewById(android.R.id.tabhost);
+		// Ugly hack that is needed to use a TabHost with Intents in a Dialog
+		LocalActivityManager localActivityManager = new LocalActivityManager(getActivity(), false);
+	    localActivityManager.dispatchCreate(savedInstanceState);
+		th.setup(localActivityManager);
 		
-		TextView commandTagsView = (TextView) v.findViewById(R.id.command_help_tags_text);
-		if (savedInstanceState == null) {
-			SpannableStringBuilder builder = new SpannableStringBuilder();
-			for (String tag : mCommandInfo.getTags()) {
-				SpannableString tagBox = new SpannableString(" " + tag + " ");
-				tagBox.setSpan(new BackgroundColorSpan(Color.GRAY), 0, tagBox.length(), 0);
-				tagBox.setSpan(new ForegroundColorSpan(Color.BLACK), 0, tagBox.length(), 0);
-				builder.append(tagBox).append(", ");
-			}
-			builder.delete(builder.length() - 2, builder.length());
-			mTagBoxes = builder;
-		} else {
-			mTagBoxes = savedInstanceState.getCharSequence("tagBoxes");
+		for (int i = 0; i < mCommandInfos.size(); i++) {
+			TabSpec ts = th.newTabSpec("ts"+i);
+			Intent intent = new Intent(getActivity(), CommandHelpActivity.class);
+			CommandInfo ci = mCommandInfos.get(i);
+			int ciSize = ci.getArgTypes().size();
+			intent.putExtra("commandInfo", ci);
+			ts.setIndicator(ciSize == 1 ? "1 arg" : (ciSize + " args")).setContent(intent);
+			th.addTab(ts);
 		}
-		commandTagsView.setText(mTagBoxes);
-
+		th.setCurrentTab(0);
+		
 		return v;
 	}
-	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putCharSequence("tagBoxes", mTagBoxes);
-	}
-
 }

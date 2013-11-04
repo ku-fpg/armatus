@@ -36,7 +36,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter {
 			public void onClick(View v) {
 				String commandName = ((DragIcon) v).getCommandName();
 				List<? extends CommandInfo> commandInfos = CommandHolder.getCommandsFromName(commandName);
-				CommandHelpDialog helpDialog = CommandHelpDialog.newInstance(commandInfos.get(0));
+				CommandHelpDialog helpDialog = CommandHelpDialog.newInstance(commandInfos);
 				helpDialog.show(mConsole.getFragmentManager(), "commandHelp");
 			}
 		};

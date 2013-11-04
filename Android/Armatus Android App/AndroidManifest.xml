@@ -5,7 +5,7 @@
 
     <uses-sdk
         android:minSdkVersion="16"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -63,6 +63,7 @@
             android:name="edu.kufpg.armatus.networking.BluetoothDeviceListActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/bluetooth_select_device_title" />
+        <activity android:name=".activity.CommandHelpActivity" />
     </application>
 
 </manifest>
