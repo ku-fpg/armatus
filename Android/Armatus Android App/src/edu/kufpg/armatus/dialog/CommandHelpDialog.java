@@ -19,7 +19,7 @@ import edu.kufpg.armatus.data.CommandInfo;
 public class CommandHelpDialog extends ConsiderateDialog {
 
 	private List<CommandInfo> mCommandInfos;
-	
+
 	public static CommandHelpDialog newInstance(List<? extends CommandInfo> commandInfos) {
 		CommandHelpDialog hd = new CommandHelpDialog();
 		Bundle args = new Bundle();
@@ -30,7 +30,7 @@ public class CommandHelpDialog extends ConsiderateDialog {
 		hd.setArguments(args);
 		return hd;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,20 +40,20 @@ public class CommandHelpDialog extends ConsiderateDialog {
 			mCommandInfos.add(i, (CommandInfo) getArguments().getParcelable("commandInfo"+i));
 		}
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View v = inflater.inflate(R.layout.command_help_dialog, container, false);
 		getDialog().setTitle(mCommandInfos.get(0).getName());
 		setCancelable(true);
-		
+
 		TabHost th = (TabHost) v.findViewById(android.R.id.tabhost);
 		// Ugly hack that is needed to use a TabHost with Intents in a Dialog
 		LocalActivityManager localActivityManager = new LocalActivityManager(getActivity(), false);
-	    localActivityManager.dispatchCreate(savedInstanceState);
+		localActivityManager.dispatchCreate(savedInstanceState);
 		th.setup(localActivityManager);
-		
+
 		for (int i = 0; i < mCommandInfos.size(); i++) {
 			TabSpec ts = th.newTabSpec("ts"+i);
 			Intent intent = new Intent(getActivity(), CommandHelpActivity.class);
@@ -64,7 +64,7 @@ public class CommandHelpDialog extends ConsiderateDialog {
 			th.addTab(ts);
 		}
 		th.setCurrentTab(0);
-		
+
 		return v;
 	}
 }

@@ -21,25 +21,30 @@ public class Glyph implements Parcelable {
 	public static final String CYAN = "#1BE0CC";
 	
 	private final GlyphStyle mStyle;
-	private final List<Crumb> mPath;
+	private final List<Crumb> mBindingSite, mPath;
 	private final String mText;
 
-	public Glyph(GlyphStyle style, List<Crumb> path, String text) {
-		this(style, ImmutableList.copyOf(path), text);
+	public Glyph(GlyphStyle style, List<Crumb> bindingSite, List<Crumb> path, String text) {
+		this(style, ImmutableList.copyOf(bindingSite), ImmutableList.copyOf(path), text);
 	}
 
 	public Glyph(JSONObject o) throws JSONException {
-		this(jsonToStyle(o), jsonToCrumbs(o.getJSONArray("path")), o.getString("text"));
+		this(jsonToStyle(o), jsonToCrumbs(o.getJSONArray("bindingSite")), jsonToCrumbs(o.getJSONArray("path")), o.getString("text"));
 	}
 	
-	private Glyph(GlyphStyle style, ImmutableList<Crumb> path, String text) {
+	private Glyph(GlyphStyle style, ImmutableList<Crumb> bindingSite, ImmutableList<Crumb> path, String text) {
 		mStyle = style;
+		mBindingSite = bindingSite;
 		mPath = path;
 		mText = text;
 	}
 
 	public GlyphStyle getStyle() {
 		return mStyle;
+	}
+	
+	public List<Crumb> getBindingSite() {
+		return mBindingSite;
 	}
 
 	public List<Crumb> getPath() {
@@ -104,10 +109,12 @@ public class Glyph implements Parcelable {
 		@Override
 		public Glyph createFromParcel(Parcel source) {
 			GlyphStyle style = GlyphStyle.values()[source.readInt()];
+			ImmutableList<Crumb> bindingSite = ParcelUtils.readImmutableList
+					(source, Glyph.class.getClassLoader());
 			ImmutableList<Crumb> path = ParcelUtils.readImmutableList
 					(source, Glyph.class.getClassLoader());
 			String text = source.readString();
-			return new Glyph(style, path, text);
+			return new Glyph(style, bindingSite, path, text);
 		}
 
 		@Override
@@ -124,6 +131,7 @@ public class Glyph implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mStyle.ordinal());
+		dest.writeTypedList(mBindingSite);
 		dest.writeTypedList(mPath);
 		dest.writeString(mText);
 	}
