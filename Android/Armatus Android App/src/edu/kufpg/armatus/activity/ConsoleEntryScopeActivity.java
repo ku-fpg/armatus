@@ -17,11 +17,10 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 
-import edu.kufpg.armatus.LineTestMovementMethod;
-import edu.kufpg.armatus.LineTestScrollView;
-import edu.kufpg.armatus.LineTestSpan;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleEntry;
 import edu.kufpg.armatus.data.Crumb;
@@ -31,27 +30,29 @@ import edu.kufpg.armatus.util.StringUtils;
 public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 
 	private TextView mTextView;
-	private LineTestScrollView mScrollView;
-	private LineTestSpan mSelectedSpan;
+	private ScopeScrollView mScrollView;
+	private ScopeSpan mSelectedSpan;
+	private Spannable mSpans;
+	private Map<ScopeSpan, ScopeSpan> mSpanParentMap = Maps.newHashMap();
+	private ListMultimap<ScopeSpan, ScopeSpan> mSpanChildrenMap = ArrayListMultimap.create();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_entry_scope_activity);
 
-		mScrollView = (LineTestScrollView) findViewById(R.id.console_entry_scope_scroll_view);
+		mScrollView = (ScopeScrollView) findViewById(R.id.console_entry_scope_scroll_view);
 		mTextView = (TextView) findViewById(R.id.console_entry_scope_text_view);
-		final ConsoleEntry entry = getEntry();
 
+		//		if (savedInstanceState == null) {
+		final ConsoleEntry entry = getEntry();
 		final Spannable spans = StringUtils.charWrap(entry.getCommandResponse().getGlyphText());
-		//		final Map<LineTestSpan, LineTestSpan> mSpanParentMap = Maps.newHashMap();
-		//		final ListMultimap<LineTestSpan, LineTestSpan> mSpanChildrenMap = ArrayListMultimap.create();
-		final Map<List<Crumb>, LineTestSpan> crumbsSpanMap = Maps.newHashMap();
+		final Map<List<Crumb>, ScopeSpan> crumbsSpanMap = Maps.newHashMap();
 		final int length = spans.length();
 		int index = 0;
 		for (final Glyph glyph : entry.getCommandResponse().getGlyphs()) {
 			int endIndex = index + glyph.getText().length() + 1;
-			final LineTestSpan span = new LineTestSpan(index, Math.min(length, endIndex - 1)) {
+			final ScopeSpan span = new ScopeSpan(index, Math.min(length, endIndex - 1)) {
 				@Override
 				public void onClick(View widget) {
 					Spannable textViewSpans = new SpannableString(mTextView.getText());
@@ -73,27 +74,32 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 
 			crumbsSpanMap.put(glyph.getPath(), span);
 			if (glyph.hasBindingSite() && crumbsSpanMap.containsKey(glyph.getBindingSite())) {
-				LineTestSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
-				span.setParentSpan(parent);
-				parent.addChildSpan(span);
+				ScopeSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
+				mSpanParentMap.put(span, parent);
+				mSpanChildrenMap.put(parent, span);
 			}
 
 			spans.setSpan(span, index, Math.min(length, endIndex - 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 			index = endIndex - 1;
 		}
-
-		//		for (LineTestSpan span : spans.getSpans(0, spans.length(), LineTestSpan.class)) {
-		//			if (!span.equals(mLinedSpan)) {
-		//				span.addChildSpan(mLinedSpan);
-		//			}
-		//			if (!mLinedSpan.hasParentSpan()) {
-		//				mLinedSpan.setParentSpan(span);
-		//			}
+		mSpans = spans;
+		//		} else {
+		//			BundleUtils.getParcelableMap(savedInstanceState, "spanParentMap", mSpanParentMap);
+		//			BundleUtils.getParcelableMultimap(savedInstanceState, "spanChildrenMap", mSpanChildrenMap);
+		//			mSpans = (Spannable) savedInstanceState.getCharSequence("spans");
 		//		}
 
-		mTextView.setText(spans);
-		mTextView.setMovementMethod(LineTestMovementMethod.getInstance());
+		mTextView.setText(mSpans);
+		mTextView.setMovementMethod(ScopeMovementMethod.getInstance());
 	}
+
+	//	@Override
+	//	public void onSaveInstanceState(Bundle outState) {
+	//		super.onSaveInstanceState(outState);
+	//		BundleUtils.putParcelableMap(outState, "spanParentMap", mSpanParentMap);
+	//		BundleUtils.putParcelableMultimap(outState, "spanChildrenMap", mSpanChildrenMap);
+	//		outState.putCharSequence("spans", mSpans);
+	//	}
 
 	private Rect getSpanCoordinates(Spannable buffer, Object span) {
 		// Initialize global value
@@ -164,10 +170,10 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		return parentTextViewRect;
 	}
 
-	private void selectSpan(Spannable textViewSpans, LineTestSpan spanToSelect) {
+	private void selectSpan(Spannable textViewSpans, ScopeSpan spanToSelect) {
 		Rect coords = getSpanCoordinates(textViewSpans, spanToSelect);
-		if (spanToSelect.hasParentSpan()) {
-			LineTestSpan ps = spanToSelect.getParentSpan();
+		if (mSpanParentMap.containsKey(spanToSelect)) {
+			ScopeSpan ps = mSpanParentMap.get(spanToSelect);
 			mScrollView.drawParentalLine(coords, getSpanCoordinates(textViewSpans, ps));
 
 			textViewSpans.setSpan(new HighlightBackgroundSpan(Color.CYAN),
@@ -176,10 +182,11 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 					spanToSelect.getStartIndex(), spanToSelect.getEndIndex(), 0);
 			textViewSpans.setSpan(new HighlightBackgroundSpan(Color.BLUE),
 					ps.getStartIndex(), ps.getEndIndex(), 0);
-		} else if (spanToSelect.hasChildSpans()) {
-			Rect[] childRects = new Rect[spanToSelect.getChildSpanCount()];
-			for (int i = 0; i < spanToSelect.getChildSpanCount(); i++) {
-				LineTestSpan cs = spanToSelect.getChildSpan(i);
+		} else if (mSpanChildrenMap.containsKey(spanToSelect)) {
+			List<ScopeSpan> childSpans = mSpanChildrenMap.get(spanToSelect);
+			Rect[] childRects = new Rect[childSpans.size()];
+			for (int i = 0; i < childSpans.size(); i++) {
+				ScopeSpan cs = childSpans.get(i);
 				childRects[i] = getSpanCoordinates(textViewSpans, cs);
 
 				textViewSpans.setSpan(new HighlightBackgroundSpan(Color.CYAN),

@@ -1,4 +1,4 @@
-package edu.kufpg.armatus;
+package edu.kufpg.armatus.activity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import android.widget.ScrollView;
 
 import com.google.common.collect.Lists;
 
-public class LineTestScrollView extends ScrollView {
+public class ScopeScrollView extends ScrollView {
 
 	private final Paint PAINT = new Paint();
 	private int mScreenOffset;
@@ -21,17 +21,17 @@ public class LineTestScrollView extends ScrollView {
 	private Rect mMainRect, mParentRect;
 	private List<Rect> mChildRects = new ArrayList<Rect>();
 
-	public LineTestScrollView(Context context) {
+	public ScopeScrollView(Context context) {
 		super(context);
 		init();
 	}
 
-	public LineTestScrollView(Context context, AttributeSet attrs) {
+	public ScopeScrollView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
 
-	public LineTestScrollView(Context context, AttributeSet attrs, int defStyle) {
+	public ScopeScrollView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}

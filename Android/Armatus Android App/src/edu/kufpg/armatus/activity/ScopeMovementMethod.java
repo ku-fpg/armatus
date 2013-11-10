@@ -1,4 +1,4 @@
-package edu.kufpg.armatus;
+package edu.kufpg.armatus.activity;
 
 import android.text.Layout;
 import android.text.NoCopySpan;
@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-public class LineTestMovementMethod extends ScrollingMovementMethod {
+public class ScopeMovementMethod extends ScrollingMovementMethod {
 	
     @Override
     public boolean onTouchEvent(TextView widget, Spannable buffer,
@@ -62,12 +62,12 @@ public class LineTestMovementMethod extends ScrollingMovementMethod {
 	
 	public static MovementMethod getInstance() {
         if (sInstance == null)
-            sInstance = new LineTestMovementMethod();
+            sInstance = new ScopeMovementMethod();
 
         return sInstance;
     }
 
-    private static LineTestMovementMethod sInstance;
+    private static ScopeMovementMethod sInstance;
     private static Object FROM_BELOW = new NoCopySpan.Concrete();
 
 }
