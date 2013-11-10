@@ -32,8 +32,8 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 
 	private TextView mTextView;
 	private LineTestScrollView mScrollView;
-	private LineTestSpan mLinedSpan, mSelectedSpan;
-	
+	private LineTestSpan mSelectedSpan;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,8 +44,8 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		final ConsoleEntry entry = getEntry();
 
 		final Spannable spans = StringUtils.charWrap(entry.getCommandResponse().getGlyphText());
-//		final Map<LineTestSpan, LineTestSpan> mSpanParentMap = Maps.newHashMap();
-//		final ListMultimap<LineTestSpan, LineTestSpan> mSpanChildrenMap = ArrayListMultimap.create();
+		//		final Map<LineTestSpan, LineTestSpan> mSpanParentMap = Maps.newHashMap();
+		//		final ListMultimap<LineTestSpan, LineTestSpan> mSpanChildrenMap = ArrayListMultimap.create();
 		final Map<List<Crumb>, LineTestSpan> crumbsSpanMap = Maps.newHashMap();
 		final int length = spans.length();
 		int index = 0;
@@ -70,26 +70,26 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 				@Override
 				public void updateDrawState(TextPaint ds) {}
 			};
-			
-//			crumbsSpanMap.put(glyph.getPath(), span);
-//			if (glyph.hasBindingSite() && crumbsSpanMap.containsKey(glyph.getBindingSite())) {
-//				LineTestSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
-//				span.setParentSpan(parent);
-//				parent.addChildSpan(span);
-//			}
-			mLinedSpan = span;
+
+			crumbsSpanMap.put(glyph.getPath(), span);
+			if (glyph.hasBindingSite() && crumbsSpanMap.containsKey(glyph.getBindingSite())) {
+				LineTestSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
+				span.setParentSpan(parent);
+				parent.addChildSpan(span);
+			}
+
 			spans.setSpan(span, index, Math.min(length, endIndex - 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 			index = endIndex - 1;
 		}
 
-		for (LineTestSpan span : spans.getSpans(0, spans.length(), LineTestSpan.class)) {
-			if (!span.equals(mLinedSpan)) {
-				span.addChildSpan(mLinedSpan);
-			}
-			if (!mLinedSpan.hasParentSpan()) {
-				mLinedSpan.setParentSpan(span);
-			}
-		}
+		//		for (LineTestSpan span : spans.getSpans(0, spans.length(), LineTestSpan.class)) {
+		//			if (!span.equals(mLinedSpan)) {
+		//				span.addChildSpan(mLinedSpan);
+		//			}
+		//			if (!mLinedSpan.hasParentSpan()) {
+		//				mLinedSpan.setParentSpan(span);
+		//			}
+		//		}
 
 		mTextView.setText(spans);
 		mTextView.setMovementMethod(LineTestMovementMethod.getInstance());

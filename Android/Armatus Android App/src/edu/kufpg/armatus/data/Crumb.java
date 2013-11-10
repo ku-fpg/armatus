@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 import edu.kufpg.armatus.util.ParcelUtils;
@@ -66,7 +67,12 @@ public class Crumb implements Parcelable {
 		} else {
 			numsEqual = getNum() == c.getNum();
 		}
-		return numsEqual && getCrumbName() == c.getCrumbName();
+		return numsEqual && getCrumbName().equals(c.getCrumbName());
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(mNum, mCrumbName);
 	}
 
 	public static Parcelable.Creator<Crumb> CREATOR =
