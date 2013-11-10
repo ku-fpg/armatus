@@ -545,7 +545,7 @@ public class ConsoleActivity extends BaseActivity {
 				public boolean onEditorAction(TextView v, int actionId,
 						KeyEvent event) {
 					if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-						String searchCriterion = StringUtils.withCharWrap(mSearchInputView.getText().toString());
+						String searchCriterion = StringUtils.charWrap(mSearchInputView.getText().toString());
 						if (!searchCriterion.equalsIgnoreCase(mPrevSearchCriterion)) {
 							executeSearch(searchCriterion, SearchAction.BEGIN, null);
 						} else {
@@ -669,7 +669,7 @@ public class ConsoleActivity extends BaseActivity {
 					if (clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType("text/plain")) {
 						CharSequence pasteData = clipboard.getPrimaryClip().getItemAt(0).getText();
 						if (pasteData != null) {
-							String pastedText = StringUtils.withCharWrap(pasteData.toString());
+							String pastedText = StringUtils.charWrap(pasteData.toString());
 							if (item.getItemId() == R.id.console_input_paste_append) {
 								mConsoleInputEditText.append(pastedText);
 							} else {
@@ -844,7 +844,7 @@ public class ConsoleActivity extends BaseActivity {
 	}
 
 	public String getInput() {
-		return StringUtils.withoutCharWrap(mConsoleInputEditText.getText().toString());
+		return StringUtils.noCharWrap(mConsoleInputEditText.getText().toString());
 	}
 
 	public int getInputLength() {

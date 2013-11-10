@@ -130,7 +130,7 @@ public class HermitClient implements Parcelable {
 			}
 		} else {
 			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired(true)) {
-				String cleanInput = StringUtils.withoutCharWrap(input);
+				String cleanInput = StringUtils.noCharWrap(input);
 				Command command = new Command(mToken, cleanInput);
 				if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
 					newRunAbortResumeRequest().execute(mServerUrl + "/command", command.toString());
@@ -626,7 +626,7 @@ public class HermitClient implements Parcelable {
 		mDelayedRequestName = RequestName.values()[in.readInt()];
 		mServerUrl = in.readString();
 		mTempBundle = in.readBundle();
-		mToken = in.readParcelable(HermitClient.class.getClassLoader());
+		mToken = in.readParcelable(Token.class.getClassLoader());
 	}
 
 

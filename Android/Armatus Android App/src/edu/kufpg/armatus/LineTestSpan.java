@@ -13,20 +13,22 @@ public class LineTestSpan extends ClickableSpan {
 
 	private final int mStartIndex, mEndIndex;
 	private LineTestSpan mParentSpan;
-	private List<LineTestSpan> mChildSpans;
+	private List<LineTestSpan> mChildSpans = new ArrayList<LineTestSpan>();
 
-	public LineTestSpan(int startIndex, int endIndex, LineTestSpan parentSpan, LineTestSpan... childSpans) {
+	public LineTestSpan(int startIndex, int endIndex) {
 		super();
 		mStartIndex = startIndex;
 		mEndIndex = endIndex;
+	}
+
+	public LineTestSpan(int startIndex, int endIndex, LineTestSpan parentSpan, LineTestSpan... childSpans) {
+		this(startIndex, endIndex);
 		mParentSpan = parentSpan;
 		mChildSpans = Lists.newArrayList(childSpans);
 	}
 
 	public LineTestSpan(int startIndex, int endIndex, LineTestSpan parentSpan, Collection<? extends LineTestSpan> spans) {
-		super();
-		mStartIndex = startIndex;
-		mEndIndex = endIndex;
+		this(startIndex, endIndex);
 		mParentSpan = parentSpan;
 		mChildSpans = new ArrayList<LineTestSpan>(spans);
 	}
@@ -56,7 +58,7 @@ public class LineTestSpan extends ClickableSpan {
 	}
 
 	public boolean hasChildSpans() {
-		return mChildSpans != null && !mChildSpans.isEmpty();
+		return !mChildSpans.isEmpty();
 	}
 
 	public boolean hasParentSpan() {
@@ -64,7 +66,9 @@ public class LineTestSpan extends ClickableSpan {
 	}
 
 	public void setChildSpans(Collection<? extends LineTestSpan> newChildren) {
-		mChildSpans = new ArrayList<LineTestSpan>(newChildren);
+		if (newChildren != null) {
+			mChildSpans = new ArrayList<LineTestSpan>(newChildren);
+		}
 	}
 
 	public void setParentSpan(LineTestSpan newParent) {

@@ -1,10 +1,8 @@
 package edu.kufpg.armatus.activity;
 
-import edu.kufpg.armatus.LineTestMovementMethod;
-import edu.kufpg.armatus.LineTestScrollView;
-import edu.kufpg.armatus.LineTestSpan;
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.util.StringUtils;
+import java.util.List;
+import java.util.Map;
+
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -19,6 +17,17 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.common.collect.Maps;
+
+import edu.kufpg.armatus.LineTestMovementMethod;
+import edu.kufpg.armatus.LineTestScrollView;
+import edu.kufpg.armatus.LineTestSpan;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleEntry;
+import edu.kufpg.armatus.data.Crumb;
+import edu.kufpg.armatus.data.Glyph;
+import edu.kufpg.armatus.util.StringUtils;
+
 public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 
 	private TextView mTextView;
@@ -30,20 +39,19 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.console_entry_scope_activity);
 
-		mScrollView = (LineTestScrollView) findViewById(R.id.line_test_scroll_view);
-		mTextView = (TextView) findViewById(R.id.line_test_text_view);
+		mScrollView = (LineTestScrollView) findViewById(R.id.console_entry_scope_scroll_view);
+		mTextView = (TextView) findViewById(R.id.console_entry_scope_text_view);
+		final ConsoleEntry entry = getEntry();
 
-		mTextView.setText(StringUtils.withCharWrap("This is a test of the scoping capabilities that are soon to be integrated into Armatus " +
-				"I hope it works I actually have no idea this could end poorly so we'll see what happens here goes nothing "));
-		for (int i = 0; i < 3; i++) {
-			mTextView.append(mTextView.getText());
-		}
-
-		final Spannable spans = new SpannableString(mTextView.getText());
-		final int length = mTextView.length();
+		final Spannable spans = StringUtils.charWrap(entry.getCommandResponse().getGlyphText());
+//		final Map<LineTestSpan, LineTestSpan> mSpanParentMap = Maps.newHashMap();
+//		final ListMultimap<LineTestSpan, LineTestSpan> mSpanChildrenMap = ArrayListMultimap.create();
+		final Map<List<Crumb>, LineTestSpan> crumbsSpanMap = Maps.newHashMap();
+		final int length = spans.length();
 		int index = 0;
-		for (final String word : mTextView.getText().toString().split(StringUtils.WHITESPACE)) {
-			final LineTestSpan span = new LineTestSpan(index, Math.min(length, index + word.length() + 1), null) {
+		for (final Glyph glyph : entry.getCommandResponse().getGlyphs()) {
+			int endIndex = index + glyph.getText().length() + 1;
+			final LineTestSpan span = new LineTestSpan(index, Math.min(length, endIndex - 1)) {
 				@Override
 				public void onClick(View widget) {
 					Spannable textViewSpans = new SpannableString(mTextView.getText());
@@ -55,7 +63,6 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 					} else if (mSelectedSpan != null) {
 						mSelectedSpan = null;
 					}
-
 					mScrollView.requestLayout();
 					mTextView.setText(textViewSpans);
 				}
@@ -63,9 +70,16 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 				@Override
 				public void updateDrawState(TextPaint ds) {}
 			};
+			
+//			crumbsSpanMap.put(glyph.getPath(), span);
+//			if (glyph.hasBindingSite() && crumbsSpanMap.containsKey(glyph.getBindingSite())) {
+//				LineTestSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
+//				span.setParentSpan(parent);
+//				parent.addChildSpan(span);
+//			}
 			mLinedSpan = span;
-			spans.setSpan(span, index, Math.min(length, index + word.length() + 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-			index += word.length() + 1;
+			spans.setSpan(span, index, Math.min(length, endIndex - 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			index = endIndex - 1;
 		}
 
 		for (LineTestSpan span : spans.getSpans(0, spans.length(), LineTestSpan.class)) {

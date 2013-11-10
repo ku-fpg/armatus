@@ -14,6 +14,7 @@
     <string name="select">Select</string>
     <string name="swap">Swap</string>
     <string name="transform">Transform</string>
+    <string name="scope">Scope</string>
     <string name="enable_wifi_title">Wi-Fi permission request</string>
     <string name="enable_wifi_message">Armatus is requesting permission to turn on Wi-Fi. Do you want to do this?</string>
     <string name="terminal_not_installed_title">Error: ATE not installed</string>

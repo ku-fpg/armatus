@@ -6,44 +6,75 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Crumb implements Parcelable {
-	private final int mNum;
-	private final String mCrumb;
+import com.google.common.base.Optional;
 
-	public Crumb(int num, String crumb) {
-		mNum = num;
-		mCrumb = crumb;
+import edu.kufpg.armatus.util.ParcelUtils;
+
+public class Crumb implements Parcelable {
+	private static final String CRUMB = "crumb", NUM = "num";
+
+	private final Optional<? extends Integer> mNum;
+	private final String mCrumbName;
+
+	public Crumb(String crumbName) {
+		this(Optional.<Integer>absent(), crumbName);
+	}
+
+	public Crumb(Integer num, String crumbName) {
+		this(Optional.fromNullable(num), crumbName);
 	}
 
 	public Crumb(JSONObject o) throws JSONException {
-		this(jsonToNum(o), o.getString("crumb"));
+		this(jsonToNum(o), o.getString(CRUMB));
 	}
 
-	public int getNum() {
-		return mNum;
+	private Crumb(Optional<Integer> num, String crumbName) {
+		mNum = num;
+		mCrumbName = crumbName;
 	}
 
-	public String getCrumb() {
-		return mCrumb;
+	public int getNum() throws IllegalStateException {
+		return mNum.get();
 	}
 
-	private static int jsonToNum(JSONObject o) {
-		int num = -1;
-		if (o.has("num")) {
-			try {
-				num = o.getInt("style");
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-		return num;
+	public String getCrumbName() {
+		return mCrumbName;
 	}
 	
+	public boolean hasNum() {
+		return mNum.isPresent();
+	}
+
+	private static Optional<Integer> jsonToNum(JSONObject o) throws JSONException {
+		if (o.has(NUM)) {
+			return Optional.of(o.getInt(NUM));
+		} else {
+			return Optional.absent();
+		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Crumb)) {
+			return false;
+		}
+
+		Crumb c = (Crumb) o;
+		boolean numsEqual;
+		if (!hasNum()) {
+			numsEqual = !c.hasNum();
+		} else {
+			numsEqual = getNum() == c.getNum();
+		}
+		return numsEqual && getCrumbName() == c.getCrumbName();
+	}
+
 	public static Parcelable.Creator<Crumb> CREATOR =
 			new Parcelable.Creator<Crumb>() {
 		@Override
 		public Crumb createFromParcel(Parcel source) {
-			int num = source.readInt();
+			Optional<Integer> num = ParcelUtils.readOptional
+					(source, Integer.class.getClassLoader());
 			String crumb = source.readString();
 			return new Crumb(num, crumb);
 		}
@@ -61,7 +92,7 @@ public class Crumb implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(mNum);
-		dest.writeString(mCrumb);
+		ParcelUtils.writeOptional(mNum, dest);
+		dest.writeString(mCrumbName);
 	}
 }

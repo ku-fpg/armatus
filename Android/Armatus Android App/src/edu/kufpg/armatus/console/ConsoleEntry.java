@@ -1,19 +1,14 @@
 package edu.kufpg.armatus.console;
 
-import java.util.List;
-
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
 import edu.kufpg.armatus.data.CommandResponse;
-import edu.kufpg.armatus.data.Glyph;
-import edu.kufpg.armatus.data.Glyph.GlyphStyle;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -49,11 +44,7 @@ public class ConsoleEntry implements Parcelable {
 	}
 
 	protected ConsoleEntry(int entryNum, int ast, String userInput, CommandResponse commandResponse, String errorResponse) {
-		mEntryNum = entryNum;
-		mAst = ast;
-		mUserInput = userInput;
-		mCommandResponse = commandResponse;
-		mErrorResponse = errorResponse;
+		this(entryNum, ast, userInput, commandResponse, errorResponse, null);
 		mShortContents = buildShortContents(userInput, commandResponse, errorResponse);
 	}
 
@@ -145,16 +136,16 @@ public class ConsoleEntry implements Parcelable {
 		mShortContents = buildShortContents(mUserInput, mCommandResponse, mErrorResponse);
 	}
 
-	private CharSequence buildShortContents(String userInput, CommandResponse commandResponse, String errorResponse) {
+	private static CharSequence buildShortContents(String userInput, CommandResponse commandResponse, String errorResponse) {
 		SpannableStringBuilder builder = new SpannableStringBuilder();
 		if (userInput != null) {
 			builder.append(userInput).append("\n");
 		}
 		if (commandResponse != null) {
-			if (commandResponse.getGlyphs() != null) {
-				builder.append(createPrettyText(commandResponse.getGlyphs())).append("\n");
+			if (commandResponse.hasGlyphs()) {
+				builder.append(commandResponse.getGlyphText()).append("\n");
 			}
-			if (commandResponse.getMessage() != null) {
+			if (commandResponse.hasMessage()) {
 				builder.append(commandResponse.getMessage()).append("\n");
 			}
 		}
@@ -168,35 +159,13 @@ public class ConsoleEntry implements Parcelable {
 		return builder;
 	}
 
-	private CharSequence createPrettyText(List<Glyph> glyphs) {
-		SpannableStringBuilder builder = new SpannableStringBuilder();
-		for (Glyph glyph : glyphs) {
-			SpannableString spanWord = new SpannableString(glyph.getText());
-			if (glyph.getStyle().equals(GlyphStyle.WARNING)) {
-				spanWord.setSpan(new BackgroundColorSpan(Color.YELLOW),
-						0, glyph.getText().length(), 0);
-				spanWord.setSpan(new ForegroundColorSpan(Color.BLACK),
-						0, glyph.getText().length(), 0);
-			} else {
-				String glyphColor = glyph.getColor();
-				if (glyphColor != null) {
-					spanWord.setSpan(new ForegroundColorSpan(Color.parseColor(glyphColor)),
-							0, glyph.getText().length(), 0);
-				}
-
-			}
-			builder.append(spanWord);
-		}
-		return builder;
-	}
-
 	public static final Parcelable.Creator<ConsoleEntry> CREATOR
 	= new Parcelable.Creator<ConsoleEntry>() {
 		public ConsoleEntry createFromParcel(Parcel in) {
 			int entryNum = in.readInt();
 			int ast = in.readInt();
 			String userInput = in.readString();
-			CommandResponse commandResponse = in.readParcelable(ConsoleEntry.class.getClassLoader());
+			CommandResponse commandResponse = in.readParcelable(CommandResponse.class.getClassLoader());
 			String errorResponse = in.readString();
 			CharSequence shortContents = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
 			return new ConsoleEntry(entryNum, ast, userInput, commandResponse, errorResponse, shortContents);

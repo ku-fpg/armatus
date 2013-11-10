@@ -28,7 +28,7 @@ public class LineTestActivity extends BaseActivity {
 		mScrollView = (LineTestScrollView) findViewById(R.id.line_test_scroll_view);
 		mTextView = (TextView) findViewById(R.id.line_test_text_view);
 
-		mTextView.setText(StringUtils.withCharWrap("This is a test of the scoping capabilities that are soon to be integrated into Armatus " +
+		mTextView.setText(StringUtils.charWrap("This is a test of the scoping capabilities that are soon to be integrated into Armatus " +
 				"I hope it works I actually have no idea this could end poorly so we'll see what happens here goes nothing "));
 		for (int i = 0; i < 3; i++) {
 			mTextView.append(mTextView.getText());

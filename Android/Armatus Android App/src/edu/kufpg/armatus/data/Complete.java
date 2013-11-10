@@ -7,6 +7,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Complete implements Parcelable {
+	private static final String USER = "user", CMD = "cmd";
+	
 	private final int mUser;
 	private final String mCommand;
 	
@@ -26,8 +28,8 @@ public class Complete implements Parcelable {
 	public JSONObject toJSONObject() {
 		JSONObject o = new JSONObject();
 		try {
-			o.put("user", mUser);
-			o.put("cmd", mCommand);
+			o.put(USER, mUser);
+			o.put(CMD, mCommand);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

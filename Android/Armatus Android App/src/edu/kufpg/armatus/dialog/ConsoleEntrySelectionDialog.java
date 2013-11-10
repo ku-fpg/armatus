@@ -67,7 +67,7 @@ public class ConsoleEntrySelectionDialog extends ConsiderateDialog {
 				if (mClipboard.hasPrimaryClip() && mClipboard.getPrimaryClipDescription().hasMimeType("text/plain")) {
 					mClipboard.removePrimaryClipChangedListener(this);
 					String contents = mClipboard.getPrimaryClip().getItemAt(0).getText().toString();
-					ClipData newCopy = ClipData.newPlainText("copiedText", StringUtils.withoutCharWrap(contents));
+					ClipData newCopy = ClipData.newPlainText("copiedText", StringUtils.noCharWrap(contents));
 					mClipboard.setPrimaryClip(newCopy);
 					mClipboard.addPrimaryClipChangedListener(this);
 				}

@@ -14,16 +14,19 @@ import com.google.common.collect.ImmutableList;
 import edu.kufpg.armatus.util.ParcelUtils;
 
 public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
+	private static final String HELP = "help", NAME = "name", TAGS = "tags", ARG_TYS = "argTys", RES_TY = "resTy";
+
 	private final String mHelp, mName, mResultType;
 	private final List<String> mTags, mArgTypes;
-	
+
 
 	public CommandInfo(String help, String name, List<String> tags, List<String> argTypes, String resultType) {
 		this(help, name, ImmutableList.copyOf(tags), ImmutableList.copyOf(argTypes), resultType);
 	}
 
 	public CommandInfo(JSONObject o) throws JSONException {
-		this(o.getString("help"), o.getString("name"), jsonToList(o.getJSONArray("tags")), jsonToList(o.getJSONArray("argTys")), o.getString("resTy"));
+		this(o.getString(HELP), o.getString(NAME), jsonToList(o.getJSONArray(TAGS)),
+				jsonToList(o.getJSONArray(ARG_TYS)), o.getString(RES_TY));
 	}
 
 	private CommandInfo(String help, String name, ImmutableList<String> tags, ImmutableList<String> argTypes, String resultType) {
@@ -45,27 +48,23 @@ public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
 	public List<String> getTags() {
 		return mTags;
 	}
-	
+
 	public List<String> getArgTypes() {
 		return mArgTypes;
 	}
-	
+
 	public String getResultType() {
 		return mResultType;
 	}
 
-	private static ImmutableList<String> jsonToList(JSONArray a) {
+	private static ImmutableList<String> jsonToList(JSONArray a) throws JSONException {
 		ImmutableList.Builder<String> builder = ImmutableList.builder();
 		for (int i = 0; i < a.length(); i++) {
-			try {
-				builder.add(a.getString(i));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			builder.add(a.getString(i));
 		}
 		return builder.build();
 	}
-	
+
 	@Override
 	public int compareTo(CommandInfo another) {
 		int nameComp = getName().compareTo(another.getName());
@@ -82,10 +81,8 @@ public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
 		public CommandInfo createFromParcel(Parcel source) {
 			String help = source.readString();
 			String name = source.readString();
-			ImmutableList<String> tags = ParcelUtils.readImmutableList
-					(source, CommandInfo.class.getClassLoader());
-			ImmutableList<String> argTypes = ParcelUtils.readImmutableList
-					(source, CommandInfo.class.getClassLoader());
+			ImmutableList<String> tags = ParcelUtils.readImmutableStringList(source);
+			ImmutableList<String> argTypes = ParcelUtils.readImmutableStringList(source);
 			String resultType = source.readString();
 			return new CommandInfo(help, name, tags, argTypes, resultType);
 		}

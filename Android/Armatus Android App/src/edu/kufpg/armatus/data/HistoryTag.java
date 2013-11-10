@@ -7,6 +7,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class HistoryTag implements Parcelable {
+	private static final String TAG = "tag", AST = "ast";
+	
 	private final String mTag;
 	private final int mAst;
 	
@@ -16,7 +18,7 @@ public class HistoryTag implements Parcelable {
 	}
 	
 	public HistoryTag(JSONObject o) throws JSONException {
-		this(o.getString("tag"), o.getInt("ast"));
+		this(o.getString(TAG), o.getInt(AST));
 	}
 	
 	public String getTag() {

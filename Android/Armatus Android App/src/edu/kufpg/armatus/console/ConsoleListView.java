@@ -1,10 +1,9 @@
 package edu.kufpg.armatus.console;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.util.StringUtils;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -17,6 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.activity.ConsoleEntryIntent;
+import edu.kufpg.armatus.activity.ConsoleEntryScopeActivity;
+import edu.kufpg.armatus.util.StringUtils;
 
 /**
  * Used in {@link ConsoleActivity} to display console entries. This class defines special
@@ -198,7 +201,7 @@ public class ConsoleListView extends ListView {
 				copyBuilder.deleteCharAt(copyBuilder.length() - 1); //Remove final newline
 				ClipboardManager clipboard = (ClipboardManager) mConsole.getSystemService(Context.CLIPBOARD_SERVICE);
 				ClipData copiedText = ClipData.newPlainText("copiedText",
-						StringUtils.withoutCharWrap(copyBuilder.toString()));
+						StringUtils.noCharWrap(copyBuilder.toString()));
 				clipboard.setPrimaryClip(copiedText);
 				mConsole.showToast((mPrevCheckedStates.size() == 1 ? "Entry" : "Entries") + " copied to clipboard!");
 				mode.finish();
@@ -229,6 +232,15 @@ public class ConsoleListView extends ListView {
 					mode.finish();
 				}
 				return true;
+			case R.id.console_list_view_scope: {
+				if (mPrevCheckedStates.size() == 1) {
+					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+					Intent scopeIntent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntryScopeActivity.class);
+					mConsole.startActivity(scopeIntent);
+					mode.finish();
+				}
+				return true;
+			}
 			}
 			return false;
 		}

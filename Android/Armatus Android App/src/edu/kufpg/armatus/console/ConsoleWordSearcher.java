@@ -270,7 +270,8 @@ public class ConsoleWordSearcher implements Parcelable {
 
 	private ConsoleWordSearcher(Parcel in) {
 		mCriterion = in.readString();
-		ParcelUtils.readMultimap(mSearchOffsetsMap, in, ConsoleWordSearcher.class.getClassLoader());
+		ParcelUtils.readMultimap(mSearchOffsetsMap, in,
+				String.class.getClassLoader(), Integer.class.getClassLoader());
 		in.readTypedList(mPreviousMatches, MatchParams.CREATOR);
 		in.readTypedList(mNextMatches, MatchParams.CREATOR);
 		mSelectedMatch = in.readParcelable(ConsoleWordSearcher.class.getClassLoader());

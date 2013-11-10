@@ -79,7 +79,7 @@ public class ConsoleEntryTransformDialog extends ConsiderateDialog {
 		RadialMenuItem nothing = new RadialMenuItem("Nothing", "Nothing");
 		parent.addView(renderer.renderView());
 
-		String baseText = StringUtils.withoutFirstLine(StringUtils.withoutCharWrap(mEntry.getShortContents().toString()));
+		String baseText = StringUtils.noFirstLine(StringUtils.noCharWrap(mEntry.getShortContents().toString()));
 		selectableView.setText(baseText);
 		longClickableView.setText(baseText);
 		radialClickView.setText(baseText);

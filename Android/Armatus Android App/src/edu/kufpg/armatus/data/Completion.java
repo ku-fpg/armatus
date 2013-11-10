@@ -7,6 +7,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Completion implements Parcelable {
+	private static final String IS_FINISHED = "isFinished", REPLACEMENT = "replacement", DISPLAY = "display";
+	
 	private final boolean mIsFinished;
 	private final String mReplacement;
 	private final String mDisplay;
@@ -18,7 +20,7 @@ public class Completion implements Parcelable {
 	}
 	
 	public Completion(JSONObject o) throws JSONException {
-		this(o.getBoolean("isFinished"), o.getString("replacement"), o.getString("display"));
+		this(o.getBoolean(IS_FINISHED), o.getString(REPLACEMENT), o.getString(DISPLAY));
 	}
 	
 	public boolean isFinished() {

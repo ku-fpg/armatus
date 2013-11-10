@@ -1,6 +1,8 @@
 package edu.kufpg.armatus.util;
 
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 
 /**
  * Utility class containing methods useful for string analysis and transformation.
@@ -61,7 +63,7 @@ public class StringUtils {
 	 * @param str The string to apply character wrap to.
 	 * @return a string with all spaces replaced by {@link #NBSP}.
 	 */
-	public static String withCharWrap(String str) {
+	public static String charWrap(String str) {
 		return str.replace(" ", NBSP);
 	}
 
@@ -70,13 +72,12 @@ public class StringUtils {
 	 * @param editable The {@code Editable} object to apply character wrap to.
 	 * @return an {@code Editable} object with all spaces replaced by {@link #NBSP}.
 	 */
-	public static Editable withCharWrap(Editable editable) {
-		for (int i = 0; i < editable.length(); i++) {
-			if (editable.charAt(i) == ' ') {
-				editable.replace(i, i+1, NBSP);
-			}
-		}
-		return editable;
+	public static Editable charWrap(Editable editable) {
+		return charWrap((CharSequence) editable);
+	}
+	
+	public static Spannable charWrap(Spannable spannable) {
+		return charWrap((CharSequence) spannable);
 	}
 
 	/**
@@ -84,7 +85,7 @@ public class StringUtils {
 	 * @param str The string from which character wrap should be removed.
 	 * @return a string with all non-breaking spaces replaced by regular ones.
 	 */
-	public static String withoutCharWrap(String str) {
+	public static String noCharWrap(String str) {
 		return str.replace(NBSP, " ");
 	}
 
@@ -94,16 +95,15 @@ public class StringUtils {
 	 * @return an {@code Editable} object with all non-breaking spaces replaced by regular
 	 * ones.
 	 */
-	public static Editable withoutCharWrap(Editable editable) {
-		for (int i = 0; i < editable.length(); i++) {
-			if (editable.charAt(i) == NBSP_CHAR) {
-				editable.replace(i, i+1, " ");
-			}
-		}
-		return editable;
+	public static Editable noCharWrap(Editable editable) {
+		return noCharWrap((CharSequence) editable);
 	}
 	
-	public static String withoutFirstLine(String str) {
+	public static Spannable noCharWrap(Spannable spannable) {
+		return noCharWrap((CharSequence) spannable);
+	}
+	
+	public static String noFirstLine(String str) {
 		return str.substring(str.indexOf('\n') + 1);
 	}
 
@@ -129,6 +129,26 @@ public class StringUtils {
 			return str;
 		}
 		return str.substring(start, end + 1);
+	}
+	
+	private static SpannableStringBuilder charWrap(CharSequence text) {
+		SpannableStringBuilder s = new SpannableStringBuilder(text);
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == ' ') {
+				s.replace(i, i+1, NBSP);
+			}
+		}
+		return s;
+	}
+	
+	private static SpannableStringBuilder noCharWrap(CharSequence text) {
+		SpannableStringBuilder s = new SpannableStringBuilder(text);
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == NBSP_CHAR) {
+				s.replace(i, i+1, " ");
+			}
+		}
+		return s;
 	}
 
 }

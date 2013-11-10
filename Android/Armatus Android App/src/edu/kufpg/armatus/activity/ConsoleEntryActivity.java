@@ -16,8 +16,8 @@ public class ConsoleEntryActivity extends BaseActivity {
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			mEntry = extras.getParcelable("entry");
-			mHermitClient = extras.getParcelable("hermitClient");
+			mEntry = extras.getParcelable(ConsoleEntryIntent.ENTRY_TAG);
+			mHermitClient = extras.getParcelable(ConsoleEntryIntent.CLIENT_TAG);
 		}
 	}
 	

@@ -7,6 +7,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Command implements Parcelable {
+	private static final String TOKEN = "token", CMD = "cmd";
+	
 	private final Token mToken;
 	private final String mCommand;
 	
@@ -18,8 +20,8 @@ public class Command implements Parcelable {
 	public JSONObject toJSONObject() {
 		JSONObject o = new JSONObject();
 		try {
-			o.put("token", mToken.toJSONObject());
-			o.put("cmd", mCommand);
+			o.put(TOKEN, mToken.toJSONObject());
+			o.put(CMD, mCommand);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -35,7 +37,7 @@ public class Command implements Parcelable {
 			new Parcelable.Creator<Command>() {
 		@Override
 		public Command createFromParcel(Parcel source) {
-			Token token = source.readParcelable(Command.class.getClassLoader());
+			Token token = source.readParcelable(Token.class.getClassLoader());
 			String command = source.readString();
 			return new Command(token, command);
 		}
