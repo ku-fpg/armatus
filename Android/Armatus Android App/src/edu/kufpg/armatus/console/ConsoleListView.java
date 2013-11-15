@@ -19,6 +19,7 @@ import android.widget.ListView;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.activity.ConsoleEntryIntent;
 import edu.kufpg.armatus.activity.ConsoleEntryScopeActivity;
+import edu.kufpg.armatus.activity.ConsoleSelectEntryActivity;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -226,8 +227,10 @@ public class ConsoleListView extends ListView {
 			case R.id.console_list_view_transform:
 				if (mPrevCheckedStates.size() == 1) {
 					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
-					if (entry.getShortContents().toString().split(StringUtils.WHITESPACE).length > 1) {
-						mConsole.showEntryTransformDialog(entry);
+					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
+//						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleSelectEntryActivity.class);
+						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleSelectEntryActivity.class);
+						mConsole.startActivity(i);
 					}
 					mode.finish();
 				}
