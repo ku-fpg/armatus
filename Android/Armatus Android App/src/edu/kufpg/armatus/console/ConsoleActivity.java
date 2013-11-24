@@ -61,11 +61,14 @@ import edu.kufpg.armatus.BaseApplication;
 import edu.kufpg.armatus.MainActivity;
 import edu.kufpg.armatus.PrefsActivity;
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.CommandExpandableMenuAdapter.CommandExpandableMenuItem;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.SearchDirection;
+import edu.kufpg.armatus.data.CommandInfo;
 import edu.kufpg.armatus.data.CommandResponse;
 import edu.kufpg.armatus.data.HistoryCommand;
+import edu.kufpg.armatus.dialog.CommandHelpDialog;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
 import edu.kufpg.armatus.dialog.ConsoleEntryTransformDialog;
 import edu.kufpg.armatus.dialog.GestureDialog;
@@ -77,6 +80,7 @@ import edu.kufpg.armatus.input.SpecialKeyAdapter;
 import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.InternetUtils;
+import edu.kufpg.armatus.util.OnExpandableItemLongClickListener;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -107,6 +111,7 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleWordSearcher mSearcher;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
+	private CharSequence mMenuSearchConstraint;
 	private ArrayList<HistoryCommand> mCommandHistory;
 	private ArrayList<ConsoleEntry> mConsoleEntries;
 	private ConsoleEntry mNextConsoleEntry;
@@ -138,6 +143,7 @@ public class ConsoleActivity extends BaseActivity {
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		mCommandHistoryView = (ListView) findViewById(R.id.command_history_list_view);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
+		final EditText commandExpandableMenuSearch = (EditText) findViewById(R.id.command_expandable_menu_search);
 		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
 		mSearchMatches = (TextView) findViewById(R.id.console_search_matches_indicator);
 		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
@@ -208,7 +214,7 @@ public class ConsoleActivity extends BaseActivity {
 				} else {
 					mSoftKeyboardVisible = false;
 				}
-				
+
 				specialKeyRow.setVisibility(mSoftKeyboardVisible ? View.VISIBLE : View.GONE);
 			}
 		});
@@ -290,16 +296,60 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandHistoryView.setAdapter(mCommandHistoryAdapter);
 		mCommandHistoryView.setEmptyView(findViewById(R.id.command_history_empty_view));
 
-		mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
+		if (savedInstanceState != null) {
+			mMenuSearchConstraint = savedInstanceState.getCharSequence("menuSearchConstraint");
+			if (mMenuSearchConstraint != null) {
+				mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this, mMenuSearchConstraint);
+			} else {
+				mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
+			}
+		} else {
+			mCommandExpandableMenuAdapter = new CommandExpandableMenuAdapter(this);
+		}
 		mCommandExpandableMenuView.setAdapter(mCommandExpandableMenuAdapter);
 		mCommandExpandableMenuView.setOnChildClickListener(new OnChildClickListener() {
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 				String cmdName = mCommandExpandableMenuAdapter.getChild(groupPosition, childPosition);
-				setInputText(cmdName + StringUtils.NBSP);
+				appendInputText(cmdName + StringUtils.NBSP);
 				return true;
 			}
 		});
+		mCommandExpandableMenuView.setOnItemLongClickListener(new OnExpandableItemLongClickListener() {
+			@Override
+			public boolean onChildLongClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+				CommandExpandableMenuItem item = (CommandExpandableMenuItem) mCommandExpandableMenuAdapter.
+						getChildView(groupPosition, childPosition, false, v, parent).getTag();
+				String commandName = item.commandName.getText().toString();
+				List<? extends CommandInfo> commandInfos = CommandHolder.getCommandsFromName(commandName);
+				CommandHelpDialog helpDialog = CommandHelpDialog.newInstance(commandInfos);
+				helpDialog.show(getFragmentManager(), "commandHelp");
+				return true;
+			}
+		});
+
+		//commandExpandableMenuSearch.setCompoundDrawable
+		commandExpandableMenuSearch.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
+					CharSequence constraint = commandExpandableMenuSearch.getText();
+					mMenuSearchConstraint = constraint.length() == 0 ? null : constraint;
+					mCommandExpandableMenuAdapter.getFilter().filter(mMenuSearchConstraint);
+					commandExpandableMenuSearch.clearFocus();
+					mConsoleInputEditText.requestFocus();
+					return true;
+				}
+				return false;
+			}
+		});
+		//		if (savedInstanceState != null) {
+		//			mMenuSearchConstraint = savedInstanceState.getCharSequence("menuSearchConstraint");
+		//			if (mMenuSearchConstraint != null) {
+		//				mCommandExpandableMenuAdapter.getFilter().filter(mMenuSearchConstraint);
+		//			}
+		//		}
 
 		mConsoleInputNumView.setTypeface(TYPEFACE);
 		mConsoleInputEditText.setTypeface(TYPEFACE);
@@ -422,7 +472,7 @@ public class ConsoleActivity extends BaseActivity {
 				}
 			}
 		});
-		
+
 		updateConsoleEntries();
 		resizeSlidingMenu();
 	}
@@ -440,6 +490,7 @@ public class ConsoleActivity extends BaseActivity {
 			outState.putString("searchInput", mSearchInputView.getText().toString());
 			outState.putString("prevSearchCriterion", mPrevSearchCriterion);
 		}
+		outState.putCharSequence("menuSearchConstraint", mMenuSearchConstraint);
 		outState.putBoolean("softKeyboardVisibility", mSoftKeyboardVisible);
 		outState.putBoolean("findTextEnabled", mSearchEnabled);
 		outState.putParcelableArrayList("consoleEntries", mConsoleEntries);
@@ -737,7 +788,7 @@ public class ConsoleActivity extends BaseActivity {
 		updateConsoleEntries();
 		scrollToBottom();
 	}
-	
+
 	public void clearCommandHistory() {
 		mCommandHistory.clear();
 		mCommandHistoryAdapter.notifyDataSetChanged();
@@ -780,6 +831,11 @@ public class ConsoleActivity extends BaseActivity {
 		} else {
 			addCommandResponseEntry(commandResponse);
 		}
+	}
+	
+	public void appendInputText(String text) {
+		mConsoleInputEditText.getText().append(text);
+		mConsoleInputEditText.setSelection(getInputLength());
 	}
 
 	public void clear() {
@@ -885,7 +941,7 @@ public class ConsoleActivity extends BaseActivity {
 	public void showEntrySelectionDialog(int... entries) {
 		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
 	}
-	
+
 	public void showEntryTransformDialog(ConsoleEntry entry) {
 		showDialog(ConsoleEntryTransformDialog.newInstance(entry), TRANSFORM_TAG);
 	}
@@ -1037,7 +1093,7 @@ public class ConsoleActivity extends BaseActivity {
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		}
 	}
-	
+
 	void setCommandHistory(List<HistoryCommand> historyCommands) {
 		mCommandHistory = new ArrayList<HistoryCommand>(historyCommands);
 		Collections.sort(mCommandHistory);

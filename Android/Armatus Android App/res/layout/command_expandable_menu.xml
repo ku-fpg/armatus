@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/command_expandable_menu"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:divider="@null"
-    android:groupIndicator="?attr/expanderGroup"
-    android:indicatorLeft="0dp"
-    android:indicatorRight="40dp" />
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/command_expandable_menu_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:hint="Search"
+        android:imeOptions="actionGo|flagNoExtractUi"
+        android:inputType="textNoSuggestions" />
+
+    <ExpandableListView
+        android:id="@+id/command_expandable_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/command_expandable_menu_search"
+        android:groupIndicator="?attr/expanderGroup"
+        android:indicatorLeft="0dp"
+        android:indicatorRight="40dp" />
+
+</RelativeLayout>

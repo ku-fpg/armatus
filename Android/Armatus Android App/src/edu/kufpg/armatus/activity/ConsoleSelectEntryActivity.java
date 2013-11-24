@@ -1,16 +1,9 @@
 package edu.kufpg.armatus.activity;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-import com.touchmenotapps.widget.radialmenu.menu.v2.RadialMenuItem;
-
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleActivity;
 import edu.kufpg.armatus.console.ConsoleEntry;
 import edu.kufpg.armatus.data.Glyph;
-import edu.kufpg.armatus.radialmenu.RadialMenuSpan;
-import edu.kufpg.armatus.util.LongClickableSpan;
 import edu.kufpg.armatus.util.StringUtils;
 import edu.kufpg.armatus.util.TextDrawable;
 import android.graphics.Color;
@@ -18,7 +11,6 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
-import android.view.View;
 import android.widget.TextView;
 
 public class ConsoleSelectEntryActivity extends ConsoleEntryActivity {

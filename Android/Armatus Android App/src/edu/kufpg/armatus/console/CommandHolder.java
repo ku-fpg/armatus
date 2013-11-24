@@ -34,12 +34,24 @@ public class CommandHolder {
 		return sTagCommandNames.get(tagName);
 	}
 
+	public static int getCommandTypeSigCount(String commandName) {
+		return sNameCommands.get(commandName).size();
+	}
+
 	public static List<? extends CommandInfo> getCommandsFromName(String commandName) {
 		return sNameCommands.get(commandName);
 	}
-	
+
 	public static boolean isCommonlyUsedCommand(String commandName) {
 		return COMMONLY_USED_COMMANDS.contains(commandName);
+	}
+
+	static List<String> getTags() {
+		return sTags;
+	}
+
+	static ListMultimap<String, String> getTagCommandNames() {
+		return sTagCommandNames;
 	}
 
 	static void setTags(Iterable<? extends String> tagList) {
@@ -75,7 +87,7 @@ public class CommandHolder {
 				"info","top","bash","simplify","unshadow","{","}",
 				"set-pp","set-pp-coerion","set-pp-renderer","set-pp-type","set-pp-width");
 	}
-	
+
 	private static ListMultimap<String, ? extends CommandInfo> createDefaultNameCommands() {
 		ImmutableListMultimap.Builder<String, CommandInfo> builder = ImmutableListMultimap.builder();
 		for (Map.Entry<String, CustomCommandInfo> entry : CustomCommandDispatcher.getCommandNameInfos().entrySet()) {

@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.LocalActivityManager;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +48,17 @@ public class CommandHelpDialog extends ConsiderateDialog {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View v = inflater.inflate(R.layout.command_help_dialog, container, false);
+		getDialog().setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_BACK
+						&& event.getAction() == KeyEvent.ACTION_UP) {
+					dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
 		getDialog().setTitle(mCommandInfos.get(0).getName());
 		setCancelable(true);
 

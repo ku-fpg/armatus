@@ -8,6 +8,7 @@
         <item name="actionFindPrevious">@drawable/ic_action_find_previous_dark</item>
         <item name="actionGestures">@drawable/ic_action_gestures_dark</item>
         <item name="actionRedo">@drawable/ic_action_redo_dark</item>
+        <item name="actionSearch">@drawable/ic_action_search_dark</item>
         <item name="actionSelect">@drawable/ic_action_select_dark</item>
         <item name="actionSwap">@drawable/ic_action_swap_dark</item>
         <item name="actionUndo">@drawable/ic_action_undo_dark</item>
@@ -30,6 +31,7 @@
         <item name="actionFindPrevious">@drawable/ic_action_find_previous_light</item>
         <item name="actionGestures">@drawable/ic_action_gestures_light</item>
         <item name="actionRedo">@drawable/ic_action_redo_light</item>
+        <item name="actionSearch">@drawable/ic_action_search_light</item>
         <item name="actionSelect">@drawable/ic_action_select_light</item>
         <item name="actionSwap">@drawable/ic_action_swap_light</item>
         <item name="actionUndo">@drawable/ic_action_undo_light</item>

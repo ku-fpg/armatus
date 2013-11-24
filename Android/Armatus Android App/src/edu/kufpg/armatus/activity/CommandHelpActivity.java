@@ -59,5 +59,8 @@ public class CommandHelpActivity extends Activity {
 		super.onSaveInstanceState(outState);
 		outState.putCharSequence("tagBoxes", mTagBoxes);
 	}
+	
+	@Override
+	public void onBackPressed() {}
 
 }
