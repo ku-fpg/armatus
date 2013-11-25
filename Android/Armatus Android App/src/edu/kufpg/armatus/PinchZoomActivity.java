@@ -11,7 +11,6 @@ public class PinchZoomActivity extends Activity {
 	private final static int DEFAULT_SIZE = 15;
 
 	private TextView mScalingView;
-	private OnPinchZoomListener mZoomListener;
 	private ScaleGestureDetector mScaleGestureDetector;
 
 	@Override
@@ -19,7 +18,7 @@ public class PinchZoomActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.textsize_pinchzoom);
 
-		mZoomListener = new OnPinchZoomListener(this, DEFAULT_SIZE) {
+		final OnPinchZoomListener zoomListener = new OnPinchZoomListener(this, DEFAULT_SIZE) {
 			@Override
 			public void onScaleEnd(ScaleGestureDetector detector) {
 				mScalingView.setTextSize(getIntSize());
@@ -28,7 +27,7 @@ public class PinchZoomActivity extends Activity {
 		};
 		mScalingView = (TextView) findViewById(R.id.resize_me);
 		mScalingView.setTextSize(DEFAULT_SIZE);
-		mScaleGestureDetector = new ScaleGestureDetector(this, mZoomListener);
+		mScaleGestureDetector = new ScaleGestureDetector(this, zoomListener);
 	}
 
 

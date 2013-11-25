@@ -14,6 +14,8 @@ import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleEntry;
 import edu.kufpg.armatus.data.Crumb;
 import edu.kufpg.armatus.data.Glyph;
+import edu.kufpg.armatus.gesture.OnPinchZoomListener;
 import edu.kufpg.armatus.util.BundleUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
@@ -36,6 +39,7 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 	private Spannable mSpans;
 	private Map<GlyphScopeSpan, GlyphScopeSpan> mSpanParentMap = Maps.newHashMap();
 	private ListMultimap<GlyphScopeSpan, GlyphScopeSpan> mSpanChildrenMap = ArrayListMultimap.create();
+	private ScaleGestureDetector mScaleGestureDetector;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,24 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 
 		mScrollView = (ScopeScrollView) findViewById(R.id.console_entry_scope_scroll_view);
 		mTextView = (TextView) findViewById(R.id.console_entry_scope_text_view);
+		final OnPinchZoomListener zoomListener = new OnPinchZoomListener(this, (int) mTextView.getTextSize()) {
+			@Override
+			public void onScaleEnd(ScaleGestureDetector detector) {
+				mTextView.setTextSize(getIntSize());
+				if (mSelectedSpan != null) {
+					mTextView.post(new Runnable() {
+						@Override
+						public void run() {
+							mScrollView.clearLines();
+							selectSpan(mSpans, mSelectedSpan);
+							mScrollView.invalidate();
+						}
+					});
+				}
+				super.onScaleEnd(detector);
+			}
+		};
+		mScaleGestureDetector = new ScaleGestureDetector(this, zoomListener);
 
 		if (savedInstanceState == null) {
 			final ConsoleEntry entry = getEntry();
@@ -71,6 +93,7 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 			BundleUtils.getParcelableMultimap(savedInstanceState, "spanChildrenMap", mSpanChildrenMap);
 			mSelectedSpan = savedInstanceState.getParcelable("selectedSpan");
 			mSpans = (Spannable) savedInstanceState.getCharSequence("spans");
+			int textSize = savedInstanceState.getInt("textSize");
 
 			for (GlyphScopeSpan span : mSpans.getSpans(0, mSpans.length(), GlyphScopeSpan.class)) {
 				span.attach(this);
@@ -85,6 +108,9 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 					}	
 				});
 			}
+			// Watch out! setTextSize() takes sp, but textSize is in pixels!
+			mTextView.setTextSize(textSize / getResources().getDisplayMetrics().scaledDensity);
+			zoomListener.setSize(textSize);
 		}
 
 		mTextView.setText(mSpans);
@@ -98,6 +124,13 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		BundleUtils.putParcelableMultimap(outState, "spanChildrenMap", mSpanChildrenMap);
 		outState.putParcelable("selectedSpan", mSelectedSpan);
 		outState.putCharSequence("spans", mSpans);
+		outState.putInt("textSize", (int) mTextView.getTextSize());
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		mScaleGestureDetector.onTouchEvent(event);
+		return super.onTouchEvent(event);
 	}
 
 	private Rect getSpanCoordinates(Spannable buffer, Object span) {

@@ -86,6 +86,11 @@ public class OnPinchZoomListener extends SimpleOnScaleGestureListener {
 	public float getFloatSize() {
 		return mFloatSize;
 	}
+	
+	public void setSize(int newSize) {
+		mFloatSize = newSize;
+		refreshPopup(newSize);
+	}
 
 	private void refreshPopup(int newFontSize) {
 		mIntSize = newFontSize;
