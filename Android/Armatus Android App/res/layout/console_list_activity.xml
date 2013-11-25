@@ -11,7 +11,7 @@
         android:layout_weight="1"
         android:background="?attr/consoleBackgroundColor" >
 
-        <edu.kufpg.armatus.drag.ListViewDragEdges
+        <edu.kufpg.armatus.gesture.ListViewDragEdges
             android:id="@+id/console_list_wrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
@@ -25,7 +25,7 @@
                 android:dividerHeight="0dp"
                 android:paddingTop="@dimen/entry_padding"
                 android:splitMotionEvents="false" />
-        </edu.kufpg.armatus.drag.ListViewDragEdges>
+        </edu.kufpg.armatus.gesture.ListViewDragEdges>
 
         <View
             android:id="@+id/console_empty_space"

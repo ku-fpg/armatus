@@ -1,4 +1,4 @@
-package edu.kufpg.armatus.drag;
+package edu.kufpg.armatus.gesture;
 
 import android.content.Context;
 import android.os.SystemClock;
@@ -73,7 +73,7 @@ public class ListViewDragEdges extends RelativeLayout {
 	
 	/**
 	 * init Function: 
-	 * Creates a {@link edu.kufpg.armatus.drag.ListViewDragEdges.DragEdge DragEdges} from the {@link Android.Content.Context Context} for top and bottom and checks for a case of a onDrag event.
+	 * Creates a {@link edu.kufpg.armatus.gesture.ListViewDragEdges.DragEdge DragEdges} from the {@link Android.Content.Context Context} for top and bottom and checks for a case of a onDrag event.
 	 * @param {@link Android.Content.Context context}
 	 */
 	private void init(Context context) {
@@ -137,7 +137,7 @@ public class ListViewDragEdges extends RelativeLayout {
     	
     	/**
     	 * DragEdge function. On a drag of edge this function gets the {@link android.content.Context context} of the image. 
-    	 * After that it runs it through the {@link edu.kufpg.armatus.drag.ListViewDragEdges.DragEdge.init init} function.
+    	 * After that it runs it through the {@link edu.kufpg.armatus.gesture.ListViewDragEdges.DragEdge.init init} function.
     	 * @param c{@link Android.Content.Context context}
     	 */
     	public DragEdge(Context context) {
@@ -148,7 +148,7 @@ public class ListViewDragEdges extends RelativeLayout {
     	/**
     	 * DragEdge function. On a drag of edge this function gets the {@link android.content.Context context} 
     	 * and {@link android.util.AttributeSet AttributeSet} of the image. 
-    	 * After that it runs it through the {@link edu.kufpg.armatus.drag.ListViewDragEdges.DragEdge.init init} function.
+    	 * After that it runs it through the {@link edu.kufpg.armatus.gesture.ListViewDragEdges.DragEdge.init init} function.
     	 * @param {@link Android.Content.Context context}
     	 * @param {@link andorid.util.AttributeSet attrs}
     	 */
@@ -160,7 +160,7 @@ public class ListViewDragEdges extends RelativeLayout {
     	/**
     	 * DragEdge function. On a drag of edge this function gets the {@link android.content.Context context}, {@link android.util.AttributeSet AttributeSet} 
     	 * and style of the image. 
-    	 * After that it runs it through the {@link edu.kufpg.armatus.drag.ListViewDragEdges.DragEdge.init init} function.
+    	 * After that it runs it through the {@link edu.kufpg.armatus.gesture.ListViewDragEdges.DragEdge.init init} function.
     	 * @param {@link Android.Content.Context context}
     	 * @param {@link android.util.AttributeSet attrs}
     	 * @param defStyle
