@@ -25,16 +25,17 @@ import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleEntry;
 import edu.kufpg.armatus.data.Crumb;
 import edu.kufpg.armatus.data.Glyph;
+import edu.kufpg.armatus.util.BundleUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 
 	private TextView mTextView;
 	private ScopeScrollView mScrollView;
-	private ScopeSpan mSelectedSpan;
+	private GlyphScopeSpan mSelectedSpan;
 	private Spannable mSpans;
-	private Map<ScopeSpan, ScopeSpan> mSpanParentMap = Maps.newHashMap();
-	private ListMultimap<ScopeSpan, ScopeSpan> mSpanChildrenMap = ArrayListMultimap.create();
+	private Map<GlyphScopeSpan, GlyphScopeSpan> mSpanParentMap = Maps.newHashMap();
+	private ListMultimap<GlyphScopeSpan, GlyphScopeSpan> mSpanChildrenMap = ArrayListMultimap.create();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,62 +45,60 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		mScrollView = (ScopeScrollView) findViewById(R.id.console_entry_scope_scroll_view);
 		mTextView = (TextView) findViewById(R.id.console_entry_scope_text_view);
 
-		//		if (savedInstanceState == null) {
-		final ConsoleEntry entry = getEntry();
-		final Spannable spans = StringUtils.charWrap(entry.getCommandResponse().getGlyphText());
-		final Map<List<Crumb>, ScopeSpan> crumbsSpanMap = Maps.newHashMap();
-		final int length = spans.length();
-		int index = 0;
-		for (final Glyph glyph : entry.getCommandResponse().getGlyphs()) {
-			int endIndex = index + glyph.getText().length() + 1;
-			final ScopeSpan span = new ScopeSpan(index, Math.min(length, endIndex - 1)) {
-				@Override
-				public void onClick(View widget) {
-					Spannable textViewSpans = new SpannableString(mTextView.getText());
-					removeHighlight(textViewSpans);
-					mScrollView.clearLines();
+		if (savedInstanceState == null) {
+			final ConsoleEntry entry = getEntry();
+			final Spannable spans = StringUtils.charWrap(entry.getCommandResponse().getGlyphText());
+			final Map<List<Crumb>, GlyphScopeSpan> crumbsSpanMap = Maps.newHashMap();
+			final int length = spans.length();
+			int index = 0;
+			for (final Glyph glyph : entry.getCommandResponse().getGlyphs()) {
+				int endIndex = index + glyph.getText().length() + 1;
+				final GlyphScopeSpan span = new GlyphScopeSpan(this, index, Math.min(length, endIndex - 1));
 
-					if (mSelectedSpan == null || !mSelectedSpan.equals(this)) {
-						selectSpan(textViewSpans, this);
-					} else if (mSelectedSpan != null) {
-						mSelectedSpan = null;
-					}
-					mScrollView.requestLayout();
-					mTextView.setText(textViewSpans);
+				crumbsSpanMap.put(glyph.getPath(), span);
+				if (glyph.hasBindingSite() && crumbsSpanMap.containsKey(glyph.getBindingSite())) {
+					GlyphScopeSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
+					mSpanParentMap.put(span, parent);
+					mSpanChildrenMap.put(parent, span);
 				}
 
-				@Override
-				public void updateDrawState(TextPaint ds) {}
-			};
-
-			crumbsSpanMap.put(glyph.getPath(), span);
-			if (glyph.hasBindingSite() && crumbsSpanMap.containsKey(glyph.getBindingSite())) {
-				ScopeSpan parent = crumbsSpanMap.get(glyph.getBindingSite());
-				mSpanParentMap.put(span, parent);
-				mSpanChildrenMap.put(parent, span);
+				spans.setSpan(span, index, Math.min(length, endIndex - 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+				index = endIndex - 1;
 			}
+			mSpans = spans;
+		} else {
+			BundleUtils.getParcelableMap(savedInstanceState, "spanParentMap", mSpanParentMap);
+			BundleUtils.getParcelableMultimap(savedInstanceState, "spanChildrenMap", mSpanChildrenMap);
+			mSelectedSpan = savedInstanceState.getParcelable("selectedSpan");
+			mSpans = (Spannable) savedInstanceState.getCharSequence("spans");
 
-			spans.setSpan(span, index, Math.min(length, endIndex - 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-			index = endIndex - 1;
+			for (GlyphScopeSpan span : mSpans.getSpans(0, mSpans.length(), GlyphScopeSpan.class)) {
+				span.attach(this);
+			}
+			if (mSelectedSpan != null) {
+				mTextView.post(new Runnable() {
+					@Override
+					public void run() {
+						removeHighlight(mSpans);
+						selectSpan(mSpans, mSelectedSpan);
+						mTextView.setText(mSpans);
+					}	
+				});
+			}
 		}
-		mSpans = spans;
-		//		} else {
-		//			BundleUtils.getParcelableMap(savedInstanceState, "spanParentMap", mSpanParentMap);
-		//			BundleUtils.getParcelableMultimap(savedInstanceState, "spanChildrenMap", mSpanChildrenMap);
-		//			mSpans = (Spannable) savedInstanceState.getCharSequence("spans");
-		//		}
 
 		mTextView.setText(mSpans);
 		mTextView.setMovementMethod(ScopeMovementMethod.getInstance());
 	}
 
-	//	@Override
-	//	public void onSaveInstanceState(Bundle outState) {
-	//		super.onSaveInstanceState(outState);
-	//		BundleUtils.putParcelableMap(outState, "spanParentMap", mSpanParentMap);
-	//		BundleUtils.putParcelableMultimap(outState, "spanChildrenMap", mSpanChildrenMap);
-	//		outState.putCharSequence("spans", mSpans);
-	//	}
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		BundleUtils.putParcelableMap(outState, "spanParentMap", mSpanParentMap);
+		BundleUtils.putParcelableMultimap(outState, "spanChildrenMap", mSpanChildrenMap);
+		outState.putParcelable("selectedSpan", mSelectedSpan);
+		outState.putCharSequence("spans", mSpans);
+	}
 
 	private Rect getSpanCoordinates(Spannable buffer, Object span) {
 		// Initialize global value
@@ -170,7 +169,7 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		return parentTextViewRect;
 	}
 
-	private void selectSpan(Spannable textViewSpans, ScopeSpan spanToSelect) {
+	private void selectSpan(Spannable textViewSpans, GlyphScopeSpan spanToSelect) {
 		Rect coords = getSpanCoordinates(textViewSpans, spanToSelect);
 		if (mSpanParentMap.containsKey(spanToSelect)) {
 			ScopeSpan ps = mSpanParentMap.get(spanToSelect);
@@ -183,7 +182,7 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 			textViewSpans.setSpan(new HighlightBackgroundSpan(Color.BLUE),
 					ps.getStartIndex(), ps.getEndIndex(), 0);
 		} else if (mSpanChildrenMap.containsKey(spanToSelect)) {
-			List<ScopeSpan> childSpans = mSpanChildrenMap.get(spanToSelect);
+			List<GlyphScopeSpan> childSpans = mSpanChildrenMap.get(spanToSelect);
 			Rect[] childRects = new Rect[childSpans.size()];
 			for (int i = 0; i < childSpans.size(); i++) {
 				ScopeSpan cs = childSpans.get(i);
@@ -213,8 +212,58 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		}
 	}
 
-	private class HighlightBackgroundSpan extends BackgroundColorSpan {
+	private ScopeScrollView getScrollView() {
+		return mScrollView;
+	}
 
+	private ScopeSpan getSelectedSpan() {
+		return mSelectedSpan;
+	}
+
+	private TextView getTextView() {
+		return mTextView;
+	}
+
+	private void setSelectedSpan(GlyphScopeSpan newSpan) {
+		mSelectedSpan = newSpan;
+	}
+
+	private static class GlyphScopeSpan extends ScopeSpan {
+		private ConsoleEntryScopeActivity mActivity;
+
+		private GlyphScopeSpan(ConsoleEntryScopeActivity activity, int startIndex, int endIndex) {
+			super(startIndex, endIndex);
+			mActivity = activity;
+		}
+
+		@Override
+		public void onClick(View widget) {
+			final TextView tv = mActivity.getTextView();
+			final ScopeScrollView sv = mActivity.getScrollView();
+			final ScopeSpan selectedSpan = mActivity.getSelectedSpan();
+
+			Spannable textViewSpans = new SpannableString(tv.getText());
+			mActivity.removeHighlight(textViewSpans);
+			sv.clearLines();
+
+			if (selectedSpan == null || !selectedSpan.equals(this)) {
+				mActivity.selectSpan(textViewSpans, this);
+			} else if (selectedSpan != null) {
+				mActivity.setSelectedSpan(null);
+			}
+			sv.requestLayout();
+			tv.setText(textViewSpans);
+		}
+
+		@Override
+		public void updateDrawState(TextPaint ds) {}
+
+		private void attach(ConsoleEntryScopeActivity activity) {
+			mActivity = activity;
+		}
+	}
+
+	private static class HighlightBackgroundSpan extends BackgroundColorSpan {
 		public HighlightBackgroundSpan(int color) {
 			super(color);
 		}
@@ -224,8 +273,7 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 		}
 	}
 
-	private class HighlightTextSpan extends ForegroundColorSpan {
-
+	private static class HighlightTextSpan extends ForegroundColorSpan {
 		public HighlightTextSpan(int color) {
 			super(color);
 		}

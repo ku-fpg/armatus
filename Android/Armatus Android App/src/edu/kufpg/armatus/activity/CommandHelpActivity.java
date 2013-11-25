@@ -16,12 +16,12 @@ public class CommandHelpActivity extends Activity {
 
 	private CommandInfo mCommandInfo;
 	private CharSequence mTagBoxes;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.command_help_activity);
-		
+
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			mCommandInfo = extras.getParcelable("commandInfo");
@@ -59,7 +59,7 @@ public class CommandHelpActivity extends Activity {
 		super.onSaveInstanceState(outState);
 		outState.putCharSequence("tagBoxes", mTagBoxes);
 	}
-	
+
 	@Override
 	public void onBackPressed() {}
 

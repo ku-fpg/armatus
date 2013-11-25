@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.kufpg.armatus"
     android:versionCode="1"
@@ -39,15 +40,7 @@
             android:label="@string/app_name" />
         <activity
             android:name=".activity.ConsoleEntryActivity"
-            android:label="@string/app_name"
-            android:parentActivityName=".console.ConsoleActivity" >
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".console.ConsoleActivity" />
-             />
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".activity.ConsoleSelectEntryActivity"
             android:label="@string/app_name" />
