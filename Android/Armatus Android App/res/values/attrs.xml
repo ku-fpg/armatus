@@ -8,6 +8,9 @@
         <attr name="actionFindNext" format="reference" />
         <attr name="actionFindPrevious" format="reference" />
         <attr name="actionGestures" format="reference" />
+        <attr name="actionNextGlyph" format="reference" />
+        <attr name="actionPrevGlyph" format="reference" />
+        <attr name="actionWrapGlyphs" format="reference" />
         <attr name="actionRedo" format="reference" />
         <attr name="actionSearch" format="reference" />
         <attr name="actionSelect" format="reference" />

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <edu.kufpg.armatus.util.TurboImageButton
+        android:id="@+id/test123"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/test456"
+        android:src="?attr/actionPrevGlyph" />
+
+    <ImageButton
+        android:id="@+id/test456"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/test789"
+        android:src="?attr/actionWrapGlyphs" />
+
+    <edu.kufpg.armatus.util.TurboImageButton
+        android:id="@+id/test789"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:src="?attr/actionNextGlyph" />
+
+</RelativeLayout>

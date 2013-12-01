@@ -12,8 +12,16 @@
     <string name="popup_text">Font size:</string>
     <string name="copy">Copy</string>
     <string name="select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="prev_glyph">Previous glyph</string>
+    <string name="prev_glyph_condensed">&lt; Glyph</string>
+    <string name="next_glyph">Next glyph</string>
+    <string name="next_glyph_condensed">Glyph &gt;</string>
+    <string name="wrap_glyphs">Wrap glyph</string>
+    <string name="wrap_glyphs_condensed">Wrap</string>
     <string name="swap">Swap</string>
     <string name="transform">Transform</string>
+    <string name="transform2">Transform2</string>
     <string name="scope">Scope</string>
     <string name="enable_wifi_title">Wi-Fi permission request</string>
     <string name="enable_wifi_message">Armatus is requesting permission to turn on Wi-Fi. Do you want to do this?</string>

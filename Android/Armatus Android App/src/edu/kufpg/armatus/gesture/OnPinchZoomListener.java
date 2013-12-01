@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class OnPinchZoomListener extends SimpleOnScaleGestureListener {
 	public final static int DEFAULT_SIZE = 20;
 	public final static int DEFAULT_MIN_SIZE = 15;
-	public final static int DEFAULT_MAX_SIZE = 40;
+	public final static int DEFAULT_MAX_SIZE = 60;
 
 	private Activity mActivity;
 	private PopupWindow mPopup;

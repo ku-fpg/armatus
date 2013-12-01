@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <ScrollView
+        android:id="@+id/console_entry_selection_container2"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.8" >
+
+        <edu.kufpg.armatus.activity.SelectionTextView
+            android:id="@+id/console_entry_selection_view2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/entry_padding"
+            android:textIsSelectable="true"
+            android:textSize="20sp"
+            android:typeface="monospace" />
+    </ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.2"
+        android:background="?attr/consoleBackgroundColor"
+        android:gravity="center"
+        android:text="(Pinch-zoom here)" />
+
+</LinearLayout>

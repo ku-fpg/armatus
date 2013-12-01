@@ -34,9 +34,17 @@
         android:titleCondensed="@string/transform">
     </item>
     <item
-        android:id="@+id/console_list_view_scope"
+        android:id="@+id/console_list_view_transform2"
         android:icon="?attr/actionSelect"
         android:orderInCategory="5"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/transform2"
+        android:titleCondensed="@string/transform2">
+    </item>
+    <item
+        android:id="@+id/console_list_view_scope"
+        android:icon="?attr/actionSelect"
+        android:orderInCategory="6"
         android:showAsAction="ifRoom|withText"
         android:title="@string/scope"
         android:titleCondensed="@string/scope">

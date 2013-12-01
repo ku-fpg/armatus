@@ -19,7 +19,8 @@ import android.widget.ListView;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.activity.ConsoleEntryIntent;
 import edu.kufpg.armatus.activity.ConsoleEntryScopeActivity;
-import edu.kufpg.armatus.activity.ConsoleSelectEntryActivity;
+import edu.kufpg.armatus.activity.ConsoleEntrySelectionActivity;
+import edu.kufpg.armatus.activity.ConsoleEntrySelectionActivity2;
 import edu.kufpg.armatus.util.StringUtils;
 
 /**
@@ -41,7 +42,7 @@ public class ConsoleListView extends ListView {
 	 * keywords. */
 	private MenuItem mSwapItem;
 
-	private MenuItem mTransformItem;
+	private MenuItem mTransformItem, mTransform2Item;
 
 	/** Tracks which {@link ConsoleEntry ConsoleEntries} are currently checked, since
 	 * {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE CHOICE_MODE_MULTIPLE}'s
@@ -159,11 +160,13 @@ public class ConsoleListView extends ListView {
 				mActionMode.setSubtitle("One entry selected");
 				mSwapItem.setVisible(true);
 				mTransformItem.setVisible(true);
+				mTransform2Item.setVisible(true);
 				break;
 			default:
 				mActionMode.setSubtitle(mPrevCheckedStates.size() + " entries selected");
 				mSwapItem.setVisible(false);
 				mTransformItem.setVisible(false);
+				mTransform2Item.setVisible(false);
 				break;
 			}
 		}
@@ -181,6 +184,7 @@ public class ConsoleListView extends ListView {
 			mode.setTitle("Select entries");
 			mSwapItem = menu.findItem(R.id.console_list_view_swap);
 			mTransformItem = menu.findItem(R.id.console_list_view_transform);
+			mTransform2Item = menu.findItem(R.id.console_list_view_transform2);
 			return true;
 		}
 
@@ -228,8 +232,17 @@ public class ConsoleListView extends ListView {
 				if (mPrevCheckedStates.size() == 1) {
 					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
 					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
-//						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleSelectEntryActivity.class);
-						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleSelectEntryActivity.class);
+						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity.class);
+						mConsole.startActivity(i);
+					}
+					mode.finish();
+				}
+				return true;
+			case R.id.console_list_view_transform2:
+				if (mPrevCheckedStates.size() == 1) {
+					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
+						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity2.class);
 						mConsole.startActivity(i);
 					}
 					mode.finish();

@@ -1,5 +1,6 @@
 package edu.kufpg.armatus.util;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -7,8 +8,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 
 public class ParcelUtils {
 
@@ -41,6 +45,7 @@ public class ParcelUtils {
 			return;
 		}
 
+		outVal.clear();
 		while (n > 0) {
 			@SuppressWarnings("unchecked")
 			K key = (K) p.readValue(keyLoader);
@@ -51,7 +56,7 @@ public class ParcelUtils {
 		}
 	}
 
-	
+
 	public static <T> Optional<T> readOptional(Parcel p, ClassLoader loader) {
 		int s = p.readInt();
 		if (s == -1) {
@@ -62,6 +67,50 @@ public class ParcelUtils {
 			@SuppressWarnings("unchecked")
 			T thing = (T) p.readValue(loader);
 			return Optional.of(thing);
+		}
+	}
+	
+	public static <C extends Comparable<?>> Range<C> readRange(Parcel p, ClassLoader loader) {
+		int s = p.readInt();
+		if (s == -1) {
+			return null;
+		} else {
+			int lowerOrd = p.readInt();
+			@SuppressWarnings("unchecked")
+			C lowerVal = (C) p.readValue(loader);
+			int upperOrd = p.readInt();
+			@SuppressWarnings("unchecked")
+			C upperVal = (C) p.readValue(loader);
+			
+			if (lowerVal != null && upperVal != null) {
+				BoundType lowerType = BoundType.values()[lowerOrd];
+				BoundType upperType = BoundType.values()[upperOrd];
+				return Range.range(lowerVal, lowerType, upperVal, upperType);
+			} else if (lowerVal != null) {
+				BoundType lowerType = BoundType.values()[lowerOrd];
+				return Range.downTo(lowerVal, lowerType);
+			} else if (upperVal != null) {
+				BoundType upperType = BoundType.values()[upperOrd];
+				return Range.upTo(upperVal, upperType);
+			} else {
+				return Range.all();
+			}
+		}
+	}
+
+	public static <K extends Comparable<?>, V> void readRangeMap(RangeMap<K, V> outVal, Parcel p, ClassLoader keyLoader, ClassLoader valueLoader) {
+		int n = p.readInt();
+		if (n < 0) {
+			return;
+		}
+
+		outVal.clear();
+		while (n > 0) {
+			Range<K> range = readRange(p, keyLoader);
+			@SuppressWarnings("unchecked")
+			V value = (V) p.readValue(valueLoader);
+			outVal.put(range, value);
+			n--;
 		}
 	}
 
@@ -90,6 +139,44 @@ public class ParcelUtils {
 		for (Entry<K, V> e : multimap.entries()) {
 			p.writeValue(e.getKey());
 			p.writeValue(e.getValue());
+		}
+	}
+
+	public static <C extends Comparable<?>> void writeRange(Range<C> range, Parcel p) {
+		if (range == null) {
+			p.writeInt(-1);
+			return;
+		}
+
+		p.writeInt(1);
+		
+		if (range.hasLowerBound()) {
+			p.writeInt(range.lowerBoundType().ordinal());
+			p.writeValue(range.lowerEndpoint());
+		} else {
+			p.writeInt(-1);
+			p.writeValue(null);
+		}
+		
+		if (range.hasUpperBound()) {
+			p.writeInt(range.upperBoundType().ordinal());
+			p.writeValue(range.upperEndpoint());
+		} else {
+			p.writeInt(-1);
+			p.writeValue(null);
+		}
+	}
+
+	public static <K extends Comparable<?>, V> void writeRangeMap(RangeMap<K, V> rangeMap, Parcel p) {
+		if (rangeMap == null) {
+			p.writeInt(-1);
+			return;
+		}
+
+		p.writeInt(rangeMap.asMapOfRanges().size());
+		for (Map.Entry<Range<K>, V> entry : rangeMap.asMapOfRanges().entrySet()) {
+			writeRange(entry.getKey(), p);
+			p.writeValue(entry.getValue());
 		}
 	}
 

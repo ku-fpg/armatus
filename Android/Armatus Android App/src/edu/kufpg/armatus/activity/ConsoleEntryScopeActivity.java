@@ -89,8 +89,8 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 			}
 			mSpans = spans;
 		} else {
-			BundleUtils.getParcelableMap(savedInstanceState, "spanParentMap", mSpanParentMap);
-			BundleUtils.getParcelableMultimap(savedInstanceState, "spanChildrenMap", mSpanChildrenMap);
+			BundleUtils.getParParMap(savedInstanceState, "spanParentMap", mSpanParentMap);
+			BundleUtils.getParParMultimap(savedInstanceState, "spanChildrenMap", mSpanChildrenMap);
 			mSelectedSpan = savedInstanceState.getParcelable("selectedSpan");
 			mSpans = (Spannable) savedInstanceState.getCharSequence("spans");
 			int textSize = savedInstanceState.getInt("textSize");
@@ -120,8 +120,8 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		BundleUtils.putParcelableMap(outState, "spanParentMap", mSpanParentMap);
-		BundleUtils.putParcelableMultimap(outState, "spanChildrenMap", mSpanChildrenMap);
+		BundleUtils.putParMap(outState, "spanParentMap", mSpanParentMap);
+		BundleUtils.putParMultimap(outState, "spanChildrenMap", mSpanChildrenMap);
 		outState.putParcelable("selectedSpan", mSelectedSpan);
 		outState.putCharSequence("spans", mSpans);
 		outState.putInt("textSize", (int) mTextView.getTextSize());

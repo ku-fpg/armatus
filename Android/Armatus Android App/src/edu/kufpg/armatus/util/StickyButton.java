@@ -55,8 +55,8 @@ public class StickyButton extends Button {
 	}
 	
 	@Override
-	public void setOnClickListener(OnClickListener listener) {
-		mOnClickListener = listener;
+	public void setOnClickListener(OnClickListener l) {
+		mOnClickListener = l;
 	}
 	
 	/** 
