@@ -126,8 +126,8 @@ public class Glyph implements Parcelable {
 		public Glyph createFromParcel(Parcel source) {
 			GlyphStyle style = GlyphStyle.values()[source.readInt()];
 			Optional<ImmutableList<Crumb>> bindingSite = ParcelUtils.readOptional
-					(source, ImmutableList.class.getClassLoader());
-			ImmutableList<Crumb> path = ParcelUtils.readImmutableTypedList(source, Crumb.CREATOR);
+					(source, Crumb.class.getClassLoader());
+			ImmutableList<Crumb> path = ParcelUtils.readImmutableList(source, Crumb.class.getClassLoader());
 			String text = source.readString();
 			return new Glyph(style, bindingSite, path, text);
 		}
@@ -146,7 +146,7 @@ public class Glyph implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mStyle.ordinal());
-		ParcelUtils.writeOptional(mBindingSite, dest);
+		ParcelUtils.writeOptional(dest, mBindingSite);
 		dest.writeTypedList(mPath);
 		dest.writeString(mText);
 	}

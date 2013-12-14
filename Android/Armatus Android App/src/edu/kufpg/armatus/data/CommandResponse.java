@@ -142,7 +142,7 @@ public class CommandResponse implements Parcelable {
 		public CommandResponse createFromParcel(Parcel source) {
 			int ast = source.readInt();
 			Optional<ImmutableList<Glyph>> glyphs = ParcelUtils.readOptional
-					(source, ImmutableList.class.getClassLoader());
+					(source, Glyph.class.getClassLoader());
 			Optional<SpannableStringBuilder> glyphText = ParcelUtils.readOptional
 					(source, SpannableStringBuilder.class.getClassLoader());
 			Optional<String> message = ParcelUtils.readOptional(source, String.class.getClassLoader());
@@ -163,8 +163,8 @@ public class CommandResponse implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(mAst);
-		ParcelUtils.writeOptional(mGlyphs, dest);
-		ParcelUtils.writeOptional(mGlyphText, dest);
-		ParcelUtils.writeOptional(mMessage, dest);
+		ParcelUtils.writeOptional(dest, mGlyphs);
+		ParcelUtils.writeOptional(dest, mGlyphText);
+		ParcelUtils.writeOptional(dest, mMessage);
 	}
 }
