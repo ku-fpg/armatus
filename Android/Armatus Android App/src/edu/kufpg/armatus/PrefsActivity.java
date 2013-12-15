@@ -58,13 +58,6 @@ public class PrefsActivity extends PreferenceActivity {
 		private Preference mHistoryDirPref;
 
 		/**
-		 * Preference that can change the string representation of what the current {@link
-		 * BaseActivity.EditMode EditMode} is (the value mapped to by {@link BaseActivity#EDIT_MODE_KEY
-		 * EDIT_MODE_KEY}).
-		 */
-		private ListPreference mEditModePref;
-
-		/**
 		 * Preference that can change the current app theme (the value mapped to by {@link
 		 * BaseActivity#APP_THEME_KEY APP_THEME_KEY}).
 		 */
@@ -98,7 +91,6 @@ public class PrefsActivity extends PreferenceActivity {
 			mIsHistoryDirCustomPref = (CheckBoxPreference) findPreference(Prefs.IS_HISTORY_DIR_CUSTOM_KEY);
 			mHistoryDirPref = findPreference(Prefs.HISTORY_DIR_KEY);
 			setHistoryDirPrefSummary(Prefs.isHistoryDirCustom(getActivity()));
-			mEditModePref = (ListPreference) findPreference(Prefs.EDIT_MODE_KEY);
 			mAppThemePref = (ListPreference) findPreference(Prefs.APP_THEME_KEY);
 			mNetworkSourcePref = (ListPreference) findPreference(Prefs.NETWORK_SOURCE_KEY);
 			mChooseBluetoothDevicePref = (Preference) findPreference(Prefs.CHOOSE_BLUETOOTH_DEVICE_KEY);
@@ -123,14 +115,6 @@ public class PrefsActivity extends PreferenceActivity {
 					intent.setType(FileUtils.MIME_TYPE_TEXT);
 					intent.addCategory(Intent.CATEGORY_OPENABLE);
 					startActivityForResult(intent, DIR_CHANGE_CODE);
-					return true;
-				}
-			});
-
-			mEditModePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
-					//TODO: Change edit mode
 					return true;
 				}
 			});

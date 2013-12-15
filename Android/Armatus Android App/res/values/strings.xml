@@ -49,6 +49,8 @@
     <string name="pref_choose_bluetooth_device">CHOOSE_BLUETOOTH_DEVICE</string>
     <string name="pref_bluetooth_device_name">BLUETOOTH_DEVICE_NAME</string>
     <string name="pref_bluetooth_device_address">BLUETOOTH_DEVICE_ADDRESS</string>
+    <string name="pref_special_keys_visible">SPECIAL_KEYS_VISIBLE</string>
+    <string name="pref_is_first_time">IS_FIRST_TIME</string>
     <string name="pref_restore_defaults">RESTORE_DEFAULTS</string>
 
     <!-- BluetoothDeviceListActivity -->

@@ -2,6 +2,7 @@ package edu.kufpg.armatus;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -91,6 +92,8 @@ public final class Prefs {
 	 */
 	static String BLUETOOTH_DEVICE_ADDRESS_KEY;
 
+	static String SPECIAL_KEYS_VISIBLE_KEY;
+
 	/**
 	 * Maps special {@link android.preference.Preference Preference} keys to their default values
 	 * when the default values are impossible to know before runtime (e.g., the external cache
@@ -98,6 +101,8 @@ public final class Prefs {
 	 */
 	static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
 
+	static String IS_FIRST_TIME_KEY;
+	
 	/**
 	 * {@link Preference} key used to choose the Bluetooth device if Bluetooth communications
 	 * are enabled.
@@ -126,6 +131,8 @@ public final class Prefs {
 		NETWORK_SOURCE_BLUETOOTH_SERVER = context.getResources().getString(R.string.pref_network_source_bluetooth);
 		BLUETOOTH_DEVICE_NAME_KEY = context.getResources().getString(R.string.pref_bluetooth_device_name);
 		BLUETOOTH_DEVICE_ADDRESS_KEY = context.getResources().getString(R.string.pref_bluetooth_device_address);
+		SPECIAL_KEYS_VISIBLE_KEY = context.getResources().getString(R.string.pref_special_keys_visible);
+		IS_FIRST_TIME_KEY = context.getResources().getString(R.string.pref_is_first_time);
 
 		CHOOSE_BLUETOOTH_DEVICE_KEY = context.getResources().getString(R.string.pref_choose_bluetooth_device);
 		RESTORE_DEFAULTS_KEY = context.getResources().getString(R.string.pref_restore_defaults);
@@ -133,6 +140,11 @@ public final class Prefs {
 		DYNAMIC_PREF_DEFAULTS_MAP = mapDynamicPrefDefaults();
 		PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
 		restoreDyanmicPrefDefaultValues(context);
+		
+		if (isFirstTime(context)) {
+			setSpecialKeysVisible(context, false);
+			setIsFirstTime(context, false);
+		}
 	}
 
 	/**
@@ -181,15 +193,19 @@ public final class Prefs {
 				editor.putFloat(entry.getKey(), (Float) entry.getValue());
 			} else if (entry.getValue() instanceof Long) {
 				editor.putLong(entry.getKey(), (Long) entry.getValue());
+			} else if (entry.getValue() instanceof Set) {
+				@SuppressWarnings("unchecked")
+				Set<String> set = (Set<String>) entry.getValue();
+				editor.putStringSet(entry.getKey(), set);
 			}
 		}
 		editor.commit();
 	}
-	
+
 	public static String getBluetoothDeviceAddress(Context context) {
 		return getPrefs(context).getString(BLUETOOTH_DEVICE_ADDRESS_KEY, null);
 	}
-	
+
 	public static String getBluetoothDeviceName(Context context) {
 		return getPrefs(context).getString(BLUETOOTH_DEVICE_NAME_KEY, null);
 	}
@@ -208,7 +224,7 @@ public final class Prefs {
 	public static String getHistoryDir(Context context) {
 		return getPrefs(context).getString(HISTORY_DIR_KEY, null);
 	}
-	
+
 	public static NetworkSource getNetworkSource(Context context) {
 		String source = getPrefs(context).getString(NETWORK_SOURCE_KEY, null);
 		if (source.equals(NETWORK_SOURCE_WEB_SERVER)) {
@@ -218,6 +234,10 @@ public final class Prefs {
 		}
 	}
 	
+	public static boolean getSpecialKeysVisible(Context context) {
+		return getPrefs(context).getBoolean(SPECIAL_KEYS_VISIBLE_KEY, false);
+	}
+
 	/**
 	 * Returns the resource ID of the current app theme (either {@code ThemeLight} or
 	 * {@code ThemeDark}.
@@ -231,19 +251,23 @@ public final class Prefs {
 			return Theme.DARK;
 		}
 	}
+	
+	private static boolean isFirstTime(Context context) {
+		return getPrefs(context).getBoolean(IS_FIRST_TIME_KEY, true);
+	}
 
 	public static boolean isHistoryDirCustom(Context context) {
-		return getPrefs(context).getBoolean(Prefs.IS_HISTORY_DIR_CUSTOM_KEY, false);
+		return getPrefs(context).getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, false);
 	}
-	
+
 	public static void refreshTheme(Context context) {
-		Prefs.setTheme(context, Prefs.getTheme(context));
+		setTheme(context, getTheme(context));
 	}
-	
+
 	public static void setBluetoothDeviceAddress(Context context, String address) {
 		getPrefsEditor(context).putString(BLUETOOTH_DEVICE_ADDRESS_KEY, address).commit();
 	}
-	
+
 	public static void setBluetoothDeviceName(Context context, String friendlyName) {
 		getPrefsEditor(context).putString(BLUETOOTH_DEVICE_NAME_KEY, friendlyName).commit();
 	}
@@ -267,11 +291,15 @@ public final class Prefs {
 	public static void setHistoryDir(Context context, String dir) {
 		getPrefsEditor(context).putString(HISTORY_DIR_KEY, dir).commit();
 	}
+	
+	public static void setIsFirstTime(Context context, boolean isFirstTime) {
+		getPrefsEditor(context).putBoolean(IS_FIRST_TIME_KEY, isFirstTime).commit();
+	}
 
 	public static void setIsHistoryDirCustom(Context context, boolean custom) {
 		getPrefsEditor(context).putBoolean(IS_HISTORY_DIR_CUSTOM_KEY, custom).commit();
 	}
-	
+
 	public static void setNetworkSource(Context context, NetworkSource source) {
 		SharedPreferences.Editor editor = getPrefsEditor(context);
 		switch (source) {
@@ -285,6 +313,10 @@ public final class Prefs {
 		editor.commit();
 	}
 	
+	public static void setSpecialKeysVisible(Context context, boolean visible) {
+		getPrefsEditor(context).putBoolean(SPECIAL_KEYS_VISIBLE_KEY, visible).commit();
+	}
+
 	public static void setTheme(Context context, Theme theme) {
 		SharedPreferences.Editor editor = getPrefsEditor(context);
 		switch (theme) {
@@ -299,15 +331,15 @@ public final class Prefs {
 		}
 		editor.commit();
 	}
-	
+
 	public static enum EditMode {
 		READ, WRITE, ARITHMETIC
 	}
-	
+
 	public static enum Theme {
 		LIGHT, DARK
 	}
-	
+
 	public static enum NetworkSource {
 		WEB_SERVER, BLUETOOTH_SERVER
 	}

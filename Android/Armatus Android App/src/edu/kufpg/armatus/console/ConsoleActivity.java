@@ -153,6 +153,7 @@ public class ConsoleActivity extends BaseActivity {
 		final ImageButton nextEntryButton = (ImageButton) findViewById(R.id.console_input_next_entry);
 		final ImageButton scrollEntriesButton = (ImageButton) findViewById(R.id.console_input_scroll_entries);
 		final ImageButton prevEntryButton = (ImageButton) findViewById(R.id.console_input_previous_entry);
+		final ImageButton toggleSpecialKeysButton = (ImageButton) findViewById(R.id.console_options_toggle_special_keys);
 		final ImageButton hideOptionsBarButton = (ImageButton) findViewById(R.id.console_options_hide_button);
 		final HorizontalListView specialKeyRow = (HorizontalListView) findViewById(R.id.console_special_key_list);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
@@ -213,7 +214,8 @@ public class ConsoleActivity extends BaseActivity {
 					mSoftKeyboardVisible = false;
 				}
 
-				specialKeyRow.setVisibility(mSoftKeyboardVisible ? View.VISIBLE : View.GONE);
+				specialKeyRow.setVisibility((mSoftKeyboardVisible && Prefs.getSpecialKeysVisible(ConsoleActivity.this))
+						? View.VISIBLE : View.GONE);
 			}
 		});
 
@@ -437,6 +439,13 @@ public class ConsoleActivity extends BaseActivity {
 				if (mUserInputHistoryChoice > 0) {
 					selectFromUserInputHistory(mUserInputHistoryChoice - 1);
 				}
+			}
+		});
+		
+		toggleSpecialKeysButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Prefs.setSpecialKeysVisible(ConsoleActivity.this, !Prefs.getSpecialKeysVisible(ConsoleActivity.this));
 			}
 		});
 
