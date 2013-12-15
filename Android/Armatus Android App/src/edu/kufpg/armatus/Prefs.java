@@ -102,7 +102,7 @@ public final class Prefs {
 	static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
 
 	static String IS_FIRST_TIME_KEY;
-	
+
 	/**
 	 * {@link Preference} key used to choose the Bluetooth device if Bluetooth communications
 	 * are enabled.
@@ -139,9 +139,10 @@ public final class Prefs {
 
 		DYNAMIC_PREF_DEFAULTS_MAP = mapDynamicPrefDefaults();
 		PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-		restoreDyanmicPrefDefaultValues(context);
-		
+		getPrefsEditor(context).commit();
+
 		if (isFirstTime(context)) {
+			restoreDyanmicPrefDefaultValues(context);
 			setSpecialKeysVisible(context, false);
 			setIsFirstTime(context, false);
 		}
@@ -233,7 +234,7 @@ public final class Prefs {
 			return NetworkSource.BLUETOOTH_SERVER;
 		}
 	}
-	
+
 	public static boolean getSpecialKeysVisible(Context context) {
 		return getPrefs(context).getBoolean(SPECIAL_KEYS_VISIBLE_KEY, false);
 	}
@@ -251,7 +252,7 @@ public final class Prefs {
 			return Theme.DARK;
 		}
 	}
-	
+
 	private static boolean isFirstTime(Context context) {
 		return getPrefs(context).getBoolean(IS_FIRST_TIME_KEY, true);
 	}
@@ -291,7 +292,7 @@ public final class Prefs {
 	public static void setHistoryDir(Context context, String dir) {
 		getPrefsEditor(context).putString(HISTORY_DIR_KEY, dir).commit();
 	}
-	
+
 	public static void setIsFirstTime(Context context, boolean isFirstTime) {
 		getPrefsEditor(context).putBoolean(IS_FIRST_TIME_KEY, isFirstTime).commit();
 	}
@@ -312,7 +313,7 @@ public final class Prefs {
 		}
 		editor.commit();
 	}
-	
+
 	public static void setSpecialKeysVisible(Context context, boolean visible) {
 		getPrefsEditor(context).putBoolean(SPECIAL_KEYS_VISIBLE_KEY, visible).commit();
 	}

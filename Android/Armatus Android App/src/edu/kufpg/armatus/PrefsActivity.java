@@ -191,6 +191,7 @@ public class PrefsActivity extends PreferenceActivity {
 							break;
 						}
 						Prefs.setHistoryDir(getActivity(), dir);
+						setHistoryDirPrefSummary(Prefs.isHistoryDirCustom(getActivity()));
 					}
 				}
 				break;
