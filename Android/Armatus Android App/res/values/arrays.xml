@@ -6,9 +6,9 @@
         <item>Arithmetic</item>
     </string-array>
     <string-array name="edit_mode_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>@string/pref_edit_mode_read</item>
+        <item>@string/pref_edit_mode_write</item>
+        <item>@string/pref_edit_mode_arithmetic</item>
     </string-array>
     <string-array name="app_theme_entries">
         <item>Dark theme</item>

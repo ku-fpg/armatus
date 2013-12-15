@@ -40,6 +40,9 @@
     <string name="pref_app_theme">APP_THEME</string>
     <string name="pref_app_theme_dark">THEME_DARK</string>
     <string name="pref_app_theme_light">THEME_LIGHT</string>
+    <string name="pref_edit_mode_read">READ</string>
+	<string name="pref_edit_mode_write">WRITE</string>
+	<string name="pref_edit_mode_arithmetic">ARITHMETIC</string>
     <string name="pref_network_source">NETWORK_SOURCE</string>
     <string name="pref_network_source_web">WEB_SERVER</string>
     <string name="pref_network_source_bluetooth">BLUETOOTH_SERVER</string>

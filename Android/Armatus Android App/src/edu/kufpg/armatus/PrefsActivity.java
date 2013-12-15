@@ -5,14 +5,13 @@ import java.io.File;
 import com.ipaulpro.afilechooser.FileChooserActivity;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
+import edu.kufpg.armatus.Prefs.NetworkSource;
 import edu.kufpg.armatus.dialog.YesOrNoDialog;
 import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
 import edu.kufpg.armatus.networking.BluetoothUtils;
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -30,58 +29,11 @@ import android.widget.Toast;
  */
 public class PrefsActivity extends PreferenceActivity {
 
-	/**
-	 * {@link Preference} key used to choose the Bluetooth device if Bluetooth communications
-	 * are enabled.
-	 */
-	private static String CHOOSE_BLUETOOTH_DEVICE_KEY;
-
-	/**
-	 * {@link Preference} key used for resetting preferences back to their default values.
-	 */
-	private static String RESTORE_DEFAULTS_KEY;
-
-	/** Used to access persistent user preferences. Editing them requires {@link #sPrefsEditor}. */
-	private static SharedPreferences sPrefs;
-
-	/** Used to edit persistent user preferences stored in {@link #sPrefs}. */
-	private static SharedPreferences.Editor sPrefsEditor;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		CHOOSE_BLUETOOTH_DEVICE_KEY = getResources().getString(R.string.pref_choose_bluetooth_device);
-		RESTORE_DEFAULTS_KEY = getResources().getString(R.string.pref_restore_defaults);
-		getPrefs(this);
-		getPrefsEditor(this);
-
-		setTheme(BaseActivity.getThemePrefId());
+		Prefs.refreshTheme(this);
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
 		super.onCreate(savedInstanceState);
-	}
-	
-	/**
-	 * Convenience for retrieving the app's default {@link SharedPreferences}.
-	 * @param context The {@link Context} to use.
-	 * @return The app's {@code SharedPreferences}.
-	 */
-	public static SharedPreferences getPrefs(Context context) {
-		if (sPrefs == null) {
-			sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		}
-		return sPrefs;
-	}
-	
-	/**
-	 * Convenience for retrieving the {@code Editor} that can change the app's
-	 * {@link SharedPreferences}.
-	 * @param context The {@link Context} to use.
-	 * @return The app's {@code SharedPreferences.Editor}.
-	 */
-	public static SharedPreferences.Editor getPrefsEditor(Context context) {
-		if (sPrefsEditor == null) {
-			sPrefsEditor = getPrefs(context).edit();
-		}
-		return sPrefsEditor;
 	}
 
 	/**
@@ -143,20 +95,18 @@ public class PrefsActivity extends PreferenceActivity {
 			addPreferencesFromResource(R.xml.preferences);
 
 			//Preference initialization, summary setting, and disabling (if necessary)
-			mIsHistoryDirCustomPref = (CheckBoxPreference) findPreference(BaseActivity.IS_HISTORY_DIR_CUSTOM_KEY);
-			mHistoryDirPref = findPreference(BaseActivity.HISTORY_DIR_KEY);
-			setHistoryDirPrefSummary(sPrefs.getBoolean(BaseActivity.IS_HISTORY_DIR_CUSTOM_KEY, false));
-			mEditModePref = (ListPreference) findPreference(BaseActivity.EDIT_MODE_KEY);
-			mAppThemePref = (ListPreference) findPreference(BaseActivity.APP_THEME_KEY);
-			mNetworkSourcePref = (ListPreference) findPreference(BaseActivity.NETWORK_SOURCE_KEY);
-			mChooseBluetoothDevicePref = (Preference) findPreference(CHOOSE_BLUETOOTH_DEVICE_KEY);
-			setChooseBluetoothDevicePrefSummary(sPrefs.getString(BaseActivity.BLUETOOTH_DEVICE_NAME_KEY, null),
-					sPrefs.getString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, null));
-			if (sPrefs.getString(BaseActivity.NETWORK_SOURCE_KEY, null)
-					.equals(BaseActivity.NETWORK_SOURCE_WEB_SERVER)) {
+			mIsHistoryDirCustomPref = (CheckBoxPreference) findPreference(Prefs.IS_HISTORY_DIR_CUSTOM_KEY);
+			mHistoryDirPref = findPreference(Prefs.HISTORY_DIR_KEY);
+			setHistoryDirPrefSummary(Prefs.isHistoryDirCustom(getActivity()));
+			mEditModePref = (ListPreference) findPreference(Prefs.EDIT_MODE_KEY);
+			mAppThemePref = (ListPreference) findPreference(Prefs.APP_THEME_KEY);
+			mNetworkSourcePref = (ListPreference) findPreference(Prefs.NETWORK_SOURCE_KEY);
+			mChooseBluetoothDevicePref = (Preference) findPreference(Prefs.CHOOSE_BLUETOOTH_DEVICE_KEY);
+			setChooseBluetoothDevicePrefSummary(Prefs.getBluetoothDeviceName(getActivity()), Prefs.getBluetoothDeviceAddress(getActivity()));
+			if (Prefs.getNetworkSource(getActivity()).equals(NetworkSource.WEB_SERVER)) {
 				mChooseBluetoothDevicePref.setEnabled(false);
 			}
-			mRestoreDefaultsPref = findPreference(RESTORE_DEFAULTS_KEY);
+			mRestoreDefaultsPref = findPreference(Prefs.RESTORE_DEFAULTS_KEY);
 
 			mIsHistoryDirCustomPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
@@ -198,9 +148,9 @@ public class PrefsActivity extends PreferenceActivity {
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
 					//TODO: Change network source
 					String source = (String) newValue;
-					if (source.equals(BaseActivity.NETWORK_SOURCE_WEB_SERVER)) {
+					if (source.equals(Prefs.NETWORK_SOURCE_WEB_SERVER)) {
 						mChooseBluetoothDevicePref.setEnabled(false);
-					} else if (source.equals(BaseActivity.NETWORK_SOURCE_BLUETOOTH_SERVER)) {
+					} else if (source.equals(Prefs.NETWORK_SOURCE_BLUETOOTH_SERVER)) {
 						mChooseBluetoothDevicePref.setEnabled(true);
 					}
 					return true;
@@ -226,9 +176,9 @@ public class PrefsActivity extends PreferenceActivity {
 					YesOrNoDialog restorePrefsDialog = new YesOrNoDialog("Restore default preferences", message) {
 						@Override
 						protected void yes(DialogInterface dialog, int whichButton) {
-							sPrefsEditor.clear().commit();
+							Prefs.getPrefsEditor(getActivity()).clear().commit();
 							PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, true);
-							BaseActivity.restoreDyanmicPrefDefaultValues().commit();
+							Prefs.restoreDyanmicPrefDefaultValues(getActivity());
 
 							getActivity().finish();
 							startActivity(new Intent(getActivity(), PrefsActivity.class));
@@ -256,7 +206,7 @@ public class PrefsActivity extends PreferenceActivity {
 							showToast("Error: directory does not exist"); //Should never happen
 							break;
 						}
-						sPrefsEditor.putString(BaseActivity.HISTORY_DIR_KEY, dir).commit();
+						Prefs.setHistoryDir(getActivity(), dir);
 					}
 				}
 				break;
@@ -269,11 +219,12 @@ public class PrefsActivity extends PreferenceActivity {
 				if (resultCode == RESULT_OK) {
 					String newName = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
 					String newAddress = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-					String oldAddress = sPrefs.getString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, null);
+					String oldAddress = Prefs.getBluetoothDeviceAddress(getActivity());
 					if (!newAddress.equals(oldAddress) && BluetoothUtils.isBluetoothConnected(getActivity())) {
 						BluetoothUtils.closeBluetooth();
 					}
-					BluetoothUtils.setBluetoothDeviceInfo(getActivity(), newName, newAddress);
+					Prefs.setBluetoothDeviceName(getActivity(), newName);
+					Prefs.setBluetoothDeviceAddress(getActivity(), newAddress);
 					setChooseBluetoothDevicePrefSummary(newName, newAddress);
 				}
 				break;
@@ -300,7 +251,7 @@ public class PrefsActivity extends PreferenceActivity {
 		 */
 		private void setHistoryDirPrefSummary(boolean isCustom) {
 			if (isCustom) {
-				mHistoryDirPref.setSummary(sPrefs.getString(BaseActivity.HISTORY_DIR_KEY, null));
+				mHistoryDirPref.setSummary(Prefs.getHistoryDir(getActivity()));
 			} else {
 				mHistoryDirPref.setSummary(null);
 			}

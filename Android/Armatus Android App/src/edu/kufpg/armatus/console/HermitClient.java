@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -25,8 +24,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 
-import edu.kufpg.armatus.BaseActivity;
-import edu.kufpg.armatus.PrefsActivity;
+import edu.kufpg.armatus.Constants;
+import edu.kufpg.armatus.Prefs;
+import edu.kufpg.armatus.Prefs.NetworkSource;
 import edu.kufpg.armatus.data.Command;
 import edu.kufpg.armatus.data.CommandInfo;
 import edu.kufpg.armatus.data.CommandResponse;
@@ -92,11 +92,10 @@ public class HermitClient implements Parcelable {
 	public void loadHistory() {
 		if (isNetworkConnected(RequestName.HISTORY) && isTokenAcquired(false)) {
 			String path = "";
-			SharedPreferences prefs = PrefsActivity.getPrefs(mConsole);
-			if (prefs.getBoolean(BaseActivity.IS_HISTORY_DIR_CUSTOM_KEY, true)) {
-				path = prefs.getString(BaseActivity.HISTORY_DIR_KEY, null);
+			if (Prefs.isHistoryDirCustom(mConsole)) {
+				path = Prefs.getHistoryDir(mConsole);
 			} else {
-				path = BaseActivity.CACHE_DIR;
+				path = Constants.CACHE_DIR;
 			}
 
 			final File file = new File(path + HISTORY_FILENAME);
@@ -354,11 +353,10 @@ public class HermitClient implements Parcelable {
 				}
 
 				String path = "";
-				SharedPreferences prefs = PrefsActivity.getPrefs(getActivity());
-				if (prefs.getBoolean(BaseActivity.IS_HISTORY_DIR_CUSTOM_KEY, true)) {
-					path = prefs.getString(BaseActivity.HISTORY_DIR_KEY, null);
+				if (Prefs.isHistoryDirCustom(getActivity())) {
+					path = Prefs.getHistoryDir(getActivity());
 				} else {
-					path = BaseActivity.CACHE_DIR;
+					path = Constants.CACHE_DIR;
 				}
 
 				final File file = new File(path + HISTORY_FILENAME);
@@ -545,9 +543,8 @@ public class HermitClient implements Parcelable {
 	}
 
 	private boolean isNetworkConnected(RequestName name) {
-		String server = PrefsActivity.getPrefs(mConsole).getString(
-				BaseActivity.NETWORK_SOURCE_KEY, null);
-		if (BaseActivity.NETWORK_SOURCE_BLUETOOTH_SERVER.equals(server)) {
+		NetworkSource server = Prefs.getNetworkSource(mConsole);
+		if (server.equals(NetworkSource.BLUETOOTH_SERVER)) {
 			if (BluetoothUtils.isBluetoothEnabled(mConsole)) {
 				if (BluetoothUtils.getBluetoothDevice(mConsole) != null) {
 					return true;
@@ -559,7 +556,7 @@ public class HermitClient implements Parcelable {
 				notifyDelay(name);
 				BluetoothUtils.enableBluetooth(mConsole);
 			}
-		} else if (BaseActivity.NETWORK_SOURCE_WEB_SERVER.equals(server)) {
+		} else if (server.equals(NetworkSource.WEB_SERVER)) {
 			if (InternetUtils.isAirplaneModeOn(mConsole)) {
 				mConsole.appendErrorResponse("ERROR: Please disable airplane mode before attempting to connect.");
 			} else if (!InternetUtils.isWifiConnected(mConsole)

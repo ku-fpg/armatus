@@ -15,7 +15,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -59,8 +58,9 @@ import com.meetme.android.horizontallistview.HorizontalListView;
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.BaseApplication;
 import edu.kufpg.armatus.MainActivity;
-import edu.kufpg.armatus.PrefsActivity;
+import edu.kufpg.armatus.Prefs;
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.Prefs.NetworkSource;
 import edu.kufpg.armatus.console.CommandExpandableMenuAdapter.CommandExpandableMenuItem;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
@@ -128,7 +128,6 @@ public class ConsoleActivity extends BaseActivity {
 	private boolean mSearchEnabled = false;
 	private int mConsoleInputNum = 0;
 	private int mConsoleEntriesHeight, mConsoleInputHeight, mScreenHeight, mConsoleWidth;
-	private SharedPreferences mPrefs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,7 +155,6 @@ public class ConsoleActivity extends BaseActivity {
 		final ImageButton prevEntryButton = (ImageButton) findViewById(R.id.console_input_previous_entry);
 		final ImageButton hideOptionsBarButton = (ImageButton) findViewById(R.id.console_options_hide_button);
 		final HorizontalListView specialKeyRow = (HorizontalListView) findViewById(R.id.console_special_key_list);
-		mPrefs = PrefsActivity.getPrefs(this);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		if (savedInstanceState == null) {
@@ -532,7 +530,8 @@ public class ConsoleActivity extends BaseActivity {
 				if (resultCode == RESULT_OK) {
 					String name = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_NAME);
 					String address = data.getStringExtra(BluetoothDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-					BluetoothUtils.setBluetoothDeviceInfo(this, name, address);
+					Prefs.setBluetoothDeviceName(this, name);
+					Prefs.setBluetoothDeviceAddress(this, address);
 					mHermitClient.runDelayedRequest();
 				} else {
 					appendErrorResponse("ERROR: Failed to locate Bluetooth device.");
@@ -873,7 +872,7 @@ public class ConsoleActivity extends BaseActivity {
 
 	@SuppressWarnings("unchecked")
 	private void exitForced() {
-		if (mPrefs.getString(NETWORK_SOURCE_KEY, null).equals(NETWORK_SOURCE_BLUETOOTH_SERVER)) {
+		if (Prefs.getNetworkSource(this).equals(NetworkSource.BLUETOOTH_SERVER)) {
 			if (BluetoothUtils.isBluetoothConnected(this)) {
 				BluetoothUtils.closeBluetooth();
 			}
