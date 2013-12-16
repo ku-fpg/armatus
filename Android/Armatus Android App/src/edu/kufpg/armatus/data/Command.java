@@ -64,7 +64,7 @@ public class Command implements Parcelable {
 		public Command createFromParcel(Parcel source) {
 			Token token = source.readParcelable(Token.class.getClassLoader());
 			String command = source.readString();
-			Optional<Integer> width = ParcelUtils.readOptional(source, Integer.class.getClassLoader());
+			Optional<Integer> width = ParcelUtils.readOptional(source);
 			return new Command(token, command, width);
 		}
 

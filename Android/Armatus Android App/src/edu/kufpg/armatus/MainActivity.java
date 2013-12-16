@@ -76,7 +76,7 @@ public class MainActivity extends BaseActivity {
 				startActivity(new Intent(MainActivity.this, RadialMenuActivity.class));
 			}
 		});
-		
+
 		mTestActivityButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

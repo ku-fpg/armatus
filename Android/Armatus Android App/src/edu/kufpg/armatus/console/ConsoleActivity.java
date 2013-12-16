@@ -394,7 +394,9 @@ public class ConsoleActivity extends BaseActivity {
 							} else {
 								mUserInputHistoryChoice = size - 1;
 							}
-							mHermitClient.runCommand(input);
+							float lineWidth = mConsoleInputEditText.getMeasuredWidth();
+							float charWidth = mConsoleInputEditText.getPaint().measureText(" ");
+							mHermitClient.runCommand(input, (int) (lineWidth / charWidth));
 						}
 						mConsoleInputEditText.setText("");
 						return true;
@@ -441,7 +443,7 @@ public class ConsoleActivity extends BaseActivity {
 				}
 			}
 		});
-		
+
 		toggleSpecialKeysButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -840,7 +842,7 @@ public class ConsoleActivity extends BaseActivity {
 			addCommandResponseEntry(commandResponse);
 		}
 	}
-	
+
 	public void appendInputText(String text) {
 		mConsoleInputEditText.getText().append(text);
 		mConsoleInputEditText.setSelection(getInputLength());

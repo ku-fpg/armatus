@@ -81,8 +81,8 @@ public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
 		public CommandInfo createFromParcel(Parcel source) {
 			String help = source.readString();
 			String name = source.readString();
-			ImmutableList<String> tags = ParcelUtils.readImmutableList(source, String.class.getClassLoader());
-			ImmutableList<String> argTypes = ParcelUtils.readImmutableList(source, String.class.getClassLoader());
+			ImmutableList<String> tags = ParcelUtils.readImmutableList(source);
+			ImmutableList<String> argTypes = ParcelUtils.readImmutableList(source);
 			String resultType = source.readString();
 			return new CommandInfo(help, name, tags, argTypes, resultType);
 		}

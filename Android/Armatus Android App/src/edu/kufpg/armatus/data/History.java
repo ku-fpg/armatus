@@ -60,8 +60,8 @@ public class History implements Parcelable {
 			new Parcelable.Creator<History>() {
 		@Override
 		public History createFromParcel(Parcel source) {
-			ImmutableList<HistoryCommand> commands = ParcelUtils.readImmutableList(source, HistoryCommand.class.getClassLoader());
-			List<HistoryTag> tags = ParcelUtils.readImmutableList(source, HistoryTag.class.getClassLoader());
+			ImmutableList<HistoryCommand> commands = ParcelUtils.readImmutableList(source);
+			List<HistoryTag> tags = ParcelUtils.readImmutableList(source);
 			return new History(commands, tags);
 		}
 

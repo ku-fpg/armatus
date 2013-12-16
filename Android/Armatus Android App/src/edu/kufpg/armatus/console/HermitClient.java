@@ -117,7 +117,7 @@ public class HermitClient implements Parcelable {
 		}
 	}
 
-	public void runCommand(String input) {
+	public void runCommand(String input, int charsPerLine) {
 		String[] inputs = input.trim().split(StringUtils.WHITESPACE);
 		mConsole.addUserInputEntry(input);
 		if (CustomCommandDispatcher.isCustomCommand(inputs[0])) {
@@ -130,7 +130,7 @@ public class HermitClient implements Parcelable {
 		} else {
 			if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired(true)) {
 				String cleanInput = StringUtils.noCharWrap(input);
-				Command command = new Command(mToken, cleanInput);
+				Command command = new Command(mToken, cleanInput, charsPerLine);
 				if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
 					newRunAbortResumeRequest().execute(mServerUrl + "/command", command.toString());
 				} else {
@@ -138,6 +138,7 @@ public class HermitClient implements Parcelable {
 				}
 			} else {
 				mTempBundle.putString("input", input);
+				mTempBundle.putInt("charsPerLine", charsPerLine);
 			}
 		}
 	}
@@ -500,8 +501,10 @@ public class HermitClient implements Parcelable {
 			switch (mDelayedRequestName) {
 			case COMMAND: {
 				String input = mTempBundle.getString("input");
-				runCommand(input);
+				int charsPerLine = mTempBundle.getInt("charsPerLine");
+				runCommand(input, charsPerLine);
 				mTempBundle.remove("input");
+				mTempBundle.remove("charsPerLine");
 				break;
 			}
 			case COMMANDS: {

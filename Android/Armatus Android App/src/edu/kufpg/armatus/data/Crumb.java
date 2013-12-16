@@ -79,8 +79,7 @@ public class Crumb implements Parcelable {
 			new Parcelable.Creator<Crumb>() {
 		@Override
 		public Crumb createFromParcel(Parcel source) {
-			Optional<Integer> num = ParcelUtils.readOptional
-					(source, Integer.class.getClassLoader());
+			Optional<Integer> num = ParcelUtils.readOptional(source);
 			String crumb = source.readString();
 			return new Crumb(num, crumb);
 		}

@@ -141,11 +141,9 @@ public class CommandResponse implements Parcelable {
 		@Override
 		public CommandResponse createFromParcel(Parcel source) {
 			int ast = source.readInt();
-			Optional<ImmutableList<Glyph>> glyphs = ParcelUtils.readOptional
-					(source, Glyph.class.getClassLoader());
-			Optional<SpannableStringBuilder> glyphText = ParcelUtils.readOptional
-					(source, SpannableStringBuilder.class.getClassLoader());
-			Optional<String> message = ParcelUtils.readOptional(source, String.class.getClassLoader());
+			Optional<ImmutableList<Glyph>> glyphs = ParcelUtils.readOptional(source);
+			Optional<SpannableStringBuilder> glyphText = ParcelUtils.readOptional(source);
+			Optional<String> message = ParcelUtils.readOptional(source);
 			return new CommandResponse(ast, glyphs, glyphText, message);
 		}
 

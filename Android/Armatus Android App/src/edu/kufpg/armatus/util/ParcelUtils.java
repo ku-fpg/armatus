@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.Trie;
+
 import android.os.Parcel;
 import android.util.Log;
 
@@ -30,16 +32,18 @@ public class ParcelUtils {
 	private static final String NO_NAME = "!@#$%^&*()";
 	private static final String CREATE = "create";
 
-	private static final int VAL_LIST = 25;
-	private static final int VAL_MAP = 26;
+	private static final int VAL_LIST2 = 25;
+	private static final int VAL_MAP2 = 26;
 	private static final int VAL_MULTIMAP = 27;
 	private static final int VAL_OPTIONAL = 28;
 	private static final int VAL_RANGE = 29;
 	private static final int VAL_RANGEMAP = 30;
 	private static final int VAL_SET = 31;
+	private static final int VAL_TRIE = 32;
 
 	private ParcelUtils() {}
 
+	// Ewww reflection
 	private static boolean isAssignableFrom(Class<?> cls, String asgnName) throws IllegalArgumentException {
 		try {
 			return cls.isAssignableFrom(Class.forName(asgnName));
@@ -48,6 +52,7 @@ public class ParcelUtils {
 		}
 	}
 
+	// This is bad, bad design practice but there's not another to do what I need
 	private static Object newInstance(String name) throws IllegalArgumentException {
 		try {
 			Class<?> c = Class.forName(name);
@@ -68,6 +73,7 @@ public class ParcelUtils {
 		}
 	}
 
+	// Seriously don't copy this elsewhere
 	private static Object singletonInstance(String className, String singletonMethodName) throws IllegalArgumentException {
 		try {
 			Class<?> c = Class.forName(className);
@@ -92,123 +98,123 @@ public class ParcelUtils {
 		}
 	}
 
-	public static <E> List<E> readList(Parcel p, ClassLoader loader) {
+	public static <E> List<E> readList(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableList.class, name)) {
-			return readImmutableList(p, loader);
+			return readImmutableList(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readListInternal(p, loader, name);
+			return readListInternal(p, name);
 		}
 	}
 
-	private static <E> List<E> readListInternal(Parcel p, ClassLoader loader, String name) {
+	private static <E> List<E> readListInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		List<E> outVal = (List<E>) newInstance(name);
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			E elem = (E) readValue(p, loader);
+			E elem = (E) readValue(p);
 			outVal.add(elem);
 		}
 		return outVal;
 	}
 
-	public static <E> ImmutableList<E> readImmutableList(Parcel p, ClassLoader loader) {
+	public static <E> ImmutableList<E> readImmutableList(Parcel p) {
 		int n = p.readInt();
 		ImmutableList.Builder<E> builder = ImmutableList.builder();
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			E elem = (E) readValue(p, loader);
+			E elem = (E) readValue(p);
 			builder.add(elem);
 		}
 		return builder.build();
 	}
 
-	public static <K, V> Map<K, V> readMap(Parcel p, ClassLoader loader) {
+	public static <K, V> Map<K, V> readMap(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableMap.class, name)) {
-			return readImmutableMap(p, loader);
+			return readImmutableMap(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readMapInternal(p, loader, name);
+			return readMapInternal(p, name);
 		}
 	}
 
-	private static <K, V> Map<K, V> readMapInternal(Parcel p, ClassLoader loader, String name) {
+	private static <K, V> Map<K, V> readMapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		Map<K, V> outVal = (Map<K, V>) newInstance(name);
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			@SuppressWarnings("unchecked")
-			V v = (V) readValue(p, loader);
+			V v = (V) readValue(p);
 			outVal.put(k, v);
 		}
 		return outVal;
 	}
 
-	public static <K, V> ImmutableMap<K, V> readImmutableMap(Parcel p, ClassLoader loader) {
+	public static <K, V> ImmutableMap<K, V> readImmutableMap(Parcel p) {
 		int n = p.readInt();
 		ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			@SuppressWarnings("unchecked")
-			V v = (V) readValue(p, loader);
+			V v = (V) readValue(p);
 			builder.put(k, v);
 		}
 		return builder.build();
 	}
 
-	public static <K, V> Multimap<K, V> readMultimap(Parcel p, ClassLoader loader) {
+	public static <K, V> Multimap<K, V> readMultimap(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableListMultimap.class, name)) {
-			return readImmutableListMultimap(p, loader);
+			return readImmutableListMultimap(p);
 		} else if (isAssignableFrom(ImmutableSetMultimap.class, name)) {
-			return readImmutableSetMultimap(p, loader);
+			return readImmutableSetMultimap(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readMultimapInternal(p, loader, name);
+			return readMultimapInternal(p, name);
 		}
 	}
 
-	public static <K, V> ListMultimap<K, V> readListMultimap(Parcel p, ClassLoader loader) {
+	public static <K, V> ListMultimap<K, V> readListMultimap(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableListMultimap.class, name)) {
-			return readImmutableListMultimap(p, loader);
+			return readImmutableListMultimap(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readListMultimapInternal(p, loader, name);
+			return readListMultimapInternal(p, name);
 		}
 	}
 
-	public static <K, V> SetMultimap<K, V> readSetMultimap(Parcel p, ClassLoader loader) {
+	public static <K, V> SetMultimap<K, V> readSetMultimap(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableSetMultimap.class, name)) {
-			return readImmutableSetMultimap(p, loader);
+			return readImmutableSetMultimap(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readSetMultimapInternal(p, loader, name);
+			return readSetMultimapInternal(p, name);
 		}
 	}
-	
-	public static <K, V> SortedSetMultimap<K, V> readSortedSetMultimap(Parcel p, ClassLoader loader) {
+
+	public static <K, V> SortedSetMultimap<K, V> readSortedSetMultimap(Parcel p) {
 		String name = p.readString();
 		if (name.equals(NO_NAME)) {
 			return null;
@@ -216,14 +222,14 @@ public class ParcelUtils {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
 			SortedSetMultimap<K, V> outVal = (SortedSetMultimap<K, V>) singletonInstance(name, CREATE);
-			
+
 			for (int i = 0; i < n; i++) {
 				@SuppressWarnings("unchecked")
-				K k = (K) readValue(p, loader);
+				K k = (K) readValue(p);
 				int q = p.readInt();
 				for (int j = 0; j < q; j++) {
 					@SuppressWarnings("unchecked")
-					V v = (V) readValue(p, loader);
+					V v = (V) readValue(p);
 					outVal.put(k, v);
 				}
 			}
@@ -231,95 +237,95 @@ public class ParcelUtils {
 		}
 	}
 
-	public static <K, V> ImmutableListMultimap<K, V> readImmutableListMultimap(Parcel p, ClassLoader loader) {
+	public static <K, V> ImmutableListMultimap<K, V> readImmutableListMultimap(Parcel p) {
 		int n = p.readInt();
 		ImmutableListMultimap.Builder<K, V> builder = ImmutableListMultimap.builder();
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			int q = p.readInt();
 			for (int j = 0; j < q; j++) {
 				@SuppressWarnings("unchecked")
-				V v = (V) readValue(p, loader);
+				V v = (V) readValue(p);
 				builder.put(k, v);
 			}
 		}
 		return builder.build();
 	}
 
-	public static <K, V> ImmutableSetMultimap<K, V> readImmutableSetMultimap(Parcel p, ClassLoader loader) {
+	public static <K, V> ImmutableSetMultimap<K, V> readImmutableSetMultimap(Parcel p) {
 		int n = p.readInt();
 		ImmutableSetMultimap.Builder<K, V> builder = ImmutableSetMultimap.builder();
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			int q = p.readInt();
 			for (int j = 0; j < q; j++) {
 				@SuppressWarnings("unchecked")
-				V v = (V) readValue(p, loader);
+				V v = (V) readValue(p);
 				builder.put(k, v);
 			}
 		}
 		return builder.build();
 	}
 
-	private static <K, V> ListMultimap<K, V> readListMultimapInternal(Parcel p, ClassLoader loader, String name) {
+	private static <K, V> ListMultimap<K, V> readListMultimapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		ListMultimap<K, V> outVal = (ListMultimap<K, V>) singletonInstance(name, CREATE);
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			int q = p.readInt();
 			for (int j = 0; j < q; j++) {
 				@SuppressWarnings("unchecked")
-				V v = (V) readValue(p, loader);
+				V v = (V) readValue(p);
 				outVal.put(k, v);
 			}
 		}
 		return outVal;
 	}
 
-	private static <K, V> SetMultimap<K, V> readSetMultimapInternal(Parcel p, ClassLoader loader, String name) {
+	private static <K, V> SetMultimap<K, V> readSetMultimapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		SetMultimap<K, V> outVal = (SetMultimap<K, V>) singletonInstance(name, CREATE);
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			int q = p.readInt();
 			for (int j = 0; j < q; j++) {
 				@SuppressWarnings("unchecked")
-				V v = (V) readValue(p, loader);
+				V v = (V) readValue(p);
 				outVal.put(k, v);
 			}
 		}
 		return outVal;
 	}
 
-	private static <K, V> Multimap<K, V> readMultimapInternal(Parcel p, ClassLoader loader, String name) {
+	private static <K, V> Multimap<K, V> readMultimapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		Multimap<K, V> outVal = (Multimap<K, V>) singletonInstance(name, CREATE);
 
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			K k = (K) readValue(p, loader);
+			K k = (K) readValue(p);
 			int q = p.readInt();
 			for (int j = 0; j < q; j++) {
 				@SuppressWarnings("unchecked")
-				V v = (V) readValue(p, loader);
+				V v = (V) readValue(p);
 				outVal.put(k, v);
 			}
 		}
 		return outVal;
 	}
 
-	public static <T> Optional<T> readOptional(Parcel p, ClassLoader loader) {
+	public static <T> Optional<T> readOptional(Parcel p) {
 		int s = p.readInt();
 		if (s == -1) {
 			return null;
@@ -327,21 +333,21 @@ public class ParcelUtils {
 			return Optional.absent();
 		} else {
 			@SuppressWarnings("unchecked")
-			T thing = (T) readValue(p, loader);
+			T thing = (T) readValue(p);
 			return Optional.of(thing);
 		}
 	}
 
-	public static <C extends Comparable<?>> Range<C> readRange(Parcel p, ClassLoader loader) {
+	public static <C extends Comparable<?>> Range<C> readRange(Parcel p) {
 		if (p.readInt() == -1) {
 			return null;
 		} else {
 			int lowerOrd = p.readInt();
 			@SuppressWarnings("unchecked")
-			C lowerVal = (C) readValue(p, loader);
+			C lowerVal = (C) readValue(p);
 			int upperOrd = p.readInt();
 			@SuppressWarnings("unchecked")
-			C upperVal = (C) readValue(p, loader);
+			C upperVal = (C) readValue(p);
 
 			if (lowerVal != null && upperVal != null) {
 				BoundType lowerType = BoundType.values()[lowerOrd];
@@ -358,105 +364,131 @@ public class ParcelUtils {
 			}
 		}
 	}
-	
-	public static <K extends Comparable<?>, V> RangeMap<K, V> readRangeMap(Parcel p, ClassLoader loader) {
+
+	public static <K extends Comparable<?>, V> RangeMap<K, V> readRangeMap(Parcel p) {
 		String name = p.readString();
-		
+
 		if (isAssignableFrom(ImmutableRangeMap.class, name)) {
-			return readImmutableRangeMap(p, loader);
+			return readImmutableRangeMap(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readRangeMapInternal(p, loader, name);
+			return readRangeMapInternal(p, name);
 		}
 	}
-	
-	public static <K extends Comparable<?>, V> ImmutableRangeMap<K, V> readImmutableRangeMap(Parcel p, ClassLoader loader) {
+
+	public static <K extends Comparable<?>, V> ImmutableRangeMap<K, V> readImmutableRangeMap(Parcel p) {
 		int n = p.readInt();
 		ImmutableRangeMap.Builder<K, V> builder = ImmutableRangeMap.builder();
 
 		for (int i = 0; i < n; i++) {
-			Range<K> range = readRange(p, loader);
+			Range<K> range = readRange(p);
 			@SuppressWarnings("unchecked")
-			V value = (V) readValue(p, loader);
+			V value = (V) readValue(p);
 			builder.put(range, value);
 		}
 
 		return builder.build();
 	}
-	
-	private static <K extends Comparable<?>, V> RangeMap<K, V> readRangeMapInternal(Parcel p, ClassLoader loader, String name) {
+
+	private static <K extends Comparable<?>, V> RangeMap<K, V> readRangeMapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		RangeMap<K, V> outVal = (RangeMap<K, V>) singletonInstance(name, CREATE);
 
 		for (int i = 0; i < n; i++) {
-			Range<K> range = readRange(p, loader);
+			Range<K> range = readRange(p);
 			@SuppressWarnings("unchecked")
-			V value = (V) readValue(p, loader);
+			V value = (V) readValue(p);
 			outVal.put(range, value);
 		}
 
 		return outVal;
 	}
-	
-	public static <E> Set<E> readSet(Parcel p, ClassLoader loader) {
+
+	public static <E> Set<E> readSet(Parcel p) {
 		String name = p.readString();
-		
+
 		if (isAssignableFrom(ImmutableSet.class, name)) {
-			return readImmutableSet(p, loader);
+			return readImmutableSet(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
-			return readSetInternal(p, loader, name);
+			return readSetInternal(p, name);
 		}
 	}
-	
-	public static <E> ImmutableSet<E> readImmutableSet(Parcel p, ClassLoader loader) {
+
+	public static <E> ImmutableSet<E> readImmutableSet(Parcel p) {
 		int n = p.readInt();
 		ImmutableSet.Builder<E> builder = ImmutableSet.builder();
-		
+
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			E elem = (E) readValue(p, loader);
+			E elem = (E) readValue(p);
 			builder.add(elem);
 		}
 		return builder.build();
 	}
-	
-	private static <E> Set<E> readSetInternal(Parcel p, ClassLoader loader, String name) {
+
+	private static <E> Set<E> readSetInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		Set<E> outVal = (Set<E>) newInstance(name);
-		
+
 		for (int i = 0; i < n; i++) {
 			@SuppressWarnings("unchecked")
-			E elem = (E) readValue(p, loader);
+			E elem = (E) readValue(p);
 			outVal.add(elem);
 		}
 		return outVal;
 	}
 
-	public static final Object readValue(Parcel p, ClassLoader loader) {
+	public static <K, V> Trie<K, V> readTrie(Parcel p) {
+		String name = p.readString();
+		if (name.equals(NO_NAME)) {
+			return null;
+		} else {
+			int n = p.readInt();
+			@SuppressWarnings("unchecked")
+			Trie<K, V> outVal = (Trie<K, V>) newInstance(name);
+
+			for (int i = 0; i < n; i++) {
+				@SuppressWarnings("unchecked")
+				K k = (K) readValue(p);
+				@SuppressWarnings("unchecked")
+				V v = (V) readValue(p);
+				outVal.put(k, v);
+			}
+			return outVal;
+		}
+	}
+
+	public static final Object readValue(Parcel p) {
 		int type = p.readInt();
 
 		switch (type) {
-		case VAL_LIST:
-			return readList(p, loader);
-		case VAL_MAP:
-			return readMap(p, loader);
+		case VAL_LIST2:
+			return readList(p);
+		case VAL_MAP2:
+			return readMap(p);
 		case VAL_MULTIMAP:
-			return readMultimap(p, loader);
+			return readMultimap(p);
 		case VAL_OPTIONAL:
-			return readOptional(p, loader);
+			return readOptional(p);
 		case VAL_RANGE:
-			return readRange(p, loader);
+			return readRange(p);
 		case VAL_RANGEMAP:
-			return readRangeMap(p, loader);
+			return readRangeMap(p);
 		case VAL_SET:
-			return readSet(p, loader);
+			return readSet(p);
+		case VAL_TRIE:
+			return readTrie(p);
 		default:
-			return p.readValue(loader);
+			/* For some bizarre reason, you have to pass in a ClassLoader from a class
+			 * in the app itself. Using a ClassLoader from a regular Java class won't
+			 * work. I have absolutely no idea why.
+			 */
+			return p.readValue(ParcelUtils.class.getClassLoader());
 		}
 	}
 
@@ -561,12 +593,25 @@ public class ParcelUtils {
 		}
 	}
 
+	public static <K, V> void writeTrie(Parcel p, Trie<K, V> trie) {
+		if (trie == null) {
+			p.writeString(NO_NAME);
+		} else {
+			p.writeString(trie.getClass().getCanonicalName());
+			p.writeInt(trie.size());
+			for (Map.Entry<K, V> entry : trie.entrySet()) {
+				writeValue(p, entry.getKey());
+				writeValue(p, entry.getValue());
+			}
+		}
+	}
+
 	public static void writeValue(Parcel p, Object v) {
 		if (v instanceof List) {
-			p.writeInt(VAL_LIST);
+			p.writeInt(VAL_LIST2);
 			writeList(p, (List<?>) v);
 		} else if (v instanceof Map) {
-			p.writeInt(VAL_MAP);
+			p.writeInt(VAL_MAP2);
 			writeMap(p, (Map<?, ?>) v);
 		} else if (v instanceof Multimap) {
 			p.writeInt(VAL_MULTIMAP);
@@ -587,7 +632,10 @@ public class ParcelUtils {
 		} else if (v instanceof Set) {
 			p.writeInt(VAL_SET);
 			writeSet(p, (Set<?>) v);
-		} else {
+		} else if (v instanceof Trie) {
+			p.writeInt(VAL_TRIE);
+			writeTrie(p, (Trie<?, ?>) v);
+		} else { // Delegate to default writeValue()
 			p.writeInt(-2);
 			p.writeValue(v);
 		}
