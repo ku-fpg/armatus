@@ -52,7 +52,7 @@ public class ParcelUtils {
 		}
 	}
 
-	// This is bad, bad design practice but there's not another to do what I need
+	// This is bad, bad design practice but there's not another way to do what I need
 	private static Object newInstance(String name) throws IllegalArgumentException {
 		try {
 			Class<?> c = Class.forName(name);

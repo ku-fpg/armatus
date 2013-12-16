@@ -41,7 +41,7 @@ public class Crumb implements Parcelable {
 	public String getCrumbName() {
 		return mCrumbName;
 	}
-	
+
 	public boolean hasNum() {
 		return mNum.isPresent();
 	}
@@ -56,20 +56,14 @@ public class Crumb implements Parcelable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof Crumb)) {
+		if (o instanceof Crumb) {
+			Crumb c = (Crumb) o;
+			return mNum.equals(c.mNum) && mCrumbName.equals(c.getCrumbName());
+		} else {
 			return false;
 		}
-
-		Crumb c = (Crumb) o;
-		boolean numsEqual;
-		if (!hasNum()) {
-			numsEqual = !c.hasNum();
-		} else {
-			numsEqual = getNum() == c.getNum();
-		}
-		return numsEqual && getCrumbName().equals(c.getCrumbName());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(mNum, mCrumbName);

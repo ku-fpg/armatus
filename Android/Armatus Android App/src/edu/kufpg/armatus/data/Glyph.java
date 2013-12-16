@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -118,6 +119,27 @@ public class Glyph implements Parcelable {
 
 	public static enum GlyphStyle {
 		NORMAL, KEYWORD, SYNTAX, VAR, COERCION, TYPE, LIT, WARNING;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Glyph) {
+			Glyph g = (Glyph) o;
+			return mStyle.equals(g.getStyle()) && mBindingSite.equals(g.mBindingSite)
+					&& mPath.equals(g.getPath()) && mText.equals(g.getText());
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(mStyle, mBindingSite, mPath, mText);
+	}
+	
+	@Override
+	public String toString() {
+		return mText;
 	}
 
 	public static Parcelable.Creator<Glyph> CREATOR =

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.lucasr.twowayview.TwoWayView;
+
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -53,14 +55,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.meetme.android.horizontallistview.HorizontalListView;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.BaseApplication;
 import edu.kufpg.armatus.MainActivity;
 import edu.kufpg.armatus.Prefs;
-import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.Prefs.NetworkSource;
+import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.CommandExpandableMenuAdapter.CommandExpandableMenuItem;
 import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
@@ -70,7 +71,6 @@ import edu.kufpg.armatus.data.CommandResponse;
 import edu.kufpg.armatus.data.HistoryCommand;
 import edu.kufpg.armatus.dialog.CommandHelpDialog;
 import edu.kufpg.armatus.dialog.ConsoleEntrySelectionDialog;
-import edu.kufpg.armatus.dialog.ConsoleEntryTransformDialog;
 import edu.kufpg.armatus.dialog.GestureDialog;
 import edu.kufpg.armatus.dialog.InputCompletionDialog;
 import edu.kufpg.armatus.dialog.KeywordSwapDialog;
@@ -97,7 +97,6 @@ public class ConsoleActivity extends BaseActivity {
 	private static final String SCROLL_ENTRIES_TAG = "scrollentries";
 	private static final String SELECTION_TAG = "selection";
 	private static final String KEYWORD_SWAP_TAG = "keywordswap";
-	private static final String TRANSFORM_TAG = "transform";
 	private static final String WORD_COMPLETION_TAG = "wordcomplete";
 	public static Typeface TYPEFACE;
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
@@ -155,7 +154,7 @@ public class ConsoleActivity extends BaseActivity {
 		final ImageButton prevEntryButton = (ImageButton) findViewById(R.id.console_input_previous_entry);
 		final ImageButton toggleSpecialKeysButton = (ImageButton) findViewById(R.id.console_options_toggle_special_keys);
 		final ImageButton hideOptionsBarButton = (ImageButton) findViewById(R.id.console_options_hide_button);
-		final HorizontalListView specialKeyRow = (HorizontalListView) findViewById(R.id.console_special_key_list);
+		final TwoWayView specialKeyRow = (TwoWayView) findViewById(R.id.console_special_key_list);
 		TYPEFACE = Typeface.createFromAsset(getAssets(), TYPEFACE_PATH);
 
 		if (savedInstanceState == null) {
@@ -950,10 +949,6 @@ public class ConsoleActivity extends BaseActivity {
 
 	public void showEntrySelectionDialog(int... entries) {
 		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
-	}
-
-	public void showEntryTransformDialog(ConsoleEntry entry) {
-		showDialog(ConsoleEntryTransformDialog.newInstance(entry), TRANSFORM_TAG);
 	}
 
 	public void showKeywordSwapDialog(int entryNum, String entryContents) {
