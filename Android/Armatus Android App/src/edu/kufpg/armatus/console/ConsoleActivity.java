@@ -39,9 +39,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -469,15 +467,6 @@ public class ConsoleActivity extends BaseActivity {
 						MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 				specialKeyRow.getLayoutParams().height = charView.getMeasuredHeight();
 				specialKeyRow.requestLayout();
-			}
-		});
-		specialKeyRow.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if (getCurrentFocus() instanceof EditText) {
-					EditText et = (EditText) getCurrentFocus();
-					et.getText().insert(et.getSelectionStart(), ska.getItem(position));
-				}
 			}
 		});
 
