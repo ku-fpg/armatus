@@ -28,21 +28,34 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.SortedSetMultimap;
 
 public class ParcelUtils {
-	private static final String TAG = ParcelUtils.class.getName();
+	private static final String TAG = ParcelUtils.class.getSimpleName();
 	private static final String NO_NAME = "!@#$%^&*()";
 	private static final String CREATE = "create";
 
-	private static final int VAL_LIST2 = 25;
-	private static final int VAL_MAP2 = 26;
-	private static final int VAL_MULTIMAP = 27;
-	private static final int VAL_OPTIONAL = 28;
-	private static final int VAL_RANGE = 29;
-	private static final int VAL_RANGEMAP = 30;
-	private static final int VAL_SET = 31;
-	private static final int VAL_TRIE = 32;
+	private static final int VAL_BOOLEAN = 25;
+	private static final int VAL_ENUM = 26;
+	private static final int VAL_LIST2 = 27;
+	private static final int VAL_MAP2 = 28;
+	private static final int VAL_MULTIMAP = 29;
+	private static final int VAL_OPTIONAL = 30;
+	private static final int VAL_RANGE = 31;
+	private static final int VAL_RANGEMAP = 32;
+	private static final int VAL_SET = 33;
+	private static final int VAL_TRIE = 34;
 
 	private ParcelUtils() {}
-
+	
+	private static Class<?> forName(String className) throws IllegalArgumentException {
+		try {
+			return Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			Log.e(TAG, "Illegal access when unmarshalling: "
+					+ className, e);
+			throw new IllegalArgumentException("ClassNotFoundException when unmarshalling: "
+					+ className);
+		}
+	}
+	
 	// Ewww reflection
 	private static boolean isAssignableFrom(Class<?> cls, String asgnName) throws IllegalArgumentException {
 		try {
@@ -53,23 +66,23 @@ public class ParcelUtils {
 	}
 
 	// This is bad, bad design practice but there's not another way to do what I need
-	private static Object newInstance(String name) throws IllegalArgumentException {
+	private static Object newInstance(String className) throws IllegalArgumentException {
 		try {
-			Class<?> c = Class.forName(name);
+			Class<?> c = Class.forName(className);
 			return c.newInstance();
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, "Illegal access when unmarshalling: "
-					+ name, e);
+					+ className, e);
 			throw new IllegalArgumentException("ClassNotFoundException when unmarshalling: "
-					+ name);
+					+ className);
 		} catch (InstantiationException e) {
 			Log.e(TAG, "Class not found when unmarshalling: "
-					+ name, e);
+					+ className, e);
 			throw new IllegalArgumentException("InstantiationException when unmarshalling: "
-					+ name);
+					+ className);
 		} catch (IllegalAccessException e) {
 			throw new IllegalArgumentException("IllegalAccessException when unmarshalling: "
-					+ name);
+					+ className);
 		}
 	}
 
@@ -97,12 +110,28 @@ public class ParcelUtils {
 					+ className + " with method " + singletonMethodName);
 		}
 	}
+	
+	public static boolean readBoolean(Parcel p) {
+		return p.readInt() == 1 ? true : false;
+	}
+	
+	public static <E extends Enum<E>> E readEnum(Parcel p) {
+		String className = p.readString();
+		if (className.equals(NO_NAME)) {
+			return null;
+		} else {
+			@SuppressWarnings("unchecked")
+			Class<E> cls = (Class<E>) forName(className);
+			String valueName = p.readString();
+			return Enum.valueOf(cls, valueName);
+		}
+	}
 
 	public static <E> List<E> readList(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableList.class, name)) {
-			return readImmutableList(p);
+			return readImmutableListInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -124,6 +153,19 @@ public class ParcelUtils {
 	}
 
 	public static <E> ImmutableList<E> readImmutableList(Parcel p) {
+		p.readString();
+		int n = p.readInt();
+		ImmutableList.Builder<E> builder = ImmutableList.builder();
+
+		for (int i = 0; i < n; i++) {
+			@SuppressWarnings("unchecked")
+			E elem = (E) readValue(p);
+			builder.add(elem);
+		}
+		return builder.build();
+	}
+	
+	public static <E> ImmutableList<E> readImmutableListInternal(Parcel p) {
 		int n = p.readInt();
 		ImmutableList.Builder<E> builder = ImmutableList.builder();
 
@@ -139,7 +181,7 @@ public class ParcelUtils {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableMap.class, name)) {
-			return readImmutableMap(p);
+			return readImmutableMapInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -163,6 +205,21 @@ public class ParcelUtils {
 	}
 
 	public static <K, V> ImmutableMap<K, V> readImmutableMap(Parcel p) {
+		p.readString();
+		int n = p.readInt();
+		ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
+
+		for (int i = 0; i < n; i++) {
+			@SuppressWarnings("unchecked")
+			K k = (K) readValue(p);
+			@SuppressWarnings("unchecked")
+			V v = (V) readValue(p);
+			builder.put(k, v);
+		}
+		return builder.build();
+	}
+	
+	public static <K, V> ImmutableMap<K, V> readImmutableMapInternal(Parcel p) {
 		int n = p.readInt();
 		ImmutableMap.Builder<K, V> builder = ImmutableMap.builder();
 
@@ -180,9 +237,9 @@ public class ParcelUtils {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableListMultimap.class, name)) {
-			return readImmutableListMultimap(p);
+			return readImmutableListMultimapInternal(p);
 		} else if (isAssignableFrom(ImmutableSetMultimap.class, name)) {
-			return readImmutableSetMultimap(p);
+			return readImmutableSetMultimapInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -194,7 +251,7 @@ public class ParcelUtils {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableListMultimap.class, name)) {
-			return readImmutableListMultimap(p);
+			return readImmutableListMultimapInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -206,7 +263,7 @@ public class ParcelUtils {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableSetMultimap.class, name)) {
-			return readImmutableSetMultimap(p);
+			return readImmutableSetMultimapInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -238,6 +295,24 @@ public class ParcelUtils {
 	}
 
 	public static <K, V> ImmutableListMultimap<K, V> readImmutableListMultimap(Parcel p) {
+		p.readString();
+		int n = p.readInt();
+		ImmutableListMultimap.Builder<K, V> builder = ImmutableListMultimap.builder();
+
+		for (int i = 0; i < n; i++) {
+			@SuppressWarnings("unchecked")
+			K k = (K) readValue(p);
+			int q = p.readInt();
+			for (int j = 0; j < q; j++) {
+				@SuppressWarnings("unchecked")
+				V v = (V) readValue(p);
+				builder.put(k, v);
+			}
+		}
+		return builder.build();
+	}
+	
+	public static <K, V> ImmutableListMultimap<K, V> readImmutableListMultimapInternal(Parcel p) {
 		int n = p.readInt();
 		ImmutableListMultimap.Builder<K, V> builder = ImmutableListMultimap.builder();
 
@@ -255,6 +330,24 @@ public class ParcelUtils {
 	}
 
 	public static <K, V> ImmutableSetMultimap<K, V> readImmutableSetMultimap(Parcel p) {
+		p.readString();
+		int n = p.readInt();
+		ImmutableSetMultimap.Builder<K, V> builder = ImmutableSetMultimap.builder();
+
+		for (int i = 0; i < n; i++) {
+			@SuppressWarnings("unchecked")
+			K k = (K) readValue(p);
+			int q = p.readInt();
+			for (int j = 0; j < q; j++) {
+				@SuppressWarnings("unchecked")
+				V v = (V) readValue(p);
+				builder.put(k, v);
+			}
+		}
+		return builder.build();
+	}
+	
+	public static <K, V> ImmutableSetMultimap<K, V> readImmutableSetMultimapInternal(Parcel p) {
 		int n = p.readInt();
 		ImmutableSetMultimap.Builder<K, V> builder = ImmutableSetMultimap.builder();
 
@@ -338,26 +431,23 @@ public class ParcelUtils {
 		}
 	}
 
-	public static <C extends Comparable<?>> Range<C> readRange(Parcel p) {
+	public static <C extends Comparable<? super C>> Range<C> readRange(Parcel p) {
 		if (p.readInt() == -1) {
 			return null;
 		} else {
-			int lowerOrd = p.readInt();
+			BoundType lowerType = readEnum(p);
 			@SuppressWarnings("unchecked")
 			C lowerVal = (C) readValue(p);
-			int upperOrd = p.readInt();
+			
+			BoundType upperType = readEnum(p);
 			@SuppressWarnings("unchecked")
 			C upperVal = (C) readValue(p);
 
 			if (lowerVal != null && upperVal != null) {
-				BoundType lowerType = BoundType.values()[lowerOrd];
-				BoundType upperType = BoundType.values()[upperOrd];
 				return Range.range(lowerVal, lowerType, upperVal, upperType);
 			} else if (lowerVal != null) {
-				BoundType lowerType = BoundType.values()[lowerOrd];
 				return Range.downTo(lowerVal, lowerType);
 			} else if (upperVal != null) {
-				BoundType upperType = BoundType.values()[upperOrd];
 				return Range.upTo(upperVal, upperType);
 			} else {
 				return Range.all();
@@ -365,11 +455,11 @@ public class ParcelUtils {
 		}
 	}
 
-	public static <K extends Comparable<?>, V> RangeMap<K, V> readRangeMap(Parcel p) {
+	public static <K extends Comparable<? super K>, V> RangeMap<K, V> readRangeMap(Parcel p) {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableRangeMap.class, name)) {
-			return readImmutableRangeMap(p);
+			return readImmutableRangeMapInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -377,7 +467,22 @@ public class ParcelUtils {
 		}
 	}
 
-	public static <K extends Comparable<?>, V> ImmutableRangeMap<K, V> readImmutableRangeMap(Parcel p) {
+	public static <K extends Comparable<? super K>, V> ImmutableRangeMap<K, V> readImmutableRangeMap(Parcel p) {
+		p.readString();
+		int n = p.readInt();
+		ImmutableRangeMap.Builder<K, V> builder = ImmutableRangeMap.builder();
+
+		for (int i = 0; i < n; i++) {
+			Range<K> range = readRange(p);
+			@SuppressWarnings("unchecked")
+			V value = (V) readValue(p);
+			builder.put(range, value);
+		}
+
+		return builder.build();
+	}
+	
+	public static <K extends Comparable<? super K>, V> ImmutableRangeMap<K, V> readImmutableRangeMapInternal(Parcel p) {
 		int n = p.readInt();
 		ImmutableRangeMap.Builder<K, V> builder = ImmutableRangeMap.builder();
 
@@ -391,7 +496,7 @@ public class ParcelUtils {
 		return builder.build();
 	}
 
-	private static <K extends Comparable<?>, V> RangeMap<K, V> readRangeMapInternal(Parcel p, String name) {
+	private static <K extends Comparable<? super K>, V> RangeMap<K, V> readRangeMapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
 		RangeMap<K, V> outVal = (RangeMap<K, V>) singletonInstance(name, CREATE);
@@ -410,7 +515,7 @@ public class ParcelUtils {
 		String name = p.readString();
 
 		if (isAssignableFrom(ImmutableSet.class, name)) {
-			return readImmutableSet(p);
+			return readImmutableSetInternal(p);
 		} else if (name.equals(NO_NAME)) {
 			return null;
 		} else {
@@ -419,6 +524,19 @@ public class ParcelUtils {
 	}
 
 	public static <E> ImmutableSet<E> readImmutableSet(Parcel p) {
+		p.readString();
+		int n = p.readInt();
+		ImmutableSet.Builder<E> builder = ImmutableSet.builder();
+
+		for (int i = 0; i < n; i++) {
+			@SuppressWarnings("unchecked")
+			E elem = (E) readValue(p);
+			builder.add(elem);
+		}
+		return builder.build();
+	}
+	
+	public static <E> ImmutableSet<E> readImmutableSetInternal(Parcel p) {
 		int n = p.readInt();
 		ImmutableSet.Builder<E> builder = ImmutableSet.builder();
 
@@ -467,6 +585,10 @@ public class ParcelUtils {
 		int type = p.readInt();
 
 		switch (type) {
+		case VAL_BOOLEAN:
+			return readBoolean(p);
+		case VAL_ENUM:
+			return readEnum(p);
 		case VAL_LIST2:
 			return readList(p);
 		case VAL_MAP2:
@@ -491,12 +613,25 @@ public class ParcelUtils {
 			return p.readValue(ParcelUtils.class.getClassLoader());
 		}
 	}
+	
+	public static void writeBoolean(Parcel p, boolean b) {
+		p.writeInt(b ? 1 : 0);
+	}
+	
+	public static <E extends Enum<?>> void writeEnum(Parcel p, E enumVal) {
+		if (enumVal == null) {
+			p.writeString(NO_NAME);
+		} else {
+			p.writeString(enumVal.getClass().getName());
+			p.writeString(enumVal.name());
+		}
+	}
 
 	public static <E> void writeList(Parcel p, List<E> list) {
 		if (list == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(list.getClass().getCanonicalName());
+			p.writeString(list.getClass().getName());
 			p.writeInt(list.size());
 			for (E elem : list) {
 				writeValue(p, elem);
@@ -508,7 +643,7 @@ public class ParcelUtils {
 		if (map == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(map.getClass().getCanonicalName());
+			p.writeString(map.getClass().getName());
 			p.writeInt(map.size());
 			for (Map.Entry<K, V> entry : map.entrySet()) {
 				writeValue(p, entry.getKey());
@@ -521,7 +656,7 @@ public class ParcelUtils {
 		if (multimap == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(multimap.getClass().getCanonicalName());
+			p.writeString(multimap.getClass().getName());
 			p.writeInt(multimap.size());
 			for (Map.Entry<K, Collection<V>> entry : multimap.asMap().entrySet()) {
 				writeValue(p, entry.getKey());
@@ -551,18 +686,18 @@ public class ParcelUtils {
 			p.writeInt(1);
 
 			if (range.hasLowerBound()) {
-				p.writeInt(range.lowerBoundType().ordinal());
+				writeEnum(p, range.lowerBoundType());
 				writeValue(p, range.lowerEndpoint());
 			} else {
-				p.writeInt(-1);
+				writeEnum(p, null);
 				p.writeValue(null);
 			}
 
 			if (range.hasUpperBound()) {
-				p.writeInt(range.upperBoundType().ordinal());
+				writeEnum(p, range.upperBoundType());
 				writeValue(p, range.upperEndpoint());
 			} else {
-				p.writeInt(-1);
+				writeEnum(p, null);
 				p.writeValue(null);
 			}
 		}
@@ -572,7 +707,7 @@ public class ParcelUtils {
 		if (rangeMap == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(rangeMap.getClass().getCanonicalName());
+			p.writeString(rangeMap.getClass().getName());
 			p.writeInt(rangeMap.asMapOfRanges().size());
 			for (Map.Entry<Range<K>, V> entry : rangeMap.asMapOfRanges().entrySet()) {
 				writeRange(p, entry.getKey());
@@ -585,7 +720,7 @@ public class ParcelUtils {
 		if (set == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(set.getClass().getCanonicalName());
+			p.writeString(set.getClass().getName());
 			p.writeInt(set.size());
 			for (E elem : set) {
 				writeValue(p, elem);
@@ -597,7 +732,7 @@ public class ParcelUtils {
 		if (trie == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(trie.getClass().getCanonicalName());
+			p.writeString(trie.getClass().getName());
 			p.writeInt(trie.size());
 			for (Map.Entry<K, V> entry : trie.entrySet()) {
 				writeValue(p, entry.getKey());
@@ -607,7 +742,13 @@ public class ParcelUtils {
 	}
 
 	public static void writeValue(Parcel p, Object v) {
-		if (v instanceof List) {
+		if (v instanceof Boolean) {
+			p.writeInt(VAL_BOOLEAN);
+			writeBoolean(p, (Boolean) v);
+		} else if (v.getClass().isEnum()) {
+			p.writeInt(VAL_BOOLEAN);
+			writeEnum(p, (Enum<?>) v);
+		} else if (v instanceof List) {
 			p.writeInt(VAL_LIST2);
 			writeList(p, (List<?>) v);
 		} else if (v instanceof Map) {

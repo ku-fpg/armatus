@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.activity;
 
-import java.util.List;
 import java.util.Map;
 
 import android.os.Bundle;
@@ -17,14 +16,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.activity.SelectionTextView.SelectionWatcher;
-import edu.kufpg.armatus.data.Crumb;
 import edu.kufpg.armatus.data.Glyph;
 import edu.kufpg.armatus.gesture.OnPinchZoomListener;
 import edu.kufpg.armatus.util.BundleUtils;
@@ -33,8 +30,6 @@ import edu.kufpg.armatus.util.TurboImageButton;
 public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 	private SelectionTextView mTextView;
 	private RangeMap<Integer, Glyph> mRangeGlyphMap = TreeRangeMap.create();
-	private Map<Glyph, Range<Integer>> mGlyphRangeMap = Maps.newHashMap();
-	private Map<List<Crumb>, Glyph> mPathGlyphMap = Maps.newHashMap();
 	private int mSelStart = -1;
 	private int mSelEnd = -1;
 	private ScaleGestureDetector mScaleGestureDetector;
@@ -79,15 +74,11 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 				if (!glyph.getText().isEmpty()) {
 					Range<Integer> glyphRange = Range.closedOpen(index, index + glyph.getText().length());
 					mRangeGlyphMap.put(glyphRange, glyph);
-					mGlyphRangeMap.put(glyph, glyphRange);
-					mPathGlyphMap.put(glyph.getPath(), glyph);
 					index += glyph.getText().length();
 				}
 			}
 		} else {
 			mRangeGlyphMap = BundleUtils.getRangeMap(savedInstanceState, "rangeGlyphMap");
-//			mGlyphRangeMap = BundleUtils.getMap(savedInstanceState, "glyphRangeMap");
-//			mPathGlyphMap = BundleUtils.getMap(savedInstanceState, "pathGlyphMap");
 		}
 	}
 
@@ -95,8 +86,6 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		BundleUtils.putRangeMap(outState, "rangeGlyphMap", mRangeGlyphMap);
-//		BundleUtils.putMap(outState, "glyphRangeMap", mGlyphRangeMap);
-//		BundleUtils.putMap(outState, "pathGlyphMap", mPathGlyphMap);
 	}
 
 	@Override

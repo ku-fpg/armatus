@@ -146,7 +146,7 @@ public class Glyph implements Parcelable {
 			new Parcelable.Creator<Glyph>() {
 		@Override
 		public Glyph createFromParcel(Parcel source) {
-			GlyphStyle style = GlyphStyle.values()[source.readInt()];
+			GlyphStyle style = ParcelUtils.readEnum(source);
 			Optional<ImmutableList<Crumb>> bindingSite = ParcelUtils.readOptional(source);
 			ImmutableList<Crumb> path = ParcelUtils.readImmutableList(source);
 			String text = source.readString();
@@ -166,9 +166,9 @@ public class Glyph implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(mStyle.ordinal());
+		ParcelUtils.writeEnum(dest, mStyle);
 		ParcelUtils.writeOptional(dest, mBindingSite);
-		dest.writeTypedList(mPath);
+		ParcelUtils.writeList(dest, mPath);
 		dest.writeString(mText);
 	}
 }

@@ -26,7 +26,7 @@ public class BaseApplication<A extends Activity> extends Application {
 	 * @param task The {@code AsyncActivityTask} to remove.
 	 */
 	public void removeTask(A activity, AsyncActivityTask<A,?,?,?> task) {
-		mActivityTaskMap.remove(activity.getClass().getCanonicalName(), task);
+		mActivityTaskMap.remove(activity.getClass().getName(), task);
 	}
 
 	/**
@@ -36,7 +36,7 @@ public class BaseApplication<A extends Activity> extends Application {
 	 * @param task The {@code AsyncActivityTask} to connect.
 	 */
 	public void addTask(A activity, AsyncActivityTask<A,?,?,?> task) {
-		mActivityTaskMap.put(activity.getClass().getCanonicalName(), task);
+		mActivityTaskMap.put(activity.getClass().getName(), task);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class BaseApplication<A extends Activity> extends Application {
 	 * @param activity The {@code Activity} whose references should be set to null.
 	 */
 	public void detachActivity(A activity) {
-		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getCanonicalName())) {
+		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getName())) {
 			task.setActivity(null);
 		}
 	}
@@ -58,13 +58,13 @@ public class BaseApplication<A extends Activity> extends Application {
 	 * @param activity The {@code Activity} whose references should be reestablished.
 	 */
 	public void attachActivity(A activity) {
-		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getCanonicalName())) {
+		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getName())) {
 			task.setActivity(activity);
 		}
 	}
 	
 	public void cancelActivityTasks(A activity) {
-		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getCanonicalName())) {
+		for (AsyncActivityTask<A,?,?,?> task : mActivityTaskMap.get(activity.getClass().getName())) {
 			task.cancel(true);
 		}
 	}

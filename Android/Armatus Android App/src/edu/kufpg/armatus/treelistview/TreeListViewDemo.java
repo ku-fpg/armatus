@@ -21,6 +21,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.util.BundleUtils;
 
 /**
  * Demo activity showing how the tree view can be used.
@@ -61,8 +62,7 @@ public class TreeListViewDemo extends BaseActivity {
 		} else {
 			mManager = (TreeStateManager<Long>) savedInstanceState
 					.getSerializable("treeManager");
-			newTreeType = TreeType.values()[savedInstanceState
-					.getInt("treeType")];
+			newTreeType = BundleUtils.getEnum(savedInstanceState, "treeType");
 			newCollapsible = savedInstanceState.getBoolean("collapsible");
 			mRecursive = savedInstanceState.getBoolean("recursive");
 		}
@@ -80,7 +80,7 @@ public class TreeListViewDemo extends BaseActivity {
 	@Override
 	protected void onSaveInstanceState(final Bundle outState) {
 		outState.putSerializable("treeManager", mManager);
-		outState.putInt("treeType", mTreeType.ordinal());
+		BundleUtils.putEnum(outState, "treeType", mTreeType);
 		outState.putBoolean("collapsible", mCollapsible);
 		super.onSaveInstanceState(outState);
 	}

@@ -40,6 +40,7 @@ import edu.kufpg.armatus.networking.HermitHttpServerRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
 import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.JsonUtils;
+import edu.kufpg.armatus.util.ParcelUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
 public class HermitClient implements Parcelable {
@@ -623,7 +624,7 @@ public class HermitClient implements Parcelable {
 	};
 
 	private HermitClient(Parcel in) {
-		mDelayedRequestName = RequestName.values()[in.readInt()];
+		mDelayedRequestName = ParcelUtils.readEnum(in);
 		mServerUrl = in.readString();
 		mTempBundle = in.readBundle();
 		mToken = in.readParcelable(Token.class.getClassLoader());
@@ -637,7 +638,7 @@ public class HermitClient implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(mDelayedRequestName.ordinal());
+		ParcelUtils.writeEnum(dest, mDelayedRequestName);
 		dest.writeString(mServerUrl);
 		dest.writeBundle(mTempBundle);
 		dest.writeParcelable(mToken, flags);

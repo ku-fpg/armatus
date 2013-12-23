@@ -2,8 +2,6 @@ package edu.kufpg.armatus.data;
 
 import java.util.List;
 
-import org.apache.commons.collections4.Trie;
-import org.apache.commons.collections4.trie.PatriciaTrie;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +15,6 @@ import android.text.SpannableStringBuilder;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -32,7 +29,6 @@ public class CommandResponse implements Parcelable {
 	private final Optional<? extends List<Glyph>> mGlyphs;
 	private final Optional<? extends Spannable> mGlyphText;
 	private final Optional<? extends String> mMessage;
-	private final Optional<? extends Trie<String, Glyph>> mGlyphPathTrie;
 
 	public CommandResponse(int ast) {
 		this(ast, Optional.<ImmutableList<Glyph>>absent(), Optional.<String>absent());
@@ -54,27 +50,16 @@ public class CommandResponse implements Parcelable {
 		this(o.getInt(AST), jsonToGlyphs(o), jsonToMessage(o));
 	}
 
-	private CommandResponse(int ast, Optional<ImmutableList<Glyph>> glyphs, Optional<String> message) {
-		this(ast, glyphs, createPrettyText(glyphs), message, glyphs.transform(new Function<List<Glyph>, PatriciaTrie<Glyph>>() {
-			@Override
-			public PatriciaTrie<Glyph> apply(List<Glyph> glyphs_) {
-				PatriciaTrie<Glyph> trie = new PatriciaTrie<Glyph>();
-				for (Glyph glyph : glyphs_) {
-					trie.put(concat(glyph.getPath()), glyph);
-				}
-				return trie;
-			}
-		}));
+	private CommandResponse(int ast, Optional<ImmutableList<Glyph>> maybeGlyphs, Optional<String> maybeMessage) {
+		this(ast, maybeGlyphs, createPrettyText(maybeGlyphs), maybeMessage);
 	}
 	
 	private CommandResponse(int ast, Optional<ImmutableList<Glyph>> glyphs,
-			Optional<SpannableStringBuilder> glyphText, Optional<String> message,
-			Optional<PatriciaTrie<Glyph>> glyphPathTrie) {
+			Optional<SpannableStringBuilder> glyphText, Optional<String> message) {
 		mAst = ast;
 		mGlyphs = glyphs;
 		mGlyphText = glyphText;
 		mMessage = message;
-		mGlyphPathTrie = glyphPathTrie;
 	}
 
 	public int getAst() {
@@ -83,10 +68,6 @@ public class CommandResponse implements Parcelable {
 
 	public List<Glyph> getGlyphs() throws IllegalStateException {
 		return mGlyphs.get();
-	}
-	
-	public Trie<String, Glyph> getGlyphPathTrie() throws IllegalStateException {
-		return mGlyphPathTrie.get();
 	}
 
 	public Spannable getGlyphText() throws IllegalStateException {
@@ -151,14 +132,6 @@ public class CommandResponse implements Parcelable {
 			return Optional.absent();
 		}
 	}
-	
-	private static <E> String concat(List<E> list) {
-		StringBuilder builder = new StringBuilder();
-		for (E e : list) {
-			builder.append(e.toString());
-		}
-		return builder.toString();
-	}
 
 	public static Parcelable.Creator<CommandResponse> CREATOR =
 			new Parcelable.Creator<CommandResponse>() {
@@ -168,8 +141,7 @@ public class CommandResponse implements Parcelable {
 			Optional<ImmutableList<Glyph>> glyphs = ParcelUtils.readOptional(source);
 			Optional<SpannableStringBuilder> glyphText = ParcelUtils.readOptional(source);
 			Optional<String> message = ParcelUtils.readOptional(source);
-			Optional<PatriciaTrie<Glyph>> glyphPathTrie = ParcelUtils.readOptional(source);
-			return new CommandResponse(ast, glyphs, glyphText, message, glyphPathTrie);
+			return new CommandResponse(ast, glyphs, glyphText, message);
 		}
 
 		@Override
@@ -189,6 +161,5 @@ public class CommandResponse implements Parcelable {
 		ParcelUtils.writeOptional(dest, mGlyphs);
 		ParcelUtils.writeOptional(dest, mGlyphText);
 		ParcelUtils.writeOptional(dest, mMessage);
-		ParcelUtils.writeOptional(dest, mGlyphPathTrie);
 	}
 }

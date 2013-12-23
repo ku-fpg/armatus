@@ -1,5 +1,7 @@
 package edu.kufpg.armatus.util;
 
+import java.util.List;
+
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -31,6 +33,14 @@ public class StringUtils {
 
 	private StringUtils() {}
 
+	public static <E> String concat(List<E> list) {
+		StringBuilder builder = new StringBuilder();
+		for (E e : list) {
+			builder.append(e.toString());
+		}
+		return builder.toString();
+	}
+	
 	public static int countOccurrences(String haystack, String needle) {
 		return haystack.length() - haystack.replace(needle, "").length();
 	}

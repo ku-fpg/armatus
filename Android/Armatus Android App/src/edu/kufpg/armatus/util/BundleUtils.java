@@ -28,7 +28,7 @@ import com.google.common.collect.RangeMap;
 import com.google.common.collect.SetMultimap;
 
 public class BundleUtils {
-	private static final String TAG = BundleUtils.class.getName();
+	private static final String TAG = BundleUtils.class.getSimpleName();
 
 	private static final String SIZE = "Size", KEY = "Key", VALUE = "Value", NULL = "Null";
 	private static final String NAME = "Name", NO_NAME = "!@#$%^&*()";
@@ -68,8 +68,20 @@ public class BundleUtils {
 	private static final int VAL_MULTIMAP = 28;
 	private static final int VAL_RANGE = 29;
 	private static final int VAL_RANGEMAP = 30;
+	private static final int VAL_ENUM = 31;
 
 	private BundleUtils() {}
+	
+	private static Class<?> forName(String className) throws IllegalArgumentException {
+		try {
+			return Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			Log.e(TAG, "Illegal access when unmarshalling: "
+					+ className, e);
+			throw new IllegalArgumentException("ClassNotFoundException when unmarshalling: "
+					+ className);
+		}
+	}
 
 	private static boolean isAssignableFrom(Class<?> cls, String asgnName) throws IllegalArgumentException {
 		try {
@@ -138,6 +150,18 @@ public class BundleUtils {
 			@SuppressWarnings("unchecked")
 			T[] ts = (T[]) outVal;
 			return ts;
+		}
+	}
+	
+	public static <E extends Enum<E>> E getEnum(Bundle b, String key) {
+		String className = b.getString(key + NAME);
+		if (className.equals(NO_NAME)) {
+			return null;
+		} else {
+			@SuppressWarnings("unchecked")
+			Class<E> cls = (Class<E>) forName(className);
+			String valueName = b.getString(key);
+			return Enum.valueOf(cls, valueName);
 		}
 	}
 
@@ -357,7 +381,7 @@ public class BundleUtils {
 		return outVal;
 	}
 
-	public static <C extends Comparable<?>> Range<C> getRange(Bundle b, String key) {
+	public static <C extends Comparable<? super C>> Range<C> getRange(Bundle b, String key) {
 		if (b.getBoolean(key + NULL)) {
 			return null;
 		} else {
@@ -365,11 +389,11 @@ public class BundleUtils {
 			boolean isUpperBounded = b.getBoolean(key + IS_UPPER_BOUNDED);
 
 			if (isLowerBounded && isUpperBounded) {
-				BoundType lowerType = BoundType.values()[b.getInt(key + LOWER_TYPE)];
+				BoundType lowerType = getEnum(b, key + LOWER_TYPE);
 				@SuppressWarnings("unchecked")
 				C lowerVal = (C) getValue(b, key + LOWER_VALUE);
 
-				BoundType upperType = BoundType.values()[b.getInt(key + UPPER_TYPE)];
+				BoundType upperType = getEnum(b, key + UPPER_TYPE);
 				@SuppressWarnings("unchecked")
 				C upperVal = (C) getValue(b, key + UPPER_VALUE);
 
@@ -392,7 +416,7 @@ public class BundleUtils {
 		}
 	}
 
-	public static <K extends Comparable<?>, V> RangeMap<K, V> getRangeMap(Bundle b, String key) {
+	public static <K extends Comparable<? super K>, V> RangeMap<K, V> getRangeMap(Bundle b, String key) {
 		String name = b.getString(key + NAME);
 		if (isAssignableFrom(ImmutableRangeMap.class, name)) {
 			return getImmutableRangeMap(b, key);
@@ -403,7 +427,7 @@ public class BundleUtils {
 		}
 	}
 
-	public static <K extends Comparable<?>, V> ImmutableRangeMap<K, V> getImmutableRangeMap(Bundle b, String key) {
+	public static <K extends Comparable<? super K>, V> ImmutableRangeMap<K, V> getImmutableRangeMap(Bundle b, String key) {
 		int n = b.getInt(key + SIZE);
 		ImmutableRangeMap.Builder<K, V> builder = ImmutableRangeMap.builder();
 
@@ -417,7 +441,7 @@ public class BundleUtils {
 		return builder.build();
 	}
 
-	private static <K extends Comparable<?>, V> RangeMap<K, V> getRangeMapInternal(Bundle b, String key) {
+	private static <K extends Comparable<? super K>, V> RangeMap<K, V> getRangeMapInternal(Bundle b, String key) {
 		int n = b.getInt(key + SIZE);
 		String name = b.getString(key + NAME);
 		@SuppressWarnings("unchecked")
@@ -441,6 +465,9 @@ public class BundleUtils {
 		switch (type) {
 		case VAL_NULL:
 			return null;
+			
+		case VAL_ENUM:
+			return getEnum(b, kv);
 
 		case VAL_STRING:
 			return b.getString(kv);
@@ -552,12 +579,21 @@ public class BundleUtils {
 			}
 		}
 	}
+	
+	public static <E extends Enum<?>> void putEnum(Bundle b, String key, E value) {
+		if (value == null) {
+			b.putString(key + NAME, NO_NAME);
+		} else {
+			b.putString(key + NAME, value.getClass().getName());
+			b.putString(key, value.name());
+		}
+	}
 
 	public static <E> void putList(Bundle b, String key, List<E> value) {
 		if (value == null) {
 			b.putString(key + NAME, NO_NAME);
 		} else {
-			b.putString(key + NAME, value.getClass().getCanonicalName());
+			b.putString(key + NAME, value.getClass().getName());
 			int n = value.size();
 			b.putInt(key + SIZE, n);
 			for (int i = 0; i < n; i++) {
@@ -570,7 +606,7 @@ public class BundleUtils {
 		if (value == null) {
 			b.putString(key + NAME, NO_NAME);
 		} else {
-			b.putString(key + NAME, value.getClass().getCanonicalName());
+			b.putString(key + NAME, value.getClass().getName());
 			int n = value.size();
 			b.putInt(key + SIZE, n);
 			int i = 0;
@@ -586,7 +622,7 @@ public class BundleUtils {
 		if (value == null) {
 			b.putString(key + NAME, NO_NAME);
 		} else {
-			b.putString(key + NAME, value.getClass().getCanonicalName());
+			b.putString(key + NAME, value.getClass().getName());
 			int n = value.size();
 			b.putInt(key + SIZE, n);
 			int i = 0;
@@ -611,7 +647,7 @@ public class BundleUtils {
 
 			if (value.hasLowerBound()) {
 				b.putBoolean(key + IS_LOWER_BOUNDED, true);
-				b.putInt(key + LOWER_TYPE, value.lowerBoundType().ordinal());
+				putEnum(b, key + LOWER_TYPE, value.lowerBoundType());
 				putValue(b, key + LOWER_VALUE, value.lowerEndpoint());
 			} else {
 				b.putBoolean(key + IS_LOWER_BOUNDED, false);
@@ -619,7 +655,7 @@ public class BundleUtils {
 
 			if (value.hasUpperBound()) {
 				b.putBoolean(key + IS_UPPER_BOUNDED, true);
-				b.putInt(key + UPPER_TYPE, value.upperBoundType().ordinal());
+				putEnum(b, key + UPPER_TYPE, value.upperBoundType());
 				putValue(b, key + UPPER_VALUE, value.upperEndpoint());
 			} else {
 				b.putBoolean(key + IS_UPPER_BOUNDED, false);
@@ -631,7 +667,7 @@ public class BundleUtils {
 		if (value == null) {
 			b.putString(key + NAME, NO_NAME);
 		} else {
-			b.putString(key + NAME, value.getClass().getCanonicalName());
+			b.putString(key + NAME, value.getClass().getName());
 			int n = value.asMapOfRanges().size();
 			b.putInt(key + SIZE, n);
 			int i = 0;
@@ -649,6 +685,9 @@ public class BundleUtils {
 
 		if (v == null) {
 			b.putInt(kk, VAL_NULL);
+		} else if (v.getClass().isEnum()) {
+			b.putInt(kk, VAL_ENUM);
+			putEnum(b, kv, (Enum<?>) v);
 		} else if (v instanceof String) {
 			b.putInt(kk, VAL_STRING);
 			b.putString(kv, (String) v);

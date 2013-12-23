@@ -14,7 +14,7 @@ import edu.kufpg.armatus.util.ParcelUtils;
 public class Crumb implements Parcelable {
 	private static final String CRUMB = "crumb", NUM = "num";
 
-	private final Optional<? extends Integer> mNum;
+	private final Optional<Integer> mNum;
 	private final String mCrumbName;
 
 	public Crumb(String crumbName) {
