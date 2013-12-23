@@ -12,7 +12,6 @@ public class TurboButton extends Button {
 	private OnClickListener mOnClickListener;
 	private OnTurboListener mOnTurboListener;
 
-
 	public TurboButton(Context context) {
 		super(context);
 		init();
@@ -38,6 +37,14 @@ public class TurboButton extends Button {
 			}
 		};
 		setOnTouchListener(mOnTurboListener);
+	}
+	
+	public void disableTurbo() {
+		mOnTurboListener.disableTurbo();
+	}
+	
+	public void enableTurbo() {
+		mOnTurboListener.enableTurbo();
 	}
 
 	@Override

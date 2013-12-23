@@ -22,12 +22,17 @@ public abstract class OnTurboListener implements OnTouchListener {
 	private Handler mHandler = new Handler();
 	private int mInitialInterval;
 	private int mNormalInterval;
+	private boolean mEnabled = true;
 	private View mDownView;
 	private Runnable mHandlerRunnable = new Runnable() {
 		@Override
 		public void run() {
-			mHandler.postDelayed(this, mNormalInterval);
-			onClick(mDownView);
+			synchronized (this) {
+				if (mEnabled) {
+					mHandler.postDelayed(this, mNormalInterval);
+					onClick(mDownView);
+				}
+			}
 		}
 	};
 
@@ -54,9 +59,11 @@ public abstract class OnTurboListener implements OnTouchListener {
 		switch (motionEvent.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mHandler.removeCallbacks(mHandlerRunnable);
-			mHandler.postDelayed(mHandlerRunnable, mInitialInterval);
-			mDownView = view;
-			onClick(view);
+			synchronized (this) {
+				mHandler.postDelayed(mHandlerRunnable, mInitialInterval);
+				mDownView = view;
+				onClick(view);
+			}
 			return false;
 		case MotionEvent.ACTION_UP:
 			mHandler.removeCallbacks(mHandlerRunnable);
@@ -67,19 +74,27 @@ public abstract class OnTurboListener implements OnTouchListener {
 		}
 	}
 
-	public int getInitialInterval() {
+	public synchronized void disableTurbo() {
+		mEnabled = false;
+	}
+
+	public synchronized void enableTurbo() {
+		mEnabled = true;
+	}
+
+	public synchronized int getInitialInterval() {
 		return mInitialInterval;
 	}
 
-	public int getNormalInterval() {
+	public synchronized int getNormalInterval() {
 		return mNormalInterval;
 	}
 
-	public void setInitialInterval(int initialInterval) {
+	public synchronized void setInitialInterval(int initialInterval) {
 		mInitialInterval = initialInterval;
 	}
 
-	public void setNormalInterval(int normalInterval) {
+	public synchronized void setNormalInterval(int normalInterval) {
 		mNormalInterval = normalInterval;
 	}
 

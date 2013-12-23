@@ -38,6 +38,14 @@ public class TurboImageButton extends ImageButton {
 		};
 		setOnTouchListener(mOnTurboListener);
 	}
+	
+	public void disableTurbo() {
+		mOnTurboListener.disableTurbo();
+	}
+	
+	public void enableTurbo() {
+		mOnTurboListener.enableTurbo();
+	}
 
 	@Override
 	public void setOnClickListener(OnClickListener l) {

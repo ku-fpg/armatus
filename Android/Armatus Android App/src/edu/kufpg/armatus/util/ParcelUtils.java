@@ -622,7 +622,7 @@ public class ParcelUtils {
 		if (enumVal == null) {
 			p.writeString(NO_NAME);
 		} else {
-			p.writeString(enumVal.getClass().getName());
+			p.writeString(enumVal.getDeclaringClass().getName());
 			p.writeString(enumVal.name());
 		}
 	}

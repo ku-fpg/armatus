@@ -4,23 +4,23 @@
     android:layout_height="wrap_content" >
 
     <edu.kufpg.armatus.util.TurboImageButton
-        android:id="@+id/test123"
+        android:id="@+id/console_entry_selection_prev_glyph"
         style="?android:attr/actionButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/test456"
+        android:layout_toLeftOf="@+id/console_entry_selection_wrap_glyphs"
         android:src="?attr/actionPrevGlyph" />
 
     <ImageButton
-        android:id="@+id/test456"
+        android:id="@+id/console_entry_selection_wrap_glyphs"
         style="?android:attr/actionButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/test789"
+        android:layout_toLeftOf="@+id/console_entry_selection_next_glyph"
         android:src="?attr/actionWrapGlyphs" />
 
     <edu.kufpg.armatus.util.TurboImageButton
-        android:id="@+id/test789"
+        android:id="@+id/console_entry_selection_next_glyph"
         style="?android:attr/actionButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

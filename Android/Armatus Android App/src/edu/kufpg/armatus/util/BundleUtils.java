@@ -584,7 +584,7 @@ public class BundleUtils {
 		if (value == null) {
 			b.putString(key + NAME, NO_NAME);
 		} else {
-			b.putString(key + NAME, value.getClass().getName());
+			b.putString(key + NAME, value.getDeclaringClass().getName());
 			b.putString(key, value.name());
 		}
 	}

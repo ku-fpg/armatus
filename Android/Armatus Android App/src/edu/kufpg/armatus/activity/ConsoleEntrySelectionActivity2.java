@@ -95,6 +95,7 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 	}
 
 	private class GlyphSelectionCallback implements Callback {
+		private TurboImageButton mPrevGlyph, mNextGlyph;
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -105,11 +106,13 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 			mode.setTitle("Text selection");
 
 			View actionView = menu.findItem(R.id.console_entry_selection_glyph_navigation).getActionView();
-			ImageButton prevGlyph = (TurboImageButton) actionView.findViewById(R.id.test123);
-			ImageButton wrapGlyphs = (ImageButton) actionView.findViewById(R.id.test456);
-			ImageButton nextGlyph = (TurboImageButton) actionView.findViewById(R.id.test789);
+			mPrevGlyph = (TurboImageButton) actionView.findViewById(R.id.console_entry_selection_prev_glyph);
+			mPrevGlyph.enableTurbo();
+			ImageButton wrapGlyphs = (ImageButton) actionView.findViewById(R.id.console_entry_selection_wrap_glyphs);
+			mNextGlyph = (TurboImageButton) actionView.findViewById(R.id.console_entry_selection_next_glyph);
+			mNextGlyph.enableTurbo();
 
-			prevGlyph.setOnClickListener(new OnClickListener() {
+			mPrevGlyph.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Map.Entry<Range<Integer>, Glyph> entry = mRangeGlyphMap.getEntry(mSelStart - 1);
@@ -127,7 +130,7 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 					Selection.setSelection((Spannable) mTextView.getText(), mSelStart, mSelEnd);
 				}
 			});
-			nextGlyph.setOnClickListener(new OnClickListener() {
+			mNextGlyph.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Map.Entry<Range<Integer>, Glyph> entry = mRangeGlyphMap.getEntry(mSelEnd);
@@ -151,7 +154,10 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 		}
 
 		@Override
-		public void onDestroyActionMode(ActionMode mode) {}
+		public void onDestroyActionMode(ActionMode mode) {
+			mPrevGlyph.disableTurbo();
+			mNextGlyph.disableTurbo();
+		}
 	}
 
 }
