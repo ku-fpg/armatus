@@ -40,7 +40,7 @@ public class StringUtils {
 		}
 		return builder.toString();
 	}
-	
+
 	public static int countOccurrences(String haystack, String needle) {
 		return haystack.length() - haystack.replace(needle, "").length();
 	}
@@ -85,7 +85,7 @@ public class StringUtils {
 	public static Editable charWrap(Editable editable) {
 		return charWrap((CharSequence) editable);
 	}
-	
+
 	public static Spannable charWrap(Spannable spannable) {
 		return charWrap((CharSequence) spannable);
 	}
@@ -108,11 +108,11 @@ public class StringUtils {
 	public static Editable noCharWrap(Editable editable) {
 		return noCharWrap((CharSequence) editable);
 	}
-	
+
 	public static Spannable noCharWrap(Spannable spannable) {
 		return noCharWrap((CharSequence) spannable);
 	}
-	
+
 	public static String noFirstLine(String str) {
 		return str.substring(str.indexOf('\n') + 1);
 	}
@@ -140,7 +140,7 @@ public class StringUtils {
 		}
 		return str.substring(start, end + 1);
 	}
-	
+
 	private static SpannableStringBuilder charWrap(CharSequence text) {
 		SpannableStringBuilder s = new SpannableStringBuilder(text);
 		for (int i = 0; i < s.length(); i++) {
@@ -150,7 +150,7 @@ public class StringUtils {
 		}
 		return s;
 	}
-	
+
 	private static SpannableStringBuilder noCharWrap(CharSequence text) {
 		SpannableStringBuilder s = new SpannableStringBuilder(text);
 		for (int i = 0; i < s.length(); i++) {

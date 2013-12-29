@@ -1,6 +1,10 @@
 package edu.kufpg.armatus.activity;
 
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections4.Trie;
+import org.apache.commons.collections4.trie.PatriciaTrie;
 
 import android.os.Bundle;
 import android.text.Selection;
@@ -16,23 +20,27 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.activity.SelectionTextView.SelectionWatcher;
+import edu.kufpg.armatus.data.Crumb;
 import edu.kufpg.armatus.data.Glyph;
 import edu.kufpg.armatus.gesture.OnPinchZoomListener;
-import edu.kufpg.armatus.util.BundleUtils;
 import edu.kufpg.armatus.util.TurboImageButton;
 
 public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
+	private static final String DELIMETER = "×"; // Uncommon character
+
 	private SelectionTextView mTextView;
 	private RangeMap<Integer, Glyph> mRangeGlyphMap = TreeRangeMap.create();
 	private int mSelStart = -1;
 	private int mSelEnd = -1;
 	private ScaleGestureDetector mScaleGestureDetector;
+	private Trie<String, Range<Integer>> mGlyphPathTrie = new PatriciaTrie<Range<Integer>>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,24 +76,19 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 		};
 		mScaleGestureDetector = new ScaleGestureDetector(this, zoomListener);
 
-		if (savedInstanceState == null) {
-			int index = 0;
-			for (Glyph glyph : getEntry().getCommandResponse().getGlyphs()) {
-				if (!glyph.getText().isEmpty()) {
-					Range<Integer> glyphRange = Range.closedOpen(index, index + glyph.getText().length());
-					mRangeGlyphMap.put(glyphRange, glyph);
-					index += glyph.getText().length();
-				}
-			}
-		} else {
-			mRangeGlyphMap = BundleUtils.getRangeMap(savedInstanceState, "rangeGlyphMap");
-		}
-	}
+		// RangeMap/Trie initialization
+		int index = 0;
+		for (Glyph glyph : getEntry().getCommandResponse().getGlyphs()) {
+			if (!glyph.getText().isEmpty()) {
+				Range<Integer> glyphRange = Range.closedOpen(index, index + glyph.getText().length());
+				mRangeGlyphMap.put(glyphRange, glyph);
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		BundleUtils.putRangeMap(outState, "rangeGlyphMap", mRangeGlyphMap);
+				String pathStr = pathToString(glyph.getPath());
+				mGlyphPathTrie.put(pathStr, glyphRange);
+
+				index += glyph.getText().length();
+			}
+		}
 	}
 
 	@Override
@@ -93,9 +96,22 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 		mScaleGestureDetector.onTouchEvent(event);
 		return super.onTouchEvent(event);
 	}
+	
+	private static String pathToString(List<Crumb> path) {
+		StringBuilder pathStrBuilder = new StringBuilder("");
+		if (!path.isEmpty()) {
+			pathStrBuilder.append(path.get(0));
+			int size = path.size();
+			for (int i = 1; i < size; i++) {
+				pathStrBuilder.append(DELIMETER);
+				pathStrBuilder.append(path.get(i).toString());
+			}
+		}
+		return pathStrBuilder.toString();
+	}
 
 	private class GlyphSelectionCallback implements Callback {
-		private TurboImageButton mPrevGlyph, mNextGlyph;
+		private TurboImageButton mPrevGlyph, mNextGlyph, mParentGlyph;
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -111,6 +127,8 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 			ImageButton wrapGlyphs = (ImageButton) actionView.findViewById(R.id.console_entry_selection_wrap_glyphs);
 			mNextGlyph = (TurboImageButton) actionView.findViewById(R.id.console_entry_selection_next_glyph);
 			mNextGlyph.enableTurbo();
+			mParentGlyph = (TurboImageButton) actionView.findViewById(R.id.console_entry_selection_parent_glyph);
+			mParentGlyph.enableTurbo();
 
 			mPrevGlyph.setOnClickListener(new OnClickListener() {
 				@Override
@@ -138,6 +156,37 @@ public class ConsoleEntrySelectionActivity2 extends ConsoleEntryActivity {
 						mSelEnd = entry.getKey().upperEndpoint();
 						Selection.setSelection((Spannable) mTextView.getText(), mSelStart, mSelEnd);
 					}
+				}
+			});
+			mParentGlyph.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					RangeMap<Integer, Glyph> subMap = mRangeGlyphMap.subRangeMap(Range.closedOpen(mSelStart, mSelEnd));
+					String prefix = "";
+					for (Glyph glyph : subMap.asMapOfRanges().values()) {
+						if (!glyph.getPath().isEmpty()) {
+							if (prefix.isEmpty()) {
+								prefix = pathToString(glyph.getPath());
+							} else {
+								prefix = Strings.commonPrefix(prefix, pathToString(glyph.getPath()));
+							}
+						}
+					}
+					
+					int index = prefix.lastIndexOf(DELIMETER);
+					if (index == -1) {
+						mSelStart = 0;
+						mSelEnd = mTextView.length();
+					} else {
+						String parentPrefix = prefix.substring(0, index);
+						Range<Integer> parentRange = Range.singleton(mSelStart);
+						for (Range<Integer> range : mGlyphPathTrie.prefixMap(parentPrefix).values()) {
+							parentRange = parentRange.span(range);
+						}
+						mSelStart = parentRange.lowerEndpoint();
+						mSelEnd = parentRange.upperEndpoint();
+					}
+					Selection.setSelection((Spannable) mTextView.getText(), mSelStart, mSelEnd);
 				}
 			});
 			return true;

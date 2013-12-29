@@ -28,7 +28,7 @@ public class CommandResponse implements Parcelable {
 	private final int mAst;
 	private final Optional<? extends List<Glyph>> mGlyphs;
 	private final Optional<? extends Spannable> mGlyphText;
-	private final Optional<? extends String> mMessage;
+	private final Optional<String> mMessage;
 
 	public CommandResponse(int ast) {
 		this(ast, Optional.<ImmutableList<Glyph>>absent(), Optional.<String>absent());
