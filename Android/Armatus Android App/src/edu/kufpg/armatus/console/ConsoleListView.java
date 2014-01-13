@@ -1,5 +1,8 @@
 package edu.kufpg.armatus.console;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -7,50 +10,30 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.ActionMode.Callback;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.activity.ConsoleEntryIntent;
 import edu.kufpg.armatus.activity.ConsoleEntryScopeActivity;
 import edu.kufpg.armatus.activity.ConsoleEntrySelectionActivity;
 import edu.kufpg.armatus.activity.ConsoleEntrySelectionActivity2;
+import edu.kufpg.armatus.util.ParcelUtils;
 import edu.kufpg.armatus.util.StringUtils;
+import edu.kufpg.armatus.util.Views;
 
-/**
- * Used in {@link ConsoleActivity} to display console entries. This class defines special
- * {@link AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
- * onItemClick(AdapterView, View, int, long)} and {@link ActionMode} behavior.
- */
-public class ConsoleListView extends ListView {
-	/** Reference to the current console. */
+public class ConsoleListView extends ExpandableListView {
 	private ConsoleActivity mConsole;
-
-	/** Reference to the {@link ListView}'s action mode (if visible). */
 	private ActionMode mActionMode;
-
-	/** Reference to {@link #mActionMode}'s callback (if visible). */
-	private ActionModeCallback mCallback;
-
-	/** Reference to the {@link MenuItem} that allows for swapping  {@link ConsoleEntry}
-	 * keywords. */
-	private MenuItem mSwapItem;
-
-	private MenuItem mTransformItem, mTransform2Item;
-
-	/** Tracks which {@link ConsoleEntry ConsoleEntries} are currently checked, since
-	 * {@link android.widget.AbsListView#CHOICE_MODE_MULTIPLE CHOICE_MODE_MULTIPLE}'s
-	 * checking behavior is not desirable. */
-	private SparseBooleanArray mPrevCheckedStates = new SparseBooleanArray();
-
-	/** Tracks if {@link #mActionMode} is visible. */
+	private ConsoleListViewCallback2 mActionModeCallback;
 	private boolean mActionModeVisible = false;
+	private SortedSet<Integer> mPrevCheckedStates = new TreeSet<Integer>();
 
 	public ConsoleListView(Context context) {
 		super(context);
@@ -67,33 +50,61 @@ public class ConsoleListView extends ListView {
 		init(context);
 	}
 
-	/**
-	 * Initializes variables and sets special
-	 * {@link AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
-	 * onItemClick(AdapterView, View, int, long)} behavior.
-	 * @param context The {@link Context} to use.
-	 */
 	private void init(Context context) {
 		mConsole = (ConsoleActivity) context;
-		mCallback = new ActionModeCallback();
-		setOnItemClickListener(new OnItemClickListener() {
+		mActionModeCallback = new ConsoleListViewCallback2(mConsole, this);
+		setGroupIndicator(null);
+		setOnGroupClickListener(new OnGroupClickListener() { // Disable collapsing of groups
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if (position != getCount() - 1) {
-					boolean showActionMode = true;
-					if (mPrevCheckedStates.get(position) == true) {
-						mPrevCheckedStates.delete(position);
-					} else {
-						mPrevCheckedStates.put(position, true);
-					}
-					if (mPrevCheckedStates.size() == 0) {
-						showActionMode = false;
-					}
-					setActionModeVisible(showActionMode);
-					refreshActionMode();
-				}
+			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+				return true;
 			}
 		});
+		setOnChildClickListener(new OnChildClickListener() {
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+				boolean showActionMode = true;
+				int combinedChildId = Views.getFlatListPosition(ConsoleListView.this, groupPosition, childPosition);
+				//int combinedChildId = getFlatListPosition(getPackedPositionForChild(groupPosition, childPosition));
+
+				setItemChecked(combinedChildId, !mPrevCheckedStates.contains(combinedChildId));
+				if (mPrevCheckedStates.contains(combinedChildId)) {
+					mPrevCheckedStates.remove(combinedChildId);
+				} else {
+					mPrevCheckedStates.add(combinedChildId);
+				}
+
+				if (mPrevCheckedStates.isEmpty()) {
+					showActionMode = false;
+				}
+				setActionModeVisible(showActionMode);
+				refreshActionMode();
+				return true;
+			}
+		});
+	}
+
+	public boolean isActionModeVisible() {
+		return mActionModeVisible;
+	}
+
+	/**
+	 * Shows or hides the {@link ListView}'s {@link ActionMode}.
+	 * @param visible {@code true} if the {@code ActionMode} should be shown,
+	 * {@code false} if it should be hidden.
+	 */
+	public void setActionModeVisible(boolean visible) {
+		if (visible && !mActionModeVisible) {
+			mActionMode = startActionMode(mActionModeCallback);
+		} else if (!visible && mActionModeVisible) {
+			mActionMode.finish();
+		}
+	}
+
+	private void refreshActionMode() {
+		if (isActionModeVisible()) {
+			updateSinglyClickedActionModeItems(mPrevCheckedStates.size());
+		}
 	}
 
 	@Override
@@ -113,70 +124,51 @@ public class ConsoleListView extends ListView {
 		SavedState ss = (SavedState) state;
 		super.onRestoreInstanceState(ss.getSuperState());
 		mPrevCheckedStates = ss.checkedStates;
-		if (mPrevCheckedStates.size() > 0) {
+		if (!mPrevCheckedStates.isEmpty()) {
 			setActionModeVisible(true);
-			for (int i = 0; i < mPrevCheckedStates.size(); i++) {
-				setItemChecked(mPrevCheckedStates.keyAt(i), true);
+			for (int item : mPrevCheckedStates) {
+				setItemChecked(item, true);
 			}
 		}
 		refreshActionMode();
 	}
 
-	/**
-	 * Shows or hides the {@link ListView}'s {@link ActionMode}.
-	 * @param visible {@code true} if the {@code ActionMode} should be shown,
-	 * {@code false} if it should be hidden.
-	 */
-	public void setActionModeVisible(boolean visible) {
-		if (visible && !mActionModeVisible) {
-			mActionMode = startActionMode(mCallback);
-		} else if (!visible && mActionModeVisible) {
-			mActionMode.finish();
+	protected SortedSet<Integer> getPrevCheckedStates() {
+		return mPrevCheckedStates;
+	}
+
+	void setActionModeVisibleInternal(boolean visible) {
+		mActionModeVisible = visible;
+	}
+
+	void updateSinglyClickedActionModeItems(int itemsSelected) {
+		boolean oneSelected = itemsSelected == 1;
+		mActionMode.setSubtitle(oneSelected ? "One entry selected" : itemsSelected + " entries selected");
+		mActionModeCallback.setSinglyClickedItemVisibility(oneSelected);
+	}
+
+	@Override
+	public void setAdapter(ExpandableListAdapter adapter) {
+		super.setAdapter(adapter);
+		expandAllGroups();
+	}
+
+	public void expandAllGroups() {
+		for (int i = 0; i < getExpandableListAdapter().getGroupCount(); i++) {
+			expandGroup(i);
 		}
 	}
 
-	/**
-	 * Returns whether a particular {@link ConsoleEntry} is currently shown to the
-	 * user on-screen.
-	 * @param entryIndex The index of the entry to look up.
-	 * @return {@code true} if the entry is currently visible to the user.
-	 */
-	public boolean isEntryVisible(int entryIndex) {
-		return getFirstVisiblePosition() <= entryIndex && entryIndex <= getLastVisiblePosition();
-	}
+	protected static class ConsoleListViewCallback2 implements Callback {
+		private ConsoleActivity mConsole;
+		private ConsoleListView mListView;
+		private MenuItem mSwapItem, mTransformItem, mTransform2Item;
 
-	/**
-	 * Returns whether the the {@link ListView}'s {@link ActionMode} is visible.
-	 * @return {@code true} if the {@code ActionMode} is visible.
-	 */
-	public boolean isActionModeVisible() {
-		return mActionModeVisible;
-	}
-
-	private void refreshActionMode() {
-		if (mActionModeVisible) {
-			switch (mPrevCheckedStates.size()) {
-			case 1:
-				mActionMode.setSubtitle("One entry selected");
-				mSwapItem.setVisible(true);
-				mTransformItem.setVisible(true);
-				mTransform2Item.setVisible(true);
-				break;
-			default:
-				mActionMode.setSubtitle(mPrevCheckedStates.size() + " entries selected");
-				mSwapItem.setVisible(false);
-				mTransformItem.setVisible(false);
-				mTransform2Item.setVisible(false);
-				break;
-			}
+		public ConsoleListViewCallback2(ConsoleActivity console, ConsoleListView listView) {
+			mConsole = console;
+			mListView = listView;
 		}
-	}
 
-	/**
-	 * Defines the behavior of {@code ConsoleListView}'s {@link ActionMode} callback,
-	 * such as item click behavior and subtitle updating.
-	 */
-	private class ActionModeCallback implements Callback {
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
@@ -190,17 +182,19 @@ public class ConsoleListView extends ListView {
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			mActionModeVisible = true;
+			mListView.setActionModeVisibleInternal(true);
 			return true;
 		}
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			final SortedSet<Integer> prevCheckedStates = mListView.getPrevCheckedStates();
+
 			switch (item.getItemId()) {
 			case R.id.console_list_view_copy:
 				StringBuilder copyBuilder = new StringBuilder();
-				for (int i = 0; i < mPrevCheckedStates.size(); i++) {
-					copyBuilder.append(((ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(i)))
+				for (int state : prevCheckedStates) {
+					copyBuilder.append(((ConsoleEntry) mListView.getItemAtPosition(state))
 							.getFullContents()).append('\n');
 				}
 				copyBuilder.deleteCharAt(copyBuilder.length() - 1); //Remove final newline
@@ -208,20 +202,24 @@ public class ConsoleListView extends ListView {
 				ClipData copiedText = ClipData.newPlainText("copiedText",
 						StringUtils.noCharWrap(copyBuilder.toString()));
 				clipboard.setPrimaryClip(copiedText);
-				mConsole.showToast((mPrevCheckedStates.size() == 1 ? "Entry" : "Entries") + " copied to clipboard!");
+				mConsole.showToast((prevCheckedStates.size() == 1 ? "Entry" : "Entries") + " copied to clipboard!");
 				mode.finish();
 				return true;
 			case R.id.console_list_view_select:
-				int[] checkedEntries = new int[mPrevCheckedStates.size()];
-				for (int i = 0; i < mPrevCheckedStates.size(); i++) {
-					checkedEntries[i] = mPrevCheckedStates.keyAt(i);
+				SortedSet<ConsoleLineParams> lineParams = new TreeSet<ConsoleLineParams>();
+				for (int state : prevCheckedStates) {
+					int groupPos = Views.getGroupPosition(mListView, state);
+					int childPos = Views.getChildPosition(mListView, state);
+					lineParams.add(new ConsoleLineParams(groupPos, childPos));
 				}
-				mConsole.showEntrySelectionDialog(checkedEntries);
+				mConsole.showEntrySelectionDialog(lineParams);
 				mode.finish();
 				return true;
 			case R.id.console_list_view_swap:
-				if (mPrevCheckedStates.size() == 1) {
-					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+				if (prevCheckedStates.size() == 1) {
+					int selState = prevCheckedStates.first();
+					int groupPos = Views.getGroupPosition(mListView, selState);
+					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
 					if (entry.getShortContents().toString().split(StringUtils.WHITESPACE).length > 1) {
 						mConsole.showKeywordSwapDialog(entry.getEntryNum(), entry.getShortContents().toString());
 					}
@@ -229,28 +227,34 @@ public class ConsoleListView extends ListView {
 				}
 				return true;
 			case R.id.console_list_view_transform:
-				if (mPrevCheckedStates.size() == 1) {
-					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+				if (prevCheckedStates.size() == 1) {
+					int selState = prevCheckedStates.first();
+					int groupPos = Views.getGroupPosition(mListView, selState);
+					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
 					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
-						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity.class);
-						mConsole.startActivity(i);
+						Intent intent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity.class);
+						mConsole.startActivity(intent);
 					}
 					mode.finish();
 				}
 				return true;
 			case R.id.console_list_view_transform2:
-				if (mPrevCheckedStates.size() == 1) {
-					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+				if (prevCheckedStates.size() == 1) {
+					int selState = prevCheckedStates.first();
+					int groupPos = Views.getGroupPosition(mListView, selState);
+					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
 					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
-						Intent i = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity2.class);
-						mConsole.startActivity(i);
+						Intent intent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity2.class);
+						mConsole.startActivity(intent);
 					}
 					mode.finish();
 				}
 				return true;
 			case R.id.console_list_view_scope: {
-				if (mPrevCheckedStates.size() == 1) {
-					ConsoleEntry entry = (ConsoleEntry) getItemAtPosition(mPrevCheckedStates.keyAt(0));
+				if (prevCheckedStates.size() == 1) {
+					int selState = prevCheckedStates.first();
+					int groupPos = Views.getGroupPosition(mListView, selState);
+					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
 					Intent scopeIntent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntryScopeActivity.class);
 					mConsole.startActivity(scopeIntent);
 					mode.finish();
@@ -263,16 +267,22 @@ public class ConsoleListView extends ListView {
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			clearChoices();
-			requestLayout();
-			mPrevCheckedStates.clear();
-			mActionModeVisible = false;
+			mListView.clearChoices();
+			mListView.requestLayout();
+			mListView.getPrevCheckedStates().clear();
+			mListView.setActionModeVisibleInternal(false);
+		}
+
+		public void setSinglyClickedItemVisibility(boolean visible) {
+			mSwapItem.setVisible(visible);
+			mTransformItem.setVisible(visible);
+			mTransform2Item.setVisible(visible);
 		}
 
 	}
 
 	protected static class SavedState extends BaseSavedState {
-		SparseBooleanArray checkedStates;
+		SortedSet<Integer> checkedStates;
 
 		SavedState(Parcelable superState) {
 			super(superState);
@@ -281,7 +291,7 @@ public class ConsoleListView extends ListView {
 		@Override
 		public void writeToParcel(Parcel dest, int flags) {
 			super.writeToParcel(dest, flags);
-			dest.writeSparseBooleanArray(checkedStates);
+			ParcelUtils.writeSet(dest, checkedStates);
 		}
 
 		public static final Parcelable.Creator<SavedState> CREATOR
@@ -297,7 +307,7 @@ public class ConsoleListView extends ListView {
 
 		private SavedState(Parcel in) {
 			super(in);
-			checkedStates = in.readSparseBooleanArray();
+			checkedStates = ParcelUtils.readSortedSet(in);
 		}
 	}
 

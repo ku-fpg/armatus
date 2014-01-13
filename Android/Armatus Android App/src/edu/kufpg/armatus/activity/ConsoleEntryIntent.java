@@ -12,10 +12,10 @@ public class ConsoleEntryIntent extends Intent {
 	public static final String CLIENT_TAG = "client";
 	
 	public ConsoleEntryIntent(ConsoleEntry entry,
-			ConsoleActivity context, Class<? extends ConsoleEntryActivity> cls) {
-		super(context, cls);
+			ConsoleActivity console, Class<? extends ConsoleEntryActivity> cls) {
+		super(console, cls);
 		putExtra(ENTRY_TAG, entry);
-		putExtra(CLIENT_TAG, context.getHermitClient());
+		putExtra(CLIENT_TAG, console.getHermitClient());
 	}
 	
 	public ConsoleEntryIntent(ConsoleEntry entry, HermitClient client,

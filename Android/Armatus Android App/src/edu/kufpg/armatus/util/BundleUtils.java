@@ -6,6 +6,9 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.SortedSet;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
@@ -15,12 +18,16 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.BoundType;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
@@ -30,8 +37,9 @@ import com.google.common.collect.SetMultimap;
 public class BundleUtils {
 	private static final String TAG = BundleUtils.class.getSimpleName();
 
-	private static final String SIZE = "Size", KEY = "Key", VALUE = "Value", NULL = "Null";
+	private static final String SIZE = "Size", KEY = "Key", VALUE = "Value", NULL = "Null", PRESENT_OR_NULL = "PresentOrNull";
 	private static final String NAME = "Name", NO_NAME = "!@#$%^&*()";
+	private static final String TYPE = "Type";
 	private static final String IS_LOWER_BOUNDED = "IsLowerBounded", IS_UPPER_BOUNDED = "IsUpperBounded";
 	private static final String LOWER_TYPE = "LowerType", LOWER_VALUE = "LowerValue", UPPER_TYPE = "UpperType", UPPER_VALUE = "UpperValue";
 	private static final String CREATE = "create";
@@ -66,12 +74,15 @@ public class BundleUtils {
 	private static final int VAL_FLOATARRAY = 26;
 	private static final int VAL_SHORTARRAY = 27;
 	private static final int VAL_MULTIMAP = 28;
-	private static final int VAL_RANGE = 29;
-	private static final int VAL_RANGEMAP = 30;
-	private static final int VAL_ENUM = 31;
+	private static final int VAL_OPTIONAL = 29;
+	private static final int VAL_RANGE = 30;
+	private static final int VAL_RANGEMAP = 31;
+	private static final int VAL_SET = 32;
+	//private static final int VAL_COLLECTION = 32;
+	private static final int VAL_ENUM = 33;
 
 	private BundleUtils() {}
-	
+
 	private static Class<?> forName(String className) throws IllegalArgumentException {
 		try {
 			return Class.forName(className);
@@ -134,7 +145,24 @@ public class BundleUtils {
 					+ className + " with method " + singletonMethodName);
 		}
 	}
-	
+
+	private static <E, C extends Collection<E>> C addToCollection(Bundle b, String key, C outVal, int size) {
+		for (int i = 0; i < size; i++) {
+			@SuppressWarnings("unchecked")
+			E elem = (E) getValue(b, key + i);
+			outVal.add(elem);
+		}
+		return outVal;
+	}
+
+	private static <E, ICB extends ImmutableCollection.Builder<E>> void addToImmutableCollectionBuilder(Bundle b, String key, ICB builder, int size) {
+		for (int i = 0; i < size; i++) {
+			@SuppressWarnings("unchecked")
+			E elem = (E) getValue(b, key + i);
+			builder.add(elem);
+		}
+	}
+
 	public static <T> T[] getArray(Bundle b, String key) {
 		int n = b.getInt(key + SIZE);
 		if (n < 0) {
@@ -152,7 +180,7 @@ public class BundleUtils {
 			return ts;
 		}
 	}
-	
+
 	public static <E extends Enum<E>> E getEnum(Bundle b, String key) {
 		String className = b.getString(key + NAME);
 		if (className.equals(NO_NAME)) {
@@ -182,24 +210,13 @@ public class BundleUtils {
 		String name = b.getString(key + NAME);
 		@SuppressWarnings("unchecked")
 		List<E> outVal = (List<E>) newInstance(name);
-
-		for (int i = 0; i < n; i++) {
-			@SuppressWarnings("unchecked")
-			E elem = (E) getValue(b, key + i);
-			outVal.add(elem);
-		}
-		return outVal;
+		return addToCollection(b, key, outVal, n);
 	}
 
 	public static <E> ImmutableList<E> getImmutableList(Bundle b, String key) {
 		int n = b.getInt(key + SIZE);
 		ImmutableList.Builder<E> builder = ImmutableList.builder();
-
-		for (int i = 0; i < n; i++) {
-			@SuppressWarnings("unchecked")
-			E elem = (E) getValue(b, key + i);
-			builder.add(elem);
-		}
+		addToImmutableCollectionBuilder(b, key, builder, n);
 		return builder.build();
 	}
 
@@ -381,6 +398,19 @@ public class BundleUtils {
 		return outVal;
 	}
 
+	public static <T> Optional<T> getOptional(Bundle b, String key) {
+		int s = b.getInt(key + PRESENT_OR_NULL);
+		if (s == -1) {
+			return null;
+		} else if (s == 0) {
+			return Optional.absent();
+		} else {
+			@SuppressWarnings("unchecked")
+			T thing = (T) getValue(b, key);
+			return Optional.of(thing);
+		}
+	}
+
 	public static <C extends Comparable<? super C>> Range<C> getRange(Bundle b, String key) {
 		if (b.getBoolean(key + NULL)) {
 			return null;
@@ -457,111 +487,167 @@ public class BundleUtils {
 		return outVal;
 	}
 
+	public static <E> Set<E> getSet(Bundle b, String key) {
+		String name = b.getString(key + NAME);
+
+		if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+			@SuppressWarnings("unchecked")
+			Set<E> set = (Set<E>) getImmutableSortedSet(b, key);
+			return set;
+		} else if (isAssignableFrom(ImmutableSet.class, name)) {
+			return getImmutableSet(b, key);
+		} else if (name.equals(NO_NAME)) {
+			return null;
+		} else {
+			return getSetInternal(b, key);
+		}
+	}
+
+	private static <E> Set<E> getSetInternal(Bundle b, String key) {
+		int n = b.getInt(key + SIZE);
+		String name = b.getString(key + NAME);
+		@SuppressWarnings("unchecked")
+		Set<E> outVal = (Set<E>) newInstance(name);
+		return addToCollection(b, key, outVal, n);
+	}
+
+	public static <E extends Comparable<? super E>> SortedSet<E> getSortedSet(Bundle b, String key) {
+		String name = b.getString(key + NAME);
+
+		if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+			return getImmutableSortedSet(b, key);
+		} else if (name.equals(NO_NAME)) {
+			return null;
+		} else {
+			return getSortedSetInternal(b, key);
+		}
+	}
+
+	private static <E> SortedSet<E> getSortedSetInternal(Bundle b, String key) {
+		int n = b.getInt(key + SIZE);
+		String name = b.getString(key + NAME);
+		@SuppressWarnings("unchecked")
+		SortedSet<E> outVal = (SortedSet<E>) newInstance(name);
+		return addToCollection(b, key, outVal, n);
+	}
+
+	public static <E extends Comparable<? super E>> NavigableSet<E> getNavigableSet(Bundle b, String key) {
+		String name = b.getString(key + NAME);
+
+		if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+			return getImmutableSortedSet(b, key);
+		} else if (name.equals(NO_NAME)) {
+			return null;
+		} else {
+			return getNavigableSetInternal(b, key);
+		}
+	}
+
+	private static <E> NavigableSet<E> getNavigableSetInternal(Bundle b, String key) {
+		int n = b.getInt(key + SIZE);
+		String name = b.getString(key + NAME);
+		@SuppressWarnings("unchecked")
+		NavigableSet<E> outVal = (NavigableSet<E>) newInstance(name);
+		return addToCollection(b, key, outVal, n);
+	}
+
+	public static <E> ImmutableSet<E> getImmutableSet(Bundle b, String key) {
+		if (b.getString(key + NAME).equals(NO_NAME)) {
+			return null;
+		} else {
+			int n = b.getInt(key + SIZE);
+			ImmutableSet.Builder<E> builder = ImmutableSet.builder();
+			addToImmutableCollectionBuilder(b, key, builder, n);
+			return builder.build();
+		}
+	}
+
+	public static <E extends Comparable<? super E>> ImmutableSortedSet<E> getImmutableSortedSet(Bundle b, String key) {
+		if (b.getString(key + NAME).equals(NO_NAME)) {
+			return null;
+		} else {
+			int n = b.getInt(key + SIZE);
+			ImmutableSortedSet.Builder<E> builder = ImmutableSortedSet.naturalOrder();
+			addToImmutableCollectionBuilder(b, key, builder, n);
+			return builder.build();
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public static final Object getValue(Bundle b, String key) {
-		int type = b.getInt(key + KEY);
-		String kv = key + VALUE;
+		int type = b.getInt(key + TYPE);
 
 		switch (type) {
 		case VAL_NULL:
-			return null;
-			
+			return null;	
 		case VAL_ENUM:
-			return getEnum(b, kv);
-
+			return getEnum(b, key);
+		case VAL_OPTIONAL:
+			return getOptional(b, key);
 		case VAL_STRING:
-			return b.getString(kv);
-
+			return b.getString(key);
 		case VAL_INTEGER:
-			return b.getInt(kv);
-
+			return b.getInt(key);
 		case VAL_MULTIMAP:
-			return getMultimap(b, kv);
-
+			return getMultimap(b, key);
 		case VAL_RANGE:
-			return getRange(b, kv);
-
+			return getRange(b, key);
 		case VAL_RANGEMAP:
-			return getRangeMap(b, kv);
-
+			return getRangeMap(b, key);
 		case VAL_MAP:
-			return getMap(b, kv);
-
+			return getMap(b, key);
 		case VAL_PARCELABLE:
-			return b.getParcelable(kv);
-
+			return b.getParcelable(key);
 		case VAL_SHORT:
-			return b.getShort(kv);
-
+			return b.getShort(key);
 		case VAL_LONG:
-			return b.getLong(kv);
-
+			return b.getLong(key);
 		case VAL_FLOAT:
-			return b.getFloat(kv);
-
+			return b.getFloat(key);
 		case VAL_DOUBLE:
-			return b.getDouble(kv);
-
+			return b.getDouble(key);
 		case VAL_BOOLEAN:
-			return b.getBoolean(kv);
-
+			return b.getBoolean(key);
 		case VAL_CHARSEQUENCE:
-			return b.getCharSequence(kv);
-
+			return b.getCharSequence(key);
 		case VAL_LIST:
-			return getList(b, kv);
-
+			return getList(b, key);		
+		case VAL_SET:
+			return getSet(b, key);
 		case VAL_BOOLEANARRAY:
-			return b.getBooleanArray(kv);        
-
+			return b.getBooleanArray(key);        
 		case VAL_BYTEARRAY:
-			return b.getByteArray(kv);
-
+			return b.getByteArray(key);
 		case VAL_STRINGARRAY:
-			return b.getStringArray(kv);
-
+			return b.getStringArray(key);
 		case VAL_CHARSEQUENCEARRAY:
-			return b.getCharSequenceArray(kv);
-
+			return b.getCharSequenceArray(key);
 		case VAL_CHARARRAY:
-			return b.getChar(kv);
-
+			return b.getChar(key);
 		case VAL_DOUBLEARRAY:
-			return b.getDoubleArray(kv);
-
+			return b.getDoubleArray(key);
 		case VAL_FLOATARRAY:
-			return b.getFloatArray(kv);
-
+			return b.getFloatArray(key);
 		case VAL_SHORTARRAY:
-			return b.getShortArray(kv);
-
+			return b.getShortArray(key);
 		case VAL_IBINDER:
-			return b.getBinder(kv);
-
+			return b.getBinder(key);
 		case VAL_INTARRAY:
-			return b.getIntArray(kv);
-
+			return b.getIntArray(key);
 		case VAL_LONGARRAY:
-			return b.getLongArray(kv);
-
+			return b.getLongArray(key);
 		case VAL_OBJECTARRAY:
-			return getArray(b, kv);
-
+			return getArray(b, key);
 		case VAL_BYTE:
-			return b.getByte(kv);
-
+			return b.getByte(key);
 		case VAL_SERIALIZABLE:
-			return b.getSerializable(kv);
-
+			return b.getSerializable(key);
 		case VAL_PARCELABLEARRAY:
-			return b.getParcelableArray(kv);
-
+			return b.getParcelableArray(key);
 		case VAL_SPARSEPARCELABLEARRAY:
-			return b.getSparseParcelableArray(kv);
-
+			return b.getSparseParcelableArray(key);
 		case VAL_BUNDLE:
-			return b.getBundle(kv); // loading will be deferred
-
+			return b.getBundle(key); // loading will be deferred
 		default:
 			throw new RuntimeException(
 					"Parcel " + b + ": Unmarshalling unknown type code " + type);
@@ -579,7 +665,7 @@ public class BundleUtils {
 			}
 		}
 	}
-	
+
 	public static <E extends Enum<?>> void putEnum(Bundle b, String key, E value) {
 		if (value == null) {
 			b.putString(key + NAME, NO_NAME);
@@ -639,6 +725,17 @@ public class BundleUtils {
 		}
 	}
 
+	public static <T> void putOptional(Bundle b, String key, Optional<T> value) {
+		if (value == null) {
+			b.putInt(key + PRESENT_OR_NULL, -1);
+		} else if (value.isPresent()) {
+			b.putInt(key + PRESENT_OR_NULL, 1);
+			putValue(b, key, value.get());
+		} else {
+			b.putInt(key + PRESENT_OR_NULL, 0);
+		}
+	}
+
 	public static <C extends Comparable<?>> void putRange(Bundle b, String key, Range<C> value) {
 		if (value == null) {
 			b.putBoolean(key + NULL, true);
@@ -679,118 +776,139 @@ public class BundleUtils {
 		}
 	}
 
+	public static <E> void putSet(Bundle b, String key, Set<E> value) {
+		if (value == null) {
+			b.putString(key + NAME, NO_NAME);
+		} else {
+			b.putString(key + NAME, value.getClass().getName());
+			int n = value.size();
+			b.putInt(key + SIZE, n);
+			int i = 0;
+			for (E elem : value) {
+				putValue(b, key + i, elem);
+				i++;
+			}
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public static void putValue(Bundle b, String key, Object v) {
-		String kk = key + KEY, kv = key + VALUE;
+		String keyType = key + TYPE;
 
 		if (v == null) {
-			b.putInt(kk, VAL_NULL);
+			b.putInt(keyType, VAL_NULL);
 		} else if (v.getClass().isEnum()) {
-			b.putInt(kk, VAL_ENUM);
-			putEnum(b, kv, (Enum<?>) v);
+			b.putInt(keyType, VAL_ENUM);
+			putEnum(b, key, (Enum<?>) v);
+		} else if (v instanceof Optional) {
+			b.putInt(keyType, VAL_OPTIONAL);
+			putOptional(b, key, (Optional<?>) v);
 		} else if (v instanceof String) {
-			b.putInt(kk, VAL_STRING);
-			b.putString(kv, (String) v);
+			b.putInt(keyType, VAL_STRING);
+			b.putString(key, (String) v);
 		} else if (v instanceof Integer) {
-			b.putInt(kk, VAL_INTEGER);
-			b.putInt(kv, (Integer) v);
+			b.putInt(keyType, VAL_INTEGER);
+			b.putInt(key, (Integer) v);
 		} else if (v instanceof Multimap) {
-			b.putInt(kk, VAL_MULTIMAP);
-			putMultimap(b, kv, (Multimap<?,?>) v);
+			b.putInt(keyType, VAL_MULTIMAP);
+			putMultimap(b, key, (Multimap<?,?>) v);
 		} else if (v instanceof Range) {
-			b.putInt(kk, VAL_RANGE);
+			b.putInt(keyType, VAL_RANGE);
 			@SuppressWarnings("unchecked")
 			Range<? extends Comparable<?>> range = (Range<? extends Comparable<?>>) v;
-			putRange(b, kv, range);
+			putRange(b, key, range);
 		} else if (v instanceof RangeMap) {
-			b.putInt(kk, VAL_RANGEMAP);
+			b.putInt(keyType, VAL_RANGEMAP);
 			@SuppressWarnings("unchecked")
 			RangeMap<? extends Comparable<?>, ?> rangeMap = (RangeMap<? extends Comparable<?>, ?>) v;
-			putRangeMap(b, kv, rangeMap);
+			putRangeMap(b, key, rangeMap);
 		} else if (v instanceof Map) {
-			b.putInt(kk, VAL_MAP);
-			putMap(b, kv, (Map<?,?>) v);
+			b.putInt(keyType, VAL_MAP);
+			putMap(b, key, (Map<?,?>) v);
 		} else if (v instanceof Bundle) {
 			// Must be before Parcelable
-			b.putInt(kk, VAL_BUNDLE);
-			b.putBundle(kv, (Bundle) v);
+			b.putInt(keyType, VAL_BUNDLE);
+			b.putBundle(key, (Bundle) v);
 		} else if (v instanceof Parcelable) {
-			b.putInt(kk, VAL_PARCELABLE);
-			b.putParcelable(kv, (Parcelable) v);
+			b.putInt(keyType, VAL_PARCELABLE);
+			b.putParcelable(key, (Parcelable) v);
 		} else if (v instanceof Short) {
-			b.putInt(kk, VAL_SHORT);
-			b.putShort(kv, (Short) v);
+			b.putInt(keyType, VAL_SHORT);
+			b.putShort(key, (Short) v);
 		} else if (v instanceof Long) {
-			b.putInt(kk, VAL_LONG);
-			b.putLong(kv, (Long) v);
+			b.putInt(keyType, VAL_LONG);
+			b.putLong(key, (Long) v);
 		} else if (v instanceof Float) {
-			b.putInt(kk, VAL_FLOAT);
-			b.putFloat(kv, (Float) v);
+			b.putInt(keyType, VAL_FLOAT);
+			b.putFloat(key, (Float) v);
 		} else if (v instanceof Double) {
-			b.putInt(kk, VAL_DOUBLE);
-			b.putDouble(kv, (Double) v);
+			b.putInt(keyType, VAL_DOUBLE);
+			b.putDouble(key, (Double) v);
 		} else if (v instanceof Boolean) {
-			b.putInt(kk, VAL_BOOLEAN);
-			b.putBoolean(kv, (Boolean) v);
+			b.putInt(keyType, VAL_BOOLEAN);
+			b.putBoolean(key, (Boolean) v);
 		} else if (v instanceof CharSequence) {
 			// Must be after String
-			b.putInt(kk, VAL_CHARSEQUENCE);
-			b.putCharSequence(kv, (CharSequence) v);
+			b.putInt(keyType, VAL_CHARSEQUENCE);
+			b.putCharSequence(key, (CharSequence) v);
 		} else if (v instanceof List) {
-			b.putInt(kk, VAL_LIST);
-			putList(b, kv, (List<?>) v);
+			b.putInt(keyType, VAL_LIST);
+			putList(b, key, (List<?>) v);
+		} else if (v instanceof Set) {
+			b.putInt(keyType, VAL_SET);
+			putSet(b, key, (Set<?>) v);
 		} else if (v instanceof SparseArray) {
-			b.putInt(kk, VAL_SPARSEPARCELABLEARRAY);
+			b.putInt(keyType, VAL_SPARSEPARCELABLEARRAY);
 			@SuppressWarnings("unchecked")
 			SparseArray<? extends Parcelable> spa = (SparseArray<? extends Parcelable>) v;
-			b.putSparseParcelableArray(kv, spa);
+			b.putSparseParcelableArray(key, spa);
 		} else if (v instanceof boolean[]) {
-			b.putInt(kk, VAL_BOOLEANARRAY);
-			b.putBooleanArray(kv, (boolean[]) v);
+			b.putInt(keyType, VAL_BOOLEANARRAY);
+			b.putBooleanArray(key, (boolean[]) v);
 		} else if (v instanceof byte[]) {
-			b.putInt(kk, VAL_BYTEARRAY);
-			b.putByteArray(kv, (byte[]) v);
+			b.putInt(keyType, VAL_BYTEARRAY);
+			b.putByteArray(key, (byte[]) v);
 		} else if (v instanceof String[]) {
-			b.putInt(kk, VAL_STRINGARRAY);
-			b.putStringArray(kv, (String[]) v);
+			b.putInt(keyType, VAL_STRINGARRAY);
+			b.putStringArray(key, (String[]) v);
 		} else if (v instanceof char[]) {
-			b.putInt(kk, VAL_CHARARRAY);
-			b.putCharArray(kv, (char[]) v);
+			b.putInt(keyType, VAL_CHARARRAY);
+			b.putCharArray(key, (char[]) v);
 		} else if (v instanceof double[]) {
-			b.putInt(kk, VAL_DOUBLEARRAY);
-			b.putDoubleArray(kv, (double[]) v);
+			b.putInt(keyType, VAL_DOUBLEARRAY);
+			b.putDoubleArray(key, (double[]) v);
 		} else if (v instanceof float[]) {
-			b.putInt(kk, VAL_FLOATARRAY);
-			b.putFloatArray(kv, (float[]) v);
+			b.putInt(keyType, VAL_FLOATARRAY);
+			b.putFloatArray(key, (float[]) v);
 		} else if (v instanceof short[]) {
-			b.putInt(kk, VAL_SHORTARRAY);
-			b.putShortArray(kv, (short[]) v);
+			b.putInt(keyType, VAL_SHORTARRAY);
+			b.putShortArray(key, (short[]) v);
 		} else if (v instanceof CharSequence[]) {
 			// Must be after String[] and before Object[]
-			b.putInt(kk, VAL_CHARSEQUENCEARRAY);
-			b.putCharSequenceArray(kv, (CharSequence[]) v);
+			b.putInt(keyType, VAL_CHARSEQUENCEARRAY);
+			b.putCharSequenceArray(key, (CharSequence[]) v);
 		} else if (v instanceof IBinder && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-			b.putInt(kk, VAL_IBINDER);
-			b.putBinder(kv, (IBinder) v);
+			b.putInt(keyType, VAL_IBINDER);
+			b.putBinder(key, (IBinder) v);
 		} else if (v instanceof Parcelable[]) {
-			b.putInt(kk, VAL_PARCELABLEARRAY);
-			b.putParcelableArray(kv, (Parcelable[]) v);
+			b.putInt(keyType, VAL_PARCELABLEARRAY);
+			b.putParcelableArray(key, (Parcelable[]) v);
 		} else if (v instanceof int[]) {
-			b.putInt(kk, VAL_INTARRAY);
-			b.putIntArray(kv, (int[]) v);
+			b.putInt(keyType, VAL_INTARRAY);
+			b.putIntArray(key, (int[]) v);
 		} else if (v instanceof long[]) {
-			b.putInt(kk, VAL_LONGARRAY);
-			b.putLongArray(kv, (long[]) v);
+			b.putInt(keyType, VAL_LONGARRAY);
+			b.putLongArray(key, (long[]) v);
 		} else if (v instanceof Object[]) {
-			b.putInt(kk, VAL_OBJECTARRAY);
-			putArray(b, kv, (Object[]) v);
+			b.putInt(keyType, VAL_OBJECTARRAY);
+			putArray(b, key, (Object[]) v);
 		} else if (v instanceof Byte) {
-			b.putInt(kk, VAL_BYTE);
-			b.putByte(kv, (Byte) v);
+			b.putInt(keyType, VAL_BYTE);
+			b.putByte(key, (Byte) v);
 		} else if (v instanceof Serializable) {
 			// Must be last
-			b.putInt(kk, VAL_SERIALIZABLE);
-			b.putSerializable(kv, (Serializable) v);
+			b.putInt(keyType, VAL_SERIALIZABLE);
+			b.putSerializable(key, (Serializable) v);
 		} else {
 			throw new RuntimeException("Parcel: unable to marshal value " + v);
 		}

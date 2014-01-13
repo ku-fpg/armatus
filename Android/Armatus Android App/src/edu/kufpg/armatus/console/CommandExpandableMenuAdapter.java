@@ -36,13 +36,13 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter impl
 	 * Constructs a new instance and initializes the menu data if necessary.
 	 * @param console The {@link Context} to use.
 	 */
-	public CommandExpandableMenuAdapter(ConsoleActivity console) {
-		mInflater = LayoutInflater.from(console);
+	public CommandExpandableMenuAdapter(Context context) {
+		mInflater = LayoutInflater.from(context);
 		resetData();
 	}
 
-	public CommandExpandableMenuAdapter(ConsoleActivity console, CharSequence searchConstraint) {
-		this(console);
+	public CommandExpandableMenuAdapter(Context context, CharSequence searchConstraint) {
+		this(context);
 		getFilter().filter(searchConstraint);
 	}
 
@@ -75,9 +75,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter impl
 		item.commandName.setText(commandName);
 		item.commandName.setTypeface(ConsoleActivity.TYPEFACE);
 		item.typeSigs.setText(String.valueOf(typeSigs));
-		
-//		int newWidth = mConsole.getResources().getDrawable(R.drawable.template_white).getIntrinsicWidth();
-//		item.icon.getLayoutParams().width = newWidth;
+
 		return view;
 	}
 
@@ -138,7 +136,7 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter impl
 			getFilter().filter(mConstraint);
 		}
 	}
-	
+
 	private void notifyDataSetChangedInternal() {
 		super.notifyDataSetChanged();
 	}
@@ -167,7 +165,6 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter impl
 	public Filter getFilter() {
 		if (mFilter == null) {
 			mFilter = new Filter() {
-
 				@Override
 				protected FilterResults performFiltering(CharSequence constraint) {
 					mConstraint = constraint;
@@ -263,7 +260,6 @@ public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter impl
 					mTagCommandNames = holder.tagCommandNames;
 					notifyDataSetChangedInternal();
 				}
-
 			};
 		}
 		return mFilter;

@@ -91,6 +91,11 @@ public abstract class AsyncActivityTask<A extends Activity, Params, Progress, Re
 	protected void onPostExecute(Result result) {
 		mApp.removeTask(getActivity(), this);
 	}
+	
+	@Override
+	protected void onCancelled(Result result) {
+		mApp.removeTask(getActivity(), this);
+	}
 
 	@Override
 	protected void onCancelled() {

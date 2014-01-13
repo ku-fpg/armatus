@@ -20,7 +20,7 @@ import edu.kufpg.armatus.util.StickyButton;
 public class MainActivity extends BaseActivity {
 	private TextView mButtonsView;
 	private StickyButton mStickyButton;
-	private Button mUnstickButton, mTreeButton, mConsoleButton, mTestActivityButton, mTerminalButton;
+	private Button mUnstickButton, mTreeButton, mConsoleButton, mTerminalButton;
 	private int mNumTextChanges = 0;
 
 	@Override
@@ -34,7 +34,6 @@ public class MainActivity extends BaseActivity {
 		mUnstickButton = (Button) findViewById(R.id.unlock_button);
 		mTreeButton = (Button) findViewById(R.id.tree_button);
 		mConsoleButton = (Button) findViewById(R.id.console_button);
-		mTestActivityButton = (Button) findViewById(R.id.test_activity_button);
 		mTerminalButton = (Button) findViewById(R.id.terminal_activity_button);
 
 		mStickyButton.setOnClickListener(new OnClickListener() {
@@ -64,13 +63,6 @@ public class MainActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(MainActivity.this, ConsoleActivity.class));
-			}
-		});
-
-		mTestActivityButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// PUT SOMETHING HERE
 			}
 		});
 

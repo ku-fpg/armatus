@@ -15,7 +15,7 @@ import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
 
 /**
  * Contains all {@link CustomCommandInfo}s and {@link Keyword}s that the console uses and allows
- * {@link ConsoleActivity} to execute commands.
+ * {@link ConsoleActivity1} to execute commands.
  */
 public class CustomCommandDispatcher {
 	public static final String CLIENT_COMMANDS_TAG = "Client";
@@ -92,7 +92,7 @@ public class CustomCommandDispatcher {
 	
 	/**
 	 * Attempts to run a {@link CustomCommandInfo} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommandInfo}.
+	 * @param console The {@link ConsoleActivity1} on which to run the {@link CustomCommandInfo}.
 	 * @param commandName The name of the {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
@@ -105,7 +105,7 @@ public class CustomCommandDispatcher {
 
 	/**
 	 * Attempts to run a {@link CustomCommandInfo} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommandInfo}.
+	 * @param console The {@link ConsoleActivity1} on which to run the {@link CustomCommandInfo}.
 	 * @param commandThe {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */

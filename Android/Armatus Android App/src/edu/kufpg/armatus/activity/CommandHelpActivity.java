@@ -1,8 +1,5 @@
 package edu.kufpg.armatus.activity;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-import edu.kufpg.armatus.data.CommandInfo;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,6 +8,9 @@ import android.text.SpannableStringBuilder;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleActivity;
+import edu.kufpg.armatus.data.CommandInfo;
 
 public class CommandHelpActivity extends Activity {
 

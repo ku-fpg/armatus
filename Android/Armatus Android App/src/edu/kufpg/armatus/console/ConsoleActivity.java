@@ -42,6 +42,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -61,7 +62,6 @@ import edu.kufpg.armatus.Prefs;
 import edu.kufpg.armatus.Prefs.NetworkSource;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.CommandExpandableMenuAdapter.CommandExpandableMenuItem;
-import edu.kufpg.armatus.console.ConsoleEntryAdapter.ConsoleEntryHolder;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.SearchDirection;
 import edu.kufpg.armatus.data.CommandInfo;
@@ -80,11 +80,8 @@ import edu.kufpg.armatus.networking.BluetoothUtils;
 import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.OnExpandableItemLongClickListener;
 import edu.kufpg.armatus.util.StringUtils;
+import edu.kufpg.armatus.util.Views;
 
-/**
- * Activity that displays an interactive, feature-rich
- * (at least it will be some day) HERMIT console.
- */
 public class ConsoleActivity extends BaseActivity {
 
 	public static final int DEFAULT_FONT_SIZE = 15;
@@ -102,15 +99,15 @@ public class ConsoleActivity extends BaseActivity {
 	private HermitClient mHermitClient;
 	private RelativeLayout mConsoleListLayout, mConsoleInputLayout, mConsoleOptionsBar;
 	private ConsoleListView mConsoleListView;
-	private ListView mCommandHistoryView;
-	private ExpandableListView mCommandExpandableMenuView;
 	private ConsoleEntryAdapter mConsoleListAdapter;
-	private ConsoleWordSearcher mSearcher;
-	private CommandHistoryAdapter mCommandHistoryAdapter;
-	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
-	private CharSequence mMenuSearchConstraint;
-	private ArrayList<HistoryCommand> mCommandHistory;
 	private ArrayList<ConsoleEntry> mConsoleEntries;
+	private ListView mCommandHistoryView;
+	private CommandHistoryAdapter mCommandHistoryAdapter;
+	private ArrayList<HistoryCommand> mCommandHistory;
+	private ExpandableListView mCommandExpandableMenuView;
+	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
+	private ConsoleWordSearcher mSearcher;
+	private CharSequence mMenuSearchConstraint;
 	private ConsoleEntry mNextConsoleEntry;
 	private ArrayList<String> mUserInputHistory;
 	private int mUserInputHistoryChoice;
@@ -241,7 +238,7 @@ public class ConsoleActivity extends BaseActivity {
 			public boolean onDrag(View v, DragEvent event) {
 				switch (event.getAction()) {
 				case DragEvent.ACTION_DRAG_STARTED:
-					getSlidingMenu().showContent();
+					mSlidingMenu.showContent();
 					return true;
 				case DragEvent.ACTION_DROP:
 				case DragEvent.ACTION_DRAG_ENDED:
@@ -268,17 +265,33 @@ public class ConsoleActivity extends BaseActivity {
 					int bottom, int oldLeft, int oldTop, int oldRight,
 					int oldBottom) {
 				mConsoleEntriesHeight = 0;
-				for (int i = 0; i < getEntryCount(); i++) {
-					View child = mConsoleListView.getAdapter().getView(i, null, mConsoleListView);
-					child.measure(MeasureSpec.makeMeasureSpec(mConsoleWidth, MeasureSpec.AT_MOST),
-							MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-					mConsoleEntriesHeight += child.getMeasuredHeight();
-					if (mConsoleEntriesHeight >= mScreenHeight) {
-						mConsoleEntriesHeight = mScreenHeight;
-						break;
+				mainloop: for (int groupPos = 0; groupPos < mConsoleEntries.size(); groupPos++) {
+					View group = mConsoleListView.getExpandableListAdapter().getGroupView(groupPos, true, null, mConsoleListView);
+					if (measureView(group)) {
+						break mainloop;
+					}
+
+					int children = mConsoleListView.getExpandableListAdapter().getChildrenCount(groupPos);
+					for (int childPos = 0; childPos < children; childPos++) {
+						View child = mConsoleListView.getExpandableListAdapter().getChildView(groupPos, childPos, true, null, mConsoleListView);
+						if (measureView(child)) {
+							break mainloop;
+						}
 					}
 				}
 				resizeEmptySpace();
+			}
+
+			private boolean measureView(View v) {
+				v.measure(MeasureSpec.makeMeasureSpec(mConsoleWidth, MeasureSpec.AT_MOST),
+						MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+				mConsoleEntriesHeight += v.getMeasuredHeight();
+				if (mConsoleEntriesHeight >= mScreenHeight) {
+					mConsoleEntriesHeight = mScreenHeight;
+					return true;
+				} else {
+					return false;
+				}
 			}
 		});
 
@@ -647,7 +660,6 @@ public class ConsoleActivity extends BaseActivity {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
 		switch (v.getId()) {
 		case R.id.console_empty_space:
 			super.onCreateContextMenu(menu, v, menuInfo);
@@ -660,26 +672,14 @@ public class ConsoleActivity extends BaseActivity {
 			}
 			break;
 		case R.id.console_list_view:
-			if (info.position != mConsoleEntries.size() && //To prevent footer from spawning a ContextMenu
-			!mConsoleEntries.get(info.position).getShortContents().toString().isEmpty()) { //To prevent empty lines
-				super.onCreateContextMenu(menu, v, menuInfo);
-
-				//			final int group;
-				mTempCommand = ((ConsoleEntryHolder) info.targetView.getTag()).draggedOverCommand;
-				if (mTempCommand != null) { //If user dragged CommandIcon onto entry
-					menu.setHeaderTitle("Entry " + info.position + ": Execute " + mTempCommand + " on...");
-					//				group = DRAGGED_GROUP;
-				} else { //If user long-clicked entry
-					menu.setHeaderTitle("Entry " + info.position + ": Commands found");
+			if (!(menuInfo instanceof AdapterContextMenuInfo)) {
+				ExpandableListContextMenuInfo expInfo = (ExpandableListContextMenuInfo) menuInfo;
+				int groupPos = ExpandableListView.getPackedPositionGroup(expInfo.packedPosition);
+				if (!mConsoleEntries.get(groupPos).getShortContents().toString().isEmpty()) { //To prevent empty lines
+					super.onCreateContextMenu(menu, v, menuInfo);
+					menu.setHeaderTitle("Entry " + groupPos + ": Commands found");
 					menu.add(Menu.NONE, Menu.NONE, 1, "Sample transformation (does nothing)");
-					//				group = LONG_CLICKED_GROUP;
 				}
-
-				//			int order = 2;
-				//			for (String keyword : mConsoleEntries.get(info.position).getKeywords()) {
-				//				menu.add(group, v.getId(), order, keyword);
-				//				order++;
-				//			}
 			}
 			break;
 		}
@@ -886,6 +886,10 @@ public class ConsoleActivity extends BaseActivity {
 		return mConsoleEntries.get(index);
 	}
 
+	public CharSequence getLine(int entryIndex, int lineIndex) {
+		return getEntry(entryIndex).getContentLines().get(lineIndex);
+	}
+
 	/**
 	 * @return the total number of console entries.
 	 */
@@ -936,8 +940,8 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputEditText.setSelection(getInputLength());
 	}
 
-	public void showEntrySelectionDialog(int... entries) {
-		showDialog(ConsoleEntrySelectionDialog.newInstance(entries), SELECTION_TAG);
+	public void showEntrySelectionDialog(SortedSet<ConsoleLineParams> lineParams) {
+		showDialog(ConsoleEntrySelectionDialog.newInstance(lineParams), SELECTION_TAG);
 	}
 
 	public void showKeywordSwapDialog(int entryNum, String entryContents) {
@@ -1004,14 +1008,6 @@ public class ConsoleActivity extends BaseActivity {
 		setInputText(replaceIndex, getInputLength(), completion + StringUtils.NBSP);
 	}
 
-	ListView getListView() {
-		return mConsoleListView;
-	}
-
-	SlidingMenu getSlidingMenu() {
-		return mSlidingMenu;
-	}
-
 	private void executeSearch(String criterion, SearchAction action, SearchDirection direction) {
 		if (mInputEnabled) {
 			setInputEnabled(false);
@@ -1035,9 +1031,18 @@ public class ConsoleActivity extends BaseActivity {
 				setInputEnabled(true);
 				return;
 			}
-			if (params != null && !mConsoleListView.isEntryVisible(params.listIndex)) {
-				mConsoleListView.smoothScrollToPositionFromTop(params.listIndex,
-						params.textViewOffset, SCROLL_DURATION);
+
+			//			if (params != null && !Views.isEntryVisible(mConsoleListView, params.listIndex)) {
+			//				mConsoleListView.smoothScrollToPositionFromTop(params.listIndex,
+			//						params.textViewOffset, SCROLL_DURATION);
+			//			}
+
+			if (params != null) {
+				int flatListPos = Views.getFlatListPosition(mConsoleListView, params.entryIndex, params.lineIndex);
+				if (!Views.isEntryVisible(mConsoleListView, flatListPos)) {
+					mConsoleListView.smoothScrollToPositionFromTop(flatListPos,
+							params.textViewOffset, SCROLL_DURATION);
+				}
 			}
 			setTextSearchCaption();
 			setInputEnabled(true);
@@ -1113,6 +1118,7 @@ public class ConsoleActivity extends BaseActivity {
 		if (mConsoleEntries.size() > CONSOLE_ENTRY_LIMIT) {
 			mConsoleEntries.remove(0);
 		}
+		mConsoleListView.expandAllGroups();
 		mConsoleListAdapter.notifyDataSetChanged();
 		updateInput();
 	}

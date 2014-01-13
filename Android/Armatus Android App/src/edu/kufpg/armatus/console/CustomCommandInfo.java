@@ -46,7 +46,7 @@ public abstract class CustomCommandInfo extends CommandInfo {
 
 	/**
 	 * The instructions that are ran when this {@link CustomCommandInfo} is run on the console.
-	 * @param console The {@link ConsoleActivity} on which this {@code Command} will be run.
+	 * @param console The {@link ConsoleActivity1} on which this {@code Command} will be run.
 	 * @param args Parameters that the {@code Command} uses.
 	 */
 	protected abstract void run(ConsoleActivity console, String... args);

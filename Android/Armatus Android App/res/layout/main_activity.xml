@@ -50,19 +50,11 @@
             android:text="Tree test" />
 
         <Button
-            android:id="@+id/test_activity_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/tree_button"
-            android:text="Launch TestActivity" />
-
-        <Button
             android:id="@+id/terminal_activity_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/test_activity_button"
+            android:layout_below="@+id/tree_button"
             android:text="Launch terminal emulator" />
     </RelativeLayout>
 

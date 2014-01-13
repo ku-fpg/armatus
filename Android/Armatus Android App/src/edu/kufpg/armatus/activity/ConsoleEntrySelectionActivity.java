@@ -1,12 +1,5 @@
 package edu.kufpg.armatus.activity;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-import edu.kufpg.armatus.console.ConsoleEntry;
-import edu.kufpg.armatus.data.Glyph;
-import edu.kufpg.armatus.gesture.OnPinchZoomListener;
-import edu.kufpg.armatus.util.StringUtils;
-import edu.kufpg.armatus.util.TextDrawable;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -15,6 +8,13 @@ import android.text.style.ImageSpan;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.widget.TextView;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleActivity;
+import edu.kufpg.armatus.console.ConsoleEntry;
+import edu.kufpg.armatus.data.Glyph;
+import edu.kufpg.armatus.gesture.OnPinchZoomListener;
+import edu.kufpg.armatus.util.StringUtils;
+import edu.kufpg.armatus.util.TextDrawable;
 
 public class ConsoleEntrySelectionActivity extends ConsoleEntryActivity {
 	private static final int DEFAULT_TEXT_SIZE = 17;

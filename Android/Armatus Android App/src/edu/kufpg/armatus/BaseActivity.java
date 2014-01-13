@@ -58,7 +58,6 @@ public class BaseActivity extends Activity {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onResume() {
 		//If the theme has changed while navigating the back stack
@@ -66,15 +65,18 @@ public class BaseActivity extends Activity {
 			recreate();
 		}
 		
-		((BaseApplication<BaseActivity>) getApplication()).attachActivity(this);
+		@SuppressWarnings("unchecked")
+		BaseApplication<BaseActivity> baseApp = (BaseApplication<BaseActivity>) getApplication();
+		baseApp.attachActivity(this);
 		super.onResume();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		((BaseApplication<BaseActivity>) getApplication()).detachActivity(this);
+		@SuppressWarnings("unchecked")
+		BaseApplication<BaseActivity> baseApp = (BaseApplication<BaseActivity>) getApplication();
+		baseApp.detachActivity(this);
 	}
 
 	/**

@@ -1,9 +1,9 @@
 package edu.kufpg.armatus.dialog;
 
-import edu.kufpg.armatus.console.ConsoleActivity;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import edu.kufpg.armatus.console.ConsoleActivity;
 
 public class ConsiderateDialog extends DialogFragment {
 	private ConsoleActivity mConsole;

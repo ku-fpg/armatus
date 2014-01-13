@@ -15,6 +15,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -131,6 +132,23 @@ public class CommandResponse implements Parcelable {
 		} else {
 			return Optional.absent();
 		}
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof CommandResponse) {
+			CommandResponse cr = (CommandResponse) o;
+			return mAst == cr.getAst()
+					&& mGlyphs.equals(cr.mGlyphs)
+					&& mMessage.equals(cr.mMessage);
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(mAst, mGlyphs, mMessage);
 	}
 
 	public static Parcelable.Creator<CommandResponse> CREATOR =

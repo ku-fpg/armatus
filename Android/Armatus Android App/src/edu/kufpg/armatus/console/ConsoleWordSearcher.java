@@ -50,7 +50,7 @@ public class ConsoleWordSearcher implements Parcelable {
 
 	/**
 	 * Constructs a new instance with a reference to the specified adapter.
-	 * @param adapter The {@link ConsoleEntryAdapter} to reference.
+	 * @param adapter The {@link ConsoleEntryAdapter1} to reference.
 	 */
 	public ConsoleWordSearcher(ConsoleEntryAdapter adapter) {
 		attachAdapter(adapter);
@@ -59,7 +59,7 @@ public class ConsoleWordSearcher implements Parcelable {
 	/**
 	 * Restores the reference to the console's adapter, which can be destroyed after
 	 * device standby or rotation.
-	 * @param adapter The {@link ConsoleEntryAdapter} to reconnect to.
+	 * @param adapter The {@link ConsoleEntryAdapter1} to reconnect to.
 	 */
 	void attachAdapter(ConsoleEntryAdapter adapter) {
 		mAdapter = adapter;
@@ -80,18 +80,20 @@ public class ConsoleWordSearcher implements Parcelable {
 		mNextMatches.clear();
 		mSelectedMatch = null;
 		if (!mCriterion.isEmpty()) {
-			for (int index = 0; index < mAdapter.getCount(); index++) {
-				String entryContents = mAdapter.getItem(index).getFullContents().toString().toLowerCase(Locale.US);
-				SortedSet<Integer> offsets = mSearchOffsetsMap.get(entryContents);
-				if (offsets.isEmpty() && !mSearchOffsetsMap.containsEntry(entryContents, NO_MATCH)) {
-					offsets = getMatchIndexes(mCriterion, entryContents);
-				}
-				for (int offset : offsets) {
-					if (offset != NO_MATCH) {
-						//Add them to beginning of stack to avoid having to reverse order later
-						mNextMatches.add(0, new MatchParams(index, offset));
-						mMatchCount++;
-						mSearchOffsetsMap.put(entryContents, offset);
+			for (int groupIndex = 0; groupIndex < mAdapter.getGroupCount(); groupIndex++) {
+				for (int childIndex = 0; childIndex < mAdapter.getChildrenCount(groupIndex); childIndex++) {
+					String entryContents = mAdapter.getChild(groupIndex, childIndex).toString().toLowerCase(Locale.US);
+					SortedSet<Integer> offsets = mSearchOffsetsMap.get(entryContents);
+					if (offsets.isEmpty() && !mSearchOffsetsMap.containsEntry(entryContents, NO_MATCH)) {
+						offsets = getMatchIndexes(mCriterion, entryContents);
+					}
+					for (int offset : offsets) {
+						if (offset != NO_MATCH) {
+							//Add them to beginning of stack to avoid having to reverse order later
+							mNextMatches.add(0, new MatchParams(groupIndex, childIndex, offset));
+							mMatchCount++;
+							mSearchOffsetsMap.put(entryContents, offset);
+						}
 					}
 				}
 			}
@@ -295,31 +297,20 @@ public class ConsoleWordSearcher implements Parcelable {
 
 	/** The parameters of a search match index. */
 	public static class MatchParams implements Parcelable {
-		/** The index in the {@link android.widget.ListView ListView} where the
-		 * match occurs. */
-		public final int listIndex;
+		public final int entryIndex;
+		public final int lineIndex;
 		
-		/** The offset in the {@link android.widget.TextView TextView} where the
-		 * match occurs. */
 		public final int textViewOffset;
 
-		/**
-		 * Constructs a new instance with the specified {@link android.widget.ListView
-		 * ListView} index and {@link android.widget.TextView TextView} offset.
-		 * @param listIndex The list index.
-		 * @param textViewOffset The {@code TextView} offset.
-		 */
-		public MatchParams(int listIndex, int textViewOffset) {
-			this.listIndex = listIndex;
+		public MatchParams(int groupIndex, int childIndex, int textViewOffset) {
+			this.entryIndex = groupIndex;
+			this.lineIndex = childIndex;
 			this.textViewOffset = textViewOffset;
 		}
 
-		/**
-		 * Constructs a new instance from the specified {@link MatchParams}.
-		 * @param params The {@code MatchParams} to copy.
-		 */
 		public MatchParams(MatchParams params) {
-			listIndex = params.listIndex;
+			entryIndex = params.entryIndex;
+			lineIndex = params.lineIndex;
 			textViewOffset = params.textViewOffset;
 		}
 		
@@ -327,9 +318,10 @@ public class ConsoleWordSearcher implements Parcelable {
 				new Parcelable.Creator<MatchParams>() {
 			@Override
 			public MatchParams createFromParcel(Parcel source) {
-				int listIndex = source.readInt();
+				int groupIndex = source.readInt();
+				int childIndex = source.readInt();
 				int textViewOffset = source.readInt();
-				return new MatchParams(listIndex, textViewOffset);
+				return new MatchParams(groupIndex, childIndex, textViewOffset);
 			}
 
 			@Override
@@ -345,7 +337,8 @@ public class ConsoleWordSearcher implements Parcelable {
 
 		@Override
 		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeInt(listIndex);
+			dest.writeInt(entryIndex);
+			dest.writeInt(lineIndex);
 			dest.writeInt(textViewOffset);
 		}
 	}

@@ -3,16 +3,14 @@ package edu.kufpg.armatus.dialog;
 import java.util.List;
 
 import net.simonvt.numberpicker.NumberPicker;
-
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleActivity;
 
 public class ScrollEntriesDialog extends ConsiderateDialog {
 
