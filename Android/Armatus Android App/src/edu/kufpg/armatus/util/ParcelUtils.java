@@ -89,7 +89,7 @@ public class ParcelUtils {
 		}
 	}
 
-	// Ewww reflection
+	// Eww reflection
 	private static boolean isAssignableFrom(Class<?> cls, String asgnName) throws IllegalArgumentException {
 		try {
 			return cls.isAssignableFrom(Class.forName(asgnName));
