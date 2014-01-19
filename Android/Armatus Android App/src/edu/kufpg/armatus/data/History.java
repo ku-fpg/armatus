@@ -78,7 +78,7 @@ public class History implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		ParcelUtils.writeList(dest, mCommands);
-		ParcelUtils.writeList(dest, mTags);
+		ParcelUtils.writeCollection(dest, mCommands);
+		ParcelUtils.writeCollection(dest, mTags);
 	}
 }

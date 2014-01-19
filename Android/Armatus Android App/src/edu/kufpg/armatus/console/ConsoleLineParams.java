@@ -1,5 +1,7 @@
 package edu.kufpg.armatus.console;
 
+import com.google.common.collect.ComparisonChain;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -14,11 +16,10 @@ public class ConsoleLineParams implements Comparable<ConsoleLineParams>, Parcela
 	
 	@Override
 	public int compareTo(ConsoleLineParams another) {
-		if (entryNum == another.entryNum) {
-			return Integer.valueOf(lineNum).compareTo(another.lineNum);
-		} else {
-			return Integer.valueOf(entryNum).compareTo(another.entryNum);
-		}
+		return ComparisonChain.start()
+				.compare(entryNum, another.entryNum)
+				.compare(lineNum, another.lineNum)
+				.result();
 	}
 
 

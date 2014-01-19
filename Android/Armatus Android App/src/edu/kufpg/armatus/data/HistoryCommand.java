@@ -3,6 +3,8 @@ package edu.kufpg.armatus.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.primitives.Ints;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -64,7 +66,7 @@ public class HistoryCommand implements Comparable<HistoryCommand>, Parcelable {
 
 	@Override
 	public int compareTo(HistoryCommand another) {
-		return Integer.valueOf(getFrom()).compareTo(another.getFrom());
+		return Ints.compare(getFrom(), another.getFrom());
 	}
 
 }

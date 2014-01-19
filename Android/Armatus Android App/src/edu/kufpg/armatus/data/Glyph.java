@@ -168,7 +168,7 @@ public class Glyph implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		ParcelUtils.writeEnum(dest, mStyle);
 		ParcelUtils.writeOptional(dest, mBindingSite);
-		ParcelUtils.writeList(dest, mPath);
+		ParcelUtils.writeCollection(dest, mPath);
 		dest.writeString(mText);
 	}
 }

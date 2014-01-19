@@ -291,7 +291,7 @@ public class ConsoleListView extends ExpandableListView {
 		@Override
 		public void writeToParcel(Parcel dest, int flags) {
 			super.writeToParcel(dest, flags);
-			ParcelUtils.writeSet(dest, checkedStates);
+			ParcelUtils.writeCollection(dest, checkedStates);
 		}
 
 		public static final Parcelable.Creator<SavedState> CREATOR

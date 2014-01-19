@@ -34,6 +34,7 @@ import android.view.View.OnDragListener;
 import android.view.View.OnLayoutChangeListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
@@ -283,6 +284,9 @@ public class ConsoleActivity extends BaseActivity {
 			}
 
 			private boolean measureView(View v) {
+				if (v.getLayoutParams() == null) {
+					v.setLayoutParams(new LayoutParams(0, 0)); // Prevent crashing on CyanogenMod
+				}
 				v.measure(MeasureSpec.makeMeasureSpec(mConsoleWidth, MeasureSpec.AT_MOST),
 						MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 				mConsoleEntriesHeight += v.getMeasuredHeight();

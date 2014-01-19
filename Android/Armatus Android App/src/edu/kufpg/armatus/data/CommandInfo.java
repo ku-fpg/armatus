@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableList;
 
 import edu.kufpg.armatus.util.ParcelUtils;
@@ -67,12 +68,10 @@ public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
 
 	@Override
 	public int compareTo(CommandInfo another) {
-		int nameComp = getName().compareTo(another.getName());
-		if (nameComp == 0) {
-			return Integer.valueOf(getArgTypes().size()).compareTo(another.getArgTypes().size());
-		} else {
-			return nameComp;
-		}
+		return ComparisonChain.start()
+				.compare(getName(), another.getName())
+				.compare(getArgTypes().size(), another.getArgTypes().size())
+				.result();
 	}
 
 	public static Parcelable.Creator<CommandInfo> CREATOR =
@@ -102,8 +101,8 @@ public class CommandInfo implements Comparable<CommandInfo>, Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(mHelp);
 		dest.writeString(mName);
-		dest.writeStringList(mTags);
-		dest.writeStringList(mArgTypes);
+		ParcelUtils.writeCollection(dest, mTags);
+		ParcelUtils.writeCollection(dest, mArgTypes);
 		dest.writeString(mResultType);
 	}
 

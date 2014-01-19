@@ -1,9 +1,6 @@
 package edu.kufpg.armatus.console;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.base.Objects;
 
 import android.graphics.Color;
 import android.os.Parcel;
@@ -12,6 +9,8 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
+
+import com.google.common.base.Objects;
 
 import edu.kufpg.armatus.data.CommandResponse;
 import edu.kufpg.armatus.util.ParcelUtils;
@@ -36,7 +35,7 @@ public class ConsoleEntry implements Parcelable {
 	private CommandResponse mCommandResponse;
 	private String mErrorResponse;
 	private CharSequence mShortContents;
-	private List<CharSequence> mContentLines;
+	private ArrayList<CharSequence> mContentLines;
 
 	public ConsoleEntry(int entryNum, int ast, String userInput) {
 		this(entryNum, ast, userInput, null, null);
@@ -66,7 +65,7 @@ public class ConsoleEntry implements Parcelable {
 	}
 	
 	protected ConsoleEntry(int entryNum, int ast, String userInput, CommandResponse commandResponse,
-			String errorResponse, CharSequence shortContents, List<CharSequence> contentLines) {
+			String errorResponse, CharSequence shortContents, ArrayList<CharSequence> contentLines) {
 		mEntryNum = entryNum;
 		mAst = ast;
 		mUserInput = userInput;
@@ -118,7 +117,7 @@ public class ConsoleEntry implements Parcelable {
 		return mShortContents;
 	}
 	
-	public List<CharSequence> getContentLines() {
+	public ArrayList<CharSequence> getContentLines() {
 		return mContentLines;
 	}
 
@@ -227,7 +226,7 @@ public class ConsoleEntry implements Parcelable {
 			CommandResponse commandResponse = in.readParcelable(CommandResponse.class.getClassLoader());
 			String errorResponse = in.readString();
 			CharSequence shortContents = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
-			List<CharSequence> contentLines = ParcelUtils.readList(in);
+			ArrayList<CharSequence> contentLines = ParcelUtils.readArrayList(in);
 			return new ConsoleEntry(entryNum, ast, userInput, commandResponse, errorResponse, shortContents, contentLines);
 		}
 
@@ -249,7 +248,7 @@ public class ConsoleEntry implements Parcelable {
 		dest.writeParcelable(mCommandResponse, flags);
 		dest.writeString(mErrorResponse);
 		TextUtils.writeToParcel(mShortContents, dest, flags);
-		ParcelUtils.writeList(dest, mContentLines);
+		ParcelUtils.writeCollection(dest, mContentLines);
 	}
 
 }
