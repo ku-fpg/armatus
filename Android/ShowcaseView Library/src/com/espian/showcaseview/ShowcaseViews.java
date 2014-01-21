@@ -11,12 +11,12 @@ import java.util.List;
 
 public class ShowcaseViews {
 
-	private final List<ShowcaseView> views = new ArrayList<ShowcaseView>();
-	private final List<float[]> animations = new ArrayList<float[]>();
-	private final Activity activity;
-	private OnShowcaseAcknowledged showcaseAcknowledgedListener = new OnShowcaseAcknowledged() {
+	private final List<ShowcaseView> mViews = new ArrayList<ShowcaseView>();
+	private final List<float[]> mAnimations = new ArrayList<float[]>();
+	private final Activity mActivity;
+	private OnShowcaseAcknowledgedListener mShowcaseAcknowledgedListener = new OnShowcaseAcknowledgedListener() {
 		@Override
-		public void onShowCaseAcknowledged(ShowcaseView showcaseView) {
+		public void onShowcaseAcknowledged(ShowcaseView showcaseView) {
 			//DEFAULT LISTENER - DOESN'T DO ANYTHING!
 		}
 	};
@@ -24,38 +24,45 @@ public class ShowcaseViews {
 	private static final int ABSOLUTE_COORDINATES = 0;
 	private static final int RELATIVE_COORDINATES = 1;
 
-	public interface OnShowcaseAcknowledged {
-		void onShowCaseAcknowledged(ShowcaseView showcaseView);
+	public static interface OnShowcaseAcknowledgedListener {
+		void onShowcaseAcknowledged(ShowcaseView showcaseView);
 	}
 
 	public ShowcaseViews(Activity activity) {
-		this.activity = activity;
+		this.mActivity = activity;
 	}
 
-	public ShowcaseViews(Activity activity, OnShowcaseAcknowledged acknowledgedListener) {
+	public ShowcaseViews(Activity activity, OnShowcaseAcknowledgedListener acknowledgedListener) {
 		this(activity);
-		this.showcaseAcknowledgedListener = acknowledgedListener;
+		mShowcaseAcknowledgedListener = acknowledgedListener;
 	}
 
 	public ShowcaseViews addView(ItemViewProperties properties) {
-		ShowcaseViewBuilder builder = new ShowcaseViewBuilder(activity)
-		.setText(properties.titleResId, properties.messageResId)
-		.setShowcaseIndicatorScale(properties.scale)
-		.setConfigOptions(properties.configOptions);
+		ShowcaseViewBuilder builder = new ShowcaseViewBuilder(mActivity);
+		if (properties.mmTitleResId == ItemViewProperties.ID_NOT_GIVEN
+				|| properties.mmMessageResId == ItemViewProperties.ID_NOT_GIVEN) {
+			builder.setText(properties.mmTitle, properties.mmMessage);
+		} else {
+			builder.setText(properties.mmTitleResId, properties.mmMessageResId);
+		}
+		builder.setShowcaseIndicatorScale(properties.mmScale)
+		.setConfigOptions(properties.mmConfigOptions);
 
 		if(showcaseActionBar(properties)) {
-			builder.setShowcaseItem(properties.itemType, properties.id, activity);
-		} else if (properties.id == ItemViewProperties.ID_NO_SHOWCASE) {
+			builder.setShowcaseItem(properties.mmItemType, properties.mmViewId, mActivity);
+		} else if (properties.mmViewId == ItemViewProperties.ID_NO_SHOWCASE) {
 			builder.setShowcaseNoView();
+		} else if (properties.mmViewId == ItemViewProperties.ID_NOT_GIVEN) {
+			builder.setShowcaseView(properties.mmView);
 		} else {
-			builder.setShowcaseView(activity.findViewById(properties.id));
+			builder.setShowcaseView(mActivity.findViewById(properties.mmViewId));
 		}
 
 		ShowcaseView showcaseView = builder.build();
-		showcaseView.overrideButtonClick(createShowcaseViewDismissListener(showcaseView));
-		views.add(showcaseView);
+		showcaseView.setOnButtonClickListener(createShowcaseViewDismissListener(showcaseView));
+		mViews.add(showcaseView);
 
-		animations.add(null);
+		mAnimations.add(null);
 
 		return this;
 	}
@@ -84,12 +91,12 @@ public class ShowcaseViews {
 	 * @param absoluteCoordinates   If true, this will use absolute coordinates instead of coordinates relative to the center of the showcased view
 	 */
 	public void addAnimatedGestureToView(int viewIndex, float startX, float startY, float endX, float endY, boolean absoluteCoordinates) throws IndexOutOfBoundsException {
-		animations.remove(viewIndex);
-		animations.add(viewIndex, new float[]{absoluteCoordinates?ABSOLUTE_COORDINATES:RELATIVE_COORDINATES, startX, startY, endX, endY});
+		mAnimations.remove(viewIndex);
+		mAnimations.add(viewIndex, new float[]{absoluteCoordinates?ABSOLUTE_COORDINATES:RELATIVE_COORDINATES, startX, startY, endX, endY});
 	}
 
 	private boolean showcaseActionBar(ItemViewProperties properties) {
-		return properties.itemType > ItemViewProperties.ID_NOT_IN_ACTIONBAR;
+		return properties.mmItemType > ItemViewProperties.ID_NOT_IN_ACTIONBAR;
 	}
 
 	private View.OnClickListener createShowcaseViewDismissListener(final ShowcaseView showcaseView) {
@@ -114,50 +121,51 @@ public class ShowcaseViews {
 	}
 
 	private void showNextView(ShowcaseView showcaseView) {
-		if (views.isEmpty()) {
-			showcaseAcknowledgedListener.onShowCaseAcknowledged(showcaseView);
+		if (mViews.isEmpty()) {
+			mShowcaseAcknowledgedListener.onShowcaseAcknowledged(showcaseView);
 		} else {
 			show();
 		}
 	}
 
 	public void show() {
-		if (views.isEmpty()) {
+		if (mViews.isEmpty()) {
 			return;
 		}
-		final ShowcaseView view = views.get(0);
+		final ShowcaseView view = mViews.get(0);
 
-		boolean hasShot = activity.getSharedPreferences(ShowcaseView.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
+		boolean hasShot = mActivity.getSharedPreferences(ShowcaseView.PREFS_SHOWCASE_INTERNAL, Context.MODE_PRIVATE)
 				.getBoolean("hasShot" + view.getConfigOptions().showcaseId, false);
 		if (hasShot && view.getConfigOptions().shotType == ShowcaseView.TYPE_ONE_SHOT) {
 			// The showcase has already been shot once, so we don't need to do show it again.
 			view.setVisibility(View.GONE);
-			views.remove(0);
-			animations.remove(0);
+			mViews.remove(0);
+			mAnimations.remove(0);
 			view.getConfigOptions().fadeOutDuration = 0;
 			view.performButtonClick();
 			return;
 		}
 
 		view.setVisibility(View.INVISIBLE);
-		((ViewGroup) activity.getWindow().getDecorView()).addView(view);
+		((ViewGroup) mActivity.getWindow().getDecorView()).addView(view);
 		view.show();
 
-		float[] animation = animations.get(0);
+		float[] animation = mAnimations.get(0);
 		if (animation != null) {
 			view.animateGesture(animation[1], animation[2], animation[3], animation[4], animation[0] == ABSOLUTE_COORDINATES);
 		}
 
-		views.remove(0);
-		animations.remove(0);
+		mViews.remove(0);
+		mAnimations.remove(0);
 	}
 
 	public boolean hasViews(){
-		return !views.isEmpty();
+		return !mViews.isEmpty();
 	}
 
 	public static class ItemViewProperties {
 
+		public static final int ID_NOT_GIVEN = -42;
 		public static final int ID_NO_SHOWCASE = -2202;
 		public static final int ID_NOT_IN_ACTIONBAR = -1;
 		public static final int ID_SPINNER = 0;
@@ -165,56 +173,171 @@ public class ShowcaseViews {
 		public static final int ID_OVERFLOW = 2;
 		private static final float DEFAULT_SCALE = 1f;
 
-		protected final int titleResId;
-		protected final int messageResId;
-		protected final int id;
-		protected final int itemType;
-		protected final float scale;
-		protected final ShowcaseView.ConfigOptions configOptions;
+		protected final String mmTitle;
+		protected final int mmTitleResId;
+		protected final String mmMessage;
+		protected final int mmMessageResId;
+		protected final View mmView;
+		protected final int mmViewId;
+		protected final int mmItemType;
+		protected final float mmScale;
+		protected final ShowcaseView.ConfigOptions mmConfigOptions;
 
 		public ItemViewProperties(int titleResId, int messageResId) {
-			this(ID_NO_SHOWCASE, titleResId, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
+			this(null, ID_NO_SHOWCASE, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId) {
-			this(id, titleResId, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
+		public ItemViewProperties(String title, String message) {
+			this(null, ID_NO_SHOWCASE, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, float scale) {
-			this(id, titleResId, messageResId, ID_NOT_IN_ACTIONBAR, scale, null);
+		public ItemViewProperties(int viewId, int titleResId, int messageResId) {
+			this(null, viewId, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, int itemType) {
-			this(id, titleResId, messageResId, itemType, DEFAULT_SCALE, null);
+		public ItemViewProperties(View view, int titleResId, int messageResId) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, int itemType, float scale) {
-			this(id, titleResId, messageResId, itemType, scale, null);
+		public ItemViewProperties(int viewId, String title, String message) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
+		}
+
+		public ItemViewProperties(View view, String title, String message) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, null);
+		}
+
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, float scale) {
+			this(null, viewId, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, scale, null);
+		}
+
+		public ItemViewProperties(View view, int titleResId, int messageResId, float scale) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, scale, null);
+		}
+
+		public ItemViewProperties(int viewId, String title, String message, float scale) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, scale, null);
+		}
+
+		public ItemViewProperties(View view, String title, String message, float scale) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, scale, null);
+		}
+
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, int itemType) {
+			this(null, viewId, null, titleResId, null, messageResId, itemType, DEFAULT_SCALE, null);
+		}
+
+		public ItemViewProperties(View view, int titleResId, int messageResId, int itemType) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, itemType, DEFAULT_SCALE, null);
+		}
+
+		public ItemViewProperties(int viewId, String title, String message, int itemType) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, DEFAULT_SCALE, null);
+		}
+
+		public ItemViewProperties(View view, String title, String message, int itemType) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, DEFAULT_SCALE, null);
+		}
+
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, int itemType, float scale) {
+			this(null, viewId, null, titleResId, null, messageResId, itemType, scale, null);
+		}
+
+		public ItemViewProperties(View view, int titleResId, int messageResId, int itemType, float scale) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, itemType, scale, null);
+		}
+
+		public ItemViewProperties(int viewId, String title, String message, int itemType, float scale) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, scale, null);
+		}
+
+		public ItemViewProperties(View view, String title, String message, int itemType, float scale) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, scale, null);
 		}
 
 		public ItemViewProperties(int titleResId, int messageResId, ShowcaseView.ConfigOptions configOptions) {
-			this(ID_NO_SHOWCASE, titleResId, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
+			this(null, ID_NO_SHOWCASE, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, ShowcaseView.ConfigOptions configOptions) {
-			this(id, titleResId, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
+		public ItemViewProperties(String title, String message, ShowcaseView.ConfigOptions configOptions) {
+			this(null, ID_NO_SHOWCASE, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, float scale, ShowcaseView.ConfigOptions configOptions) {
-			this(id, titleResId, messageResId, ID_NOT_IN_ACTIONBAR, scale, configOptions);
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, int itemType, ShowcaseView.ConfigOptions configOptions) {
-			this(id, titleResId, messageResId, itemType, DEFAULT_SCALE, configOptions);
+		public ItemViewProperties(View view, int titleResId, int messageResId, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
 		}
 
-		public ItemViewProperties(int id, int titleResId, int messageResId, int itemType, float scale, ShowcaseView.ConfigOptions configOptions) {
-			this.id = id;
-			this.titleResId = titleResId;
-			this.messageResId = messageResId;
-			this.itemType = itemType;
-			this.scale = scale;
-			this.configOptions = configOptions;
+		public ItemViewProperties(int viewId, String title, String message, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
+		}
+
+		public ItemViewProperties(View view, String title, String message, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, DEFAULT_SCALE, configOptions);
+		}
+
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, scale, configOptions);
+		}
+
+		public ItemViewProperties(View view, int titleResId, int messageResId, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, ID_NOT_IN_ACTIONBAR, scale, configOptions);
+		}
+
+		public ItemViewProperties(int viewId, String title, String message, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, scale, configOptions);
+		}
+
+		public ItemViewProperties(View view, String title, String message, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, ID_NOT_IN_ACTIONBAR, scale, configOptions);
+		}
+
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, int itemType, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, null, titleResId, null, messageResId, itemType, DEFAULT_SCALE, configOptions);
+		}
+
+		public ItemViewProperties(View view, int titleResId, int messageResId, int itemType, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, itemType, DEFAULT_SCALE, configOptions);
+		}
+
+		public ItemViewProperties(int viewId, String title, String message, int itemType, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, DEFAULT_SCALE, configOptions);
+		}
+
+		public ItemViewProperties(View view, String title, String message, int itemType, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, DEFAULT_SCALE, configOptions);
+		}
+
+		public ItemViewProperties(int viewId, int titleResId, int messageResId, int itemType, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, null, titleResId, null, messageResId, itemType, scale, configOptions);
+		}
+
+		public ItemViewProperties(int viewId, String title, String message, int itemType, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(null, viewId, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, scale, configOptions);
+		}
+
+		public ItemViewProperties(View view, int titleResId, int messageResId, int itemType, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, null, titleResId, null, messageResId, itemType, scale, configOptions);
+		}
+
+		public ItemViewProperties(View view, String title, String message, int itemType, float scale, ShowcaseView.ConfigOptions configOptions) {
+			this(view, ID_NOT_GIVEN, title, ID_NOT_GIVEN, message, ID_NOT_GIVEN, itemType, scale, configOptions);
+		}
+
+		public ItemViewProperties(View view, int viewId, String title, int titleResId, String message, int messageResId,
+				int itemType, float scale, ShowcaseView.ConfigOptions configOptions) {
+			mmView = view;
+			mmViewId = viewId;
+			mmTitle = title;
+			mmTitleResId = titleResId;
+			mmMessage = message;
+			mmMessageResId = messageResId;
+			mmItemType = itemType;
+			mmScale = scale;
+			mmConfigOptions = configOptions;
 		}
 	}
 }

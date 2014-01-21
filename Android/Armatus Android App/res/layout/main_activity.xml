@@ -13,14 +13,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:text="Launch console"
+            android:text="Console"
+            android:textSize="50sp" />
+
+        <Button
+            android:id="@+id/tutorial_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/console_button"
+            android:text="Tutorial"
             android:textSize="50sp" />
 
         <TextView
             android:id="@+id/code_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/console_button"
+            android:layout_below="@+id/tutorial_button"
             android:paddingLeft="5dp"
             android:textColor="?attr/codeColor"
             tools:context=".MainActivity" />

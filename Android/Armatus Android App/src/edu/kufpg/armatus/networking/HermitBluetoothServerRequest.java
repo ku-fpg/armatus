@@ -108,7 +108,7 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
 	}
 
 	@Override
-	protected void onCancelled() {
+	protected void onCancelled(String error) {
 		super.onCancelled();
 		end();
 	}

@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -175,14 +178,14 @@ public class HermitClient implements Parcelable {
 			}
 
 			@Override
-			protected void onCancelled() {
+			protected void onCancelled(List<Completion> error) {
 				String newErrorMessage = getErrorMessage();
 				setErrorMessage(null);
 				if (newErrorMessage != null && getActivity() != null) {
 					getActivity().addErrorResponseEntry(newErrorMessage);
 				}
 
-				super.onCancelled();
+				super.onCancelled(error);
 			}
 
 			@Override
@@ -208,7 +211,7 @@ public class HermitClient implements Parcelable {
 				super.onPreExecute();
 
 				getActivity().setProgressBarVisibility(false);
-				showProgressDialog(getActivity(), "Connecting...");
+				showProgressDialog(getActivity(), this, "Connecting...");
 			}
 
 			@Override
@@ -222,7 +225,7 @@ public class HermitClient implements Parcelable {
 			@Override
 			protected void onActivityAttached() {
 				if (mProgress == null) {
-					showProgressDialog(getActivity(), "Connecting...");
+					showProgressDialog(getActivity(), this, "Connecting...");
 				}
 			}
 
@@ -237,8 +240,8 @@ public class HermitClient implements Parcelable {
 			}
 
 			@Override
-			protected void onCancelled() {
-				super.onCancelled();
+			protected void onCancelled(Token error) {
+				super.onCancelled(error);
 				dismissProgressDialog();
 			}
 
@@ -261,7 +264,7 @@ public class HermitClient implements Parcelable {
 				super.onPreExecute();
 
 				getActivity().setProgressBarVisibility(false);
-				showProgressDialog(getActivity(), "Fetching commands...");
+				showProgressDialog(getActivity(), this, "Fetching commands...");
 			}
 
 			@Override
@@ -275,7 +278,7 @@ public class HermitClient implements Parcelable {
 			@Override
 			protected void onActivityAttached() {
 				if (mProgress == null) {
-					showProgressDialog(getActivity(), "Fetching commands...");
+					showProgressDialog(getActivity(), this, "Fetching commands...");
 				}
 			}
 
@@ -302,8 +305,8 @@ public class HermitClient implements Parcelable {
 			}
 
 			@Override
-			protected void onCancelled() {
-				super.onCancelled();
+			protected void onCancelled(List<CommandInfo> error) {
+				super.onCancelled(error);
 				dismissProgressDialog();
 			}
 
@@ -371,14 +374,14 @@ public class HermitClient implements Parcelable {
 			}
 
 			@Override
-			protected void onCancelled() {
+			protected void onCancelled(Void error) {
 				String newErrorMessage = getErrorMessage();
 				setErrorMessage(null);
 				if (newErrorMessage != null && getActivity() != null) {
 					getActivity().addErrorResponseEntry(newErrorMessage);
 				}
 
-				super.onCancelled();
+				super.onCancelled(error);
 			}
 
 			@Override
@@ -414,14 +417,14 @@ public class HermitClient implements Parcelable {
 				}
 
 				@Override
-				protected void onCancelled() {
+				protected void onCancelled(CommandResponse error) {
 					String newErrorMessage = getErrorMessage();
 					setErrorMessage(null);
 					if (newErrorMessage != null && getActivity() != null) {
 						getActivity().addErrorResponseEntry(newErrorMessage);
 					}
 
-					super.onCancelled();
+					super.onCancelled(error);
 				}
 
 				@Override
@@ -600,11 +603,17 @@ public class HermitClient implements Parcelable {
 		mDelayedRequestName = RequestName.NULL;
 	}
 
-	private void showProgressDialog(Context context, String message) {
+	private void showProgressDialog(Context context, final AsyncTask<?,?,?> task, String message) {
 		mProgress = new ProgressDialog(context);
 		mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mProgress.setMessage(message);
-		mProgress.setCancelable(false);
+		mProgress.setCancelable(true);
+		mProgress.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				task.cancel(true);
+			}
+		});
 		mProgress.show();
 	}
 

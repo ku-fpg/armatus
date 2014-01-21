@@ -98,15 +98,17 @@ public class ConsoleActivity extends BaseActivity {
 	private static final String TYPEFACE_PATH = "fonts/DroidSansMonoDotted.ttf";
 
 	private HermitClient mHermitClient;
-	private RelativeLayout mConsoleListLayout, mConsoleInputLayout, mConsoleOptionsBar;
-	private ConsoleListView mConsoleListView;
+	protected RelativeLayout mConsoleListLayout;
+	private RelativeLayout mConsoleInputLayout, mConsoleOptionsBar;
+	protected ConsoleListView mConsoleListView;
 	private ConsoleEntryAdapter mConsoleListAdapter;
 	private ArrayList<ConsoleEntry> mConsoleEntries;
 	private ListView mCommandHistoryView;
 	private CommandHistoryAdapter mCommandHistoryAdapter;
 	private ArrayList<HistoryCommand> mCommandHistory;
-	private ExpandableListView mCommandExpandableMenuView;
+	protected ExpandableListView mCommandExpandableMenuView;
 	private CommandExpandableMenuAdapter mCommandExpandableMenuAdapter;
+	protected EditText mCommandExpandableSearchView;
 	private ConsoleWordSearcher mSearcher;
 	private CharSequence mMenuSearchConstraint;
 	private ConsoleEntry mNextConsoleEntry;
@@ -116,7 +118,7 @@ public class ConsoleActivity extends BaseActivity {
 	private ConsoleInputEditText mConsoleInputEditText;
 	private View mConsoleEmptySpace;
 	private EditText mSearchInputView;
-	private SlidingMenu mSlidingMenu;
+	protected SlidingMenu mSlidingMenu;
 	private String mTempCommand, mTempSearchInput, mPrevSearchCriterion;
 	private boolean mInputEnabled = true;
 	private boolean mSoftKeyboardVisible = true;
@@ -137,7 +139,7 @@ public class ConsoleActivity extends BaseActivity {
 		mSlidingMenu = (SlidingMenu) findViewById(R.id.console_sliding_menu);
 		mCommandHistoryView = (ListView) findViewById(R.id.command_history_list_view);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
-		final EditText commandExpandableMenuSearch = (EditText) findViewById(R.id.command_expandable_menu_search);
+		mCommandExpandableSearchView = (EditText) findViewById(R.id.command_expandable_menu_search);
 		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
 		mSearchMatches = (TextView) findViewById(R.id.console_search_matches_indicator);
 		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
@@ -343,15 +345,15 @@ public class ConsoleActivity extends BaseActivity {
 		});
 
 		//commandExpandableMenuSearch.setCompoundDrawable
-		commandExpandableMenuSearch.setOnEditorActionListener(new OnEditorActionListener() {
+		mCommandExpandableSearchView.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-					CharSequence constraint = commandExpandableMenuSearch.getText();
+					CharSequence constraint = mCommandExpandableSearchView.getText();
 					mMenuSearchConstraint = constraint.length() == 0 ? null : constraint;
 					mCommandExpandableMenuAdapter.getFilter().filter(mMenuSearchConstraint);
-					commandExpandableMenuSearch.clearFocus();
+					mCommandExpandableSearchView.clearFocus();
 					mConsoleInputEditText.requestFocus();
 					return true;
 				}

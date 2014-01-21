@@ -65,14 +65,14 @@ implements View.OnClickListener, View.OnTouchListener {
 	public static final int INNER_CIRCLE_RADIUS = 94;
 	private static final Interpolator INTERPOLATOR = new AccelerateDecelerateInterpolator();
 
-	private int showcaseX = -1;
-	private int showcaseY = -1;
-	private float showcaseRadius = -1;
-	private float metricScale = 1.0f;
+	private int mShowcaseX = -1;
+	private int mShowcaseY = -1;
+	private float mShowcaseRadius = -1;
+	private float mMetricScale = 1.0f;
 	//    private float legacyShowcaseX = -1;
 	//    private float legacyShowcaseY = -1;
-	private boolean isRedundant = false;
-	private boolean hasCustomClickListener = false;
+	private boolean mIsRedundant = false;
+	private boolean mHasCustomClickListener = false;
 	private ConfigOptions mOptions;
 	private int mBackgroundColor;
 	private View mHandy;
@@ -80,9 +80,9 @@ implements View.OnClickListener, View.OnTouchListener {
 	OnShowcaseEventListener mEventListener = OnShowcaseEventListener.NONE;
 	private boolean mAlteredText = false;
 
-	private final String buttonText;
+	private final String mButtonText;
 
-	private float scaleMultiplier = 1f;
+	private float mScaleMultiplier = 1f;
 	private TextDrawer mTextDrawer;
 	private ClingDrawer mShowcaseDrawer;
 
@@ -118,16 +118,16 @@ implements View.OnClickListener, View.OnTouchListener {
 				.getResourceId(R.styleable.ShowcaseView_sv_detailTextAppearance,
 						R.style.TextAppearance_ShowcaseView_Detail);
 
-		buttonText = styled.getString(R.styleable.ShowcaseView_sv_buttonText);
+		mButtonText = styled.getString(R.styleable.ShowcaseView_sv_buttonText);
 		styled.recycle();
 
-		metricScale = getContext().getResources().getDisplayMetrics().density;
+		mMetricScale = getContext().getResources().getDisplayMetrics().density;
 		mEndButton = (Button) LayoutInflater.from(context).inflate(R.layout.showcase_button, null);
 
 		mShowcaseDrawer = new ClingDrawerImpl(getResources(), showcaseColor);
 
 		// TODO: This isn't ideal, ClingDrawer and Calculator interfaces should be separate
-		mTextDrawer = new TextDrawerImpl(metricScale, mShowcaseDrawer);
+		mTextDrawer = new TextDrawerImpl(mMetricScale, mShowcaseDrawer);
 		mTextDrawer.setTitleStyling(context, titleTextAppearance);
 		mTextDrawer.setDetailStyling(context, detailTextAppearance);
 
@@ -147,11 +147,11 @@ implements View.OnClickListener, View.OnTouchListener {
 		if (hasShot && mOptions.shotType == TYPE_ONE_SHOT) {
 			// The showcase has already been shot once, so we don't need to do anything
 			setVisibility(View.GONE);
-			isRedundant = true;
+			mIsRedundant = true;
 			return;
 		}
 
-		showcaseRadius = metricScale * INNER_CIRCLE_RADIUS;
+		mShowcaseRadius = mMetricScale * INNER_CIRCLE_RADIUS;
 		setOnTouchListener(this);
 
 		if (!mOptions.noButton && mEndButton.getParent() == null) {
@@ -160,13 +160,13 @@ implements View.OnClickListener, View.OnTouchListener {
 				lps = (LayoutParams) generateDefaultLayoutParams();
 				lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 				lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				int margin = ((Number) (metricScale * 12)).intValue();
+				int margin = ((Number) (mMetricScale * 12)).intValue();
 				lps.setMargins(margin, margin, margin, margin);
 			}
 			mEndButton.setLayoutParams(lps);
 			mEndButton.setText(
-					buttonText != null ? buttonText : getResources().getString(R.string.ok));
-			if (!hasCustomClickListener) {
+					mButtonText != null ? mButtonText : getResources().getString(R.string.ok));
+			if (!mHasCustomClickListener) {
 				mEndButton.setOnClickListener(this);
 			}
 			addView(mEndButton);
@@ -190,11 +190,11 @@ implements View.OnClickListener, View.OnTouchListener {
 	 */
 	@Deprecated
 	public void setShowcaseView(final View view) {
-		if (isRedundant || view == null) {
-			isRedundant = true;
+		if (mIsRedundant || view == null) {
+			mIsRedundant = true;
 			return;
 		}
-		isRedundant = false;
+		mIsRedundant = false;
 
 		view.post(new Runnable() {
 			@Override
@@ -224,11 +224,11 @@ implements View.OnClickListener, View.OnTouchListener {
 	 */
 	@Deprecated
 	public void setShowcasePosition(int x, int y) {
-		if (isRedundant) {
+		if (mIsRedundant) {
 			return;
 		}
-		showcaseX = x;
-		showcaseY = y;
+		mShowcaseX = x;
+		mShowcaseY = y;
 		//init();
 		invalidate();
 	}
@@ -261,23 +261,23 @@ implements View.OnClickListener, View.OnTouchListener {
 	}
 
 	public boolean hasShowcaseView() {
-		return (showcaseX != 1000000 && showcaseY != 1000000) || !mHasNoTarget;
+		return (mShowcaseX != 1000000 && mShowcaseY != 1000000) || !mHasNoTarget;
 	}
 
 	public void setShowcaseX(int x) {
-		setShowcasePosition(x, showcaseY);
+		setShowcasePosition(x, mShowcaseY);
 	}
 
 	public void setShowcaseY(int y) {
-		setShowcasePosition(showcaseX, y);
+		setShowcasePosition(mShowcaseX, y);
 	}
 
 	public int getShowcaseX() {
-		return showcaseX;
+		return mShowcaseX;
 	}
 
 	public int getShowcaseY() {
-		return showcaseY;
+		return mShowcaseY;
 	}
 
 	public void setShowcaseItem(final int itemType, final int actionItemId,
@@ -337,14 +337,14 @@ implements View.OnClickListener, View.OnTouchListener {
 	 *
 	 * @param listener Listener to listen to on click events
 	 */
-	public void overrideButtonClick(OnClickListener listener) {
-		if (isRedundant) {
+	public void setOnButtonClickListener(OnClickListener listener) {
+		if (mIsRedundant) {
 			return;
 		}
 		if (mEndButton != null) {
 			mEndButton.setOnClickListener(listener != null ? listener : this);
 		}
-		hasCustomClickListener = true;
+		mHasCustomClickListener = true;
 	}
 
 	protected void performButtonClick() {
@@ -390,18 +390,18 @@ implements View.OnClickListener, View.OnTouchListener {
 
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
-		if (showcaseX < 0 || showcaseY < 0 || isRedundant) {
+		if (mShowcaseX < 0 || mShowcaseY < 0 || mIsRedundant) {
 			super.dispatchDraw(canvas);
 			return;
 		}
 
-		boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(showcaseX, showcaseY);
+		boolean recalculatedCling = mShowcaseDrawer.calculateShowcaseRect(mShowcaseX, mShowcaseY);
 		boolean recalculateText = recalculatedCling || mAlteredText;
 		mAlteredText = false;
 
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB && !mHasNoTarget) {
 			Path path = new Path();
-			path.addCircle(showcaseX, showcaseY, showcaseRadius, Path.Direction.CW);
+			path.addCircle(mShowcaseX, mShowcaseY, mShowcaseRadius, Path.Direction.CW);
 			canvas.clipPath(path, Op.DIFFERENCE);
 		}
 
@@ -410,7 +410,7 @@ implements View.OnClickListener, View.OnTouchListener {
 
 		// Draw the showcase drawable
 		if (!mHasNoTarget) {
-			mShowcaseDrawer.drawShowcase(canvas, showcaseX, showcaseY, scaleMultiplier, showcaseRadius);
+			mShowcaseDrawer.drawShowcase(canvas, mShowcaseX, mShowcaseY, mScaleMultiplier, mShowcaseRadius);
 		}
 
 		// Draw the text on the screen, recalculating its position if necessary
@@ -460,8 +460,8 @@ implements View.OnClickListener, View.OnTouchListener {
 
 	private void moveHand(float startX, float startY, float endX,
 			float endY, boolean absoluteCoordinates, AnimationEndListener listener) {
-		AnimationUtils.createMovementAnimation(mHandy, absoluteCoordinates?0:showcaseX,
-				absoluteCoordinates?0:showcaseY,
+		AnimationUtils.createMovementAnimation(mHandy, absoluteCoordinates?0:mShowcaseX,
+				absoluteCoordinates?0:mShowcaseY,
 						startX, startY,
 						endX, endY,
 						listener).start();
@@ -529,17 +529,17 @@ implements View.OnClickListener, View.OnTouchListener {
 	@Override
 	public boolean onTouch(View view, MotionEvent motionEvent) {
 
-		float xDelta = Math.abs(motionEvent.getRawX() - showcaseX);
-		float yDelta = Math.abs(motionEvent.getRawY() - showcaseY);
+		float xDelta = Math.abs(motionEvent.getRawX() - mShowcaseX);
+		float yDelta = Math.abs(motionEvent.getRawY() - mShowcaseY);
 		double distanceFromFocus = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
 
 		if (MotionEvent.ACTION_UP == motionEvent.getAction() &&
-				mOptions.hideOnClickOutside && distanceFromFocus > showcaseRadius) {
+				mOptions.hideOnClickOutside && distanceFromFocus > mShowcaseRadius) {
 			this.hide();
 			return true;
 		}
 
-		return mOptions.block && distanceFromFocus > showcaseRadius;
+		return mOptions.block && distanceFromFocus > mShowcaseRadius;
 	}
 
 	/**
@@ -911,11 +911,11 @@ implements View.OnClickListener, View.OnTouchListener {
 	}
 
 	public float getScaleMultiplier() {
-		return scaleMultiplier;
+		return mScaleMultiplier;
 	}
 
 	public void setScaleMultiplier(float scaleMultiplier) {
-		this.scaleMultiplier = scaleMultiplier;
+		this.mScaleMultiplier = scaleMultiplier;
 	}
 
 }

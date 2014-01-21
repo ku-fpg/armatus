@@ -124,8 +124,8 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 	}
 
 	@Override
-	protected void onCancelled() {
-		super.onCancelled();
+	protected void onCancelled(Result error) {
+		super.onCancelled(error);
 
 		if (mErrorMessage != null && getActivity() != null) {
 			getActivity().appendErrorResponse(mErrorMessage);
