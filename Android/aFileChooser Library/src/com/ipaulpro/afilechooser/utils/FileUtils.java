@@ -214,10 +214,16 @@ public class FileUtils {
 				int column_index = cursor
 						.getColumnIndexOrThrow("_data");
 				if (cursor.moveToFirst()) {
-					return cursor.getString(column_index);
+					String ci = cursor.getString(column_index);
+					cursor.close();
+					return ci;
 				}
 			} catch (Exception e) {
 				// Eat it
+			}
+			
+			if (cursor != null) {
+				cursor.close();
 			}
 		}
 
@@ -276,6 +282,7 @@ public class FileUtils {
 		} catch (Exception e) {
 			if(DEBUG) Log.e(TAG, "getMimeTypes", e);
 		}
+		in.close();
 		return mimeTypes;
 	} 
 

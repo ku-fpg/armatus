@@ -54,9 +54,8 @@ public class JsonUtils {
 	 * @throws FileNotFoundException if {@code path} does not exist.
 	 */
 	public static String openTextFile(String path) throws FileNotFoundException {
-		BufferedReader br = null;
 		try {
-			br = new BufferedReader(new FileReader(path));
+			BufferedReader br = new BufferedReader(new FileReader(path));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 

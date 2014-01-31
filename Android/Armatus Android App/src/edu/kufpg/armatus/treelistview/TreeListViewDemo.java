@@ -1,6 +1,5 @@
 package edu.kufpg.armatus.treelistview;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.util.BundleUtils;
@@ -31,7 +29,7 @@ public class TreeListViewDemo extends BaseActivity {
 	private static final String TAG = TreeListViewDemo.class.getSimpleName();
 	private static final boolean DEBUG = false;
 
-	private enum TreeType implements Serializable { SIMPLE,	FANCY };
+	private enum TreeType { SIMPLE,	FANCY }
 	private final Set<Long> mSelected = new HashSet<Long>();
 	private TreeListView mTreeView;
 	private static final int[] DEMO_NODES = new int[] { 0, 0, 1, 1, 1, 2, 2, 1,

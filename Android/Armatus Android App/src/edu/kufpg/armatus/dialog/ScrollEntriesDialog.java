@@ -43,7 +43,7 @@ public class ScrollEntriesDialog extends ConsiderateDialog {
 		setCancelable(true);
 		
 		final NumberPicker picker = (NumberPicker) v.findViewById(R.id.console_scroll_entries_picker);
-		picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+		picker.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 		picker.setMinValue(0);
 		picker.setMaxValue(mEntries.length - 1);
 		picker.setDisplayedValues(mEntries);

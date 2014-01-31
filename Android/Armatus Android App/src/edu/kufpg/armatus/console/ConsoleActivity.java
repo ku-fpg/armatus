@@ -140,7 +140,7 @@ public class ConsoleActivity extends BaseActivity {
 		mCommandHistoryView = (ListView) findViewById(R.id.command_history_list_view);
 		mCommandExpandableMenuView = (ExpandableListView) findViewById(R.id.command_expandable_menu);
 		mCommandExpandableSearchView = (EditText) findViewById(R.id.command_expandable_menu_search);
-		mConsoleEmptySpace = (View) findViewById(R.id.console_empty_space);
+		mConsoleEmptySpace = findViewById(R.id.console_empty_space);
 		mSearchMatches = (TextView) findViewById(R.id.console_search_matches_indicator);
 		final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
 		mConsoleInputLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.console_input, null);
@@ -160,7 +160,7 @@ public class ConsoleActivity extends BaseActivity {
 			mCommandHistory = new ArrayList<HistoryCommand>();
 			mConsoleEntries = new ArrayList<ConsoleEntry>();
 			mConsoleInputLayout.setLayoutParams(new AbsListView.LayoutParams(
-					AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
+					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			mConsoleInputEditText.requestFocus();
 			mHermitClient = new HermitClient(this);
 			mUserInputHistory = new ArrayList<String>();
@@ -1146,6 +1146,6 @@ public class ConsoleActivity extends BaseActivity {
 		mConsoleInputEditText.setIndent(width - padding);
 	}
 
-	private enum SearchAction { BEGIN, CONTINUE, RESUME, END };
+	private enum SearchAction { BEGIN, CONTINUE, RESUME, END }
 
 }

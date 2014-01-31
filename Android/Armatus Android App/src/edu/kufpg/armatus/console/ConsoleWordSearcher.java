@@ -355,6 +355,6 @@ public class ConsoleWordSearcher implements Parcelable {
 		 * If there is none, search for the last offset in the next-lowest {@link
 		 * android.widget.ListView ListView} index. If there is none, wrap around to the
 		 * very last match.  */
-		PREVIOUS };
+		PREVIOUS }
 
 }

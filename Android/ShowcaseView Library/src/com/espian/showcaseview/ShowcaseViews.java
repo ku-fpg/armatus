@@ -95,7 +95,7 @@ public class ShowcaseViews {
 		mAnimations.add(viewIndex, new float[]{absoluteCoordinates?ABSOLUTE_COORDINATES:RELATIVE_COORDINATES, startX, startY, endX, endY});
 	}
 
-	private boolean showcaseActionBar(ItemViewProperties properties) {
+	private static boolean showcaseActionBar(ItemViewProperties properties) {
 		return properties.mmItemType > ItemViewProperties.ID_NOT_IN_ACTIONBAR;
 	}
 

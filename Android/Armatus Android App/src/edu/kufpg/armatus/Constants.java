@@ -13,7 +13,7 @@ public final class Constants {
 	public static String PACKAGE_NAME;
 	
 	/** The current device's manufacturer and product name. */
-	public static String DEVICE_NAME = Build.MANUFACTURER + " " + Build.PRODUCT;;
+	public static String DEVICE_NAME = Build.MANUFACTURER + " " + Build.PRODUCT;
 	
 	private Constants() {}
 	

@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ListView;
@@ -20,7 +21,7 @@ public class ListViewDragEdges extends RelativeLayout {
 	private static final int EDGE_HEIGHT = 20;
 	private ListView mListView;
 	private DragEdge mTopEdge, mBottomEdge;
-	private LayoutParams mTopParams, mBottomParams;
+	private RelativeLayout.LayoutParams mTopParams, mBottomParams;
 
 	/**
 	 * List View Drag Edges Function
@@ -104,8 +105,8 @@ public class ListViewDragEdges extends RelativeLayout {
 				}
 			}
 		};
-		mTopParams = new LayoutParams(LayoutParams.MATCH_PARENT, EDGE_HEIGHT);
-		mBottomParams = new LayoutParams(LayoutParams.MATCH_PARENT, EDGE_HEIGHT);
+		mTopParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, EDGE_HEIGHT);
+		mBottomParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, EDGE_HEIGHT);
 	}
 	
 	@Override

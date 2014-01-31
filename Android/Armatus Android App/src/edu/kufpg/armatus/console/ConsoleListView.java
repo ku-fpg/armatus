@@ -219,7 +219,7 @@ public class ConsoleListView extends ExpandableListView {
 				if (prevCheckedStates.size() == 1) {
 					int selState = prevCheckedStates.first();
 					int groupPos = Views.getGroupPosition(mListView, selState);
-					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
+					ConsoleEntry entry = mConsole.getEntry(groupPos);
 					if (entry.getShortContents().toString().split(StringUtils.WHITESPACE).length > 1) {
 						mConsole.showKeywordSwapDialog(entry.getEntryNum(), entry.getShortContents().toString());
 					}
@@ -230,7 +230,7 @@ public class ConsoleListView extends ExpandableListView {
 				if (prevCheckedStates.size() == 1) {
 					int selState = prevCheckedStates.first();
 					int groupPos = Views.getGroupPosition(mListView, selState);
-					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
+					ConsoleEntry entry = mConsole.getEntry(groupPos);
 					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
 						Intent intent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity.class);
 						mConsole.startActivity(intent);
@@ -242,7 +242,7 @@ public class ConsoleListView extends ExpandableListView {
 				if (prevCheckedStates.size() == 1) {
 					int selState = prevCheckedStates.first();
 					int groupPos = Views.getGroupPosition(mListView, selState);
-					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
+					ConsoleEntry entry = mConsole.getEntry(groupPos);
 					if (entry.getCommandResponse() != null && entry.getCommandResponse().getGlyphs() != null) {
 						Intent intent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntrySelectionActivity2.class);
 						mConsole.startActivity(intent);
@@ -254,7 +254,7 @@ public class ConsoleListView extends ExpandableListView {
 				if (prevCheckedStates.size() == 1) {
 					int selState = prevCheckedStates.first();
 					int groupPos = Views.getGroupPosition(mListView, selState);
-					ConsoleEntry entry = (ConsoleEntry) mConsole.getEntry(groupPos);
+					ConsoleEntry entry = mConsole.getEntry(groupPos);
 					Intent scopeIntent = new ConsoleEntryIntent(entry, mConsole, ConsoleEntryScopeActivity.class);
 					mConsole.startActivity(scopeIntent);
 					mode.finish();

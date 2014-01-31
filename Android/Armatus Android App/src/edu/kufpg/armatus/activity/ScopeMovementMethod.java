@@ -3,6 +3,7 @@ package edu.kufpg.armatus.activity;
 import android.text.Layout;
 import android.text.NoCopySpan;
 import android.text.Spannable;
+import android.text.Spanned;
 import android.text.method.MovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
@@ -54,7 +55,7 @@ public class ScopeMovementMethod extends ScrollingMovementMethod {
     @Override
     public void onTakeFocus(TextView view, Spannable text, int dir) {
         if ((dir & View.FOCUS_BACKWARD) != 0) {
-            text.setSpan(FROM_BELOW, 0, 0, Spannable.SPAN_POINT_POINT);
+            text.setSpan(FROM_BELOW, 0, 0, Spanned.SPAN_POINT_POINT);
         } else {
             text.removeSpan(FROM_BELOW);
         }

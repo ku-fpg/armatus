@@ -93,7 +93,7 @@ public class PrefsActivity extends PreferenceActivity {
 			setHistoryDirPrefSummary(Prefs.isHistoryDirCustom(getActivity()));
 			mAppThemePref = (ListPreference) findPreference(Prefs.APP_THEME_KEY);
 			mNetworkSourcePref = (ListPreference) findPreference(Prefs.NETWORK_SOURCE_KEY);
-			mChooseBluetoothDevicePref = (Preference) findPreference(Prefs.CHOOSE_BLUETOOTH_DEVICE_KEY);
+			mChooseBluetoothDevicePref = findPreference(Prefs.CHOOSE_BLUETOOTH_DEVICE_KEY);
 			setChooseBluetoothDevicePrefSummary(Prefs.getBluetoothDeviceName(getActivity()), Prefs.getBluetoothDeviceAddress(getActivity()));
 			if (Prefs.getNetworkSource(getActivity()).equals(NetworkSource.WEB_SERVER)) {
 				mChooseBluetoothDevicePref.setEnabled(false);

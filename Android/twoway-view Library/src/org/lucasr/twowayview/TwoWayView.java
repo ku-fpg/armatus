@@ -135,7 +135,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	public static enum Orientation {
 		HORIZONTAL,
 		VERTICAL;
-	};
+	}
 
 	private ListAdapter mAdapter;
 
@@ -2925,7 +2925,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	 }
 
 	 @TargetApi(9)
-	 private int getScaledOverscrollDistance(ViewConfiguration vc) {
+	 private static int getScaledOverscrollDistance(ViewConfiguration vc) {
 		 if (Build.VERSION.SDK_INT < 9) {
 			 return 0;
 		 }
@@ -4495,7 +4495,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  }
 
 	  private int getChildWidthMeasureSpec(LayoutParams lp) {
-		  if (!mIsVertical && lp.width == LayoutParams.WRAP_CONTENT) {
+		  if (!mIsVertical && lp.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
 			  return MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
 		  } else if (mIsVertical) {
 			  final int maxWidth = getWidth() - getPaddingLeft() - getPaddingRight();
@@ -4506,7 +4506,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  }
 
 	  private int getChildHeightMeasureSpec(LayoutParams lp) {
-		  if (mIsVertical && lp.height == LayoutParams.WRAP_CONTENT) {
+		  if (mIsVertical && lp.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
 			  return MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
 		  } else if (!mIsVertical) {
 			  final int maxHeight = getHeight() - getPaddingTop() - getPaddingBottom();
@@ -5430,7 +5430,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 		  }
 	  }
 
-	  private ContextMenuInfo createContextMenuInfo(View view, int position, long id) {
+	  private static ContextMenuInfo createContextMenuInfo(View view, int position, long id) {
 		  return new AdapterContextMenuInfo(view, position, id);
 	  }
 
@@ -5529,9 +5529,9 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  @Override
 	  protected LayoutParams generateDefaultLayoutParams() {
 		  if (mIsVertical) {
-			  return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			  return new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 		  } else {
-			  return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+			  return new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		  }
 	  }
 

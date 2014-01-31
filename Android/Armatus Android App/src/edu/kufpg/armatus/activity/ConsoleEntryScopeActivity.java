@@ -11,6 +11,7 @@ import android.os.Parcel;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
@@ -84,7 +85,7 @@ public class ConsoleEntryScopeActivity extends ConsoleEntryActivity {
 					mSpanChildrenMap.put(parent, span);
 				}
 
-				spans.setSpan(span, index, Math.min(length, endIndex - 1), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+				spans.setSpan(span, index, Math.min(length, endIndex - 1), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 				index = endIndex - 1;
 			}
 			mSpans = spans;

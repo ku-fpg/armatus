@@ -619,7 +619,7 @@ public class HermitClient implements Parcelable {
 
 	private enum RequestName {
 		COMMAND, COMMANDS, COMPLETE, CONNECT, HISTORY, NULL
-	};
+	}
 
 	public static final Parcelable.Creator<HermitClient> CREATOR
 	= new Parcelable.Creator<HermitClient>() {

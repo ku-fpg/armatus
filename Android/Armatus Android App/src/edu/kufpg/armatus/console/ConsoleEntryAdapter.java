@@ -142,7 +142,7 @@ public class ConsoleEntryAdapter extends BaseExpandableListAdapter {
 	 * Strips any spans used to color {@link TextView} words during a console search.
 	 * @param tv The {@code TextView} from which to remove all highlighting.
 	 */
-	private void removeHighlight(TextView tv) {
+	private static void removeHighlight(TextView tv) {
 		Spannable noHighlight = new SpannableString(tv.getText());
 		CharacterStyle[] matchBackgrounds = noHighlight.getSpans(0, noHighlight.length(), MatchBackgroundSpan.class);
 		for (CharacterStyle span : matchBackgrounds) {
@@ -162,7 +162,7 @@ public class ConsoleEntryAdapter extends BaseExpandableListAdapter {
 	 * @param end The ending index (exclusive) for {@code spans}.
 	 * @param spans The series of {@link CharacterStyle}s to apply to {@code spannable}.
 	 */
-	private void setSpans(Spannable spannable, int start, int end, CharacterStyle... spans) {
+	private static void setSpans(Spannable spannable, int start, int end, CharacterStyle... spans) {
 		for (CharacterStyle span : spans) {
 			spannable.setSpan(span, start, end, 0);
 		}

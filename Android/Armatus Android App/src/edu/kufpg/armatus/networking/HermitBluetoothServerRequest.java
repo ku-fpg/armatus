@@ -32,6 +32,7 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
 		mSocket = BluetoothUtils.getBluetoothSocket(getActivity());
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	protected String doInBackground(String... params) {
 		if (mSocket != null && mDevice != null && mAdapter != null) {

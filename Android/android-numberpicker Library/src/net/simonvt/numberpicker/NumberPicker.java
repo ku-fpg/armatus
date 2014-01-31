@@ -16,6 +16,7 @@
 
 package net.simonvt.numberpicker;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -59,7 +60,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1439,6 +1439,7 @@ public class NumberPicker extends LinearLayout {
 		return TOP_AND_BOTTOM_FADING_EDGE_STRENGTH;
 	}
 
+	@SuppressLint("MissingSuperCall")
 	@Override
 	protected void onDetachedFromWindow() {
 		removeAllCallbacks();
@@ -1538,7 +1539,7 @@ public class NumberPicker extends LinearLayout {
 	 * @param maxSize The max value for the size.
 	 * @return A measure spec greedily imposing the max size.
 	 */
-	private int makeMeasureSpec(int measureSpec, int maxSize) {
+	private static int makeMeasureSpec(int measureSpec, int maxSize) {
 		if (maxSize == SIZE_UNSPECIFIED) {
 			return measureSpec;
 		}
@@ -1566,7 +1567,7 @@ public class NumberPicker extends LinearLayout {
 	 * @param measureSpec The current measure spec.
 	 * @return The resolved size and state.
 	 */
-	private int resolveSizeAndStateRespectingMinSize(
+	private static int resolveSizeAndStateRespectingMinSize(
 			int minSize, int measuredSize, int measureSpec) {
 		if (minSize != SIZE_UNSPECIFIED) {
 			final int desiredWidth = Math.max(minSize, measuredSize);

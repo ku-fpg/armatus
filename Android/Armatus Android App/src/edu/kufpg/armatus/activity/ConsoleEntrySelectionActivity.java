@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -69,8 +71,8 @@ public class ConsoleEntrySelectionActivity extends ConsoleEntryActivity {
 				drawable.setTypeface(ConsoleActivity.TYPEFACE);
 				drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
 
-				ImageSpan imageSpan = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
-				selectableSpans.setSpan(imageSpan, index, index + contents.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+				ImageSpan imageSpan = new ImageSpan(drawable, DynamicDrawableSpan.ALIGN_BASELINE);
+				selectableSpans.setSpan(imageSpan, index, index + contents.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
 				index += contents.length();
 			}

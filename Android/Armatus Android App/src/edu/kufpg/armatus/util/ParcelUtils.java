@@ -1716,6 +1716,6 @@ public class ParcelUtils {
 		}
 	}
 
-	private static enum YesNoMaybe { YES, MAYBE, NO };
+	private static enum YesNoMaybe { YES, MAYBE, NO }
 
 }

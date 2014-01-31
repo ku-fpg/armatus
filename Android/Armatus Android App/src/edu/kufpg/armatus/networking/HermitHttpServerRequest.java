@@ -159,6 +159,6 @@ public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<
 		mErrorMessage = message;
 	}
 
-	public enum HttpRequest { GET, POST };
+	public enum HttpRequest { GET, POST }
 
 }

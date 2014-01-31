@@ -207,6 +207,7 @@ public final class BluetoothUtils {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	public static boolean isBluetoothConnected(Context context) {
 		BluetoothAdapter adapter = getBluetoothAdapter(context);
 		if (adapter != null) {
