@@ -66,6 +66,7 @@ public class ClingDrawerImpl implements ClingDrawer {
 	 *
 	 * @return true if voidedArea has changed, false otherwise.
 	 */
+	@Override
 	public boolean calculateShowcaseRect(float x, float y) {
 
 		if (mShowcaseRect == null) {

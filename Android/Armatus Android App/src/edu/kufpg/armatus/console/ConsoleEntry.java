@@ -219,6 +219,7 @@ public class ConsoleEntry implements Parcelable {
 
 	public static final Parcelable.Creator<ConsoleEntry> CREATOR
 	= new Parcelable.Creator<ConsoleEntry>() {
+		@Override
 		public ConsoleEntry createFromParcel(Parcel in) {
 			int entryNum = in.readInt();
 			int ast = in.readInt();
@@ -230,6 +231,7 @@ public class ConsoleEntry implements Parcelable {
 			return new ConsoleEntry(entryNum, ast, userInput, commandResponse, errorResponse, shortContents, contentLines);
 		}
 
+		@Override
 		public ConsoleEntry[] newArray(int size) {
 			return new ConsoleEntry[size];
 		}

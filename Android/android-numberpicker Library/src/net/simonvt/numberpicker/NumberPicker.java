@@ -178,6 +178,7 @@ public class NumberPicker extends LinearLayout {
 			mZeroDigit = getZeroDigit(locale);
 		}
 
+		@Override
 		public String format(int value) {
 			final Locale currentLocale = Locale.getDefault();
 			if (mZeroDigit != getZeroDigit(currentLocale)) {
@@ -640,6 +641,7 @@ public class NumberPicker extends LinearLayout {
 		inflater.inflate(layoutResId, this, true);
 
 		OnClickListener onClickListener = new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				hideSoftInput();
 				mInputText.clearFocus();
@@ -652,6 +654,7 @@ public class NumberPicker extends LinearLayout {
 		};
 
 		OnLongClickListener onLongClickListener = new OnLongClickListener() {
+			@Override
 			public boolean onLongClick(View v) {
 				hideSoftInput();
 				mInputText.clearFocus();
@@ -686,6 +689,7 @@ public class NumberPicker extends LinearLayout {
 		mInputText = (EditText) findViewById(R.id.np__numberpicker_input);
 		mInputText.setEllipsize(TruncateAt.END);
 		mInputText.setOnFocusChangeListener(new OnFocusChangeListener() {
+			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (hasFocus) {
 					mInputText.selectAll();
@@ -2020,6 +2024,7 @@ public class NumberPicker extends LinearLayout {
 
 		// XXX This doesn't allow for range limits when controlled by a
 		// soft input method!
+		@Override
 		public int getInputType() {
 			return InputType.TYPE_CLASS_TEXT;
 		}
@@ -2182,6 +2187,7 @@ public class NumberPicker extends LinearLayout {
 
 		private int mSelectionEnd;
 
+		@Override
 		public void run() {
 			mInputText.setSelection(mSelectionStart, mSelectionEnd);
 		}
@@ -2708,10 +2714,12 @@ public class NumberPicker extends LinearLayout {
 
 		public static final Parcelable.Creator<SavedState> CREATOR
 		= new Parcelable.Creator<SavedState>() {
+			@Override
 			public SavedState createFromParcel(Parcel in) {
 				return new SavedState(in);
 			}
 
+			@Override
 			public SavedState[] newArray(int size) {
 				return new SavedState[size];
 			}

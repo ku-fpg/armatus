@@ -63,7 +63,7 @@ public class GestureDialog extends ConsiderateDialog implements OnGesturePerform
 		return new AlertDialog.Builder(getActivity())
 		.setView(mGestureView)
 		.setNegativeButton("Never mind", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {}
+			@Override public void onClick(DialogInterface dialog, int whichButton) {}
 		}).create();
 	}
 

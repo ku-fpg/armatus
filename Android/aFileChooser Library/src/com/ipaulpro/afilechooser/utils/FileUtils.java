@@ -393,6 +393,7 @@ public class FileUtils {
 	 * @author paulburke
 	 */
 	private static Comparator<File> mComparator = new Comparator<File>() {
+		@Override
 		public int compare(File f1, File f2) {
 			// Sort alphabetically by lower case, which is much cleaner
 			return f1.getName().toLowerCase(Locale.US).compareTo(
@@ -406,6 +407,7 @@ public class FileUtils {
 	 * @author paulburke
 	 */
 	private static FileFilter mFileFilter = new FileFilter() {
+		@Override
 		public boolean accept(File file) {
 			final String fileName = file.getName();
 			// Return files only (not directories) and skip hidden files
@@ -419,6 +421,7 @@ public class FileUtils {
 	 * @author paulburke
 	 */
 	private static FileFilter mDirFilter = new FileFilter() {
+		@Override
 		public boolean accept(File file) {
 			final String fileName = file.getName();
 			// Return directories only and skip hidden directories

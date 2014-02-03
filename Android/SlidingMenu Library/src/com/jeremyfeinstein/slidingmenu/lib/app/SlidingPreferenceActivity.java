@@ -79,6 +79,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#setBehindContentView(int)
 	 */
+	@Override
 	public void setBehindContentView(int id) {
 		setBehindContentView(getLayoutInflater().inflate(id, null));
 	}
@@ -86,6 +87,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#setBehindContentView(android.view.View)
 	 */
+	@Override
 	public void setBehindContentView(View v) {
 		setBehindContentView(v, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 	}
@@ -93,6 +95,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#setBehindContentView(android.view.View, android.view.ViewGroup.LayoutParams)
 	 */
+	@Override
 	public void setBehindContentView(View v, LayoutParams params) {
 		mHelper.setBehindContentView(v, params);
 	}
@@ -100,6 +103,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#getSlidingMenu()
 	 */
+	@Override
 	public SlidingMenu getSlidingMenu() {
 		return mHelper.getSlidingMenu();
 	}
@@ -107,6 +111,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#toggle()
 	 */
+	@Override
 	public void toggle() {
 		mHelper.toggle();
 	}
@@ -114,6 +119,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#showAbove()
 	 */
+	@Override
 	public void showContent() {
 		mHelper.showContent();
 	}
@@ -121,6 +127,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#showBehind()
 	 */
+	@Override
 	public void showMenu() {
 		mHelper.showMenu();
 	}
@@ -128,6 +135,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#showSecondaryMenu()
 	 */
+	@Override
 	public void showSecondaryMenu() {
 		mHelper.showSecondaryMenu();
 	}
@@ -135,6 +143,7 @@ public class SlidingPreferenceActivity extends PreferenceActivity implements Sli
 	/* (non-Javadoc)
 	 * @see com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityBase#setSlidingActionBarEnabled(boolean)
 	 */
+	@Override
 	public void setSlidingActionBarEnabled(boolean b) {
 		mHelper.setSlidingActionBarEnabled(b);
 	}

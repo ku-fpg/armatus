@@ -69,35 +69,43 @@ public final class UnmodifiableOrderedMapIterator<K, V> implements OrderedMapIte
     }
 
     //-----------------------------------------------------------------------
-    public boolean hasNext() {
+    @Override
+	public boolean hasNext() {
         return iterator.hasNext();
     }
 
-    public K next() {
+    @Override
+	public K next() {
         return iterator.next();
     }
 
-    public boolean hasPrevious() {
+    @Override
+	public boolean hasPrevious() {
         return iterator.hasPrevious();
     }
 
-    public K previous() {
+    @Override
+	public K previous() {
         return iterator.previous();
     }
 
-    public K getKey() {
+    @Override
+	public K getKey() {
         return iterator.getKey();
     }
 
-    public V getValue() {
+    @Override
+	public V getValue() {
         return iterator.getValue();
     }
 
-    public V setValue(final V value) {
+    @Override
+	public V setValue(final V value) {
         throw new UnsupportedOperationException("setValue() is not supported");
     }
 
-    public void remove() {
+    @Override
+	public void remove() {
         throw new UnsupportedOperationException("remove() is not supported");
     }
 

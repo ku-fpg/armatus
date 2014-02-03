@@ -383,6 +383,7 @@ public class ConsoleActivity extends BaseActivity {
 					executeSearch(null, SearchAction.END, null);
 				}
 				mConsoleListView.post(new Runnable() {
+					@Override
 					public void run() {
 						//DON'T use scrollToBottom(); it will cause a strange jaggedy scroll effect
 						mConsoleListView.setSelection(mConsoleListView.getCount() - 1);
@@ -1080,6 +1081,7 @@ public class ConsoleActivity extends BaseActivity {
 	 */
 	private void scrollToBottom() {
 		mConsoleListView.post(new Runnable() {
+			@Override
 			public void run() {
 				mConsoleListView.setSelection(mConsoleListView.getCount());
 				mConsoleListView.smoothScrollToPosition(mConsoleListView.getCount());

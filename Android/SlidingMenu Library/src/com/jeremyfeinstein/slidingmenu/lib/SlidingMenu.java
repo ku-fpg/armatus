@@ -217,9 +217,10 @@ public class SlidingMenu extends RelativeLayout {
 			public static final int POSITION_CLOSE = 1;
 			public static final int POSITION_SECONDARY_OPEN = 2;
 
-			public void onPageScrolled(int position, float positionOffset,
-					int positionOffsetPixels) { }
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
+			@Override
 			public void onPageSelected(int position) {
 				if (position == POSITION_OPEN && mOpenListener != null) {
 					mOpenListener.onOpen();
@@ -938,6 +939,7 @@ public class SlidingMenu extends RelativeLayout {
 		/* (non-Javadoc)
 		 * @see android.view.AbsSavedState#writeToParcel(android.os.Parcel, int)
 		 */
+		@Override
 		public void writeToParcel(Parcel out, int flags) {
 			super.writeToParcel(out, flags);
 			out.writeInt(mItem);
@@ -945,10 +947,12 @@ public class SlidingMenu extends RelativeLayout {
 
 		public static final Parcelable.Creator<SavedState> CREATOR =
 				new Parcelable.Creator<SavedState>() {
+			@Override
 			public SavedState createFromParcel(Parcel in) {
 				return new SavedState(in);
 			}
 
+			@Override
 			public SavedState[] newArray(int size) {
 				return new SavedState[size];
 			}
@@ -1004,6 +1008,7 @@ public class SlidingMenu extends RelativeLayout {
 
 		if (layerType != getContent().getLayerType()) {
 			mHandler.post(new Runnable() {
+				@Override
 				public void run() {
 					if (DEBUG) Log.v(TAG, "changing layerType. hardware? " + (layerType == View.LAYER_TYPE_HARDWARE));
 					getContent().setLayerType(layerType, null);

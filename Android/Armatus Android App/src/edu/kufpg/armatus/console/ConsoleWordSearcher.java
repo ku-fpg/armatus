@@ -261,10 +261,12 @@ public class ConsoleWordSearcher implements Parcelable {
 
 	public static final Parcelable.Creator<ConsoleWordSearcher> CREATOR
 	= new Parcelable.Creator<ConsoleWordSearcher>() {
+		@Override
 		public ConsoleWordSearcher createFromParcel(Parcel in) {
 			return new ConsoleWordSearcher(in);
 		}
 
+		@Override
 		public ConsoleWordSearcher[] newArray(int size) {
 			return new ConsoleWordSearcher[size];
 		}

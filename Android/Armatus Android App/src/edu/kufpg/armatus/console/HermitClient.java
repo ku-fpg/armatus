@@ -623,10 +623,12 @@ public class HermitClient implements Parcelable {
 
 	public static final Parcelable.Creator<HermitClient> CREATOR
 	= new Parcelable.Creator<HermitClient>() {
+		@Override
 		public HermitClient createFromParcel(Parcel in) {
 			return new HermitClient(in);
 		}
 
+		@Override
 		public HermitClient[] newArray(int size) {
 			return new HermitClient[size];
 		}

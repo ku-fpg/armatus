@@ -169,15 +169,18 @@ public abstract class AbstractBitwiseTrie<K, V> extends AbstractMap<K, V>
             return setValue(value);
         }
 
-        public K getKey() {
+        @Override
+		public K getKey() {
             return key;
         }
 
-        public V getValue() {
+        @Override
+		public V getValue() {
             return value;
         }
 
-        public V setValue(final V value) {
+        @Override
+		public V setValue(final V value) {
             final V previous = this.value;
             this.value = value;
             return previous;

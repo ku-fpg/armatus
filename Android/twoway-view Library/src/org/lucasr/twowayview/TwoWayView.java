@@ -6406,7 +6406,8 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  }
 
 	  private class CheckForKeyLongPress extends WindowRunnnable implements Runnable {
-		  public void run() {
+		  @Override
+		public void run() {
 			  if (!isPressed() || mSelectedPosition < 0) {
 				  return;
 			  }

@@ -89,6 +89,7 @@ public class BluetoothDeviceListActivity extends BaseActivity {
 
 		mScanButton = (Button) findViewById(R.id.bluetooth_scan_button);
 		mScanButton.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				if (mScanInProgress) {
 					stopDiscovery();
@@ -179,6 +180,7 @@ public class BluetoothDeviceListActivity extends BaseActivity {
 
 	/** Handles clicks for all {@link ListView} items in the {@link Activity}. */
 	private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
+		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			// Cancel discovery because it's costly and we're about to connect
 			mBluetoothAdapter.cancelDiscovery();

@@ -191,6 +191,7 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
 		}
 	}
 
+	@Override
 	public synchronized void setCollapsible(boolean collapsible) {
 		if (!collapsible) {
 			expandChildren(null, true);

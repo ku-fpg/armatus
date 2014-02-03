@@ -33,7 +33,8 @@ public interface OrderedMapIterator<K, V> extends MapIterator<K, V>, OrderedIter
      *
      * @return <code>true</code> if the iterator has a previous element
      */
-    boolean hasPrevious();
+    @Override
+	boolean hasPrevious();
 
     /**
      * Gets the previous <em>key</em> from the <code>Map</code>.
@@ -41,6 +42,7 @@ public interface OrderedMapIterator<K, V> extends MapIterator<K, V>, OrderedIter
      * @return the previous key in the iteration
      * @throws java.util.NoSuchElementException if the iteration is finished
      */
-    K previous();
+    @Override
+	K previous();
 
 }
