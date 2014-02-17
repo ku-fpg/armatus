@@ -1,9 +1,6 @@
 package edu.kufpg.armatus.util;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +29,6 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
@@ -72,7 +68,7 @@ import com.google.common.collect.TreeRangeMap;
 
 public class ParcelUtils {
 	private static final Class<?>[] COMPARATOR_ARG = new Class<?>[] { Comparator.class };
-	private static final String TAG = ParcelUtils.class.getSimpleName();
+//	private static final String TAG = ParcelUtils.class.getSimpleName();
 	private static final String CREATE = "create";
 	private static final String BUILDER = "builder";
 
@@ -98,94 +94,6 @@ public class ParcelUtils {
 
 	private ParcelUtils() {}
 
-	// Warning: extremely bad code
-	private static Class<?> forName(String className) throws IllegalArgumentException {
-		try {
-			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			Log.e(TAG, "Illegal access when unmarshalling: "
-					+ className, e);
-			throw new IllegalArgumentException("ClassNotFoundException when unmarshalling: "
-					+ className);
-		}
-	}
-
-	// Eww reflection
-	private static boolean isAssignableFrom(Class<?> cls, String asgnName) throws IllegalArgumentException {
-		try {
-			return cls.isAssignableFrom(Class.forName(asgnName));
-		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException();
-		}
-	}
-
-	// It's so bad
-	private static Object newInstance(String className) throws IllegalArgumentException {
-		return newInstance(className, (Class<?>[]) null, (Object[]) null);
-	}
-
-	// This is bad, bad design practice but there's not another way to do what I need
-	private static Object newInstance(String className, Class<?>[] parameterTypes, Object... constructorArgs) throws IllegalArgumentException {
-		try {
-			Class<?> cls = Class.forName(className);
-			if (constructorArgs == null || constructorArgs.length == 0) {
-				return cls.newInstance();
-			} else {
-				Constructor<?> constr = cls.getConstructor(parameterTypes);
-				return constr.newInstance(constructorArgs);
-			}
-		} catch (ClassNotFoundException e) {
-			Log.e(TAG, "Illegal access when unmarshalling: "
-					+ className, e);
-			throw new IllegalArgumentException("ClassNotFoundException when unmarshalling: "
-					+ className);
-		} catch (InstantiationException e) {
-			Log.e(TAG, "Class not found when unmarshalling: "
-					+ className, e);
-			throw new IllegalArgumentException("InstantiationException when unmarshalling: "
-					+ className);
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException("IllegalAccessException when unmarshalling: "
-					+ className);
-		} catch (NoSuchMethodException e) {
-			throw new IllegalArgumentException("NoSuchMethodException when unmarshalling: "
-					+ className);
-		} catch (InvocationTargetException e) {
-			throw new IllegalArgumentException("InvocationTargetException when unmarshalling: "
-					+ className);
-		}
-	}
-
-	// I can't believe I actually wrote this code
-	private static Object singletonInstance(String className, String singletonMethodName) throws IllegalArgumentException {
-		return singletonInstance(className, singletonMethodName, (Object[]) null);
-	}
-
-	// Seriously don't copy this elsewhere
-	private static Object singletonInstance(String className, String singletonMethodName, Object... methodArgs) throws IllegalArgumentException {
-		try {
-			Class<?> c = Class.forName(className);
-			Method m = c.getMethod(singletonMethodName);
-			return m.invoke(null, methodArgs);
-		} catch (ClassNotFoundException e) {
-			Log.e(TAG, "Illegal access when unmarshalling: "
-					+ className + " with method " + singletonMethodName, e);
-			throw new IllegalArgumentException("ClassNotFoundException when unmarshalling: "
-					+ className + " with method " + singletonMethodName);
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException("IllegalAccessException when unmarshalling: "
-					+ className + " with method " + singletonMethodName);
-		} catch (NoSuchMethodException e) {
-			Log.e(TAG, "Method not found when unmarshalling: "
-					+ className + " with method " + singletonMethodName, e);
-			throw new IllegalArgumentException("NoSuchMethodException when unmarshalling: "
-					+ className + " with method " + singletonMethodName);
-		} catch (InvocationTargetException e) {
-			throw new IllegalArgumentException("InvocationTargetException when unmarshalling: "
-					+ className + " with method " + singletonMethodName);
-		}
-	}
-
 	public static boolean readBoolean(Parcel p) {
 		return p.readInt() != 0;
 	}
@@ -197,7 +105,7 @@ public class ParcelUtils {
 			return null;
 		} else {
 			@SuppressWarnings("unchecked")
-			Class<E> cls = (Class<E>) forName(className);
+			Class<E> cls = (Class<E>) ReflectionUtils.forName(className);
 			String valueName = p.readString();
 			return Enum.valueOf(cls, valueName);
 		}
@@ -208,12 +116,12 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableList.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableList.class, name)) {
 			return readImmutableListInternal(p);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			List<E> outVal = (List<E>) newInstance(name);
+			List<E> outVal = (List<E>) ReflectionUtils.newInstance(name);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -278,20 +186,20 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMap.class, name)) {
 			return readImmutableSortedMapInternal(p);
-		} else if (isAssignableFrom(ImmutableBiMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableBiMap.class, name)) {
 			return readImmutableBiMapInternal(p);
-		} else if (isAssignableFrom(ImmutableMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableMap.class, name)) {
 			return readImmutableMapInternal(p);
-		} else if (isAssignableFrom(SortedMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedMap.class, name)) {
 			return readSortedMapInternal(p, name);
-		} else if (isAssignableFrom(BiMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(BiMap.class, name)) {
 			return readBiMapInternal(p, name);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			Map<K, V> outVal = (Map<K, V>) newInstance(name);
+			Map<K, V> outVal = (Map<K, V>) ReflectionUtils.newInstance(name);
 			return addToMap(p, outVal, n);
 		}
 	}
@@ -301,9 +209,9 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMap.class, name)) {
 			return readImmutableSortedMapInternal(p);
-		} else if (isAssignableFrom(PatriciaTrie.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(PatriciaTrie.class, name)) {
 			@SuppressWarnings("unchecked")
 			SortedMap<K, V> sortedMap = (SortedMap<K, V>) readPatriciaTrieInternal(p);
 			return sortedMap;
@@ -317,11 +225,11 @@ public class ParcelUtils {
 		Comparator<? super K> c = readComparator(p);
 		if (c == null) {
 			@SuppressWarnings("unchecked")
-			SortedMap<K, V> outVal = (SortedMap<K, V>) newInstance(name);
+			SortedMap<K, V> outVal = (SortedMap<K, V>) ReflectionUtils.newInstance(name);
 			return addToMap(p, outVal, n);
 		} else {
 			@SuppressWarnings("unchecked")
-			SortedMap<K, V> outVal = (SortedMap<K, V>) newInstance(name, COMPARATOR_ARG, c);
+			SortedMap<K, V> outVal = (SortedMap<K, V>) ReflectionUtils.newInstance(name, COMPARATOR_ARG, c);
 			return addToMap(p, outVal, n);
 		}
 	}
@@ -331,18 +239,18 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMap.class, name)) {
 			return readImmutableSortedMapInternal(p);
 		} else {
 			int n = p.readInt();
 			Comparator<? super K> c = readComparator(p);
 			if (c == null) {
 				@SuppressWarnings("unchecked")
-				NavigableMap<K, V> outVal = (NavigableMap<K, V>) newInstance(name);
+				NavigableMap<K, V> outVal = (NavigableMap<K, V>) ReflectionUtils.newInstance(name);
 				return addToMap(p, outVal, n);
 			} else {
 				@SuppressWarnings("unchecked")
-				NavigableMap<K, V> outVal = (NavigableMap<K, V>) newInstance(name, COMPARATOR_ARG, c);
+				NavigableMap<K, V> outVal = (NavigableMap<K, V>) ReflectionUtils.newInstance(name, COMPARATOR_ARG, c);
 				return addToMap(p, outVal, n);
 			}
 		}
@@ -353,7 +261,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableBiMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableBiMap.class, name)) {
 			return readImmutableBiMapInternal(p);
 		} else {
 			return readBiMapInternal(p, name);
@@ -363,7 +271,7 @@ public class ParcelUtils {
 	private static <K, V> BiMap<K, V> readBiMapInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
-		BiMap<K, V> outVal = (BiMap<K, V>) singletonInstance(name, CREATE);
+		BiMap<K, V> outVal = (BiMap<K, V>) ReflectionUtils.singletonInstance(name, CREATE);
 		return addToMap(p, outVal, n);
 	}
 
@@ -493,7 +401,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMap.class, name)) {
 			return readImmutableSortedMapInternal(p);
 		} else {
 			return readImmutableMapInternal(p);
@@ -560,18 +468,18 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableListMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableListMultimap.class, name)) {
 			return readImmutableListMultimapInternal(p);
-		} else if (isAssignableFrom(ImmutableSetMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSetMultimap.class, name)) {
 			return readImmutableSetMultimapInternal(p);
-		} else if (isAssignableFrom(TreeMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(TreeMultimap.class, name)) {
 			return readTreeMultimapInternal(p);
-		} else if (isAssignableFrom(SortedSetMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedSetMultimap.class, name)) {
 			return readSortedSetMultimapInternal(p, name);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			Multimap<K, V> outVal = (Multimap<K, V>) singletonInstance(name, CREATE);
+			Multimap<K, V> outVal = (Multimap<K, V>) ReflectionUtils.singletonInstance(name, CREATE);
 			return addToMultimap(p, outVal, n);
 		}
 	}
@@ -581,12 +489,12 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableListMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableListMultimap.class, name)) {
 			return readImmutableListMultimapInternal(p);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			ListMultimap<K, V> outVal = (ListMultimap<K, V>) singletonInstance(name, CREATE);
+			ListMultimap<K, V> outVal = (ListMultimap<K, V>) ReflectionUtils.singletonInstance(name, CREATE);
 			return addToMultimap(p, outVal, n);
 		}
 	}
@@ -616,16 +524,16 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSetMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSetMultimap.class, name)) {
 			return readImmutableSetMultimapInternal(p);
-		} else if (isAssignableFrom(TreeMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(TreeMultimap.class, name)) {
 			return readTreeMultimapInternal(p);
-		} else if (isAssignableFrom(SortedSetMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedSetMultimap.class, name)) {
 			return readSortedSetMultimapInternal(p, name);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			SetMultimap<K, V> outVal = (SetMultimap<K, V>) singletonInstance(name, CREATE);
+			SetMultimap<K, V> outVal = (SetMultimap<K, V>) ReflectionUtils.singletonInstance(name, CREATE);
 			return addToMultimap(p, outVal, n);
 		}
 	}
@@ -655,7 +563,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(TreeMultimap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(TreeMultimap.class, name)) {
 			return readTreeMultimapInternal(p);
 		} else {
 			return readSortedSetMultimapInternal(p, name);
@@ -667,11 +575,11 @@ public class ParcelUtils {
 		Comparator<? super V> valC = readComparator(p);
 		if (valC == null) {
 			@SuppressWarnings("unchecked")
-			SortedSetMultimap<K, V> outVal = (SortedSetMultimap<K, V>) singletonInstance(name, CREATE);
+			SortedSetMultimap<K, V> outVal = (SortedSetMultimap<K, V>) ReflectionUtils.singletonInstance(name, CREATE);
 			return addToMultimap(p, outVal, n);
 		} else {
 			@SuppressWarnings("unchecked")
-			SortedSetMultimap<K, V> outVal = (SortedSetMultimap<K, V>) singletonInstance(name, CREATE, valC);
+			SortedSetMultimap<K, V> outVal = (SortedSetMultimap<K, V>) ReflectionUtils.singletonInstance(name, CREATE, valC);
 			return addToMultimap(p, outVal, n);
 		}
 	}
@@ -768,18 +676,22 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMultiset.class, name)) {
 			return readImmutableSortedMultisetInternal(p);
-		} else if (isAssignableFrom(ImmutableMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableMultiset.class, name)) {
 			return readImmutableMultisetInternal(p);
-		} else if (isAssignableFrom(SortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedMultiset.class, name)) {
 			return readSortedMultisetInternal(p, name);
 		} else {
-			int n = p.readInt();
-			@SuppressWarnings("unchecked")
-			Multiset<E> outVal = (Multiset<E>) singletonInstance(name, CREATE);
-			return addToCollection(p, outVal, n);
+			return readMultisetInternal(p, name);
 		}
+	}
+	
+	private static <E> Multiset<E> readMultisetInternal(Parcel p, String name) {
+		int n = p.readInt();
+		@SuppressWarnings("unchecked")
+		Multiset<E> outVal = (Multiset<E>) ReflectionUtils.singletonInstance(name, CREATE);
+		return addToCollection(p, outVal, n);
 	}
 
 	//	public static <E extends Enum<E>> EnumMultiset<E> readEnumMultiset(Parcel p) {
@@ -817,7 +729,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMultiset.class, name)) {
 			return readImmutableSortedMultisetInternal(p);
 		} else {
 			return readSortedMultisetInternal(p, name);
@@ -829,11 +741,11 @@ public class ParcelUtils {
 		Comparator<? super E> c = readComparator(p);
 		if (c == null) {
 			@SuppressWarnings("unchecked")
-			SortedMultiset<E> outVal = (SortedMultiset<E>) singletonInstance(name, CREATE);
+			SortedMultiset<E> outVal = (SortedMultiset<E>) ReflectionUtils.singletonInstance(name, CREATE);
 			return addToCollection(p, outVal, n);
 		} else {
 			@SuppressWarnings("unchecked")
-			SortedMultiset<E> outVal = (SortedMultiset<E>) singletonInstance(name, CREATE, c);
+			SortedMultiset<E> outVal = (SortedMultiset<E>) ReflectionUtils.singletonInstance(name, CREATE, c);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -860,7 +772,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMultiset.class, name)) {
 			return readImmutableSortedMultisetInternal(p);
 		} else {
 			return readImmutableMultisetInternal(p);
@@ -915,12 +827,12 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(PriorityQueue.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(PriorityQueue.class, name)) {
 			return readPriorityQueueInternal(p);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			Queue<E> outVal = (Queue<E>) newInstance(name);
+			Queue<E> outVal = (Queue<E>) ReflectionUtils.newInstance(name);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -933,7 +845,7 @@ public class ParcelUtils {
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			Deque<E> outVal = (Deque<E>) newInstance(name);
+			Deque<E> outVal = (Deque<E>) ReflectionUtils.newInstance(name);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -1022,12 +934,12 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableRangeMap.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableRangeMap.class, name)) {
 			return readImmutableRangeMapInternal(p);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			RangeMap<K, V> outVal = (RangeMap<K, V>) singletonInstance(name, CREATE);
+			RangeMap<K, V> outVal = (RangeMap<K, V>) ReflectionUtils.singletonInstance(name, CREATE);
 			return addToRangeMap(p, outVal, n);
 		}
 	}
@@ -1079,16 +991,16 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedSet.class, name)) {
 			return readImmutableSortedSetInternal(p);
-		} else if (isAssignableFrom(ImmutableSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSet.class, name)) {
 			return readImmutableSetInternal(p);
-		} else if (isAssignableFrom(SortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedSet.class, name)) {
 			return readSortedSetInternal(p, name);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			Set<E> outVal = (Set<E>) newInstance(name);
+			Set<E> outVal = (Set<E>) ReflectionUtils.newInstance(name);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -1118,7 +1030,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedSet.class, name)) {
 			return readImmutableSortedSetInternal(p);
 		} else {
 			return readImmutableSetInternal(p);
@@ -1137,18 +1049,18 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedSet.class, name)) {
 			return readImmutableSortedSetInternal(p);
 		} else {
 			int n = p.readInt();
 			Comparator<? super E> c = readComparator(p);
 			if (c == null) {
 				@SuppressWarnings("unchecked")
-				NavigableSet<E> outVal = (NavigableSet<E>) newInstance(name);
+				NavigableSet<E> outVal = (NavigableSet<E>) ReflectionUtils.newInstance(name);
 				return addToCollection(p, outVal, n);
 			} else {
 				@SuppressWarnings("unchecked")
-				NavigableSet<E> outVal = (NavigableSet<E>) newInstance(name, COMPARATOR_ARG, c);
+				NavigableSet<E> outVal = (NavigableSet<E>) ReflectionUtils.newInstance(name, COMPARATOR_ARG, c);
 				return addToCollection(p, outVal, n);
 			}
 		}
@@ -1175,7 +1087,7 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedSet.class, name)) {
 			return readImmutableSortedSetInternal(p);
 		} else {
 			return readSortedSetInternal(p, name);
@@ -1187,11 +1099,11 @@ public class ParcelUtils {
 		Comparator<? super E> c = readComparator(p);
 		if (c == null) {
 			@SuppressWarnings("unchecked")
-			SortedSet<E> outVal = (SortedSet<E>) newInstance(name);
+			SortedSet<E> outVal = (SortedSet<E>) ReflectionUtils.newInstance(name);
 			return addToCollection(p, outVal, n);
 		} else {
 			@SuppressWarnings("unchecked")
-			SortedSet<E> outVal = (SortedSet<E>) newInstance(name, COMPARATOR_ARG, c);
+			SortedSet<E> outVal = (SortedSet<E>) ReflectionUtils.newInstance(name, COMPARATOR_ARG, c);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -1238,22 +1150,24 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMultiset.class, name)) {
 			return readImmutableSortedMultisetInternal(p);
-		} else if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedSet.class, name)) {
 			return readImmutableSortedSetInternal(p);
-		} else if (isAssignableFrom(ImmutableCollection.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableCollection.class, name)) {
 			return readImmutableCollectionInternal(p, name);
-		} else if (isAssignableFrom(PriorityQueue.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(PriorityQueue.class, name)) {
 			return readPriorityQueueInternal(p);
-		} else if (isAssignableFrom(SortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedMultiset.class, name)) {
 			return readSortedMultisetInternal(p, name);
-		} else if (isAssignableFrom(SortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(SortedSet.class, name)) {
 			return readSortedSetInternal(p, name);
+		} else if (ReflectionUtils.isAssignableFrom(Multiset.class, name)) {
+			return readMultisetInternal(p, name);
 		} else {
 			int n = p.readInt();
 			@SuppressWarnings("unchecked")
-			Collection<E> outVal = (Collection<E>) newInstance(name);
+			Collection<E> outVal = (Collection<E>) ReflectionUtils.newInstance(name);
 			return addToCollection(p, outVal, n);
 		}
 	}
@@ -1263,9 +1177,9 @@ public class ParcelUtils {
 
 		if (name == null) {
 			return null;
-		} else if (isAssignableFrom(ImmutableSortedMultiset.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedMultiset.class, name)) {
 			return readImmutableSortedMultisetInternal(p);
-		} else if (isAssignableFrom(ImmutableSortedSet.class, name)) {
+		} else if (ReflectionUtils.isAssignableFrom(ImmutableSortedSet.class, name)) {
 			return readImmutableSortedSetInternal(p);
 		} else {
 			return readImmutableCollectionInternal(p, name);
@@ -1275,7 +1189,7 @@ public class ParcelUtils {
 	private static <E> ImmutableCollection<E> readImmutableCollectionInternal(Parcel p, String name) {
 		int n = p.readInt();
 		@SuppressWarnings("unchecked")
-		ImmutableCollection.Builder<E> builder = (ImmutableCollection.Builder<E>) singletonInstance(name, BUILDER);
+		ImmutableCollection.Builder<E> builder = (ImmutableCollection.Builder<E>) ReflectionUtils.singletonInstance(name, BUILDER);
 		addToImmutableCollectionBuilder(p, builder, n);
 		return builder.build();
 	}

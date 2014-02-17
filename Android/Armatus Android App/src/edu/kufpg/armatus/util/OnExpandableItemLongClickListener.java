@@ -5,7 +5,7 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class OnExpandableItemLongClickListener implements OnItemLongClickListener {
+public abstract class OnExpandableItemLongClickListener implements OnItemLongClickListener {
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

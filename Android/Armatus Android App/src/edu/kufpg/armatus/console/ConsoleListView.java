@@ -309,7 +309,7 @@ public class ConsoleListView extends ExpandableListView {
 
 		private SavedState(Parcel in) {
 			super(in);
-			checkedStates = ParcelUtils.readSortedSet(in);
+			checkedStates = ParcelUtils.readTreeSet(in);
 		}
 	}
 
