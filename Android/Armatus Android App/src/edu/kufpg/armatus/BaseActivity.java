@@ -64,19 +64,8 @@ public class BaseActivity extends Activity {
 		if (!sThemeId.equals(Prefs.getTheme(this))) {
 			recreate();
 		}
-		
-		@SuppressWarnings("unchecked")
-		BaseApplication<BaseActivity> baseApp = (BaseApplication<BaseActivity>) getApplication();
-		baseApp.attachActivity(this);
-		super.onResume();
-	}
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		@SuppressWarnings("unchecked")
-		BaseApplication<BaseActivity> baseApp = (BaseApplication<BaseActivity>) getApplication();
-		baseApp.detachActivity(this);
+		super.onResume();
 	}
 
 	/**
