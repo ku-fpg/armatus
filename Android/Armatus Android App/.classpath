@@ -6,5 +6,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="libs/guava-16.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/jsr305-2.0.3.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
