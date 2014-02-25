@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component jdk="Android API 19 Platform" jdk_type="Android SDK">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<levels>
+		<level name="guava-16.0.1" value="project"/>
+		<level name="jsr305-2.0.3" value="project"/>
+		<level name="commons-collections4-4.0" value="project"/>
+	</levels>
+</component>

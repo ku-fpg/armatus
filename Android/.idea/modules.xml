@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Armatus Android App/Armatus Android App.iml" filepath="$PROJECT_DIR$/Armatus Android App/Armatus Android App.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ShowcaseView Library/ShowcaseView Library.iml" filepath="$PROJECT_DIR$/ShowcaseView Library/ShowcaseView Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SlidingMenu Library/SlidingMenu Library.iml" filepath="$PROJECT_DIR$/SlidingMenu Library/SlidingMenu Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TreeListView Library/TreeListView Library.iml" filepath="$PROJECT_DIR$/TreeListView Library/TreeListView Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aFileChooser Library/aFileChooser Library.iml" filepath="$PROJECT_DIR$/aFileChooser Library/aFileChooser Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-numberpicker Library/android-numberpicker Library.iml" filepath="$PROJECT_DIR$/android-numberpicker Library/android-numberpicker Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/twoway-view Library/twoway-view Library.iml" filepath="$PROJECT_DIR$/twoway-view Library/twoway-view Library.iml" />
+    </modules>
+  </component>
+</project>
+
