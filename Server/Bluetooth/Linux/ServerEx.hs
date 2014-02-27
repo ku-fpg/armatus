@@ -1,19 +1,20 @@
 module ServerEx where
+
 import qualified BluezServer
+import Control.Monad
 import Foreign.C
 
-main = do
-  client <- BluezServer.init_server
-  loopServer client
+main :: IO ()
+main = BluezServer.init_server >>= \ client -> loopServer client
   
 loopServer :: CInt -> IO ()
 loopServer client = do
-  message <- peekCString $ BluezServer.read_server client
+  cMessage <- BluezServer.read_server client
+  message <- peekCString cMessage
   response <- newCString $ hermitMagic message
-  if (not $ null message) then do
+  when (not $ null message) $ do
     BluezServer.write_server client response
     loopServer client
-                          else return ()
 
 hermitMagic :: [Char] -> [Char]
 -- Replace this with some other crazy string manipulation

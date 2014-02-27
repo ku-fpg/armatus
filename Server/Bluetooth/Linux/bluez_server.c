@@ -5,6 +5,7 @@
 #include <bluetooth/sdp.h>
 #include <bluetooth/sdp_lib.h>
 #include <bluetooth/rfcomm.h>
+#include "bluez_server.h"
 
 /* To compile this, use the following Bash command:
 * gcc -I/usr/include/glib-2.0/ -I/usr/lib/glib-2.0/include -o server-with-haskell server-with-haskell.c -lbluetooth
