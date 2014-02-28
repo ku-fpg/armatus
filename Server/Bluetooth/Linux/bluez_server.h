@@ -3,9 +3,15 @@
 
 #include <bluetooth/sdp_lib.h>
 
-sdp_session_t *register_service(uint8_t rfcomm_channel);
-int init_server();
-char *read_server(int client);
-void write_server(int client, char *message);
+typedef struct {
+    int client;
+    int serverSock;
+    sdp_session_t *session;
+} server_info_t;
+
+server_info_t *init_server();
+char *read_server(const server_info_t * const info, char *input);
+void write_server(const server_info_t * const info, const char * const message);
+void close_server(server_info_t *info);
 
 #endif

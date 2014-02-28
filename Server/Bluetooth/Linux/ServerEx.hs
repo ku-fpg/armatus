@@ -1,21 +1,30 @@
 module ServerEx where
 
-import qualified BluezServer
-import Control.Monad
-import Foreign.C
+import qualified BlueZServer as BZ
+import Foreign.C.String
+import Foreign.Ptr
+import Foreign.Marshal.Alloc
 
 main :: IO ()
-main = BluezServer.init_server >>= \ client -> loopServer client
+main = do
+    info <- BZ.init_server
+    loopServer info
   
-loopServer :: CInt -> IO ()
-loopServer client = do
-  cMessage <- BluezServer.read_server client
-  message <- peekCString cMessage
-  response <- newCString $ hermitMagic message
-  when (not $ null message) $ do
-    BluezServer.write_server client response
-    loopServer client
+loopServer :: Ptr BZ.ServerInfo -> IO ()
+loopServer info = do
+    messagePtr <- newCString ""
+    cMessage <- BZ.read_server info messagePtr
+    message <- peekCString cMessage
+    free messagePtr
+    if (not $ null message)
+       then do
+           response <- newCString $ hermitMagic message
+           BZ.write_server info response
+           free response
+           loopServer info
+       else do
+           BZ.close_server info 
 
-hermitMagic :: [Char] -> [Char]
+hermitMagic :: String -> String
 -- Replace this with some other crazy string manipulation
 hermitMagic str = str ++ " (don't forget Haskell!)"
