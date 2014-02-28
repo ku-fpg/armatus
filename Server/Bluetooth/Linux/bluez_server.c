@@ -126,7 +126,7 @@ sdp_session_t *register_service(const uint8_t rfcomm_channel) {
 }
 
 server_info_t *init_server() {
-    int result, sock, client, bytes_read, bytes_sent;
+    int result, sock, client;
     const int port = 3;
     struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
     char buffer[1024] = { 0 };
