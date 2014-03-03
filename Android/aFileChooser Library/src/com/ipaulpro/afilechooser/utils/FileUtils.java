@@ -16,16 +16,6 @@
 
 package com.ipaulpro.afilechooser.utils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.net.URISyntaxException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,8 +27,18 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Video;
 import android.util.Log;
-
 import com.ipaulpro.afilechooser.R;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @version 2009-07-03
@@ -64,11 +64,8 @@ public class FileUtils {
 	 * @return
 	 */
 	public static boolean isLocal(String uri) {
-		if (uri != null && !uri.startsWith("http://")) {
-			return true;
-		}
-		return false;
-	}
+        return uri != null && !uri.startsWith("http://");
+    }
 
 	/**
 	 * Gets the extension of a file name, like ".png" or ".jpg".
@@ -82,7 +79,7 @@ public class FileUtils {
 			return null;
 		}
 
-		int dot = uri.lastIndexOf(".");
+		int dot = uri.lastIndexOf('.');
 		if (dot >= 0) {
 			return uri.substring(dot);
 		} else {
@@ -99,14 +96,10 @@ public class FileUtils {
 	 */
 	public static boolean isMediaUri(Uri uri) {
 		String uriString = uri.toString();
-		if (uriString.startsWith(Audio.Media.INTERNAL_CONTENT_URI.toString())
-				|| uriString.startsWith(Audio.Media.EXTERNAL_CONTENT_URI.toString())
-				|| uriString.startsWith(Video.Media.INTERNAL_CONTENT_URI.toString())
-				|| uriString.startsWith(Video.Media.EXTERNAL_CONTENT_URI.toString())) {
-			return true;
-		} else {
-			return false;
-		}
+        return uriString.startsWith(Audio.Media.INTERNAL_CONTENT_URI.toString())
+                || uriString.startsWith(Audio.Media.EXTERNAL_CONTENT_URI.toString())
+                || uriString.startsWith(Video.Media.INTERNAL_CONTENT_URI.toString())
+                || uriString.startsWith(Video.Media.EXTERNAL_CONTENT_URI.toString());
 	}
 
 	/**
@@ -173,9 +166,8 @@ public class FileUtils {
 		if (curdir.endsWith("/")) {
 			separator = "";
 		}
-		File clickedFile = new File(curdir + separator
-				+ file);
-		return clickedFile;
+        return new File(curdir + separator
+                + file);
 	}
 
 	public static File getFile(File curdir, String file) {
@@ -202,7 +194,7 @@ public class FileUtils {
 				", Query: " + uri.getQuery() +
 				", Scheme: " + uri.getScheme() +
 				", Host: " + uri.getHost() +
-				", Segments: " + uri.getPathSegments().toString()
+				", Segments: " + uri.getPathSegments()
 				);
 
 		if ("content".equalsIgnoreCase(uri.getScheme())) {
@@ -254,9 +246,9 @@ public class FileUtils {
 		if (size > BYTES_IN_KILOBYTES) {
 			fileSize = size/BYTES_IN_KILOBYTES;
 			if (fileSize > BYTES_IN_KILOBYTES) {
-				fileSize = fileSize/BYTES_IN_KILOBYTES;
+                fileSize /= BYTES_IN_KILOBYTES;
 				if (fileSize > BYTES_IN_KILOBYTES) {
-					fileSize = fileSize/BYTES_IN_KILOBYTES;
+                    fileSize /= BYTES_IN_KILOBYTES;
 					suffix = GIGABYTES;
 				} else {
 					suffix = MEGABYTES;
@@ -361,13 +353,13 @@ public class FileUtils {
 					if(DEBUG) Log.d(TAG, "Got thumb ID: "+id);					
 
 					if (mimeType.contains("video")) {
-						bm = MediaStore.Video.Thumbnails.getThumbnail(
+						bm = Video.Thumbnails.getThumbnail(
 								resolver, 
 								id, 
-								MediaStore.Video.Thumbnails.MINI_KIND, 
+								Video.Thumbnails.MINI_KIND,
 								null);
 					} 
-					else if (mimeType.contains(FileUtils.MIME_TYPE_IMAGE)) {
+					else if (mimeType.contains(MIME_TYPE_IMAGE)) {
 						bm = MediaStore.Images.Thumbnails.getThumbnail(
 								resolver, 
 								id, 
@@ -392,7 +384,7 @@ public class FileUtils {
 	 * 
 	 * @author paulburke
 	 */
-	private static Comparator<File> mComparator = new Comparator<File>() {
+	private static final Comparator<File> mComparator = new Comparator<File>() {
 		@Override
 		public int compare(File f1, File f2) {
 			// Sort alphabetically by lower case, which is much cleaner
@@ -406,7 +398,7 @@ public class FileUtils {
 	 * 
 	 * @author paulburke
 	 */
-	private static FileFilter mFileFilter = new FileFilter() {
+	private static final FileFilter mFileFilter = new FileFilter() {
 		@Override
 		public boolean accept(File file) {
 			final String fileName = file.getName();
@@ -420,7 +412,7 @@ public class FileUtils {
 	 * 
 	 * @author paulburke
 	 */
-	private static FileFilter mDirFilter = new FileFilter() {
+	private static final FileFilter mDirFilter = new FileFilter() {
 		@Override
 		public boolean accept(File file) {
 			final String fileName = file.getName();
@@ -449,7 +441,7 @@ public class FileUtils {
 			// Sort the folders alphabetically
 			Arrays.sort(dirs, mComparator);
 			// Add each folder to the File list for the list adapter
-			for (File dir : dirs) list.add(dir);
+            Collections.addAll(list, dirs);
 		}
 
 		// List file in this directory with the file filter
@@ -458,7 +450,7 @@ public class FileUtils {
 			// Sort the files alphabetically
 			Arrays.sort(files, mComparator);
 			// Add each file to the File list for the list adapter
-			for (File file : files) list.add(file);
+            Collections.addAll(list, files);
 		}		
 
 		return list;

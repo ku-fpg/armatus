@@ -39,7 +39,7 @@ public class OnPinchZoomListener extends SimpleOnScaleGestureListener {
 
 		if (size < minSize || size > maxSize) {
 			throw new IllegalArgumentException("size (" + size + ") is not between minSize ("
-					+ minSize + ") and maxSize (" + maxSize + ")");
+					+ minSize + ") and maxSize (" + maxSize + ')');
 		}
 
 		mIntSize = size;
@@ -95,7 +95,7 @@ public class OnPinchZoomListener extends SimpleOnScaleGestureListener {
 	private void refreshPopup(int newFontSize) {
 		mIntSize = newFontSize;
 		String label = mActivity.getResources().getString(R.string.popup_text);
-		mPopupTextView.setText(label + " " + newFontSize);
+		mPopupTextView.setText(label + ' ' + newFontSize);
 	}
 
 }

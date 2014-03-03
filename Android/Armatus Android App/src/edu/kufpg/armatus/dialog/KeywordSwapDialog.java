@@ -1,12 +1,5 @@
 package edu.kufpg.armatus.dialog;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.google.common.collect.Lists;
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.util.StringUtils;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +7,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import com.google.common.collect.Lists;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * KeywordSwapDialog Class, this class extends {@link android.app.DialogFragment DialogFragment} class. 
@@ -86,7 +85,7 @@ public class KeywordSwapDialog extends ConsiderateDialog {
 			public void onClick(View v) {
 				StringBuilder builder = new StringBuilder();
 				for (String word : mEntryWords) {
-					builder.append(word).append(" ");
+					builder.append(word).append(' ');
 				}
 				getConsole().showToast(builder.toString().trim());
 			}

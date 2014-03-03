@@ -91,6 +91,6 @@ instance Storable ServerInfo where
 {-# LINE 67 "BlueZServer.chs" #-}
 
 foreign import ccall "init_server" init_server :: IO (Ptr ServerInfo)
-foreign import ccall "read_server" read_server :: Ptr ServerInfo -> CString -> IO CString
+foreign import ccall "read_server" read_server :: Ptr ServerInfo -> IO CString
 foreign import ccall "write_server" write_server :: Ptr ServerInfo -> CString -> IO ()
 foreign import ccall "close_server" close_server :: Ptr ServerInfo -> IO ()

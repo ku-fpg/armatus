@@ -25,16 +25,16 @@ import edu.kufpg.armatus.data.CommandInfo;
  * edu.kufpg.armatus.console.CustomCommandInfo.CommandInfo Command}s.
  */
 public class CommandExpandableMenuAdapter extends BaseExpandableListAdapter implements Filterable {
-	private LayoutInflater mInflater;
+	private final LayoutInflater mInflater;
 	private Filter mFilter;
 	private CharSequence mConstraint;
-	private Object mLock = new Object();
+	private final Object mLock = new Object();
 	private List<String> mTags;
 	private ListMultimap<String, String> mTagCommandNames;
 
 	/**
 	 * Constructs a new instance and initializes the menu data if necessary.
-	 * @param console The {@link Context} to use.
+	 * @param context The {@link Context} to use.
 	 */
 	public CommandExpandableMenuAdapter(Context context) {
 		mInflater = LayoutInflater.from(context);

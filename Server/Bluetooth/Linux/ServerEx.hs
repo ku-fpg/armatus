@@ -12,13 +12,12 @@ main = do
   
 loopServer :: Ptr BZ.ServerInfo -> IO ()
 loopServer info = do
-    messagePtr <- newCString ""
-    cMessage <- BZ.read_server info messagePtr
-    message <- peekCString cMessage
-    free messagePtr
-    if (not $ null message)
+    cMessage <- BZ.read_server info
+    hsMessage <- peekCString cMessage
+    free cMessage
+    if (not $ null hsMessage)
        then do
-           response <- newCString $ hermitMagic message
+           response <- newCString $ hermitMagic hsMessage
            BZ.write_server info response
            free response
            loopServer info

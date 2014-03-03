@@ -15,7 +15,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
-import edu.kufpg.armatus.Constants;
+import edu.kufpg.armatus.DeviceConstants;
 import edu.kufpg.armatus.Prefs;
 
 /**
@@ -81,7 +81,7 @@ public final class BluetoothUtils {
 			activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
 		} else {
 			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
@@ -96,7 +96,7 @@ public final class BluetoothUtils {
 			fragment.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
 		} else {
 			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
@@ -117,7 +117,7 @@ public final class BluetoothUtils {
 			}
 		}
 		if (sAdapter == null) {
-			Log.w(TAG, "Bluetooth is not supported on this " + Constants.DEVICE_NAME + "!");
+			Log.w(TAG, "Bluetooth is not supported on this " + DeviceConstants.DEVICE_NAME + '!');
 		}
 		return sAdapter;
 	}
@@ -140,7 +140,7 @@ public final class BluetoothUtils {
 				return sDevice;
 			} else {
 				Log.w(TAG, "Cannot get Bluetooth device (Bluetooth not supported on this "
-						+ Constants.DEVICE_NAME + ").");
+						+ DeviceConstants.DEVICE_NAME + ").");
 				return null;
 			}
 		} else {
@@ -170,7 +170,7 @@ public final class BluetoothUtils {
 			}
 		} else {
 			Log.w(TAG, "Cannot get Bluetooth socket (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 			return null;
 		}
 	}
@@ -187,7 +187,7 @@ public final class BluetoothUtils {
 			activity.startActivityForResult(findBtDevicesIntent, REQUEST_FIND_BLUETOOTH_DEVICE);
 		} else {
 			Log.w(TAG, "Cannot find Bluetooth device names (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
@@ -203,7 +203,7 @@ public final class BluetoothUtils {
 			fragment.startActivityForResult(findBtDevicesIntent, REQUEST_FIND_BLUETOOTH_DEVICE);
 		} else {
 			Log.w(TAG, "Cannot find Bluetooth device names (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
@@ -226,7 +226,7 @@ public final class BluetoothUtils {
 			}
 		} else {
 			Log.w(TAG, "Cannot determine Bluetooth state (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 			return false;
 		}
 	}
@@ -243,7 +243,7 @@ public final class BluetoothUtils {
 			return adapter.isEnabled();
 		} else {
 			Log.w(TAG, "Cannot determine Bluetooth state (Bluetooth not supported on this "
-					+ Constants.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 			return false;
 		}
 	}

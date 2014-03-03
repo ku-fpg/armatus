@@ -1,23 +1,22 @@
 package edu.kufpg.armatus;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
-
 import com.google.common.collect.ImmutableMap;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public final class Prefs {
 
 	/**
 	 * {@link android.preference.CheckBoxPreference CheckBoxPreference} key mapping to whether or
-	 * not {@link #CACHE_DIR} should be used to save persistent data (if the mapped value is {@code
-	 * false}). If the mapped value is {@code true}, the String to which {@link #HISTORY_DIR_KEY}
-	 * maps is used instead.
+	 * not {@link DeviceConstants#CACHE_DIR CACHE_DIR} should be used to save persistent data (if
+     * the mapped value is {@code false}). If the mapped value is {@code true}, the String to which
+     * {@link #HISTORY_DIR_KEY} maps is used instead.
 	 */
 	static String IS_HISTORY_DIR_CUSTOM_KEY;
 
@@ -30,9 +29,8 @@ public final class Prefs {
 
 	/**
 	 * {@link android.preference.ListPreference ListPreference} key mapping to one of three String
-	 * values: "0" (for {@link BaseActivity.EditMode#READ READ} mode), "1" (for {@link BaseActivity.
-	 * EditMode#WRITE WRITE} mode), or "2" (for {@link BaseActivity.EditMode#ARITHMETIC ARITHMETIC}
-	 * mode). The mapped String represent which {@link BaseActivity.EditMode EditMode} is currently
+	 * values: "0" (for {@code READ} mode), "1" (for {@code WRITE} mode), or "2" (for {@code ARITHMETIC}
+	 * mode). The mapped String represent which {@code EditMode} is currently
 	 * being used.
 	 */
 	static String EDIT_MODE_KEY;
@@ -174,7 +172,7 @@ public final class Prefs {
 	 * @return a map of {@code Preference} keys to their dynamic default values.
 	 */
 	private static Map<String, ? extends Object> mapDynamicPrefDefaults() {
-		return ImmutableMap.of(HISTORY_DIR_KEY, Constants.CACHE_DIR);
+		return ImmutableMap.of(HISTORY_DIR_KEY, DeviceConstants.CACHE_DIR);
 	}
 
 	/**
@@ -253,6 +251,10 @@ public final class Prefs {
 		}
 	}
 
+    public static boolean isBluetoothSource(Context context) {
+        return getNetworkSource(context).equals(NetworkSource.BLUETOOTH_SERVER);
+    }
+
 	private static boolean isFirstTime(Context context) {
 		return getPrefs(context).getBoolean(IS_FIRST_TIME_KEY, true);
 	}
@@ -260,6 +262,10 @@ public final class Prefs {
 	public static boolean isHistoryDirCustom(Context context) {
 		return getPrefs(context).getBoolean(IS_HISTORY_DIR_CUSTOM_KEY, false);
 	}
+
+    public static boolean isWebSource(Context context) {
+        return getNetworkSource(context).equals(NetworkSource.WEB_SERVER);
+    }
 
 	public static void refreshTheme(Context context) {
 		setTheme(context, getTheme(context));

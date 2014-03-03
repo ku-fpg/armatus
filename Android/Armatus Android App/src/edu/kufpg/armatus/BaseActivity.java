@@ -25,7 +25,7 @@ public class BaseActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Constants.initConstants(this);
+		DeviceConstants.init(this);
 		Prefs.initPrefs(this);
 		sThemeId = Prefs.getTheme(this);
 		Prefs.setTheme(this, sThemeId);
@@ -72,7 +72,7 @@ public class BaseActivity extends Activity {
 	 * Utility method for easily showing a quick message to the user.
 	 * @param message The message to display.
 	 */
-	public void showToast(String message) {
+	public void showToast(CharSequence message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 

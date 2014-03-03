@@ -332,7 +332,7 @@ public class TextDrawable extends Drawable {
 	 * You must call {@link #setBounds(int, int, int, int) setBounds()} before
 	 * applying this TextDrawable to any View.
 	 *
-	 * Calling this method with <code>null</code> will remove any Path currently attached.
+	 * Calling this method with {@code null} will remove any Path currently attached.
 	 */
 	public void setTextPath(Path path) {
 		if (mTextPath != path) {

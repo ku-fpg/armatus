@@ -1,7 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.util.ArrayList;
-
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,27 +7,27 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-
 import com.google.common.base.Objects;
-
 import edu.kufpg.armatus.data.CommandResponse;
 import edu.kufpg.armatus.util.ParcelUtils;
 import edu.kufpg.armatus.util.StringUtils;
 
+import java.util.ArrayList;
+
 /**
- * Contains values that describe an entry in {@link ConsoleListView1}. This class
+ * Contains values that describe an entry in {@link ConsoleListView}. This class
  * is primarily used for populating {@link android.view.View Views} in {@link
- * ConsoleEntryAdapter1}.
+ * ConsoleEntryAdapter}.
  */
 public class ConsoleEntry implements Parcelable {
 	/** 
 	 * The unique entry number used to identify this entry. Entry numbers begin
 	 * at 0 (although the first entry in the console may not be 0 since the number
-	 * of entries could exceed the {@link ConsoleActivity1#CONSOLE_ENTRY_LIMIT
+	 * of entries could exceed the {@link ConsoleActivity#CONSOLE_ENTRY_LIMIT
 	 * CONSOLE_ENTRY_LIMIT}).
 	 */
-	private int mEntryNum;
-	private int mAst;
+	private final int mEntryNum;
+	private final int mAst;
 
 	private String mUserInput;
 	private CommandResponse mCommandResponse;
@@ -76,7 +74,7 @@ public class ConsoleEntry implements Parcelable {
 	}
 
 	/**
-	 * Constructs a new instance with the specified {@link ConsoleEntry}'s number
+	 * Constructs a new instance with the specified {@code ConsoleEntry}'s number
 	 * and contents.
 	 * @param entry the {@code ConsoleEntry} to copy.
 	 */
@@ -132,7 +130,7 @@ public class ConsoleEntry implements Parcelable {
 	public SpannableStringBuilder getFullContentsPrefix() {
 		SpannableStringBuilder prefix = new SpannableStringBuilder(StringUtils.NBSP);
 		if (mAst != HermitClient.NO_TOKEN) {
-			prefix = prefix.append("hermit<" + mAst + ">");
+			prefix = prefix.append("hermit<").append(String.valueOf(mAst)).append('>');
 		} else {
 			prefix = prefix.append("armatus");
 		}

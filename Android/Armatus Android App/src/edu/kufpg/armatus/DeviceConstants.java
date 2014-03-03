@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 
-public final class Constants {
+public final class DeviceConstants {
 	
 	/** The directory where any persistent data should be saved. */
 	public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() + "/data/armatus";
@@ -13,11 +13,11 @@ public final class Constants {
 	public static String PACKAGE_NAME;
 	
 	/** The current device's manufacturer and product name. */
-	public static String DEVICE_NAME = Build.MANUFACTURER + " " + Build.PRODUCT;
+	public static String DEVICE_NAME = Build.MANUFACTURER + ' ' + Build.PRODUCT;
 	
-	private Constants() {}
+	private DeviceConstants() {}
 	
-	static void initConstants(Context context) {
+	static void init(Context context) {
 		PACKAGE_NAME = context.getApplicationContext().getPackageName();
 	}
 

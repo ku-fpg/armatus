@@ -41,7 +41,7 @@ public class CommandHelpActivity extends Activity {
 		if (savedInstanceState == null) {
 			SpannableStringBuilder builder = new SpannableStringBuilder();
 			for (String tag : mCommandInfo.getTags()) {
-				SpannableString tagBox = new SpannableString(" " + tag + " ");
+				SpannableString tagBox = new SpannableString(' ' + tag + ' ');
 				tagBox.setSpan(new BackgroundColorSpan(Color.GRAY), 0, tagBox.length(), 0);
 				tagBox.setSpan(new ForegroundColorSpan(Color.BLACK), 0, tagBox.length(), 0);
 				builder.append(tagBox).append(", ");

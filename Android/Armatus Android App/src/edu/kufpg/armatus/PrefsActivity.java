@@ -224,7 +224,7 @@ public class PrefsActivity extends PreferenceActivity {
 		 */
 		private void setChooseBluetoothDevicePrefSummary(String name, String address) {
 			if (name != null && address != null) {
-				mChooseBluetoothDevicePref.setSummary(name + " (" + address + ")");
+				mChooseBluetoothDevicePref.setSummary(name + " (" + address + ')');
 			} else {
 				mChooseBluetoothDevicePref.setSummary(null);
 			}

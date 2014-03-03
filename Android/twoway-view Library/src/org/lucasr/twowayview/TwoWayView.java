@@ -565,7 +565,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  * if the choice mode is not {@link #CHOICE_MODE_NONE} (default).
 	  *
 	  * <p>To determine the specific items that are currently selected, use one of
-	  * the <code>getChecked*</code> methods.
+	  * the {@code getChecked*} methods.
 	  *
 	  * @return The number of items currently selected
 	  *
@@ -583,7 +583,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  * or {@link #CHOICE_MODE_MULTIPLE}.
 	  *
 	  * @param position The item whose checked state to return
-	  * @return The item's checked state or <code>false</code> if choice mode
+	  * @return The item's checked state or {@code false} if choice mode
 	  *         is invalid
 	  *
 	  * @see #setChoiceMode(int)
@@ -620,7 +620,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  *
 	  * @return  A SparseBooleanArray which will return true for each call to
 	  *          get(int position) where position is a position in the list,
-	  *          or <code>null</code> if the choice mode is set to
+	  *          or {@code null} if the choice mode is set to
 	  *          {@link #CHOICE_MODE_NONE}.
 	  */
 	 public SparseBooleanArray getCheckedItemPositions() {
@@ -1756,7 +1756,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	 /**
 	  * Return true if child is an ancestor of parent, (or equal to the parent).
 	  */
-	 private boolean isViewAncestorOf(View child, View parent) {
+	 private static boolean isViewAncestorOf(View child, View parent) {
 		 if (child == parent) {
 			 return true;
 		 }
@@ -1971,7 +1971,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  * and re-layout the items as appropriate.
 	  *
 	  * @param selectedView The currently selected view (before changing selection).
-	  *   should be <code>null</code> if there was no previous selection.
+	  *   should be {@code null} if there was no previous selection.
 	  * @param direction either {@link View#FOCUS_UP} or {@link View#FOCUS_DOWN} or
 	  *        {@link View#FOCUS_LEFT} or {@link View#FOCUS_RIGHT} depending on the
 	  *        current view orientation.
@@ -2061,7 +2061,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 	  *        {@link View#FOCUS_LEFT} or {@link View#FOCUS_RIGHT} depending on the
 	  *        current view orientation.
 	  *
-	  * @return The result if focus has changed, or <code>null</code>.
+	  * @return The result if focus has changed, or {@code null}.
 	  */
 	 private ArrowScrollFocusResult arrowScrollFocused(final int direction) {
 		 forceValidFocusDirection(direction);
@@ -6259,7 +6259,7 @@ ViewTreeObserver.OnTouchModeChangeListener {
 					  + " viewStart=" + viewStart
 					  + " height=" + height
 					  + " position=" + position
-					  + " checkState=" + checkState + "}";
+					  + " checkState=" + checkState + '}';
 		  }
 
 		  public static final Parcelable.Creator<SavedState> CREATOR

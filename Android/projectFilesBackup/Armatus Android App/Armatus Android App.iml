@@ -7,8 +7,6 @@
         <proGuardCfgFiles>
           <file>file://$MODULE_DIR$/proguard-project.txt</file>
           <file>file://%MODULE_SDK_HOME%/tools/proguard/proguard-android.txt</file>
-          <file>file://%MODULE_SDK_HOME%/tools/proguard/proguard-android.txt</file>
-          <file>file://$MODULE_DIR$/proguard-project.txt</file>
         </proGuardCfgFiles>
       </configuration>
     </facet>

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <bluetooth/bluetooth.h>
@@ -170,23 +171,26 @@ server_info_t *init_server() {
     return info;
 }
 
-char *read_server(const server_info_t * const info, char *input) {
+char *read_server(const server_info_t * const info) {
     // read data from the client
-    int bytes_read;
-    bytes_read = read(info->client, input, sizeof(input));
+    char input[1024] = { 0 };
+    char *inputCpy = malloc(sizeof(char) * (1024 + 1));
+    int bytes_read = read(info->client, input, sizeof(input));
+    strcpy(inputCpy, input);
     if (bytes_read > 0) {
-        printf("received [%s]\n", input);
+        printf("received [%s]\n", inputCpy);
     }
 
-    return input;
+    return inputCpy;
 }
 
 void write_server(const server_info_t * const info, const char *const message) {
     // send data to the client
-    int bytes_sent;
-    bytes_sent = write(info->client, message, sizeof(message));
+    char messageCpy[1024] = { 0 };
+    strcpy(messageCpy, message);
+    int bytes_sent = write(info->client, messageCpy, sizeof(messageCpy));
     if (bytes_sent > 0) {
-        printf("sent [%s]\n", message);
+        printf("sent [%s]\n", messageCpy);
     }
 }
 

@@ -1217,7 +1217,9 @@ public class ParcelUtils {
 		if (s == -1) {
 			return null;
 		} else if (s == 0) {
-			return p.readParcelable(ParcelUtils.class.getClassLoader());
+            @SuppressWarnings("unchecked")
+            Comparator<T> c = (Comparator<T>) p.readParcelable(ParcelUtils.class.getClassLoader());
+			return c;
 		} else {
 			@SuppressWarnings("unchecked")
 			Comparator<T> c = (Comparator<T>) p.readSerializable();

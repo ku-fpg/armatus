@@ -145,7 +145,7 @@ public class CustomCommandDispatcher {
 	private static String varargsToString(String... varargs) {
 		StringBuilder builder = new StringBuilder();
 		for(String string : varargs) {
-			builder.append(string).append(" ");
+			builder.append(string).append(' ');
 		}
 		return builder.toString().trim();
 	}
