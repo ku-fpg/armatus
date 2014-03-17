@@ -1,0 +1,28 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                chatActionOnDisconnect = id; 
+                chatActionOnMessageTextField = id; 
+                chatActionOnServerStart = id; 
+                waitActionCancel = id; 
+            }; 
+            CLASS = ChatServerController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                chatDisconnectButton = id; 
+                chatInputTextField = id; 
+                chatOutputTextField = id; 
+                chatServerButton = id; 
+                mainWindow = id; 
+                myBluetoothInterface = id; 
+                serverWaitBar = id; 
+                waitCancelButton = id; 
+                waitConnectionPanel = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

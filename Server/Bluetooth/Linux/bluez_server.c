@@ -9,6 +9,8 @@
 #include <bluetooth/rfcomm.h>
 #include "bluez_server.h"
 
+#define UUID1 { 0x01110000, 0x00100000, 0x80000080, 0xFB349B5F }
+
 /*
  * Adapted from http://www.btessentials.com/examples/examples.html, under the following license:
  *
@@ -48,7 +50,7 @@ sdp_session_t *register_service(const uint8_t rfcomm_channel) {
      * Regardless of the UUID used, it must match the one that the Armatus Android app is searching
      * for.
      */
-    uint32_t svc_uuid_int[] = { 0x01110000, 0x00100000, 0x80000080, 0xFB349B5F };
+    uint32_t svc_uuid_int[] = UUID1;
     const char *service_name = "Armatus Bluetooth server";
     const char *svc_dsc = "A HERMIT server that interfaces with the Armatus Android app";
     const char *service_prov = "Armatus";

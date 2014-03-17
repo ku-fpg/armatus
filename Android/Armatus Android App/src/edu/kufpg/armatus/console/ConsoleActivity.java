@@ -1,14 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.lucasr.twowayview.TwoWayView;
-
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -50,12 +41,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.BaseApplication;
 import edu.kufpg.armatus.MainActivity;
@@ -82,6 +71,14 @@ import edu.kufpg.armatus.networking.InternetUtils;
 import edu.kufpg.armatus.util.OnExpandableItemLongClickListener;
 import edu.kufpg.armatus.util.StringUtils;
 import edu.kufpg.armatus.util.Views;
+import org.lucasr.twowayview.TwoWayView;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class ConsoleActivity extends BaseActivity {
 

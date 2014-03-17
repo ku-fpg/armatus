@@ -6,10 +6,8 @@ import android.bluetooth.BluetoothSocket;
 import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActivity, String, String, String> {
@@ -32,7 +30,6 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
         mSocket = BluetoothUtils.getBluetoothSocket(getActivity());
     }
 
-    @SuppressWarnings("resource")
     @Override
     protected String doInBackground(String... params) {
         if (mSocket != null && mDevice != null && mAdapter != null) {
@@ -55,17 +52,11 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
             }
             byte[] messageBytes = message.getBytes();
             publishProgress("Output stream created! Sending message (" + message + ") to server...");
-            OutputStream outStream;
+            OutputStream outStream = null;
             try {
                 outStream = mSocket.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-                publishProgress("ERROR: Output stream creation failed. Ensure that the server is up and try again.");
-                return null;
-            }
-
-            try {
                 outStream.write(messageBytes);
+                outStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
                 publishProgress("ERROR: Message sending failed. Ensure that the server is up and try again.");
@@ -81,16 +72,15 @@ public class HermitBluetoothServerRequest extends AsyncActivityTask<ConsoleActiv
                 publishProgress("ERROR: Input stream creation failed. Ensure that the server is up and try again.");
                 return null;
             }
-            BufferedReader serverReader = new BufferedReader(new InputStreamReader(inStream));
             String response;
-            char[] buffer = new char[5000];
             try {
                 /**
                  * WARNING! If the Android device is not connected to the server by this point,
                  * calling read() will crash the app without throwing an exception!
                  */
-                serverReader.read(buffer);
-                response = new String(buffer);
+                byte[] buffer = new byte[5092];
+                int bytes = inStream.read(buffer);
+                response = new String(buffer, 0, bytes);
             } catch (IOException e) {
                 e.printStackTrace();
                 publishProgress("ERROR: Failed to read server response. Ensure that the server is up and try again.");

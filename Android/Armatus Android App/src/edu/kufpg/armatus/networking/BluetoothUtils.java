@@ -1,8 +1,5 @@
 package edu.kufpg.armatus.networking;
 
-import java.io.IOException;
-import java.util.UUID;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
@@ -17,6 +14,9 @@ import android.os.Build;
 import android.util.Log;
 import edu.kufpg.armatus.DeviceConstants;
 import edu.kufpg.armatus.Prefs;
+
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Utility class that organizes all of the crazy Android Bluetooth API calls into much
@@ -54,12 +54,12 @@ public final class BluetoothUtils {
 	public static void closeBluetooth() {
 		if (sSocket != null) {
 			try {
-				if (sSocket.getOutputStream() != null) {
-					sSocket.getOutputStream().close();
-				}
-				if (sSocket.getInputStream() != null) {
-					sSocket.getInputStream().close();
-				}
+//				if (sSocket.getOutputStream() != null) {
+//					sSocket.getOutputStream().close();
+//				}
+//				if (sSocket.getInputStream() != null) {
+//					sSocket.getInputStream().close();
+//				}
 				sSocket.close();
 			} catch (IOException e) {
 				Log.w(TAG, "Error occurred when closing Bluetooth socket!");
@@ -87,7 +87,7 @@ public final class BluetoothUtils {
 
 	/**
 	 * If Bluetooth is not already on, this method prompts the user to turn on Bluetooth.
-	 * @param activity The {@link Fragment} that will handle the result (with the {@code
+	 * @param fragment The {@link Fragment} that will handle the result (with the {@code
 	 * requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
 	 */
 	public static void enableBluetooth(Fragment fragment) {
@@ -194,7 +194,7 @@ public final class BluetoothUtils {
 	/**
 	 * Starts an {@link Intent} that allows the user to select a Bluetooth device from a list
 	 * of nearby devices.
-	 * @param activity The {@link Fragment} that will handle the result (with the {@code
+	 * @param fragment The {@link Fragment} that will handle the result (with the {@code
 	 * requestCode} {@link #REQUEST_FIND_BLUETOOTH_DEVICE}).
 	 */
 	public static void findDeviceName(Fragment fragment) {

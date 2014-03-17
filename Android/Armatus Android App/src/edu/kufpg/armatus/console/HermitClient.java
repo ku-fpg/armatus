@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.common.base.Function;
@@ -25,7 +27,8 @@ import edu.kufpg.armatus.data.History;
 import edu.kufpg.armatus.data.HistoryCommand;
 import edu.kufpg.armatus.data.Token;
 import edu.kufpg.armatus.networking.BluetoothUtils;
-import edu.kufpg.armatus.networking.HermitBluetoothServerRequest;
+import edu.kufpg.armatus.networking.HermitBluetoothReceiveRequest;
+import edu.kufpg.armatus.networking.HermitBluetoothSendRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest.HttpRequest;
 import edu.kufpg.armatus.networking.InternetUtils;
@@ -53,9 +56,22 @@ public class HermitClient implements Parcelable {
     private String mServerUrl;
     private Bundle mTempBundle = new Bundle();
     private Token mToken;
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            String input = (String) msg.obj;
+            if (input != null) {
+                mConsole.appendErrorResponse(input);
+            }
+        }
+    };
 
     public HermitClient(ConsoleActivity console) {
         mConsole = console;
+    }
+
+    public void handleInput(String input) {
+        mHandler.obtainMessage(-1, input).sendToTarget();
     }
 
     public void completeInput(final String input) {
@@ -131,10 +147,12 @@ public class HermitClient implements Parcelable {
         } else {
             //Hardcode Bluetooth testing for now since I'm lazy
             if (Prefs.isBluetoothSource(mConsole)) {
-                if (isNetworkConnected(RequestName.COMMAND)) {
+                if (input.equals("btconnect") && !BluetoothUtils.isBluetoothConnected(mConsole)) {
+                    new HermitBluetoothReceiveRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else if (isNetworkConnected(RequestName.COMMAND) && BluetoothUtils.isBluetoothConnected(mConsole)) {
                     String cleanInput = StringUtils.noCharWrap(input);
-                    new HermitBluetoothServerRequest(mConsole).execute(cleanInput);
-                } else {
+                    new HermitBluetoothSendRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, cleanInput);
+                } else if (BluetoothUtils.isBluetoothConnected(mConsole)) {
                     mTempBundle.putString("input", input);
                     mTempBundle.putInt("charsPerLine", charsPerLine);
                 }
