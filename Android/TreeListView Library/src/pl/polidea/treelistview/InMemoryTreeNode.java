@@ -21,7 +21,6 @@ class InMemoryTreeNode<T> implements Serializable {
 
 	public InMemoryTreeNode(final T id, final T parent, final int level,
 			final boolean visible) {
-		super();
 		mId = id;
 		mParent = parent;
 		mLevel = level;
@@ -65,7 +64,7 @@ class InMemoryTreeNode<T> implements Serializable {
 		mChildIdListCache = null;
 		// Note! top levell children are always visible (!)
 		final InMemoryTreeNode<T> newNode = new InMemoryTreeNode<T>(child,
-				getId(), getLevel() + 1, getId() == null ? true : visible);
+				getId(), getLevel() + 1, getId() == null || visible);
 		mChildren.add(index, newNode);
 		return newNode;
 	}
@@ -98,7 +97,7 @@ class InMemoryTreeNode<T> implements Serializable {
 		return "InMemoryTreeNode [id=" + getId() + ", parent=" + getParent()
 				+ ", level=" + getLevel() + ", visible=" + mVisible
 				+ ", children=" + mChildren + ", childIdListCache="
-				+ mChildIdListCache + "]";
+				+ mChildIdListCache + ']';
 	}
 
 	T getId() {

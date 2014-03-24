@@ -71,6 +71,7 @@ public class SlidingActivityHelper {
 			secondary = false;
 		}
 		new Handler().post(new Runnable() {
+			@Override
 			public void run() {
 				if (open) {
 					if (secondary) {

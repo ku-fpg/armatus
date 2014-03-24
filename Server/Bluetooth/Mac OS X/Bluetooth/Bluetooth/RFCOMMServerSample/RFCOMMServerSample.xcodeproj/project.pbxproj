@@ -1,0 +1,321 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9A2EFAE107A865B400258FA4 /* ChatBluetoothServerInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 31D3412C027DEF2205CD2B62 /* ChatBluetoothServerInterface.h */; };
+		9A2EFAE207A865B400258FA4 /* ChatServerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 31D3412E027DEF2205CD2B62 /* ChatServerController.h */; };
+		9A2EFAE407A865B400258FA4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
+		9A2EFAE507A865B400258FA4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		9A2EFAE607A865B400258FA4 /* SerialPortDictionary.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3142521A027DFC9805CD2B62 /* SerialPortDictionary.plist */; };
+		9A2EFAE807A865B400258FA4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		9A2EFAE907A865B400258FA4 /* ChatBluetoothServerInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D3412D027DEF2205CD2B62 /* ChatBluetoothServerInterface.m */; };
+		9A2EFAEA07A865B400258FA4 /* ChatServerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D3412F027DEF2205CD2B62 /* ChatServerController.m */; };
+		9A2EFAEC07A865B400258FA4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		9A2EFAED07A865B400258FA4 /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31D34135027DEF4C05CD2B62 /* IOBluetooth.framework */; };
+		9A2EFAF807A865CB00258FA4 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A2EFAF707A865CB00258FA4 /* Info.plist */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		3142521A027DFC9805CD2B62 /* SerialPortDictionary.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; path = SerialPortDictionary.plist; sourceTree = "<group>"; };
+		31D3412C027DEF2205CD2B62 /* ChatBluetoothServerInterface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ChatBluetoothServerInterface.h; sourceTree = "<group>"; };
+		31D3412D027DEF2205CD2B62 /* ChatBluetoothServerInterface.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ChatBluetoothServerInterface.m; sourceTree = "<group>"; };
+		31D3412E027DEF2205CD2B62 /* ChatServerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ChatServerController.h; sourceTree = "<group>"; };
+		31D3412F027DEF2205CD2B62 /* ChatServerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ChatServerController.m; sourceTree = "<group>"; };
+		31D34135027DEF4C05CD2B62 /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = /System/Library/Frameworks/IOBluetooth.framework; sourceTree = "<absolute>"; };
+		9A2EFAEF07A865B400258FA4 /* RFCOMMServerSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RFCOMMServerSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A2EFAF707A865CB00258FA4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9A2EFAEB07A865B400258FA4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A2EFAEC07A865B400258FA4 /* Cocoa.framework in Frameworks */,
+				9A2EFAED07A865B400258FA4 /* IOBluetooth.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				31D3412C027DEF2205CD2B62 /* ChatBluetoothServerInterface.h */,
+				31D3412D027DEF2205CD2B62 /* ChatBluetoothServerInterface.m */,
+				31D3412E027DEF2205CD2B62 /* ChatServerController.h */,
+				31D3412F027DEF2205CD2B62 /* ChatServerController.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+				31D34135027DEF4C05CD2B62 /* IOBluetooth.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9A2EFAEF07A865B400258FA4 /* RFCOMMServerSample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* RFCOMMServerSample */ = {
+			isa = PBXGroup;
+			children = (
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = RFCOMMServerSample;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				3142521A027DFC9805CD2B62 /* SerialPortDictionary.plist */,
+				9A2EFAF707A865CB00258FA4 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		9A2EFAE007A865B400258FA4 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A2EFAE107A865B400258FA4 /* ChatBluetoothServerInterface.h in Headers */,
+				9A2EFAE207A865B400258FA4 /* ChatServerController.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		9A2EFADF07A865B400258FA4 /* RFCOMMServerSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9A4E6EF208BA770A00AC9CD7 /* Build configuration list for PBXNativeTarget "RFCOMMServerSample" */;
+			buildPhases = (
+				9A2EFAE007A865B400258FA4 /* Headers */,
+				9A2EFAE307A865B400258FA4 /* Resources */,
+				9A2EFAE707A865B400258FA4 /* Sources */,
+				9A2EFAEB07A865B400258FA4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RFCOMMServerSample;
+			productInstallPath = "$(HOME)/Applications";
+			productName = RFCOMMServerSample;
+			productReference = 9A2EFAEF07A865B400258FA4 /* RFCOMMServerSample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 9A4E6EF608BA770A00AC9CD7 /* Build configuration list for PBXProject "RFCOMMServerSample" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* RFCOMMServerSample */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9A2EFADF07A865B400258FA4 /* RFCOMMServerSample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9A2EFAE307A865B400258FA4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A2EFAE407A865B400258FA4 /* MainMenu.nib in Resources */,
+				9A2EFAE507A865B400258FA4 /* InfoPlist.strings in Resources */,
+				9A2EFAE607A865B400258FA4 /* SerialPortDictionary.plist in Resources */,
+				9A2EFAF807A865CB00258FA4 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9A2EFAE707A865B400258FA4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A2EFAE807A865B400258FA4 /* main.m in Sources */,
+				9A2EFAE907A865B400258FA4 /* ChatBluetoothServerInterface.m in Sources */,
+				9A2EFAEA07A865B400258FA4 /* ChatServerController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C165DFE840E0CC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				29B97319FDCFA39411CA2CEA /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		9A4E6EF308BA770A00AC9CD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				PRODUCT_NAME = RFCOMMServerSample;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		9A4E6EF408BA770A00AC9CD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				PRODUCT_NAME = RFCOMMServerSample;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		9A4E6EF708BA770A00AC9CD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+			};
+			name = Debug;
+		};
+		9A4E6EF808BA770A00AC9CD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9A4E6EF208BA770A00AC9CD7 /* Build configuration list for PBXNativeTarget "RFCOMMServerSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A4E6EF308BA770A00AC9CD7 /* Debug */,
+				9A4E6EF408BA770A00AC9CD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9A4E6EF608BA770A00AC9CD7 /* Build configuration list for PBXProject "RFCOMMServerSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A4E6EF708BA770A00AC9CD7 /* Debug */,
+				9A4E6EF808BA770A00AC9CD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

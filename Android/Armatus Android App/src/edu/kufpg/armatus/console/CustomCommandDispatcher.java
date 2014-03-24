@@ -1,23 +1,21 @@
 package edu.kufpg.armatus.console;
 
-import java.util.Map;
-import java.util.SortedSet;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
+import android.content.Intent;
+import android.widget.Toast;
+
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ListMultimap;
 
 import edu.kufpg.armatus.BaseActivity;
 import edu.kufpg.armatus.dialog.TerminalNotInstalledDialog;
-import android.content.Intent;
-import android.widget.Toast;
 
 /**
  * Contains all {@link CustomCommandInfo}s and {@link Keyword}s that the console uses and allows
- * {@link ConsoleActivity} to execute commands.
+ * {@link ConsoleActivity1} to execute commands.
  */
 public class CustomCommandDispatcher {
 	public static final String CLIENT_COMMANDS_TAG = "Client";
@@ -74,32 +72,32 @@ public class CustomCommandDispatcher {
 		}
 	};
 
-	private static final Map<String, CustomCommandInfo> CUSTOM_COMMAND_NAME_MAP = mapCustomCommands();
-	private static final ListMultimap<String, CustomCommandInfo> CUSTOM_COMMAND_TAG_MAP = mapCustomCommandTags();
-	private static final SortedSet<String> CUSTOM_COMMAND_NAME_SET = createCustomCommandNameSet();
+	private static final NavigableMap<String, CustomCommandInfo> CUSTOM_COMMAND_NAME_INFOS = mapCustomCommandNameInfos();
+	private static final NavigableSet<String> CUSTOM_COMMAND_NAMES = createCustomCommandNames();
+	private static final ListMultimap<String, String> CUSTOM_TAG_COMMAND_NAMES = mapCustomTagCommandNames();
 
 	private CustomCommandDispatcher() {}
 	
-	static Map<String, CustomCommandInfo> getCustomCommandNameMap() {
-		return CUSTOM_COMMAND_NAME_MAP;
+	static NavigableMap<String, CustomCommandInfo> getCommandNameInfos() {
+		return CUSTOM_COMMAND_NAME_INFOS;
 	}
 	
-	static SortedSet<String> getCustomCommandSet() {
-		return CUSTOM_COMMAND_NAME_SET;
+	static NavigableSet<String> getCommandSet() {
+		return CUSTOM_COMMAND_NAMES;
 	}
 	
-	static ListMultimap<String, CustomCommandInfo> getCustomCommandTagMap() {
-		return CUSTOM_COMMAND_TAG_MAP;
+	static ListMultimap<String, String> getTagCommandNames() {
+		return CUSTOM_TAG_COMMAND_NAMES;
 	}
 	
 	/**
 	 * Attempts to run a {@link CustomCommandInfo} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommandInfo}.
+	 * @param console The {@link ConsoleActivity1} on which to run the {@link CustomCommandInfo}.
 	 * @param commandName The name of the {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
 	public static void runCustomCommand(ConsoleActivity console, String commandName, String... args) {
-		CustomCommandInfo command = CUSTOM_COMMAND_NAME_MAP.get(commandName);
+		CustomCommandInfo command = CUSTOM_COMMAND_NAME_INFOS.get(commandName);
 		if (command != null) {
 			runCustomCommand(console, command, args);
 		}
@@ -107,7 +105,7 @@ public class CustomCommandDispatcher {
 
 	/**
 	 * Attempts to run a {@link CustomCommandInfo} on the console.
-	 * @param console The {@link ConsoleActivity} on which to run the {@link CustomCommandInfo}.
+	 * @param console The {@link ConsoleActivity1} on which to run the {@link CustomCommandInfo}.
 	 * @param commandThe {@code Command} to run.
 	 * @param args The parameters of the {@code Command}.
 	 */
@@ -131,11 +129,11 @@ public class CustomCommandDispatcher {
 	}
 
 	public static CustomCommandInfo getCustomCommand(String commandName) {
-		return CUSTOM_COMMAND_NAME_MAP.get(commandName);
+		return CUSTOM_COMMAND_NAME_INFOS.get(commandName);
 	}
 
 	public static boolean isCustomCommand(String commandName) {
-		return CUSTOM_COMMAND_NAME_MAP.containsKey(commandName);
+		return CUSTOM_COMMAND_NAME_INFOS.containsKey(commandName);
 	}
 
 	/**
@@ -147,23 +145,13 @@ public class CustomCommandDispatcher {
 	private static String varargsToString(String... varargs) {
 		StringBuilder builder = new StringBuilder();
 		for(String string : varargs) {
-			builder.append(string).append(" ");
+			builder.append(string).append(' ');
 		}
 		return builder.toString().trim();
 	}
 	
-	private static SortedSet<String> createCustomCommandNameSet() {
-		return ImmutableSortedSet.copyOf(Collections2.transform(CustomCommandDispatcher.getCustomCommandNameMap().values(),
-				new Function<CustomCommandInfo, String>() {
-			@Override
-			public String apply(CustomCommandInfo info) {
-				return info.getName();
-			}
-		}));
-	}
-
-	private static Map<String, CustomCommandInfo> mapCustomCommands() {
-		ImmutableMap.Builder<String, CustomCommandInfo> commandBuilder = ImmutableMap.builder();
+	private static NavigableMap<String, CustomCommandInfo> mapCustomCommandNameInfos() {
+		ImmutableSortedMap.Builder<String, CustomCommandInfo> commandBuilder = ImmutableSortedMap.naturalOrder();
 		return commandBuilder.put(CLEAR.getName(), CLEAR)
 				.put(CONNECT.getName(), CONNECT)
 				.put(EXIT.getName(), EXIT)
@@ -171,10 +159,14 @@ public class CustomCommandDispatcher {
 				.put(TOAST.getName(), TOAST)
 				.build();
 	}
+	
+	private static NavigableSet<String> createCustomCommandNames() {
+		return CUSTOM_COMMAND_NAME_INFOS.navigableKeySet();
+	}
 
-	private static ListMultimap<String, CustomCommandInfo> mapCustomCommandTags() {
-		ImmutableListMultimap.Builder<String, CustomCommandInfo> tagMapBuilder = ImmutableListMultimap.builder();
-		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_NAME_MAP.values()).build();
+	private static ListMultimap<String, String> mapCustomTagCommandNames() {
+		ImmutableListMultimap.Builder<String, String> tagMapBuilder = ImmutableListMultimap.builder();
+		return tagMapBuilder.putAll(CLIENT_COMMANDS_TAG, CUSTOM_COMMAND_NAME_INFOS.keySet()).build();
 	}
 
 }

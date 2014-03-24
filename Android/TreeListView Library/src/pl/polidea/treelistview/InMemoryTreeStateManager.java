@@ -1,5 +1,8 @@
 package pl.polidea.treelistview;
 
+import android.database.DataSetObserver;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,9 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import android.database.DataSetObserver;
-import android.util.Log;
 
 /**
  * In-memory manager of tree state.
@@ -191,6 +191,7 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
 		}
 	}
 
+	@Override
 	public synchronized void setCollapsible(boolean collapsible) {
 		if (!collapsible) {
 			expandChildren(null, true);
@@ -363,9 +364,9 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
 			final char[] indentString = new char[indent];
 			Arrays.fill(indentString, ' ');
 			sb.append(indentString);
-			sb.append(node.toString());
-			sb.append(Arrays.asList(getHierarchyDescription(id)).toString());
-			sb.append("\n");
+			sb.append(node);
+			sb.append(Arrays.asList(getHierarchyDescription(id)));
+			sb.append('\n');
 		}
 		final List<T> children = getChildren(id);
 		for (final T child : children) {

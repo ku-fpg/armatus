@@ -13,14 +13,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:text="Launch console"
+            android:text="Console"
+            android:textSize="50sp" />
+
+        <Button
+            android:id="@+id/tutorial_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/console_button"
+            android:text="Tutorial"
             android:textSize="50sp" />
 
         <TextView
             android:id="@+id/code_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/console_button"
+            android:layout_below="@+id/tutorial_button"
             android:paddingLeft="5dp"
             android:textColor="?attr/codeColor"
             tools:context=".MainActivity" />
@@ -50,48 +58,12 @@
             android:text="Tree test" />
 
         <Button
-            android:id="@+id/radialmenu_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/tree_button"
-            android:text="Launch radial menu test" />
-
-        <Button
-            android:id="@+id/test_activity_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/radialmenu_button"
-            android:text="Launch TestActivity" />
-
-        <Button
             android:id="@+id/terminal_activity_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/test_activity_button"
+            android:layout_below="@+id/tree_button"
             android:text="Launch terminal emulator" />
-
-        <Button
-            android:id="@+id/glyph_span_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/terminal_activity_button"
-            android:text="Get glyph span selection" />
-
-        <TextView
-            android:id="@+id/glyph_span_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/glyph_span_button"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textIsSelectable="true"
-            android:typeface="monospace" />
     </RelativeLayout>
 
 </ScrollView>

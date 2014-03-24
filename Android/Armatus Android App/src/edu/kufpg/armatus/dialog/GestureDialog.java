@@ -2,9 +2,6 @@ package edu.kufpg.armatus.dialog;
 
 import java.util.ArrayList;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -24,6 +21,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
+import edu.kufpg.armatus.R;
 
 /**
  * GestureDialog Class for the various gestures. Extends the {@link android.app.DialogFragment DialogFragment} and 
@@ -65,7 +63,7 @@ public class GestureDialog extends ConsiderateDialog implements OnGesturePerform
 		return new AlertDialog.Builder(getActivity())
 		.setView(mGestureView)
 		.setNegativeButton("Never mind", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {}
+			@Override public void onClick(DialogInterface dialog, int whichButton) {}
 		}).create();
 	}
 
@@ -81,7 +79,7 @@ public class GestureDialog extends ConsiderateDialog implements OnGesturePerform
 					maxScore = prediction.score;
 				}
 			}
-			((ConsoleActivity) getActivity()).showToast(bestPrediction.name);
+			getConsole().showToast(bestPrediction.name);
 		}
 	}
 

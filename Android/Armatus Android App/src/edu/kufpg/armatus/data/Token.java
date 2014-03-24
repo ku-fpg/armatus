@@ -7,6 +7,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Token implements Parcelable {
+	private static final String USER = "user", AST = "ast";
+
 	private final int mUser;
 	private int mAst;
 
@@ -14,9 +16,9 @@ public class Token implements Parcelable {
 		mUser = user;
 		mAst = ast;
 	}
-	
+
 	public Token(JSONObject o) throws JSONException {
-		this(o.getInt("user"), o.getInt("ast"));
+		this(o.getInt(USER), o.getInt(AST));
 	}
 
 	public int getUser() {
@@ -41,12 +43,12 @@ public class Token implements Parcelable {
 		}
 		return o;
 	}
-	
+
 	@Override
 	public String toString() {
 		return toJSONObject().toString();
 	}
-	
+
 	public static Parcelable.Creator<Token> CREATOR =
 			new Parcelable.Creator<Token>() {
 		@Override

@@ -12,8 +12,17 @@
     <string name="popup_text">Font size:</string>
     <string name="copy">Copy</string>
     <string name="select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="prev_glyph">Previous glyph</string>
+    <string name="prev_glyph_condensed">&lt; Glyph</string>
+    <string name="next_glyph">Next glyph</string>
+    <string name="next_glyph_condensed">Glyph &gt;</string>
+    <string name="wrap_glyphs">Wrap glyph</string>
+    <string name="wrap_glyphs_condensed">Wrap</string>
     <string name="swap">Swap</string>
     <string name="transform">Transform</string>
+    <string name="transform2">Transform2</string>
+    <string name="scope">Scope</string>
     <string name="enable_wifi_title">Wi-Fi permission request</string>
     <string name="enable_wifi_message">Armatus is requesting permission to turn on Wi-Fi. Do you want to do this?</string>
     <string name="terminal_not_installed_title">Error: ATE not installed</string>
@@ -31,12 +40,17 @@
     <string name="pref_app_theme">APP_THEME</string>
     <string name="pref_app_theme_dark">THEME_DARK</string>
     <string name="pref_app_theme_light">THEME_LIGHT</string>
+    <string name="pref_edit_mode_read">READ</string>
+	<string name="pref_edit_mode_write">WRITE</string>
+	<string name="pref_edit_mode_arithmetic">ARITHMETIC</string>
     <string name="pref_network_source">NETWORK_SOURCE</string>
     <string name="pref_network_source_web">WEB_SERVER</string>
     <string name="pref_network_source_bluetooth">BLUETOOTH_SERVER</string>
     <string name="pref_choose_bluetooth_device">CHOOSE_BLUETOOTH_DEVICE</string>
     <string name="pref_bluetooth_device_name">BLUETOOTH_DEVICE_NAME</string>
     <string name="pref_bluetooth_device_address">BLUETOOTH_DEVICE_ADDRESS</string>
+    <string name="pref_special_keys_visible">SPECIAL_KEYS_VISIBLE</string>
+    <string name="pref_is_first_time">IS_FIRST_TIME</string>
     <string name="pref_restore_defaults">RESTORE_DEFAULTS</string>
 
     <!-- BluetoothDeviceListActivity -->
@@ -56,105 +70,5 @@
     <string name="test2">Test2</string>
     <string name="test3">Test3</string>
     <string name="test4">Test4</string>
-
-    <string-array name="command_groups">
-        <item>Alpha Conversation</item>
-        <item>Fix Point</item>
-        <item>Local</item>
-        <item>New/Debug/Nav/GHC</item>
-        <item>Fold/Unfold/Inline</item>
-        <item>Miscellaneous</item>
-    </string-array>
-
-    <array name="command_group_arrays">
-        <item>@array/alpha_conversation_commands</item>
-        <item>@array/fix_point_commands</item>
-        <item>@array/local_commands</item>
-        <item>@array/new_debug_nav_ghc_commands</item>
-        <item>@array/unfold_fold_inline_commands</item>
-    </array>
-
-    <string-array name="alpha_conversation_commands">
-        <item name="id">1</item>
-        <item>alpha</item>
-        <item>alpha-alt</item>
-        <item>alpha-case</item>
-        <item>alpha-case-binder</item>
-        <item>alpha-lam</item>
-        <item>alpha-let</item>
-        <item>alpha-top</item>
-        <item>undershadow</item>
-    </string-array>
-    <string-array name="fix_point_commands">
-        <item name="id">2</item>
-        <item>fix-computation</item>
-        <item>fix-intro</item>
-        <item>rolling-rule</item>
-        <item>ww-assumption-a</item>
-        <item>ww-assumption-b</item>
-        <item>ww-assumption-c</item>
-        <item>ww-factorisation</item>
-        <item>ww-fusion</item>
-        <item>ww-split</item>
-        <item>ww-split-param</item>
-    </string-array>
-    <string-array name="local_commands">
-        <item name="id">3</item>
-        <item>abstract</item>
-        <item>beta-expand</item>
-        <item>beta-reduce</item>
-        <item>beta-reduce-plus</item>
-        <item>eta-expand</item>
-        <item>eta-reduce</item>
-        <item>flatten-module</item>
-        <item>flatten-program</item>
-        <item>nonrec-to-rec</item>
-    </string-array>
-    <string-array name="new_debug_nav_ghc_commands">
-        <item name="id">4</item>
-        <item>add-rule</item>
-        <item>any-call</item>
-        <item>apply-rule</item>
-        <item>apply-rules</item>
-        <item>binding-group-of</item>
-        <item>cast-eliminate</item>
-        <item>cleanup-unfold</item>
-        <item>compare-values</item>
-        <item>consider</item>
-        <item>consider-construct</item>
-        <item>consider-name</item>
-        <item>debug-unfold</item>
-        <item>deshadow-program</item>
-        <item>free-ids</item>
-        <item>info</item>
-        <item>inline-all</item>
-        <item>let-sub</item>
-        <item>let-tuple</item>
-        <item>observe</item>
-        <item>observe-fail</item>
-        <item>occure-analysis</item>
-        <item>push</item>
-        <item>resume</item>
-        <item>rhs-of</item>
-        <item>safe-let-sub</item>
-        <item>simplify</item>
-        <item>static-argument</item>
-        <item>test</item>
-        <item>trace</item>
-        <item>unfold-rule</item>
-        <item>unsafe-replace</item>
-        <item>variable</item>
-    </string-array>
-    <string-array name="unfold_fold_inline_commands">
-        <item name="id">5</item>
-        <item>fold</item>
-        <item>fold-remembered</item>
-        <item>inline</item>
-        <item>inline-case-binder</item>
-        <item>inline-name</item>
-        <item>inline-scrutinee</item>
-        <item>remember</item>
-        <item>unfold</item>
-    </string-array>
 
 </resources>

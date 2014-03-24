@@ -11,11 +11,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 
 /**
  * Adapter used to feed the table view.
@@ -23,7 +21,7 @@ import android.widget.ListAdapter;
  * @param <T>
  *            class for ID of the tree
  */
-public abstract class AbstractTreeListAdapter<T> extends BaseAdapter implements ListAdapter {
+public abstract class AbstractTreeListAdapter<T> extends BaseAdapter {
 	private static final String TAG = AbstractTreeListAdapter.class.getSimpleName();
 	private static final boolean DEBUG = false;
 	private final TreeStateManager<T> mTreeStateManager;
@@ -231,7 +229,7 @@ public abstract class AbstractTreeListAdapter<T> extends BaseAdapter implements 
 		layout.setBackground(individualRowDrawable == null ? getDrawableOrDefaultBackground(mRowBackgroundDrawable)
 				: individualRowDrawable);
 		final LinearLayout.LayoutParams indicatorLayoutParams = new LinearLayout.LayoutParams(
-				calculateIndentation(nodeInfo), LayoutParams.MATCH_PARENT);
+				calculateIndentation(nodeInfo), ViewGroup.LayoutParams.MATCH_PARENT);
 		final LinearLayout indicatorLayout = (LinearLayout) layout
 				.findViewById(R.id.tree_list_view_image_layout);
 		indicatorLayout.setGravity(mIndicatorGravity);
@@ -251,7 +249,7 @@ public abstract class AbstractTreeListAdapter<T> extends BaseAdapter implements 
 		final FrameLayout frameLayout = (FrameLayout) layout
 				.findViewById(R.id.tree_list_view_item_frame);
 		final FrameLayout.LayoutParams childParams = new FrameLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		if (newChildView) {
 			frameLayout.addView(childView, childParams);
 		}

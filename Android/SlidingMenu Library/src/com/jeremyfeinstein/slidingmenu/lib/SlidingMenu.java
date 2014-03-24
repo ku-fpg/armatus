@@ -65,9 +65,9 @@ public class SlidingMenu extends RelativeLayout {
 	 */
 	public static final int LEFT_RIGHT = 2;
 
-	private CustomViewAbove mViewAbove;
+	private final CustomViewAbove mViewAbove;
 
-	private CustomViewBehind mViewBehind;
+	private final CustomViewBehind mViewBehind;
 
 	private OnOpenListener mOpenListener;
 
@@ -80,7 +80,7 @@ public class SlidingMenu extends RelativeLayout {
 	 * The class that is interested in processing a onOpen
 	 * event implements this interface, and the object created
 	 * with that class is registered with a component using the
-	 * component's <code>addOnOpenListener<code> method. When
+	 * component's {@code addOnOpenListener} method. When
 	 * the onOpen event occurs, that object's appropriate
 	 * method is invoked
 	 */
@@ -89,7 +89,7 @@ public class SlidingMenu extends RelativeLayout {
 		/**
 		 * On open.
 		 */
-		public void onOpen();
+		void onOpen();
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class SlidingMenu extends RelativeLayout {
 		/**
 		 * On opened.
 		 */
-		public void onOpened();
+		void onOpened();
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class SlidingMenu extends RelativeLayout {
 		/**
 		 * On close.
 		 */
-		public void onClose();
+		void onClose();
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class SlidingMenu extends RelativeLayout {
 		/**
 		 * On closed.
 		 */
-		public void onClosed();
+		void onClosed();
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class SlidingMenu extends RelativeLayout {
 		 * @param canvas the canvas
 		 * @param percentOpen the percent open
 		 */
-		public void transformCanvas(Canvas canvas, float percentOpen);
+		void transformCanvas(Canvas canvas, float percentOpen);
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class SlidingMenu extends RelativeLayout {
 	 */
 	public SlidingMenu(Activity activity, int slideStyle) {
 		this(activity, null);
-		this.attachToActivity(activity, slideStyle);
+		attachToActivity(activity, slideStyle);
 	}
 
 	/**
@@ -203,10 +203,10 @@ public class SlidingMenu extends RelativeLayout {
 	public SlidingMenu(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
-		LayoutParams behindParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		LayoutParams behindParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		mViewBehind = new CustomViewBehind(context);
 		addView(mViewBehind, behindParams);
-		LayoutParams aboveParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		LayoutParams aboveParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		mViewAbove = new CustomViewAbove(context);
 		addView(mViewAbove, aboveParams);
 		// register the CustomViewBehind with the CustomViewAbove
@@ -217,9 +217,10 @@ public class SlidingMenu extends RelativeLayout {
 			public static final int POSITION_CLOSE = 1;
 			public static final int POSITION_SECONDARY_OPEN = 2;
 
-			public void onPageScrolled(int position, float positionOffset,
-					int positionOffsetPixels) { }
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
+			@Override
 			public void onPageSelected(int position) {
 				if (position == POSITION_OPEN && mOpenListener != null) {
 					mOpenListener.onOpen();
@@ -383,7 +384,7 @@ public class SlidingMenu extends RelativeLayout {
 	/**
 	 * Set the behind view (menu) content to the given View.
 	 *
-	 * @param view The desired content to display.
+	 * @param v The desired content to display.
 	 */
 	public void setMenu(View v) {
 		mViewBehind.setContent(v);
@@ -410,7 +411,7 @@ public class SlidingMenu extends RelativeLayout {
 	/**
 	 * Set the secondary behind view (right menu) content to the given View.
 	 *
-	 * @param view The desired content to display.
+	 * @param v The desired content to display.
 	 */
 	public void setSecondaryMenu(View v) {
 		mViewBehind.setSecondaryContent(v);
@@ -938,6 +939,7 @@ public class SlidingMenu extends RelativeLayout {
 		/* (non-Javadoc)
 		 * @see android.view.AbsSavedState#writeToParcel(android.os.Parcel, int)
 		 */
+		@Override
 		public void writeToParcel(Parcel out, int flags) {
 			super.writeToParcel(out, flags);
 			out.writeInt(mItem);
@@ -945,10 +947,12 @@ public class SlidingMenu extends RelativeLayout {
 
 		public static final Parcelable.Creator<SavedState> CREATOR =
 				new Parcelable.Creator<SavedState>() {
+			@Override
 			public SavedState createFromParcel(Parcel in) {
 				return new SavedState(in);
 			}
 
+			@Override
 			public SavedState[] newArray(int size) {
 				return new SavedState[size];
 			}
@@ -962,8 +966,7 @@ public class SlidingMenu extends RelativeLayout {
 	@Override
 	protected Parcelable onSaveInstanceState() {
 		Parcelable superState = super.onSaveInstanceState();
-		SavedState ss = new SavedState(superState, mViewAbove.getCurrentItem());
-		return ss;
+        return new SavedState(superState, mViewAbove.getCurrentItem());
 	}
 
 	/* (non-Javadoc)
@@ -993,7 +996,7 @@ public class SlidingMenu extends RelativeLayout {
 		return true;
 	}
 
-	private Handler mHandler = new Handler();
+	private final Handler mHandler = new Handler();
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void manageLayers(float percentOpen) {
@@ -1004,6 +1007,7 @@ public class SlidingMenu extends RelativeLayout {
 
 		if (layerType != getContent().getLayerType()) {
 			mHandler.post(new Runnable() {
+				@Override
 				public void run() {
 					if (DEBUG) Log.v(TAG, "changing layerType. hardware? " + (layerType == View.LAYER_TYPE_HARDWARE));
 					getContent().setLayerType(layerType, null);

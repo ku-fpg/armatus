@@ -1,9 +1,5 @@
 package edu.kufpg.armatus.networking;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-import edu.kufpg.armatus.dialog.YesOrNoDialog;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
@@ -15,6 +11,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleActivity;
+import edu.kufpg.armatus.dialog.YesOrNoDialog;
 
 /**
  * Utility class containing methods that detail the network state of the device.

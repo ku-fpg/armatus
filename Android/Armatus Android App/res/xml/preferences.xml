@@ -14,15 +14,14 @@
             android:key="@string/pref_history_dir"
             android:title="Edit saved history directory" />
 
-        <ListPreference
-            android:defaultValue="0"
+        <edu.kufpg.armatus.util.UpdatingListPreference
+            android:defaultValue="@string/pref_edit_mode_read"
             android:dialogTitle="Select an edit mode"
             android:entries="@array/edit_mode_entries"
             android:entryValues="@array/edit_mode_values"
             android:key="@string/pref_edit_mode"
             android:summary="Defines what commands can be performed on the code"
             android:title="Edit mode" />
-
         <edu.kufpg.armatus.util.UpdatingListPreference
             android:defaultValue="@string/pref_app_theme_dark"
             android:dialogTitle="Select a theme"

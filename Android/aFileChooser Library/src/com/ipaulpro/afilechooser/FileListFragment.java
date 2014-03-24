@@ -16,22 +16,22 @@
 
 package com.ipaulpro.afilechooser;
 
-import java.io.File;
-import java.util.List;
-
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Fragment that displays a list of Files in a given path.
@@ -121,7 +121,7 @@ public class FileListFragment extends ListFragment implements LoaderManager.Load
 		} else {
 			type = "file";
 		}
-		menu.setHeaderTitle("Choose action for this " + type + ":");
+		menu.setHeaderTitle("Choose action for this " + type + ':');
 		menu.add(Menu.NONE, ID_SELECT, 0, "Select this " + type);
 		if (file.isDirectory()) {
 			menu.add(Menu.NONE, ID_GO_INTO, 1, "Go into this " + type);

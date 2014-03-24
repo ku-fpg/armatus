@@ -111,7 +111,7 @@ public class TreeBuilder<T> {
 			final int level) {
 		if (parent == null && level != 0) {
 			throw new TreeConfigurationException("Trying to add new id " + id
-					+ " to top level with level != 0 (" + level + ")");
+					+ " to top level with level != 0 (" + level + ')');
 		}
 		if (parent != null && mManager.getLevel(parent) != level - 1) {
 			throw new TreeConfigurationException("Trying to add new id " + id

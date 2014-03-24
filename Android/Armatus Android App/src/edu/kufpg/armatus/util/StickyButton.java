@@ -55,8 +55,8 @@ public class StickyButton extends Button {
 	}
 	
 	@Override
-	public void setOnClickListener(OnClickListener listener) {
-		mOnClickListener = listener;
+	public void setOnClickListener(OnClickListener l) {
+		mOnClickListener = l;
 	}
 	
 	/** 
@@ -151,10 +151,12 @@ public class StickyButton extends Button {
 
 		public static final Parcelable.Creator<SavedState> CREATOR
 		= new Parcelable.Creator<SavedState>() {
+			@Override
 			public SavedState createFromParcel(Parcel in) {
 				return new SavedState(in);
 			}
 
+			@Override
 			public SavedState[] newArray(int size) {
 				return new SavedState[size];
 			}

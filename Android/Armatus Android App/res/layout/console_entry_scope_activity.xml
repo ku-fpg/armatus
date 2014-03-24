@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <edu.kufpg.armatus.activity.ScopeScrollView
+        android:id="@+id/console_entry_scope_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.8" >
+
+        <TextView
+            android:id="@+id/console_entry_scope_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="10dp"
+            android:textSize="20sp"
+            android:typeface="monospace" />
+    </edu.kufpg.armatus.activity.ScopeScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="0.2"
+        android:background="?attr/consoleBackgroundColor"
+        android:gravity="center"
+        android:text="(Pinch-zoom here)" />
+
+</LinearLayout>

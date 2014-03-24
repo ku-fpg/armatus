@@ -11,21 +11,15 @@
         android:layout_weight="1"
         android:background="?attr/consoleBackgroundColor" >
 
-        <edu.kufpg.armatus.drag.ListViewDragEdges
-            android:id="@+id/console_list_wrapper"
+        <edu.kufpg.armatus.console.ConsoleListView
+            android:id="@+id/console_list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <edu.kufpg.armatus.console.ConsoleListView
-                android:id="@+id/console_list_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:choiceMode="multipleChoice"
-                android:divider="@null"
-                android:dividerHeight="0dp"
-                android:paddingTop="@dimen/entry_padding"
-                android:splitMotionEvents="false" />
-        </edu.kufpg.armatus.drag.ListViewDragEdges>
+            android:layout_height="match_parent"
+            android:choiceMode="multipleChoice"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:paddingTop="@dimen/entry_padding"
+            android:splitMotionEvents="false" />
 
         <View
             android:id="@+id/console_empty_space"
@@ -60,12 +54,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/ic_action_find_next_light" />
 
         <ImageButton
             android:id="@+id/console_input_scroll_entries"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/console_input_next_entry"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/console_input_next_entry"
             android:src="@drawable/ic_action_find_scroll_light" />
 
@@ -73,8 +70,19 @@
             android:id="@+id/console_input_previous_entry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/console_input_scroll_entries"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/console_input_scroll_entries"
             android:src="@drawable/ic_action_find_previous_light" />
+
+        <ImageButton
+            android:id="@+id/console_options_toggle_special_keys"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/console_input_scroll_entries"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/console_options_hide_button"
+            android:src="@drawable/ic_action_lambda_light" />
 
         <ImageButton
             android:id="@+id/console_options_hide_button"

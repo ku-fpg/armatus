@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <edu.kufpg.armatus.util.TurboImageButton
+        android:id="@+id/console_entry_selection_prev_glyph"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/console_entry_selection_wrap_glyphs"
+        android:src="?attr/actionPrevGlyph" />
+
+    <ImageButton
+        android:id="@+id/console_entry_selection_wrap_glyphs"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/console_entry_selection_next_glyph"
+        android:src="?attr/actionWrapGlyphs" />
+
+    <edu.kufpg.armatus.util.TurboImageButton
+        android:id="@+id/console_entry_selection_next_glyph"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/console_entry_selection_parent_glyph"
+        android:src="?attr/actionNextGlyph" />
+
+    <edu.kufpg.armatus.util.TurboImageButton
+        android:id="@+id/console_entry_selection_parent_glyph"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:src="?attr/actionPrevGlyph" />
+
+</RelativeLayout>

@@ -1,10 +1,5 @@
 package edu.kufpg.armatus.networking;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import edu.kufpg.armatus.BaseActivity;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
@@ -16,14 +11,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.Log;
+import edu.kufpg.armatus.DeviceConstants;
+import edu.kufpg.armatus.Prefs;
+
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Utility class that organizes all of the crazy Android Bluetooth API calls into much
  * more intuitive method names.
  */
-public class BluetoothUtils {
+public final class BluetoothUtils {
 	/** 
 	 * A wrapper around a 128-bit number used to identify this service. This UUID is the Bluetooth
 	 * Base UUID and is commonly used for simple Bluetooth applications. Regardless of the UUID used,
@@ -50,23 +49,17 @@ public class BluetoothUtils {
 
 	private static boolean sLastConnectionFailed = false;
 
-	/** Reference to the app's {@link SharedPreferences}. */
-	private static SharedPreferences sPrefs;
-
-	/** Reference to the {@code Editor} that can change the app's {@link SharedPreferences}. */
-	private static SharedPreferences.Editor sPrefsEditor;
-
 	private BluetoothUtils() {}
 
 	public static void closeBluetooth() {
 		if (sSocket != null) {
 			try {
-				if (sSocket.getOutputStream() != null) {
-					sSocket.getOutputStream().close();
-				}
-				if (sSocket.getInputStream() != null) {
-					sSocket.getInputStream().close();
-				}
+//				if (sSocket.getOutputStream() != null) {
+//					sSocket.getOutputStream().close();
+//				}
+//				if (sSocket.getInputStream() != null) {
+//					sSocket.getInputStream().close();
+//				}
 				sSocket.close();
 			} catch (IOException e) {
 				Log.w(TAG, "Error occurred when closing Bluetooth socket!");
@@ -88,13 +81,13 @@ public class BluetoothUtils {
 			activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
 		} else {
 			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
 	/**
 	 * If Bluetooth is not already on, this method prompts the user to turn on Bluetooth.
-	 * @param activity The {@link Fragment} that will handle the result (with the {@code
+	 * @param fragment The {@link Fragment} that will handle the result (with the {@code
 	 * requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
 	 */
 	public static void enableBluetooth(Fragment fragment) {
@@ -103,7 +96,7 @@ public class BluetoothUtils {
 			fragment.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
 		} else {
 			Log.w(TAG, "Cannot enable Bluetooth (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
@@ -124,22 +117,20 @@ public class BluetoothUtils {
 			}
 		}
 		if (sAdapter == null) {
-			Log.w(TAG, "Bluetooth is not supported on this " + BaseActivity.DEVICE_NAME + "!");
+			Log.w(TAG, "Bluetooth is not supported on this " + DeviceConstants.DEVICE_NAME + '!');
 		}
 		return sAdapter;
 	}
 
 	/**
 	 * Retrieves the {@code BluetoothDevice} as specified by the app's {@link SharedPreferences}.
-	 * Make sure that {@link #setBluetoothDeviceInfo(Context, String, String)} has been called
-	 * before using this method.
 	 * @param context The {@link Context} to use.
 	 * @return The {@code BluetoothDevice} corresponding to user preferences. {@code null} is
 	 * returned if no {@code BluetoothDevice} is found in user preferences or if Bluetooth is
 	 * not supported on the device.
 	 */
 	public static BluetoothDevice getBluetoothDevice(Context context) {
-		String address = getPrefs(context).getString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, null);
+		String address = Prefs.getBluetoothDeviceAddress(context);
 		if (address != null) {
 			BluetoothAdapter adapter = getBluetoothAdapter(context);
 			if (adapter != null) {
@@ -149,7 +140,7 @@ public class BluetoothUtils {
 				return sDevice;
 			} else {
 				Log.w(TAG, "Cannot get Bluetooth device (Bluetooth not supported on this "
-						+ BaseActivity.DEVICE_NAME + ").");
+						+ DeviceConstants.DEVICE_NAME + ").");
 				return null;
 			}
 		} else {
@@ -179,7 +170,7 @@ public class BluetoothUtils {
 			}
 		} else {
 			Log.w(TAG, "Cannot get Bluetooth socket (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 			return null;
 		}
 	}
@@ -196,14 +187,14 @@ public class BluetoothUtils {
 			activity.startActivityForResult(findBtDevicesIntent, REQUEST_FIND_BLUETOOTH_DEVICE);
 		} else {
 			Log.w(TAG, "Cannot find Bluetooth device names (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
 	/**
 	 * Starts an {@link Intent} that allows the user to select a Bluetooth device from a list
 	 * of nearby devices.
-	 * @param activity The {@link Fragment} that will handle the result (with the {@code
+	 * @param fragment The {@link Fragment} that will handle the result (with the {@code
 	 * requestCode} {@link #REQUEST_FIND_BLUETOOTH_DEVICE}).
 	 */
 	public static void findDeviceName(Fragment fragment) {
@@ -212,10 +203,11 @@ public class BluetoothUtils {
 			fragment.startActivityForResult(findBtDevicesIntent, REQUEST_FIND_BLUETOOTH_DEVICE);
 		} else {
 			Log.w(TAG, "Cannot find Bluetooth device names (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 		}
 	}
 
+	@SuppressWarnings("resource")
 	public static boolean isBluetoothConnected(Context context) {
 		BluetoothAdapter adapter = getBluetoothAdapter(context);
 		if (adapter != null) {
@@ -234,7 +226,7 @@ public class BluetoothUtils {
 			}
 		} else {
 			Log.w(TAG, "Cannot determine Bluetooth state (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 			return false;
 		}
 	}
@@ -251,7 +243,7 @@ public class BluetoothUtils {
 			return adapter.isEnabled();
 		} else {
 			Log.w(TAG, "Cannot determine Bluetooth state (Bluetooth not supported on this "
-					+ BaseActivity.DEVICE_NAME + ").");
+					+ DeviceConstants.DEVICE_NAME + ").");
 			return false;
 		}
 	}
@@ -266,43 +258,6 @@ public class BluetoothUtils {
 
 	public static void notifyLastConnectionSucceeded() {
 		sLastConnectionFailed = false;
-	}
-
-	/**
-	 * Configures the user preferences for the name and MAC address of the Bluetooth device
-	 * to look for when connecting to an Armatus Bluetooth server.
-	 * @param context The {@link Context} to use.
-	 * @param friendlyName The name that identifies the Bluetooth device.
-	 * @param address The MAC address of the Bluetooth device. It should be in this format:
-	 * "XX:XX:XX:XX:XX" (where an X should be replaced by any hexadecimal number).
-	 */
-	public static void setBluetoothDeviceInfo(Context context, String friendlyName, String address) {
-		getPrefsEditor(context).putString(BaseActivity.BLUETOOTH_DEVICE_NAME_KEY, friendlyName)
-		.putString(BaseActivity.BLUETOOTH_DEVICE_ADDRESS_KEY, address)
-		.commit();
-	}
-
-	/**
-	 * Convenience for retrieving the app's default {@link SharedPreferences}.
-	 * @param context The {@link Context} to use.
-	 * @return The app's {@code SharedPreferences}.
-	 */
-	private static SharedPreferences getPrefs(Context context) {
-		sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		return sPrefs;
-	}
-
-	/**
-	 * Convenience for retrieving the {@code Editor} that can change the app's
-	 * {@link SharedPreferences}.
-	 * @param context The {@link Context} to use.
-	 * @return The app's {@code SharedPreferences.Editor}.
-	 */
-	private static SharedPreferences.Editor getPrefsEditor(Context context) {
-		if (sPrefsEditor == null) {
-			sPrefsEditor = getPrefs(context).edit();
-		}
-		return sPrefsEditor;
 	}
 
 }

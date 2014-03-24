@@ -3,16 +3,14 @@ package edu.kufpg.armatus.dialog;
 import java.util.List;
 
 import net.simonvt.numberpicker.NumberPicker;
-
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.console.ConsoleActivity;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.console.ConsoleActivity;
 
 public class ScrollEntriesDialog extends ConsiderateDialog {
 
@@ -45,7 +43,7 @@ public class ScrollEntriesDialog extends ConsiderateDialog {
 		setCancelable(true);
 		
 		final NumberPicker picker = (NumberPicker) v.findViewById(R.id.console_scroll_entries_picker);
-		picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+		picker.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 		picker.setMinValue(0);
 		picker.setMaxValue(mEntries.length - 1);
 		picker.setDisplayedValues(mEntries);

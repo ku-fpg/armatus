@@ -63,7 +63,7 @@ public class TreeNodeInfo<T> {
 	public String toString() {
 		return "TreeNodeInfo [id=" + mId + ", level=" + mLevel
 				+ ", withChildren=" + mWithChildren + ", visible=" + mVisible
-				+ ", expanded=" + mExpanded + "]";
+				+ ", expanded=" + mExpanded + ']';
 	}
 
 }

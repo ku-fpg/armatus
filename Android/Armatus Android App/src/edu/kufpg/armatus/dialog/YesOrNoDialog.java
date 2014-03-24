@@ -29,11 +29,13 @@ public abstract class YesOrNoDialog extends DialogFragment {
 		.setTitle(mTitle)
 		.setMessage(mMessage)
 		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				yes(dialog, whichButton);
 			}
 		})
 		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				no(dialog, whichButton);
 			}

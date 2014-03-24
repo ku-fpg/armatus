@@ -1,20 +1,13 @@
 package edu.kufpg.armatus;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.google.common.collect.ImmutableMap;
-
+import edu.kufpg.armatus.Prefs.Theme;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,133 +19,17 @@ import android.widget.Toast;
  * detect a theme change (and restart).
  */
 public class BaseActivity extends Activity {
-
-	/** The directory where any persistent data should be saved. */
-	public static final String CACHE_DIR = Environment.getExternalStorageDirectory().getPath() + "/data/armatus";
-
-	/** The package name as specified in the Android Manifest file. */
-	public static String PACKAGE_NAME;
 	
-	/** The current device's manufacturer and product name. */
-	public static String DEVICE_NAME;
-
-	/**
-	 * {@link android.preference.CheckBoxPreference CheckBoxPreference} key mapping to whether or
-	 * not {@link #CACHE_DIR} should be used to save persistent data (if the mapped value is {@code
-	 * false}). If the mapped value is {@code true}, the String to which {@link #HISTORY_DIR_KEY}
-	 * maps is used instead.
-	 */
-	public static String IS_HISTORY_DIR_CUSTOM_KEY;
-
-	/**
-	 * {@link android.preference.Preference Preference} key mapping to the String representation
-	 * of a directory where persistent data can be stored. The directory is only used if the value
-	 * to which {@link #IS_HISTORY_DIR_CUSTOM_KEY} maps is true.
-	 */
-	public static String HISTORY_DIR_KEY;
-
-	/**
-	 * {@link android.preference.ListPreference ListPreference} key mapping to one of three String
-	 * values: "0" (for {@link BaseActivity.EditMode#READ READ} mode), "1" (for {@link BaseActivity.
-	 * EditMode#WRITE WRITE} mode), or "2" (for {@link BaseActivity.EditMode#ARITHMETIC ARITHMETIC}
-	 * mode). The mapped String represent which {@link BaseActivity.EditMode EditMode} is currently
-	 * being used.
-	 */
-	public static String EDIT_MODE_KEY;
-
-	/**
-	 * {@link android.preference.ListPreference ListPreference} key mapping to either {@link
-	 * #APP_THEME_DARK} or {@link #APP_THEME_LIGHT}, depending on which theme is currently
-	 * being used.
-	 */
-	public static String APP_THEME_KEY;
-
-	/**
-	 * One of the possible values that the {@link android.preference.Preference Preference} to
-	 * which {@link #APP_THEME_KEY} maps can be (the other being {@link #APP_THEME_LIGHT}).
-	 */
-	public static String APP_THEME_DARK;
-
-	/**
-	 * One of the possible values that the {@link android.preference.Preference Preference} to
-	 * which {@link #APP_THEME_KEY} maps can be (the other being {@link #APP_THEME_DARK}).
-	 */
-	public static String APP_THEME_LIGHT;
-
-	/**
-	 * {@link android.preference.ListPreference ListPreference} key mapping to either {@link
-	 * #NETWORK_SOURCE_WEB_SERVER} or {@link #NETWORK_SOURCE_BLUETOOTH_SERVER}, depending on
-	 * which network source is currently being used.
-	 */
-	public static String NETWORK_SOURCE_KEY;
-
-	/**
-	 * One of the possible values that the {@link android.preference.Preference Preference} to
-	 * which {@link #NETWORK_SOURCE_KEY} maps can be (the other being {@link
-	 * #NETWORK_SOURCE_BLUETOOTH_SERVER}).
-	 */
-	public static String NETWORK_SOURCE_WEB_SERVER;
-
-	/**
-	 * One of the possible values that the {@link android.preference.Preference Preference} to
-	 * which {@link #NETWORK_SOURCE_KEY} maps can be (the other being {@link
-	 * #NETWORK_SOURCE_WEB_SERVER}).
-	 */
-	public static String NETWORK_SOURCE_BLUETOOTH_SERVER;
-
-	/**
-	 * {@link android.preference.Preference Preference} key mapping to the friendly name of the
-	 * Bluetooth device being used (if enabled).
-	 */
-	public static String BLUETOOTH_DEVICE_NAME_KEY;
-
-	/**
-	 * {@link android.preference.Preference Preference} key mapping to the MAC address of the
-	 * Bluetooth device being used (if enabled).
-	 */
-	public static String BLUETOOTH_DEVICE_ADDRESS_KEY;
-
-	/**
-	 * Maps special {@link android.preference.Preference Preference} keys to their default values
-	 * when the default values are impossible to know before runtime (e.g., the external cache
-	 * directory, which {@link #IS_HISTORY_DIR_CUSTOM_KEY} maps to by default).
-	 */
-	private static Map<String, ? extends Object> DYNAMIC_PREF_DEFAULTS_MAP;
-
-	/** Used to access persistent user preferences. Editing them requires {@link #sPrefsEditor}. */
-	private static SharedPreferences sPrefs;
-
-	/** Used to edit persistent user preferences stored in {@link #sPrefs}. */
-	private static SharedPreferences.Editor sPrefsEditor;
-
 	/** Tracks the ID of the current application theme. */
-	private static int sThemeId;
+	private static Theme sThemeId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		PACKAGE_NAME = getApplicationContext().getPackageName();
-		DEVICE_NAME = Build.MANUFACTURER + " " + Build.PRODUCT;
-		sPrefs = PrefsActivity.getPrefs(this);
-		sPrefsEditor = PrefsActivity.getPrefsEditor(this);
-		IS_HISTORY_DIR_CUSTOM_KEY = getResources().getString(R.string.pref_is_history_dir_custom);
-		HISTORY_DIR_KEY = getResources().getString(R.string.pref_history_dir);
-		EDIT_MODE_KEY = getResources().getString(R.string.pref_edit_mode);
-		APP_THEME_KEY = getResources().getString(R.string.pref_app_theme);
-		APP_THEME_DARK = getResources().getString(R.string.pref_app_theme_dark);
-		APP_THEME_LIGHT = getResources().getString(R.string.pref_app_theme_light);
-		NETWORK_SOURCE_KEY = getResources().getString(R.string.pref_network_source);
-		NETWORK_SOURCE_WEB_SERVER = getResources().getString(R.string.pref_network_source_web);
-		NETWORK_SOURCE_BLUETOOTH_SERVER = getResources().getString(R.string.pref_network_source_bluetooth);
-		BLUETOOTH_DEVICE_NAME_KEY = getResources().getString(R.string.pref_bluetooth_device_name);
-		BLUETOOTH_DEVICE_ADDRESS_KEY = getResources().getString(R.string.pref_bluetooth_device_address);
-		DYNAMIC_PREF_DEFAULTS_MAP = mapDynamicPrefDefaults();
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
-
-		restoreDyanmicPrefDefaultValues().commit();
-
-		sThemeId = getThemePrefId();
-		setTheme(sThemeId);
-
+		DeviceConstants.init(this);
+		Prefs.initPrefs(this);
+		sThemeId = Prefs.getTheme(this);
+		Prefs.setTheme(this, sThemeId);
+		
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
@@ -181,30 +58,21 @@ public class BaseActivity extends Activity {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onResume() {
 		//If the theme has changed while navigating the back stack
-		if (sThemeId != getThemePrefId()) {
+		if (!sThemeId.equals(Prefs.getTheme(this))) {
 			recreate();
 		}
-		
-		((BaseApplication<BaseActivity>) getApplication()).attachActivity(this);
-		super.onResume();
-	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		((BaseApplication<BaseActivity>) getApplication()).detachActivity(this);
+		super.onResume();
 	}
 
 	/**
 	 * Utility method for easily showing a quick message to the user.
 	 * @param message The message to display.
 	 */
-	public void showToast(String message) {
+	public void showToast(CharSequence message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
@@ -239,62 +107,6 @@ public class BaseActivity extends Activity {
 			appInstalled = false;
 		}
 		return appInstalled;
-	}
-
-	/**
-	 * Returns the resource ID of the current app theme (either {@code ThemeLight} or
-	 * {@code ThemeDark}.
-	 * @return the current app theme's resource ID.
-	 */
-	public static int getThemePrefId() {
-		String theme = sPrefs.getString(APP_THEME_KEY, null);
-		if (theme.equals(APP_THEME_LIGHT)) {
-			return R.style.ThemeLight;
-		} else if (theme.equals(APP_THEME_DARK)) {
-			return R.style.ThemeDark;
-		} else {
-			return -1;
-		}
-	}
-	
-	/**
-	 * Initializes {@link #DYNAMIC_PREF_DEFAULTS_MAP} by mapping {@link
-	 * android.preference.Preference Preference} keys to their default values when the default
-	 * values are impossible to know before runtime.
-	 * @return a map of {@code Preference} keys to their dynamic default values.
-	 */
-	private static Map<String, ? extends Object> mapDynamicPrefDefaults() {
-		return ImmutableMap.of(HISTORY_DIR_KEY, CACHE_DIR);
-	}
-	
-	/**
-	 * Restores the preferences that are impossible to know before runtime to their
-	 * default values.
-	 * @return a {@link SharedPreferences.Editor} with the above changes. Calling
-	 * {@link SharedPreferences.Editor#commit() commit()} is needed for the changes
-	 * to go into effect.
-	 */
-	static SharedPreferences.Editor restoreDyanmicPrefDefaultValues() {
-		for (Entry<String, ? extends Object> entry : DYNAMIC_PREF_DEFAULTS_MAP.entrySet()) {
-			if (entry.getValue() instanceof String) {
-				sPrefsEditor.putString(entry.getKey(), (String) entry.getValue());
-			} else if (entry.getValue() instanceof Boolean) {
-				sPrefsEditor.putBoolean(entry.getKey(), (Boolean) entry.getValue());
-			} else if (entry.getValue() instanceof Integer) {
-				sPrefsEditor.putInt(entry.getKey(), (Integer) entry.getValue());
-			} else if (entry.getValue() instanceof Float) {
-				sPrefsEditor.putFloat(entry.getKey(), (Float) entry.getValue());
-			} else if (entry.getValue() instanceof Long) {
-				sPrefsEditor.putLong(entry.getKey(), (Long) entry.getValue());
-			}
-		}
-		return sPrefsEditor;
-	}
-
-	public static enum EditMode {
-		READ,
-		WRITE,
-		ARITHMETIC
 	}
 
 }

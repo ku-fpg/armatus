@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayoutPreviewToolWindow">
+    <option name="state">
+      <GlobalState>
+        <option name="visible" value="false" />
+      </GlobalState>
+    </option>
+  </component>
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2a206168-de98-48db-aedd-fc41ad0637fd" name="Default" comment="" />
+    <ignored path="Android.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DebuggerManager">
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <breakpoint_rules />
+    <ui_properties />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="Android" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="HermitClient.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/HermitClient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="63" column="31" selection-start="2431" selection-end="2431" vertical-scroll-proportion="0.0" vertical-offset="162" max-vertical-offset="11376">
+              <folding>
+                <element signature="e#2239#2482#0" expanded="true" />
+                <element signature="e#2475#2476#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HermitBluetoothServerRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothServerRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="95" column="0" selection-start="3621" selection-end="3747" vertical-scroll-proportion="0.0" vertical-offset="1116" max-vertical-offset="2232">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HermitBluetoothSendRequest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothSendRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="63" column="27" selection-start="2348" selection-end="2348" vertical-scroll-proportion="0.0" vertical-offset="1479" max-vertical-offset="2016">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HermitBluetoothReceiveRequest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothReceiveRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="76" column="32" selection-start="2664" selection-end="2664" vertical-scroll-proportion="0.7290323" vertical-offset="1029" max-vertical-offset="2070">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BluetoothUtils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/BluetoothUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="196" column="22" selection-start="6996" selection-end="6996" vertical-scroll-proportion="0.0" vertical-offset="3402" max-vertical-offset="4536">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConsoleActivity.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/ConsoleActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="772" column="61" selection-start="30696" selection-end="30696" vertical-scroll-proportion="0.0" vertical-offset="11078" max-vertical-offset="17910">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/Armatus Android App/project.properties" />
+        <option value="$PROJECT_DIR$/Armatus Android App/proguard.cfg" />
+        <option value="$PROJECT_DIR$/TreeListView Library/project.properties" />
+        <option value="$PROJECT_DIR$/TreeListView Library/proguard.cfg" />
+        <option value="$PROJECT_DIR$/Armatus Android App/proguard-project.txt" />
+        <option value="$PROJECT_DIR$/TreeListView Library/proguard-project.txt" />
+        <option value="$PROJECT_DIR$/android-numberpicker Library/src/net/simonvt/numberpicker/NumberPicker.java" />
+        <option value="$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/InMemoryTreeNode.java" />
+        <option value="$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/InMemoryTreeStateManager.java" />
+        <option value="$PROJECT_DIR$/aFileChooser Library/src/com/ipaulpro/afilechooser/utils/FileUtils.java" />
+        <option value="$PROJECT_DIR$/SlidingMenu Library/src/com/jeremyfeinstein/slidingmenu/lib/SlidingMenu.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/TextDrawable.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/CustomCommandInfo.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/activity/CommandHelpActivity.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/ConsoleEntry.java" />
+        <option value="$PROJECT_DIR$/twoway-view Library/src/org/lucasr/twowayview/TwoWayView.java" />
+        <option value="$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/TreeNodeInfo.java" />
+        <option value="$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/TreeBuilder.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/PrefsActivity.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/gesture/OnPinchZoomListener.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/dialog/KeywordSwapDialog.java" />
+        <option value="$PROJECT_DIR$/aFileChooser Library/src/com/ipaulpro/afilechooser/FileListFragment.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/CustomCommandDispatcher.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/DeviceConstants.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/BundleUtils.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/CommandExpandableMenuAdapter.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/ParcelUtils.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/JsonUtils.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/BaseActivity.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/Prefs.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/BluetoothUtils.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/HermitClient.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothSendRequest.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothServerRequest.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/ConsoleActivity.java" />
+        <option value="$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothReceiveRequest.java" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="78" />
+    <option name="width" value="761" />
+    <option name="height" value="900" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Code style issues</id>
+          </State>
+          <State>
+            <id>Groovy</id>
+          </State>
+          <State>
+            <id>Potentially confusing code constructsGroovy</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>UnnecessarilyQualifiedInnerClassAccess</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus Android App" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus Android App" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus Android App" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="networking" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Armatus Android App" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="armatus" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="console" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="options.lastSelected" value="preferences.keymap" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="recentsLimit" value="5" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Documents/android-sdk-linux/docs/reference" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="192.168.1.105:5555" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Emulwat" />
+    <property name="FullScreen" value="false" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="OverrideImplement.overriding.sorted" value="false" />
+    <property name="SearchEverywhereHistory" value="" />
+  </component>
+  <component name="RunManager" selected="Android Application.Armatus Android App">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin" singleton="true">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Specs2RunConfiguration" factoryName="Specs2">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="$PROJECT_DIR$" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="Class" />
+      <setting name="showProgressMessages" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="$PROJECT_DIR$" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="Class" />
+      <setting name="showProgressMessages" value="true" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Armatus Android App" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="Armatus Android App" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
+      <RunnerSettings RunnerId="AndroidDebugRunner" />
+      <ConfigurationWrapper RunnerId="AndroidDebugRunner" />
+      <method />
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Android Application.Armatus Android App" />
+    </list>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SliceManager">
+    <option name="analysisUIOptions">
+      <AnalysisUIOptions />
+    </option>
+  </component>
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2a206168-de98-48db-aedd-fc41ad0637fd" name="Default" comment="" />
+      <created>1393301862969</created>
+      <updated>1393301862969</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="78" y="0" width="761" height="900" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.32893" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" x="176" y="97" width="1326" height="707" />
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="SBT Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5006605" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.4993395" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31801242" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21928665" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3279503" sideWeight="0.4993395" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32881773" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39901477" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/project.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="17" selection-start="561" selection-end="561" vertical-scroll-proportion="0.4698795" vertical-offset="0" max-vertical-offset="498" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/BluetoothDeviceListActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="47" selection-start="2540" selection-end="2540" vertical-scroll-proportion="0.0" vertical-offset="1188" max-vertical-offset="4464" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/proguard-project.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="0" selection-start="781" selection-end="781" vertical-scroll-proportion="0.47058824" vertical-offset="0" max-vertical-offset="765" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/project.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="83" selection-start="524" selection-end="524" vertical-scroll-proportion="0.23529412" vertical-offset="0" max-vertical-offset="765" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/proguard-project.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="30" selection-start="662" selection-end="662" vertical-scroll-proportion="0.3764706" vertical-offset="0" max-vertical-offset="765" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/res/values/attrs.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="972" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/data/Command.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="25" selection-start="1331" selection-end="1331" vertical-scroll-proportion="0.5075922" vertical-offset="702" max-vertical-offset="1566" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/TextDrawable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="334" column="34" selection-start="9671" selection-end="9671" vertical-scroll-proportion="2.9088938" vertical-offset="4329" max-vertical-offset="7866" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/CustomCommandInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="39" selection-start="1792" selection-end="1792" vertical-scroll-proportion="1.8451025" vertical-offset="0" max-vertical-offset="954">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ShowcaseView Library/src/com/espian/showcaseview/ShowcaseView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="190" column="15" selection-start="6738" selection-end="6738" vertical-scroll-proportion="-27.165178" vertical-offset="14762" max-vertical-offset="15210" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ShowcaseView Library/src/com/espian/showcaseview/actionbar/reflection/AppCompatReflector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="53" selection-start="53" selection-end="53" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="756" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SlidingMenu Library/src/com/jeremyfeinstein/slidingmenu/lib/SlidingMenu.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="25" selection-start="3262" selection-end="3262" vertical-scroll-proportion="-2.0089285" vertical-offset="2268" max-vertical-offset="17784" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/android-numberpicker Library/src/net/simonvt/numberpicker/NumberPicker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2585" column="17" selection-start="80968" selection-end="80968" vertical-scroll-proportion="0.33188722" vertical-offset="45585" max-vertical-offset="48438" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/res/values/styles.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="44" selection-start="57" selection-end="57" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="234" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/activity/CommandHelpActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="75" selection-start="1580" selection-end="1580" vertical-scroll-proportion="0.0" vertical-offset="441" max-vertical-offset="1116" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/twoway-view Library/src/org/lucasr/twowayview/TwoWayView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6262" column="11" selection-start="182840" selection-end="182840" vertical-scroll-proportion="0.0" vertical-offset="110817" max-vertical-offset="116208" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/TreeNodeInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="65" column="47" selection-start="1382" selection-end="1382" vertical-scroll-proportion="0.0" vertical-offset="691" max-vertical-offset="1152">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/TreeBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="113" column="68" selection-start="3635" selection-end="3635" vertical-scroll-proportion="0.0" vertical-offset="1888" max-vertical-offset="2466">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/PrefsActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="226" column="79" selection-start="8737" selection-end="8737" vertical-scroll-proportion="0.3167028" vertical-offset="3202" max-vertical-offset="3960">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/gesture/OnPinchZoomListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="97" column="40" selection-start="2838" selection-end="2838" vertical-scroll-proportion="0.0" vertical-offset="1231" max-vertical-offset="1692" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/dialog/KeywordSwapDialog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="87" column="49" selection-start="3094" selection-end="3094" vertical-scroll-proportion="0.0" vertical-offset="999" max-vertical-offset="1620" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/InMemoryTreeStateManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="13" selection-start="412" selection-end="412" vertical-scroll-proportion="0.0" vertical-offset="27" max-vertical-offset="6984">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TreeListView Library/src/pl/polidea/treelistview/InMemoryTreeNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="38" selection-start="2632" selection-end="2632" vertical-scroll-proportion="0.0" vertical-offset="1447" max-vertical-offset="1908">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/aFileChooser Library/src/com/ipaulpro/afilechooser/FileListFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="123" column="64" selection-start="3791" selection-end="3791" vertical-scroll-proportion="0.0" vertical-offset="1539" max-vertical-offset="2880" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/CustomCommandDispatcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="147" column="44" selection-start="5892" selection-end="5892" vertical-scroll-proportion="0.0" vertical-offset="2198" max-vertical-offset="2898">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/DeviceConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="62" selection-start="558" selection-end="558" vertical-scroll-proportion="0.4143167" vertical-offset="43" max-vertical-offset="504">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/ConsoleEntry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="132" column="49" selection-start="4220" selection-end="4220" vertical-scroll-proportion="0.0" vertical-offset="1800" max-vertical-offset="4194">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/StringUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="122" column="42" selection-start="3759" selection-end="3759" vertical-scroll-proportion="0.0" vertical-offset="1971" max-vertical-offset="2988" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/aFileChooser Library/src/com/ipaulpro/afilechooser/utils/FileUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="81" column="34" selection-start="2377" selection-end="2377" vertical-scroll-proportion="0.0" vertical-offset="657" max-vertical-offset="7830" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/BundleUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="494" column="26" selection-start="16346" selection-end="16346" vertical-scroll-proportion="0.0" vertical-offset="8163" max-vertical-offset="16038" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/AsyncActivityTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="41" selection-start="469" selection-end="469" vertical-scroll-proportion="0.31236443" vertical-offset="0" max-vertical-offset="1854">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/CommandExpandableMenuAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="17" selection-start="909" selection-end="909" vertical-scroll-proportion="0.1813602" vertical-offset="108" max-vertical-offset="4626">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/JsonUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="55" selection-start="1784" selection-end="1784" vertical-scroll-proportion="1.9591837" vertical-offset="0" max-vertical-offset="1404" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/res/layout/console_entry_child.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="35" selection-start="614" selection-end="614" vertical-scroll-proportion="0.5638554" vertical-offset="0" max-vertical-offset="415" />
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/ParcelUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1526" column="84" selection-start="47077" selection-end="47077" vertical-scroll-proportion="-3.1538463" vertical-offset="27915" max-vertical-offset="28422" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/util/Views.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="67" selection-start="600" selection-end="600" vertical-scroll-proportion="0.59302324" vertical-offset="0" max-vertical-offset="702" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/ConsoleEntryAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="0" selection-start="2385" selection-end="2385" vertical-scroll-proportion="-0.59302324" vertical-offset="1512" max-vertical-offset="3240">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/BaseActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="111" column="1" selection-start="3151" selection-end="3151" vertical-scroll-proportion="0.7906977" vertical-offset="1392" max-vertical-offset="1908">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitHttpServerRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="22" selection-start="1231" selection-end="1231" vertical-scroll-proportion="-2.127907" vertical-offset="1242" max-vertical-offset="2556">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/android-sdk-linux/sources/android-19/java/lang/Daemons.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="169" column="0" selection-start="5928" selection-end="5928" vertical-scroll-proportion="0.33333334" vertical-offset="2531" max-vertical-offset="4824">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/android-sdk-linux/sources/android-19/java/lang/Thread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="840" column="0" selection-start="28253" selection-end="28253" vertical-scroll-proportion="0.33333334" vertical-offset="14105" max-vertical-offset="22212">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/android-sdk-linux/sources/android-19/java/io/InputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="162" column="0" selection-start="6742" selection-end="6742" vertical-scroll-proportion="0.3327032" vertical-offset="2452" max-vertical-offset="3942">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/android-sdk-linux/sources/android-19/android/bluetooth/BluetoothInputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="95" column="0" selection-start="3240" selection-end="3240" vertical-scroll-proportion="0.0" vertical-offset="1073" max-vertical-offset="1602">
+          <folding>
+            <element signature="e#0#3296#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/Prefs.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="0" selection-start="1025" selection-end="1025" vertical-scroll-proportion="-0.27221173" vertical-offset="504" max-vertical-offset="6300">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/android-sdk-linux/sources/android-19/android/os/Handler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="13" selection-start="3028" selection-end="3028" vertical-scroll-proportion="-4.246548" vertical-offset="2981" max-vertical-offset="14022">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/BluetoothUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="196" column="22" selection-start="6996" selection-end="6996" vertical-scroll-proportion="0.0" vertical-offset="486" max-vertical-offset="4536">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothServerRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="95" column="0" selection-start="3621" selection-end="3747" vertical-scroll-proportion="0.0" vertical-offset="1116" max-vertical-offset="2232">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothSendRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="27" selection-start="2348" selection-end="2348" vertical-scroll-proportion="0.0" vertical-offset="1479" max-vertical-offset="2016">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/HermitClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="31" selection-start="2431" selection-end="2431" vertical-scroll-proportion="0.0" vertical-offset="162" max-vertical-offset="11376">
+          <folding>
+            <element signature="e#2239#2482#0" expanded="true" />
+            <element signature="e#2475#2476#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/console/ConsoleActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="772" column="61" selection-start="30696" selection-end="30696" vertical-scroll-proportion="0.0" vertical-offset="11078" max-vertical-offset="17910">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Armatus Android App/src/edu/kufpg/armatus/networking/HermitBluetoothReceiveRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="32" selection-start="2664" selection-end="2664" vertical-scroll-proportion="0.7290323" vertical-offset="1029" max-vertical-offset="2070">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Android (android-numberpicker Library)|Android</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>scala-compiler</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>Android API 19 Platform</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>Android|Armatus Android App</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>Android API 19 Platform</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>nineoldandroids-2.4.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
+

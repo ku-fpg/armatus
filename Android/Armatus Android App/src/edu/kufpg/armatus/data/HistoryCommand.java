@@ -3,10 +3,14 @@ package edu.kufpg.armatus.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.primitives.Ints;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class HistoryCommand implements Comparable<HistoryCommand>, Parcelable {
+	private static final String FROM = "from", CMD = "cmd", TO = "to";
+	
 	private final int mFrom, mTo;
 	private final String mCommand;
 	
@@ -17,7 +21,7 @@ public class HistoryCommand implements Comparable<HistoryCommand>, Parcelable {
 	}
 	
 	public HistoryCommand(JSONObject o) throws JSONException {
-		this(o.getInt("from"), o.getString("cmd"), o.getInt("to"));
+		this(o.getInt(FROM), o.getString(CMD), o.getInt(TO));
 	}
 	
 	public int getFrom() {
@@ -62,7 +66,7 @@ public class HistoryCommand implements Comparable<HistoryCommand>, Parcelable {
 
 	@Override
 	public int compareTo(HistoryCommand another) {
-		return Integer.valueOf(getFrom()).compareTo(another.getFrom());
+		return Ints.compare(getFrom(), another.getFrom());
 	}
 
 }

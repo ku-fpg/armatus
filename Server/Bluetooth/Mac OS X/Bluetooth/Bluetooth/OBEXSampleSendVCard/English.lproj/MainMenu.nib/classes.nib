@@ -1,0 +1,27 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {PutButtonClicked = id; }; 
+            CLASS = MyWindow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                ButtonPut = id; 
+                TextFieldChannelID = id; 
+                TextFieldDeviceAddress = id; 
+                TextFieldEMailAddress = id; 
+                TextFieldFaxPhone = id; 
+                TextFieldFirstName = id; 
+                TextFieldHomePhone = id; 
+                TextFieldLastName = id; 
+                TextFieldMobilePhone = id; 
+                TextFieldOrganization = id; 
+                TextFieldStatus = id; 
+                TextFieldTitle = id; 
+                TextFieldWork = id; 
+            }; 
+            SUPERCLASS = NSWindow; 
+        }
+    ); 
+    IBVersion = 1; 
+}

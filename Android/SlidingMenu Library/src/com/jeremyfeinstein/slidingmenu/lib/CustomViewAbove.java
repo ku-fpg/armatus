@@ -40,6 +40,7 @@ public class CustomViewAbove extends ViewGroup {
 	private static final int MIN_DISTANCE_FOR_FLING = 25; // dips
 
 	private static final Interpolator sInterpolator = new Interpolator() {
+		@Override
 		public float getInterpolation(float t) {
 			t -= 1.0f;
 			return t * t * t * t * t + 1.0f;
@@ -127,8 +128,10 @@ public class CustomViewAbove extends ViewGroup {
 	 */
 	public static class SimpleOnPageChangeListener implements OnPageChangeListener {
 
+		@Override
 		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
+		@Override
 		public void onPageSelected(int position) {}
 
 		public void onPageScrollStateChanged(int state) {}
@@ -155,6 +158,7 @@ public class CustomViewAbove extends ViewGroup {
 		mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
 		mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
 		setInternalPageChangeListener(new SimpleOnPageChangeListener() {
+			@Override
 			public void onPageSelected(int position) {
 				if (mViewBehind != null) {
 					switch (position) {
@@ -279,7 +283,7 @@ public class CustomViewAbove extends ViewGroup {
 	float distanceInfluenceForSnapDuration(float f) {
 		f -= 0.5f; // center the values about 0.
 		f *= 0.3f * Math.PI / 2.0f;
-		return (float) FloatMath.sin(f);
+		return FloatMath.sin(f);
 	}
 
 	public int getDestScrollX(int page) {
@@ -787,7 +791,7 @@ public class CustomViewAbove extends ViewGroup {
 				targetPage += 1;
 			}
 		} else {
-			targetPage = (int) Math.round(mCurItem + pageOffset);
+			targetPage = Math.round(mCurItem + pageOffset);
 		}
 		return targetPage;
 	}

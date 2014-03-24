@@ -2,15 +2,14 @@ package edu.kufpg.armatus.console;
 
 import java.util.List;
 
-import edu.kufpg.armatus.R;
-import edu.kufpg.armatus.data.HistoryCommand;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import edu.kufpg.armatus.R;
+import edu.kufpg.armatus.data.HistoryCommand;
 
 public class CommandHistoryAdapter extends ArrayAdapter<HistoryCommand> {
 	

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module classpath="eclipse" classpath-dir="$MODULE_DIR$" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android" name="Android">
+      <configuration>
+        <proGuardCfgFiles>
+          <file>file://$MODULE_DIR$/proguard-project.txt</file>
+          <file>file://%MODULE_SDK_HOME%/tools/proguard/proguard-android.txt</file>
+          <file>file://%MODULE_SDK_HOME%/tools/proguard/proguard-android.txt</file>
+          <file>file://$MODULE_DIR$/proguard-project.txt</file>
+        </proGuardCfgFiles>
+      </configuration>
+    </facet>
+  </component>
+</module>
+

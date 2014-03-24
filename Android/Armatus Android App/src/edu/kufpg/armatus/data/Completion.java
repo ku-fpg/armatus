@@ -3,10 +3,14 @@ package edu.kufpg.armatus.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.kufpg.armatus.util.ParcelUtils;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Completion implements Parcelable {
+	private static final String IS_FINISHED = "isFinished", REPLACEMENT = "replacement", DISPLAY = "display";
+	
 	private final boolean mIsFinished;
 	private final String mReplacement;
 	private final String mDisplay;
@@ -18,7 +22,7 @@ public class Completion implements Parcelable {
 	}
 	
 	public Completion(JSONObject o) throws JSONException {
-		this(o.getBoolean("isFinished"), o.getString("replacement"), o.getString("display"));
+		this(o.getBoolean(IS_FINISHED), o.getString(REPLACEMENT), o.getString(DISPLAY));
 	}
 	
 	public boolean isFinished() {
@@ -37,7 +41,7 @@ public class Completion implements Parcelable {
 			new Parcelable.Creator<Completion>() {
 		@Override
 		public Completion createFromParcel(Parcel source) {
-			boolean isFinished = (source.readInt() == 1) ? true : false;
+			boolean isFinished = ParcelUtils.readBoolean(source);
 			String replacement = source.readString();
 			String display = source.readString();
 			return new Completion(isFinished, replacement, display);
@@ -56,7 +60,7 @@ public class Completion implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(mIsFinished ? 1 : 0);
+		ParcelUtils.writeBoolean(dest, mIsFinished);
 		dest.writeString(mReplacement);
 		dest.writeString(mDisplay);
 	}

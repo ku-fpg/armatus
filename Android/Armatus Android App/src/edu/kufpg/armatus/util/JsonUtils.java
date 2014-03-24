@@ -1,14 +1,14 @@
 package edu.kufpg.armatus.util;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Utility class containing methods useful for JSON I/O.
@@ -54,22 +54,27 @@ public class JsonUtils {
 	 * @throws FileNotFoundException if {@code path} does not exist.
 	 */
 	public static String openTextFile(String path) throws FileNotFoundException {
-		BufferedReader br = null;
+        BufferedReader br = new BufferedReader(new FileReader(path));
 		try {
-			br = new BufferedReader(new FileReader(path));
-			StringBuilder sb = new StringBuilder();
+
+            StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 
 			while (line != null) {
-				sb.append(line + "\n");
+				sb.append(line).append('\n');
 				line = br.readLine();
 			}
 
-			br.close();
 			return sb.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		} finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 		return null;
 	}
 

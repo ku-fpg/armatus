@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/console_entry_contents"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:background="?attr/consoleListSelector"
+    android:paddingBottom="@dimen/entry_padding"
+    android:paddingLeft="@dimen/entry_padding"
+    android:paddingRight="@dimen/entry_padding"
+    android:textColor="?attr/codeColor"
+    android:textIsSelectable="false"
+    android:textSize="15sp"
+    android:typeface="monospace" />

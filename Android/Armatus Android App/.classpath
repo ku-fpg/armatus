@@ -4,11 +4,15 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="libs/guava-14.0.1.jar" sourcepath="C:/Users/xnux/Desktop/guava-14.0.1-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/xnux/Desktop/guava-14.0.1-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Android API 19 Platform"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/android-numberpicker Library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/TreeListView Library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SlidingMenu Library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/twoway-view Library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ShowcaseView Library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/aFileChooser Library"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/guava-16.0.1"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jsr305-2.0.3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commons-collections4-4.0"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
