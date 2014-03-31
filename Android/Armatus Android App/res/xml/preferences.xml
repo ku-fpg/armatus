@@ -14,6 +14,11 @@
             android:key="@string/pref_history_dir"
             android:title="Edit saved history directory" />
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="SHOW_LINE_NUMBERS"
+            android:title="Show line numbers" />
+
         <edu.kufpg.armatus.util.UpdatingListPreference
             android:defaultValue="@string/pref_edit_mode_read"
             android:dialogTitle="Select an edit mode"

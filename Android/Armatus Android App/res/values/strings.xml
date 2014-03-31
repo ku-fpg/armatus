@@ -52,6 +52,7 @@
     <string name="pref_special_keys_visible">SPECIAL_KEYS_VISIBLE</string>
     <string name="pref_is_first_time">IS_FIRST_TIME</string>
     <string name="pref_restore_defaults">RESTORE_DEFAULTS</string>
+    <string name="pref_show_line_numbers">SHOW_LINE_NUMBERS</string>
 
     <!-- BluetoothDeviceListActivity -->
     <string name="bluetooth_scanning_title">Scanning for devices…</string>

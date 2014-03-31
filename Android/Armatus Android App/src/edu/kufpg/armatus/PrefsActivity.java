@@ -76,6 +76,7 @@ public class PrefsActivity extends PreferenceActivity {
 		 */
 		private Preference mChooseBluetoothDevicePref;
 
+        private CheckBoxPreference mShowLineNumbers;
 		/**
 		 * Preference that can restore the default app preferences (mapped to by {@link
 		 * BaseActivity#RESTORE_DEFAULTS_KEY RESTORE_DEFAULTS_KEY}).
@@ -98,12 +99,23 @@ public class PrefsActivity extends PreferenceActivity {
 			if (Prefs.getNetworkSource(getActivity()).equals(NetworkSource.WEB_SERVER)) {
 				mChooseBluetoothDevicePref.setEnabled(false);
 			}
+            mShowLineNumbers = (CheckBoxPreference) findPreference("SHOW_LINE_NUMBERS");//R.string.pref_show_line_numbers);
+
 			mRestoreDefaultsPref = findPreference(Prefs.RESTORE_DEFAULTS_KEY);
+
+            mShowLineNumbers.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    mShowLineNumbers.setChecked((Boolean) newValue);
+                    return (Boolean) newValue;
+                }
+            });
 
 			mIsHistoryDirCustomPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue) {
 					setHistoryDirPrefSummary((Boolean) newValue);
+                    Prefs.setShowLineNumbers((Boolean) newValue);
 					return true;
 				}
 			});
@@ -229,6 +241,8 @@ public class PrefsActivity extends PreferenceActivity {
 				mChooseBluetoothDevicePref.setSummary(null);
 			}
 		}
+
+
 
 		/**
 		 * Customizes the {@link Preference} caption for the console session history directory.

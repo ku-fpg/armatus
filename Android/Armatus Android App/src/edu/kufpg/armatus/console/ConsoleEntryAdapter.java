@@ -1,8 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.util.List;
-import java.util.SortedSet;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
@@ -15,18 +12,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 import edu.kufpg.armatus.R;
 import edu.kufpg.armatus.console.ConsoleWordSearcher.MatchParams;
+import edu.kufpg.armatus.util.Views;
+import edu.kufpg.armatus.Prefs;
+
+import java.util.List;
+import java.util.SortedSet;
 
 public class ConsoleEntryAdapter extends BaseExpandableListAdapter {
 	private final LayoutInflater mInflater;
 	private final List<ConsoleEntry> mEntryList;
 	private ConsoleWordSearcher mSearcher;
+    private Context context;
 
 	public ConsoleEntryAdapter(Context context, List<ConsoleEntry> entryList) {
 		mInflater = LayoutInflater.from(context);
 		mEntryList = entryList;
+        this.context = context;
 	}
 
 	@Override
@@ -78,6 +83,7 @@ public class ConsoleEntryAdapter extends BaseExpandableListAdapter {
 			convertView = mInflater.inflate(R.layout.console_entry_child, null);
 			holder = new ConsoleEntryHolder();
 			holder.contents = (TextView) convertView.findViewById(R.id.console_entry_contents);
+            holder.lineNumber = (TextView) convertView.findViewById(R.id.console_line_number);
 			convertView.setTag(holder);
 		} else {
 			holder = (ConsoleEntryHolder) convertView.getTag();
@@ -86,6 +92,15 @@ public class ConsoleEntryAdapter extends BaseExpandableListAdapter {
 		CharSequence entryContents = getChild(groupPosition, childPosition);
 		holder.contents.setTypeface(ConsoleActivity.TYPEFACE);
 		holder.contents.setText(entryContents);
+        if (Prefs.getShowLineNumbers(this.context)){
+            holder.lineNumber.setTypeface(ConsoleActivity.TYPEFACE);
+            holder.lineNumber.setText(Integer.toString(Views.getFlatListPosition((ExpandableListView) parent,
+                    groupPosition, childPosition) - groupPosition));
+        }
+        else {
+            holder.lineNumber.setTypeface(ConsoleActivity.TYPEFACE);
+            holder.lineNumber.setText("");
+        }
 
 		//Highlights search matches
 		if (mSearcher != null) {
@@ -136,6 +151,7 @@ public class ConsoleEntryAdapter extends BaseExpandableListAdapter {
 	/** Holds {@link TextView} reference for efficiency purposes. */
 	static class ConsoleEntryHolder {
 		public TextView contents;
+        public TextView lineNumber;
 	}
 
 	/**

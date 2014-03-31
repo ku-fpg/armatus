@@ -107,6 +107,8 @@ public final class Prefs {
 	 */
 	static String CHOOSE_BLUETOOTH_DEVICE_KEY;
 
+    static Boolean SHOW_LINE_NUMBERS;
+
 	/**
 	 * {@link Preference} key used for resetting preferences back to their default values.
 	 */
@@ -133,6 +135,7 @@ public final class Prefs {
 		IS_FIRST_TIME_KEY = context.getResources().getString(R.string.pref_is_first_time);
 
 		CHOOSE_BLUETOOTH_DEVICE_KEY = context.getResources().getString(R.string.pref_choose_bluetooth_device);
+        SHOW_LINE_NUMBERS = false;
 		RESTORE_DEFAULTS_KEY = context.getResources().getString(R.string.pref_restore_defaults);
 
 		DYNAMIC_PREF_DEFAULTS_MAP = mapDynamicPrefDefaults();
@@ -208,6 +211,15 @@ public final class Prefs {
 	public static String getBluetoothDeviceName(Context context) {
 		return getPrefs(context).getString(BLUETOOTH_DEVICE_NAME_KEY, null);
 	}
+
+    public static Boolean getShowLineNumbers(Context context) {
+        // R.string.pref_show_line_number
+        return getPrefs(context).getBoolean("SHOW_LINE_NUMBERS", false);
+    }
+
+    public static void setShowLineNumbers(Boolean newShowLineNumbers) {
+        SHOW_LINE_NUMBERS = newShowLineNumbers;
+    }
 
 	public static EditMode getEditMode(Context context) {
 		String editMode = getPrefs(context).getString(EDIT_MODE_KEY, null);
