@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="jsr305-2.0.3">
+  <library name="jsr305">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/libs/jsr305-2.0.3.jar!/" />
     </CLASSES>

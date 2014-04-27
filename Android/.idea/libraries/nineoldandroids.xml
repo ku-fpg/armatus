@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="guava-16.0.1">
+  <library name="nineoldandroids">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/guava-16.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/nineoldandroids-2.4.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

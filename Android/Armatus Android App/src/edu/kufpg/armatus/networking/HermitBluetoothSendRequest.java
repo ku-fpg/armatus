@@ -85,7 +85,6 @@ public class HermitBluetoothSendRequest extends AsyncActivityTask<ConsoleActivit
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
         if (result != null) {
-            //getActivity().appendErrorResponse(result);
             BluetoothUtils.notifyLastConnectionSucceeded();
         } else {
             BluetoothUtils.notifyLastConnectionFailed();

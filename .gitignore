@@ -23,6 +23,11 @@ local.properties
 proguard/
 proguard_logs/
 
+# IntelliJ IDEA-specific workspace configurations
+**/.idea/tasks.xml
+**/.idea/workspace.xml
+.iws
+
 # Other weird files
 .directory
 .DS_Store

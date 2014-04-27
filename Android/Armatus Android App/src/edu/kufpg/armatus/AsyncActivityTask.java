@@ -1,9 +1,9 @@
 package edu.kufpg.armatus;
 
-import java.lang.ref.WeakReference;
-
 import android.app.Activity;
 import android.os.AsyncTask;
+
+import java.lang.ref.WeakReference;
 
 /**
  * An {@link AsyncTask} whose execution is intimately connected with an {@link Activity}. Unlike
