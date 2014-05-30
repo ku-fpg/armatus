@@ -1,8 +1,5 @@
 package edu.kufpg.armatus.console;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -27,6 +24,10 @@ import edu.kufpg.armatus.activity.ConsoleEntrySelectionActivity2;
 import edu.kufpg.armatus.util.ParcelUtils;
 import edu.kufpg.armatus.util.StringUtils;
 import edu.kufpg.armatus.util.Views;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class ConsoleListView extends ExpandableListView {
 	private ConsoleActivity mConsole;
@@ -194,7 +195,8 @@ public class ConsoleListView extends ExpandableListView {
 			case R.id.console_list_view_copy:
 				StringBuilder copyBuilder = new StringBuilder();
 				for (int state : prevCheckedStates) {
-					copyBuilder.append(((ConsoleEntry) mListView.getItemAtPosition(state))
+                    int groupPos = Views.getGroupPosition(mListView, state);
+					copyBuilder.append(mConsole.getEntry(groupPos)
 							.getFullContents()).append('\n');
 				}
 				copyBuilder.deleteCharAt(copyBuilder.length() - 1); //Remove final newline
@@ -289,7 +291,7 @@ public class ConsoleListView extends ExpandableListView {
 		}
 
 		@Override
-		public void writeToParcel(Parcel dest, int flags) {
+		public void writeToParcel(@NotNull Parcel dest, int flags) {
 			super.writeToParcel(dest, flags);
 			ParcelUtils.writeCollection(dest, checkedStates);
 		}

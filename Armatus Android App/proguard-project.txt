@@ -15,7 +15,7 @@
 -dontwarn com.google.common.collect.MinMaxPriorityQueue
 
 ######################### THE SPEED SUITE ###########################
-# Comment out the lines below to speed up Proguard compilation time #
+# Uncomment the lines below to speed up Proguard compilation time #
 
 #-dontobfuscate
 #-dontoptimize
