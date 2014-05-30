@@ -16,7 +16,7 @@
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="SHOW_LINE_NUMBERS"
+            android:key="@string/pref_show_line_numbers"
             android:title="Show line numbers" />
 
         <edu.kufpg.armatus.util.UpdatingListPreference

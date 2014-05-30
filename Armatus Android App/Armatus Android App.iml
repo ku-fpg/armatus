@@ -28,7 +28,7 @@
     <orderEntry type="library" name="jsr305" level="project" />
     <orderEntry type="library" name="guava" level="project" />
     <orderEntry type="library" name="commons-collections" level="project" />
-    <orderEntry type="library" name="annotations" level="project" />
+    <orderEntry type="library" name="android-support-annotations" level="project" />
   </component>
 </module>
 

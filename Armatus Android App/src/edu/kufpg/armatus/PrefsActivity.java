@@ -1,14 +1,5 @@
 package edu.kufpg.armatus;
 
-import java.io.File;
-
-import com.ipaulpro.afilechooser.FileChooserActivity;
-import com.ipaulpro.afilechooser.utils.FileUtils;
-
-import edu.kufpg.armatus.Prefs.NetworkSource;
-import edu.kufpg.armatus.dialog.YesOrNoDialog;
-import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
-import edu.kufpg.armatus.networking.BluetoothUtils;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,74 +8,86 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
+import com.ipaulpro.afilechooser.FileChooserActivity;
+import com.ipaulpro.afilechooser.utils.FileUtils;
+import edu.kufpg.armatus.Prefs.NetworkSource;
+import edu.kufpg.armatus.dialog.YesOrNoDialog;
+import edu.kufpg.armatus.networking.BluetoothDeviceListActivity;
+import edu.kufpg.armatus.networking.BluetoothUtils;
+
+import javax.annotation.Nonnull;
+import java.io.File;
 
 /**
  * The {@link Activity} that displays user preferences (via {@link PrefsFragment}).
  */
 public class PrefsActivity extends PreferenceActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	@Override protected void onCreate(@Nullable final Bundle savedInstanceState) {
 		Prefs.refreshTheme(this);
-		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
+		getFragmentManager().beginTransaction().replace(android.R.id.content, PrefsFragment.newInstance()).commit();
 		super.onCreate(savedInstanceState);
 	}
 
 	/**
 	 * Where the user can change the app preferences.
 	 */
-	public static class PrefsFragment extends PreferenceFragment {
+	private static class PrefsFragment extends PreferenceFragment {
 		/** Request code used for selecting a directory with aFileChooser. */
-		private static final int DIR_CHANGE_CODE = 4242;
+		public static final int DIR_CHANGE_CODE = 4242;
 
 		/**
-		 * Preference that adjusts whether or not {@link BaseActivity#CACHE_DIR CACHE_DIR}
+		 * Preference that adjusts whether or not {@link DeviceConstants#CACHE_DIR CACHE_DIR}
 		 * should be used to save persistent data (the value mapped to by {@link
-		 * BaseActivity#IS_HISTORY_DIR_CUSTOM_KEY IS_HISTORY_DIR_CUSTOM_KEY}).
+		 * Prefs#IS_HISTORY_DIR_CUSTOM_KEY IS_HISTORY_DIR_CUSTOM_KEY}).
 		 */
-		private CheckBoxPreference mIsHistoryDirCustomPref;
+		public CheckBoxPreference mIsHistoryDirCustomPref;
 
 		/**
 		 * Preference that can change the String representation of a directory where persistent
-		 * data can be stored (the value mapped to by {@link BaseActivity#HISTORY_DIR_KEY
+		 * data can be stored (the value mapped to by {@link Prefs#HISTORY_DIR_KEY
 		 * HISTORY_DIR_KEY}).
 		 */
-		private Preference mHistoryDirPref;
+		public Preference mHistoryDirPref;
 
 		/**
 		 * Preference that can change the current app theme (the value mapped to by {@link
-		 * BaseActivity#APP_THEME_KEY APP_THEME_KEY}).
+		 * Prefs#APP_THEME_KEY APP_THEME_KEY}).
 		 */
-		private ListPreference mAppThemePref;
+		public ListPreference mAppThemePref;
 
 		/**
 		 * Preference that can change the current network source (the value mapped to by
-		 * {@link BaseActivity#NETWORK_SOURCE_KEY NETWORK_SOURCE_KEY}).
+		 * {@link Prefs#NETWORK_SOURCE_KEY NETWORK_SOURCE_KEY}).
 		 */
-		private ListPreference mNetworkSourcePref;
+		public ListPreference mNetworkSourcePref;
 
 		/**
 		 * Preference that can change the Bluetooth device used if Bluetooth communications
-		 * are enabled (the value mapped to by {@link BaseActivity#CHOOSE_BLUETOOTH_DEVICE_KEY
+		 * are enabled (the value mapped to by {@link Prefs#CHOOSE_BLUETOOTH_DEVICE_KEY
 		 * CHOOSE_BLUETOOTH_DEVICE_KEY}).
 		 */
-		private Preference mChooseBluetoothDevicePref;
+		public Preference mChooseBluetoothDevicePref;
 
-        private CheckBoxPreference mShowLineNumbers;
+        public CheckBoxPreference mShowLineNumbersPref;
 		/**
 		 * Preference that can restore the default app preferences (mapped to by {@link
-		 * BaseActivity#RESTORE_DEFAULTS_KEY RESTORE_DEFAULTS_KEY}).
+		 * Prefs#RESTORE_DEFAULTS_KEY RESTORE_DEFAULTS_KEY}).
 		 */
-		private Preference mRestoreDefaultsPref;
+		public Preference mRestoreDefaultsPref;
 
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
+        @Nonnull public static PrefsFragment newInstance() {
+            return new PrefsFragment();
+        }
+
+		@Override public void onCreate(@Nullable Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preferences);
 
@@ -96,33 +99,21 @@ public class PrefsActivity extends PreferenceActivity {
 			mNetworkSourcePref = (ListPreference) findPreference(Prefs.NETWORK_SOURCE_KEY);
 			mChooseBluetoothDevicePref = findPreference(Prefs.CHOOSE_BLUETOOTH_DEVICE_KEY);
 			setChooseBluetoothDevicePrefSummary(Prefs.getBluetoothDeviceName(getActivity()), Prefs.getBluetoothDeviceAddress(getActivity()));
-			if (Prefs.getNetworkSource(getActivity()).equals(NetworkSource.WEB_SERVER)) {
+			if (Prefs.getNetworkSource(getActivity()) == NetworkSource.WEB_SERVER) {
 				mChooseBluetoothDevicePref.setEnabled(false);
 			}
-            mShowLineNumbers = (CheckBoxPreference) findPreference("SHOW_LINE_NUMBERS");//R.string.pref_show_line_numbers);
-
+            mShowLineNumbersPref = (CheckBoxPreference) findPreference(Prefs.SHOW_LINE_NUMBERS_KEY);
 			mRestoreDefaultsPref = findPreference(Prefs.RESTORE_DEFAULTS_KEY);
 
-            mShowLineNumbers.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    mShowLineNumbers.setChecked((Boolean) newValue);
-                    return (Boolean) newValue;
-                }
-            });
-
 			mIsHistoryDirCustomPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
+				@Override public boolean onPreferenceChange(final Preference preference, final Object newValue) {
 					setHistoryDirPrefSummary((Boolean) newValue);
-                    Prefs.setShowLineNumbers((Boolean) newValue);
 					return true;
 				}
 			});
 
 			mHistoryDirPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
+				@Override public boolean onPreferenceClick(final Preference preference) {
 					Intent intent = new Intent(getActivity(), FileChooserActivity.class);
 					intent.setType(FileUtils.MIME_TYPE_TEXT);
 					intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -132,16 +123,14 @@ public class PrefsActivity extends PreferenceActivity {
 			});
 
 			mAppThemePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
+				@Override public boolean onPreferenceChange(final Preference preference, final Object newValue) {
 					getActivity().recreate();
 					return true;
 				}
 			});
 
 			mNetworkSourcePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-				@Override
-				public boolean onPreferenceChange(Preference preference, Object newValue) {
+				@Override public boolean onPreferenceChange(final Preference preference, final Object newValue) {
 					//TODO: Change network source
 					String source = (String) newValue;
 					if (source.equals(Prefs.NETWORK_SOURCE_WEB_SERVER)) {
@@ -154,8 +143,7 @@ public class PrefsActivity extends PreferenceActivity {
 			});
 
 			mChooseBluetoothDevicePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
+				@Override public boolean onPreferenceClick(final Preference preference) {
 					if (BluetoothUtils.isBluetoothEnabled(getActivity())) {
 						BluetoothUtils.findDeviceName(PrefsFragment.this);
 					} else {
@@ -166,12 +154,10 @@ public class PrefsActivity extends PreferenceActivity {
 			});
 
 			mRestoreDefaultsPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
+				@Override public boolean onPreferenceClick(final Preference preference) {
 					String message = getResources().getString(R.string.default_pref_message);
 					YesOrNoDialog restorePrefsDialog = new YesOrNoDialog("Restore default preferences", message) {
-						@Override
-						protected void yes(DialogInterface dialog, int whichButton) {
+						@Override protected void yes(final DialogInterface dialog, final int whichButton) {
 							Prefs.getPrefsEditor(getActivity()).clear().commit();
 							PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, true);
 							Prefs.restoreDyanmicPrefDefaultValues(getActivity());
@@ -187,8 +173,7 @@ public class PrefsActivity extends PreferenceActivity {
 			});
 		}
 
-		@Override
-		public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		@Override public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 			switch (requestCode) {
 			case DIR_CHANGE_CODE:
 				if (resultCode == RESULT_OK) {
@@ -234,7 +219,7 @@ public class PrefsActivity extends PreferenceActivity {
 		 * @param name The friendly name of the current Bluetooth device (if any).
 		 * @param address The MAC address of the current Bluetooth device (if any).
 		 */
-		private void setChooseBluetoothDevicePrefSummary(String name, String address) {
+		public void setChooseBluetoothDevicePrefSummary(@Nullable final String name, @Nullable final String address) {
 			if (name != null && address != null) {
 				mChooseBluetoothDevicePref.setSummary(name + " (" + address + ')');
 			} else {
@@ -242,13 +227,11 @@ public class PrefsActivity extends PreferenceActivity {
 			}
 		}
 
-
-
 		/**
 		 * Customizes the {@link Preference} caption for the console session history directory.
 		 * @param isCustom If the a custom directory should be used.
 		 */
-		private void setHistoryDirPrefSummary(boolean isCustom) {
+		public void setHistoryDirPrefSummary(final boolean isCustom) {
 			if (isCustom) {
 				mHistoryDirPref.setSummary(Prefs.getHistoryDir(getActivity()));
 			} else {
@@ -260,7 +243,7 @@ public class PrefsActivity extends PreferenceActivity {
 		 * Utility method for easily showing a quick message to the user.
 		 * @param message The message to display.
 		 */
-		private void showToast(String message) {
+		private void showToast(@Nullable final String message) {
 			Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 		}
 
