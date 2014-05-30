@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.ActionMode;
 import android.view.ActionMode.Callback;
@@ -24,7 +25,6 @@ import edu.kufpg.armatus.activity.ConsoleEntrySelectionActivity2;
 import edu.kufpg.armatus.util.ParcelUtils;
 import edu.kufpg.armatus.util.StringUtils;
 import edu.kufpg.armatus.util.Views;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -291,7 +291,7 @@ public class ConsoleListView extends ExpandableListView {
 		}
 
 		@Override
-		public void writeToParcel(@NotNull Parcel dest, int flags) {
+		public void writeToParcel(@NonNull Parcel dest, int flags) {
 			super.writeToParcel(dest, flags);
 			ParcelUtils.writeCollection(dest, checkedStates);
 		}
