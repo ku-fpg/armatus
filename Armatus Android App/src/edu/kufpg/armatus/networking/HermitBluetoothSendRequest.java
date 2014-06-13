@@ -9,9 +9,6 @@ import edu.kufpg.armatus.console.ConsoleActivity;
 import java.io.IOException;
 import java.io.OutputStream;
 
-/**
- * Created by xnux on 3/16/14.
- */
 public class HermitBluetoothSendRequest extends AsyncActivityTask<ConsoleActivity, String, String, Boolean> {
     private BluetoothAdapter mAdapter;
     private BluetoothDevice mDevice;
