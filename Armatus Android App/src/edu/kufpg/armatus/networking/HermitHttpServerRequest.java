@@ -1,13 +1,15 @@
 package edu.kufpg.armatus.networking;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
-
-import org.apache.http.HttpException;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.google.common.base.Optional;
+import edu.kufpg.armatus.AsyncActivityTask;
+import edu.kufpg.armatus.console.ConsoleActivity;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NoHttpResponseException;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -23,142 +25,162 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import edu.kufpg.armatus.AsyncActivityTask;
-import edu.kufpg.armatus.console.ConsoleActivity;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 
 /**
  * Task that connects to a server running HERMIT-web and simulates HERMIT commands
  * by using HTTP GET and POST requests.
  */
 public abstract class HermitHttpServerRequest<Result> extends AsyncActivityTask<ConsoleActivity, String, Void, Result> {
-	private HttpRequest mRequest;
-	private String mErrorMessage;
+    private final HttpRequest mRequest;
+    private Optional<String> mErrorMessage = Optional.absent();
 
-	/**
-	 * Constructs a new instance. The constructor is not the place to put any input
-	 * {@link JSONObject}s (do that in {@link android.os.AsyncTask#execute(JSONObject...)
-	 * execute(JSONObject...)} instead).
-	 * @param console reference to the current console.
-	 */
-	public HermitHttpServerRequest(ConsoleActivity console, HttpRequest request) {
-		super(console);
-		mRequest = request;
-	}
+    /**
+     * Constructs a new instance.
+     *
+     * @param console reference to the current console.
+     */
+    public HermitHttpServerRequest(@NonNull final ConsoleActivity console,
+                                   @NonNull final HttpRequest request) {
+        super(console);
+        mRequest = request;
+    }
 
-	@Override
-	protected void onPreExecute() {
-		super.onPreExecute();
+    @Override protected void onPreExecute() {
+        super.onPreExecute();
 
-		getActivity().setProgressBarVisibility(true);
-		getActivity().disableInput(true);
-	}
+        getActivity().setProgressBarVisibility(true);
+        getActivity().disableInput(true);
+    }
 
-	@Override
-	protected Result doInBackground(String... params) {
-		HttpClient httpClient = null;
-		HttpResponse httpResponse = null;
-		String responseStr = null;
+    @Override protected Result doInBackground(@Nullable final String... params) {
+        HttpClient httpClient = null;
+        final HttpResponse httpResponse;
+        String responseStr = null;
 
-		try {
-			final HttpParams httpParams = new BasicHttpParams();
-			//Set timeout length to 10 seconds
-			HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
-			HttpConnectionParams.setSoTimeout(httpParams, 10000);
-			httpClient = new DefaultHttpClient(httpParams);
-			HttpUriRequest request = null;
-			if (mRequest.equals(HttpRequest.GET)) {
-				request = new HttpGet(params[0]);
-			} else if (mRequest.equals(HttpRequest.POST)) {
-				final HttpPost httpPost = new HttpPost(params[0]);
-				if (params.length > 1) {
-					httpPost.setHeader("content-type", "application/json");
-					if (params[1] != null && !params[1].isEmpty()) {
-						try {
-							httpPost.setEntity(new StringEntity(params[1]));
-						} catch (UnsupportedEncodingException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-				request = httpPost;
-			}
+        try {
+            final HttpParams httpParams = new BasicHttpParams();
+            //Set timeout length to 10 seconds
+            HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
+            HttpConnectionParams.setSoTimeout(httpParams, 10000);
+            httpClient = new DefaultHttpClient(httpParams);
+            final HttpUriRequest request;
 
-			if (!isCancelled()) {
-				httpResponse = httpClient.execute(request);
-			}
+            final String url;
+            if (params != null && params[0] != null) {
+                url = params[0];
+            } else {
+                return cancelResult(null, "No URL specified.");
+            }
 
-			if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-				final String entity = EntityUtils.toString(httpResponse.getEntity(), HTTP.UTF_8).trim();
-				if (entity != null) {
-					responseStr = entity;
-				}
-			} else {
-				throw new HttpException("Error code " + httpResponse.getStatusLine().getStatusCode());
-			}
-		} catch (HttpException e) {
-			return cancelResult(e, "ERROR: server problem (" + httpResponse.getStatusLine().getStatusCode() + ").");
-		} catch (HttpHostConnectException e) {
-			return cancelResult(e, "ERROR: server connection refused.");
-		} catch (ClientProtocolException e) {
-			return cancelResult(e, "ERROR: client protocol problem.");
-		} catch (NoHttpResponseException e) {
-			return cancelResult(e, "ERROR: the target server failed to respond.");
-		} catch (ConnectTimeoutException e) {
-			return cancelResult(e, "ERROR: the server connection timed out.");
-		} catch (SocketTimeoutException e) {
-			return cancelResult(e, "ERROR: the server connection timed out.");
-		} catch (IOException e) {
-			return cancelResult(e, "ERROR: I/O problem.");
-		} finally {
-			httpClient.getConnectionManager().shutdown();
-		}
+            if (mRequest == HttpRequest.GET) {
+                request = new HttpGet(url);
+            } else { // if (mRequest == HttpRequest.POST) {
+                final HttpPost httpPost = new HttpPost(url);
+                if (params.length > 1) {
+                    httpPost.setHeader("content-type", "application/json");
+                    if (params[1] != null && !params[1].isEmpty()) {
+                        try {
+                            httpPost.setEntity(new StringEntity(params[1]));
+                        } catch (final UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                request = httpPost;
+            }
 
-		return onResponse(responseStr);
-	}
+            if (!isCancelled()) {
+                httpResponse = httpClient.execute(request);
+                if (httpResponse == null) {
+                    return cancelResult(null, "No response.");
+                }
+            } else {
+                return null;
+            }
 
-	@Override
-	protected void onPostExecute(Result result) {
-		super.onPostExecute(result);
+            final StatusLine statusLine = httpResponse.getStatusLine();
+            if (statusLine == null) {
+                return cancelResult(null, "No status.");
+            }
 
-		end();
-	}
+            final HttpEntity httpEntity = httpResponse.getEntity();
+            if (httpEntity == null) {
+                return cancelResult(null, "No HTTP entity.");
+            }
 
-	@Override
-	protected void onCancelled(Result error) {
-		super.onCancelled(error);
+            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                responseStr = EntityUtils.toString(httpEntity, HTTP.UTF_8).trim();
+            } else {
+                return cancelResult(null, "Error code " + statusLine.getStatusCode());
+            }
+        } catch (final HttpHostConnectException e) {
+            return cancelResult(e, "ERROR: server connection refused.");
+        } catch (final ClientProtocolException e) {
+            return cancelResult(e, "ERROR: client protocol problem.");
+        } catch (final NoHttpResponseException e) {
+            return cancelResult(e, "ERROR: the target server failed to respond.");
+        } catch (final ConnectTimeoutException e) {
+            return cancelResult(e, "ERROR: the server connection timed out.");
+        } catch (final SocketTimeoutException e) {
+            return cancelResult(e, "ERROR: the server connection timed out.");
+        } catch (final IOException e) {
+            return cancelResult(e, "ERROR: I/O problem.");
+        } finally {
+            if (httpClient != null) {
+                httpClient.getConnectionManager().shutdown();
+            }
+        }
 
-		if (mErrorMessage != null && getActivity() != null) {
-			getActivity().appendErrorResponse(mErrorMessage);
-		}
-		end();
-	}
+        return onResponse(responseStr);
+    }
 
-	private void end() {
-		if (getActivity().getHermitClient().isRequestDelayed()) {
-			getActivity().getHermitClient().notifyDelayedRequestFinished();
-		}
+    @Override protected void onPostExecute(@Nullable final Result result) {
+        super.onPostExecute(result);
 
-		getActivity().enableInput();
-		getActivity().setProgressBarVisibility(false);
-	}
+        end();
+    }
 
-	private Result cancelResult(Exception error, String errorMsg) {
-		error.printStackTrace();
-		mErrorMessage = errorMsg;
-		cancel(true);
-		return null;
-	}
+    @Override protected void onCancelled(@Nullable final Result error) {
+        super.onCancelled(error);
 
-	protected abstract Result onResponse(String response);
-	
-	protected String getErrorMessage() {
-		return mErrorMessage;
-	}
-	
-	protected void setErrorMessage(String message) {
-		mErrorMessage = message;
-	}
+        if (mErrorMessage.isPresent() && getActivity() != null) {
+            getActivity().appendErrorResponse(mErrorMessage.get());
+        }
+        end();
+    }
 
-	public enum HttpRequest { GET, POST }
+    private void end() {
+        if (getActivity().getHermitClient().isRequestDelayed()) {
+            getActivity().getHermitClient().notifyDelayedRequestFinished();
+        }
+
+        getActivity().enableInput();
+        getActivity().setProgressBarVisibility(false);
+    }
+
+    @Nullable private Result cancelResult(@Nullable final Exception error,
+                                @Nullable final String errorMsg) {
+        if (error != null) {
+            error.printStackTrace();
+        }
+        setErrorMessage(errorMsg);
+        cancel(true);
+        return null;
+    }
+
+    @Nullable protected abstract Result onResponse(@NonNull final String response);
+
+    @NonNull protected Optional<String> getErrorMessage() {
+        return mErrorMessage;
+    }
+
+    protected void setErrorMessage(@Nullable final String message) {
+        mErrorMessage = Optional.fromNullable(message);
+    }
+
+    public enum HttpRequest { GET, POST }
 
 }

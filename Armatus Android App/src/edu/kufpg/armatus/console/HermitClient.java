@@ -10,7 +10,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
@@ -57,27 +60,26 @@ public class HermitClient implements Parcelable {
     private Bundle mTempBundle = new Bundle();
     private Token mToken;
     private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            String input = (String) msg.obj;
+        @Override public void handleMessage(@NonNull final Message msg) {
+            final String input = (String) msg.obj;
             if (input != null) {
                 mConsole.appendErrorResponse(input);
             }
         }
     };
 
-    public HermitClient(ConsoleActivity console) {
+    public HermitClient(@NonNull final ConsoleActivity console) {
         mConsole = console;
     }
 
-    public void handleInput(String input) {
+    public void handleInput(@Nullable final String input) {
         mHandler.obtainMessage(-1, input).sendToTarget();
     }
 
-    public void completeInput(final String input) {
+    public void completeInput(@NonNull final String input) {
         if (isTokenAcquired(false)) {
             if (isNetworkConnected(RequestName.COMPLETE)) {
-                Complete complete = new Complete(mToken.getUser(), input);
+                final Complete complete = new Complete(mToken.getUser(), input);
                 newCompleteInputRequest().execute(mServerUrl + "/complete", complete.toString());
             } else {
                 mTempBundle.putString("input", input);
@@ -87,7 +89,7 @@ public class HermitClient implements Parcelable {
         }
     }
 
-    public void connect(String serverUrl) {
+    public void connect(@NonNull final String serverUrl) {
         mServerUrl = serverUrl;
         if (isNetworkConnected(RequestName.CONNECT)) {
             newConnectRequest().execute(mServerUrl + "/connect");
@@ -108,7 +110,7 @@ public class HermitClient implements Parcelable {
 
     public void loadHistory() {
         if (isNetworkConnected(RequestName.HISTORY) && isTokenAcquired(false)) {
-            String path = "";
+            final String path;
             if (Prefs.isHistoryDirCustom(mConsole)) {
                 path = Prefs.getHistoryDir(mConsole);
             } else {
@@ -118,11 +120,11 @@ public class HermitClient implements Parcelable {
             final File file = new File(path + HISTORY_FILENAME);
             if (file.exists()) {
                 try {
-                    History history = new History(JsonUtils.openJsonFile(file.getAbsolutePath()));
+                    final History history = new History(JsonUtils.openJsonFile(file.getAbsolutePath()));
                     loadHistoryCommands(history.getCommands());
-                } catch (FileNotFoundException e) {
+                } catch (final FileNotFoundException e) {
                     e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     mConsole.appendErrorResponse("ERROR: saved history corrupted.");
                     e.printStackTrace();
                 }
@@ -134,8 +136,8 @@ public class HermitClient implements Parcelable {
         }
     }
 
-    public void runCommand(String input, int charsPerLine) {
-        String[] inputs = input.trim().split(StringUtils.WHITESPACE);
+    public void runCommand(@NonNull final String input, final int charsPerLine) {
+        final String[] inputs = input.trim().split(StringUtils.WHITESPACE);
         mConsole.addUserInputEntry(input);
         if (CustomCommandDispatcher.isCustomCommand(inputs[0])) {
             if (inputs.length == 1) {
@@ -150,7 +152,7 @@ public class HermitClient implements Parcelable {
                 if (input.equals("btconnect") && !BluetoothUtils.isBluetoothConnected(mConsole)) {
                     new HermitBluetoothReceiveRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 } else if (isNetworkConnected(RequestName.COMMAND) && BluetoothUtils.isBluetoothConnected(mConsole)) {
-                    String cleanInput = StringUtils.noCharWrap(input);
+                    final String cleanInput = StringUtils.noCharWrap(input);
                     new HermitBluetoothSendRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, cleanInput);
                 } else if (BluetoothUtils.isBluetoothConnected(mConsole)) {
                     mTempBundle.putString("input", input);
@@ -158,8 +160,8 @@ public class HermitClient implements Parcelable {
                 }
             } else {
                 if (isNetworkConnected(RequestName.COMMAND) && isTokenAcquired(true)) {
-                    String cleanInput = StringUtils.noCharWrap(input);
-                    Command command = new Command(mToken, cleanInput, charsPerLine);
+                    final String cleanInput = StringUtils.noCharWrap(input);
+                    final Command command = new Command(mToken, cleanInput, charsPerLine);
                     if (inputs[0].equals("abort") || inputs[0].equals("resume")) {
                         newRunAbortResumeRequest().execute(mServerUrl + "/command", command.toString());
                     } else {
@@ -173,53 +175,52 @@ public class HermitClient implements Parcelable {
         }
     }
 
-    private HermitHttpServerRequest<List<Completion>> newCompleteInputRequest() {
+    @NonNull private HermitHttpServerRequest<List<Completion>> newCompleteInputRequest() {
         return new HermitHttpServerRequest<List<Completion>>(mConsole, HttpRequest.POST) {
-            @Override
-            protected void onPreExecute() {
+            @Override protected void onPreExecute() {
                 super.onPreExecute();
                 getActivity().disableInput(false);
             }
 
-            @Override
-            protected List<Completion> onResponse(String response) {
-                JSONObject insertNameHere;
+            @Override protected List<Completion> onResponse(@NonNull final String response) {
+                final JSONObject insertNameHere;
                 try {
                     insertNameHere = new JSONObject(response);
-                    JSONArray completions = insertNameHere.getJSONArray("completions");
-                    ImmutableList.Builder<Completion> completionsBuilder = ImmutableList.builder();
+                    final JSONArray completions = insertNameHere.getJSONArray("completions");
+                    final ImmutableList.Builder<Completion> completionsBuilder = ImmutableList.builder();
                     for (int i = 0; i < completions.length(); i++) {
                         completionsBuilder.add(new Completion(completions.getJSONObject(i)));
                     }
                     return completionsBuilder.build();
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
 
-            @Override
-            protected void onCancelled(List<Completion> error) {
-                String newErrorMessage = getErrorMessage();
+            @Override protected void onCancelled(@Nullable final List<Completion> error) {
+                final Optional<String> newErrorMessage = getErrorMessage();
                 setErrorMessage(null);
-                if (newErrorMessage != null && getActivity() != null) {
-                    getActivity().addErrorResponseEntry(newErrorMessage);
+                if (newErrorMessage.isPresent() && getActivity() != null) {
+                    getActivity().addErrorResponseEntry(newErrorMessage.get());
                 }
 
                 super.onCancelled(error);
             }
 
-            @Override
-            protected void onPostExecute(List<Completion> completions) {
+            @Override protected void onPostExecute(@Nullable final List<Completion> completions) {
                 super.onPostExecute(completions);
-                SortedSet<String> suggestions = new TreeSet<String>();
-                suggestions.addAll(Collections2.transform(completions, new Function<Completion, String>() {
-                    @Override
-                    public String apply(Completion input) {
-                        return input.getReplacement();
-                    }
-                }));
-                getActivity().attemptInputCompletion(suggestions);
+                final SortedSet<String> suggestions = new TreeSet<String>();
+
+                if (completions != null) {
+                    suggestions.addAll(Collections2.transform(completions, new Function<Completion, String>() {
+                        @Override
+                        public String apply(final Completion input) {
+                            return input.getReplacement();
+                        }
+                    }));
+                    getActivity().attemptInputCompletion(suggestions);
+                }
             }
         };
     }
@@ -227,47 +228,41 @@ public class HermitClient implements Parcelable {
     private HermitHttpServerRequest<Token> newConnectRequest() {
         return new HermitHttpServerRequest<Token>(mConsole, HttpRequest.POST) {
 
-            @Override
-            protected void onPreExecute() {
+            @Override protected void onPreExecute() {
                 super.onPreExecute();
 
                 getActivity().setProgressBarVisibility(false);
                 showProgressDialog(getActivity(), this, "Connecting...");
             }
 
-            @Override
-            protected void onActivityDetached() {
+            @Override protected void onActivityDetached() {
                 if (mProgress != null) {
                     mProgress.dismiss();
                     mProgress = null;
                 }
             }
 
-            @Override
-            protected void onActivityAttached() {
+            @Override protected void onActivityAttached() {
                 if (mProgress == null) {
                     showProgressDialog(getActivity(), this, "Connecting...");
                 }
             }
 
-            @Override
-            protected Token onResponse(String response) {
+            @Override protected Token onResponse(@NonNull final String response) {
                 try {
                     return new Token(new JSONObject(response));
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
 
-            @Override
-            protected void onCancelled(Token error) {
+            @Override protected void onCancelled(@Nullable final Token error) {
                 super.onCancelled(error);
                 dismissProgressDialog();
             }
 
-            @Override
-            protected void onPostExecute(Token token) {
+            @Override protected void onPostExecute(@Nullable final Token token) {
                 super.onPostExecute(token);
                 mToken = token;
                 dismissProgressDialog();
@@ -280,82 +275,79 @@ public class HermitClient implements Parcelable {
 
     private HermitHttpServerRequest<List<CommandInfo>> newFetchCommandsRequest() {
         return new HermitHttpServerRequest<List<CommandInfo>>(mConsole, HttpRequest.GET) {
-            @Override
-            protected void onPreExecute() {
+            @Override protected void onPreExecute() {
                 super.onPreExecute();
 
                 getActivity().setProgressBarVisibility(false);
                 showProgressDialog(getActivity(), this, "Fetching commands...");
             }
 
-            @Override
-            protected void onActivityDetached() {
+            @Override protected void onActivityDetached() {
                 if (mProgress != null) {
                     mProgress.dismiss();
                     mProgress = null;
                 }
             }
 
-            @Override
-            protected void onActivityAttached() {
+            @Override protected void onActivityAttached() {
                 if (mProgress == null) {
                     showProgressDialog(getActivity(), this, "Fetching commands...");
                 }
             }
 
-            @Override
-            protected List<CommandInfo> onResponse(String response) {
-                JSONObject insertNameHere = null;
+            @Override protected List<CommandInfo> onResponse(@NonNull final String response) {
+                final JSONObject insertNameHere;
                 try {
                     insertNameHere = new JSONObject(response);
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
                 try {
-                    JSONArray cmds = insertNameHere.getJSONArray("cmds");
-                    ImmutableList.Builder<CommandInfo> commandListBuilder = ImmutableList.builder();
+                    final JSONArray cmds = insertNameHere.getJSONArray("cmds");
+                    final ImmutableList.Builder<CommandInfo> commandListBuilder = ImmutableList.builder();
                     for (int i = 0; i < cmds.length(); i++) {
                         commandListBuilder.add(new CommandInfo(cmds.getJSONObject(i)));
                     }
                     return commandListBuilder.build();
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
 
-            @Override
-            protected void onCancelled(List<CommandInfo> error) {
+            @Override protected void onCancelled(@Nullable final List<CommandInfo> error) {
                 super.onCancelled(error);
                 dismissProgressDialog();
             }
 
-            @Override
-            protected void onPostExecute(List<CommandInfo> commands) {
+            @Override protected void onPostExecute(@Nullable final List<CommandInfo> commands) {
                 super.onPostExecute(commands);
-                ImmutableSortedSet.Builder<String> tags = ImmutableSortedSet.naturalOrder();
-                SortedSetMultimap<String, String> tagCommandNames = TreeMultimap.create();
-                SortedSetMultimap<String, CommandInfo> commandNameInfos = TreeMultimap.create();
 
-                tags.add(CommandHolder.COMMONLY_USED_COMMANDS_TAG);
-                for (CommandInfo cmdInfo : commands) {
-                    String cmdName = cmdInfo.getName();
-                    if (CommandHolder.isCommonlyUsedCommand(cmdName)) {
-                        tagCommandNames.put(CommandHolder.COMMONLY_USED_COMMANDS_TAG, cmdName);
+                if (commands != null) {
+                    final ImmutableSortedSet.Builder<String> tags = ImmutableSortedSet.naturalOrder();
+                    final SortedSetMultimap<String, String> tagCommandNames = TreeMultimap.create();
+                    final SortedSetMultimap<String, CommandInfo> commandNameInfos = TreeMultimap.create();
+
+                    tags.add(CommandHolder.COMMONLY_USED_COMMANDS_TAG);
+                    for (final CommandInfo cmdInfo : commands) {
+                        final String cmdName = cmdInfo.getName();
+                        if (CommandHolder.isCommonlyUsedCommand(cmdName)) {
+                            tagCommandNames.put(CommandHolder.COMMONLY_USED_COMMANDS_TAG, cmdName);
+                        }
+                        for (final String tag : cmdInfo.getTags()) {
+                            tags.add(tag);
+                            tagCommandNames.put(tag, cmdName);
+                        }
+                        commandNameInfos.put(cmdName, cmdInfo);
                     }
-                    for (String tag : cmdInfo.getTags()) {
-                        tags.add(tag);
-                        tagCommandNames.put(tag, cmdName);
-                    }
-                    commandNameInfos.put(cmdName, cmdInfo);
+
+                    CommandHolder.setTags(tags.build());
+                    CommandHolder.setTagCommandNames(tagCommandNames);
+                    CommandHolder.setCommandInfos(commandNameInfos);
+                    getActivity().updateCommandExpandableMenu();
+                    dismissProgressDialog();
                 }
-
-                CommandHolder.setTags(tags.build());
-                CommandHolder.setTagCommandNames(tagCommandNames);
-                CommandHolder.setCommandInfos(commandNameInfos);
-                getActivity().updateCommandExpandableMenu();
-                dismissProgressDialog();
             }
 
         };
@@ -363,22 +355,20 @@ public class HermitClient implements Parcelable {
 
     private HermitHttpServerRequest<Void> newSaveHistoryRequest() {
         return new HermitHttpServerRequest<Void>(mConsole, HttpRequest.POST) {
-            @Override
-            protected void onPreExecute() {
+            @Override protected void onPreExecute() {
                 super.onPreExecute();
                 getActivity().disableInput(false);
             }
 
-            @Override
-            protected Void onResponse(String response) {
+            @Override protected Void onResponse(@NonNull final String response) {
                 JSONObject history = null;
                 try {
                     history = new JSONObject(response);
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                 }
 
-                String path = "";
+                final String path;
                 if (Prefs.isHistoryDirCustom(getActivity())) {
                     path = Prefs.getHistoryDir(getActivity());
                 } else {
@@ -394,32 +384,30 @@ public class HermitClient implements Parcelable {
                 return null;
             }
 
-            @Override
-            protected void onCancelled(Void error) {
-                String newErrorMessage = getErrorMessage();
+            @Override protected void onCancelled(final Void error) {
+                final Optional<String> newErrorMessage = getErrorMessage();
                 setErrorMessage(null);
-                if (newErrorMessage != null && getActivity() != null) {
-                    getActivity().addErrorResponseEntry(newErrorMessage);
+                if (newErrorMessage.isPresent() && getActivity() != null) {
+                    getActivity().addErrorResponseEntry(newErrorMessage.get());
                 }
 
                 super.onCancelled(error);
             }
 
-            @Override
-            protected void onPostExecute(Void nothing) {
+            @Override protected void onPostExecute(@Nullable final Void nothing) {
                 super.onPostExecute(nothing);
                 getActivity().showToast("History saved successfully!");
             }
         };
     }
 
-    private void loadHistoryCommands(final List<HistoryCommand> historyCommands) {
+    private void loadHistoryCommands(@NonNull final List<HistoryCommand> historyCommands) {
         loadHistoryCommands(historyCommands, 0);
     }
 
-    private void loadHistoryCommands(final List<HistoryCommand> historyCommands, final int index) {
+    private void loadHistoryCommands(@NonNull final List<HistoryCommand> historyCommands, final int index) {
         if (!historyCommands.isEmpty()) {
-            Command tokenCommand = new Command(mToken, historyCommands.get(index).getCommand());
+            final Command tokenCommand = new Command(mToken, historyCommands.get(index).getCommand());
             new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
                 @Override
                 protected void onPreExecute() {
@@ -428,28 +416,28 @@ public class HermitClient implements Parcelable {
                 }
 
                 @Override
-                protected CommandResponse onResponse(String response) {
+                protected CommandResponse onResponse(@NonNull final String response) {
                     try {
                         return new CommandResponse(new JSONObject(response));
-                    } catch (JSONException e) {
+                    } catch (final JSONException e) {
                         e.printStackTrace();
                         return null;
                     }
                 }
 
                 @Override
-                protected void onCancelled(CommandResponse error) {
-                    String newErrorMessage = getErrorMessage();
+                protected void onCancelled(final CommandResponse error) {
+                    final Optional<String> newErrorMessage = getErrorMessage();
                     setErrorMessage(null);
-                    if (newErrorMessage != null && getActivity() != null) {
-                        getActivity().addErrorResponseEntry(newErrorMessage);
+                    if (newErrorMessage.isPresent() && getActivity() != null) {
+                        getActivity().addErrorResponseEntry(newErrorMessage.get());
                     }
 
                     super.onCancelled(error);
                 }
 
                 @Override
-                protected void onPostExecute(CommandResponse response) {
+                protected void onPostExecute(final CommandResponse response) {
                     super.onPostExecute(response);
                     mToken.setAst(response.getAst());
                     if (index < historyCommands.size() - 1) {
@@ -463,51 +451,49 @@ public class HermitClient implements Parcelable {
         }
     }
 
-    private HermitHttpServerRequest<CommandResponse> newRunCommandRequest(final String command) {
+    @NonNull private HermitHttpServerRequest<CommandResponse> newRunCommandRequest(@NonNull final String command) {
         return new HermitHttpServerRequest<CommandResponse>(mConsole, HttpRequest.POST) {
 
-            @Override
-            protected CommandResponse doInBackground(String... params) {
+            @Override protected CommandResponse doInBackground(final String... params) {
                 return super.doInBackground(params);
             }
 
-            @Override
-            protected CommandResponse onResponse(String response) {
+            @Override protected CommandResponse onResponse(@NonNull final String response) {
                 try {
                     return new CommandResponse(new JSONObject(response));
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
 
-            @Override
-            protected void onPostExecute(CommandResponse response) {
+            @Override protected void onPostExecute(@Nullable final CommandResponse response) {
                 super.onPostExecute(response);
-                int fromAst = mToken.getAst();
-                int toAst = response.getAst();
-                mToken.setAst(toAst);
-                getActivity().addCommandHistoryEntry(fromAst, command, toAst);
-                getActivity().appendCommandResponse(response);
+
+                if (response != null) {
+                    final int fromAst = mToken.getAst();
+                    final int toAst = response.getAst();
+                    mToken.setAst(toAst);
+                    getActivity().addCommandHistoryEntry(fromAst, command, toAst);
+                    getActivity().appendCommandResponse(response);
+                }
             }
 
         };
     }
 
-    private HermitHttpServerRequest<String> newRunAbortResumeRequest() {
+    @NonNull private HermitHttpServerRequest<String> newRunAbortResumeRequest() {
         return new HermitHttpServerRequest<String>(mConsole, HttpRequest.POST) {
-            @Override
-            protected String onResponse(String response) {
+            @Override protected String onResponse(@NonNull final String response) {
                 try {
                     return new JSONObject(response).getString("msg");
-                } catch (JSONException e) {
+                } catch (final JSONException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
 
-            @Override
-            protected void onPostExecute(String message) {
+            @Override protected void onPostExecute(@Nullable final String message) {
                 super.onPostExecute(message);
                 mToken = null;
                 getActivity().clearCommandHistory();
@@ -525,38 +511,34 @@ public class HermitClient implements Parcelable {
         if (mDelayedRequestName != null) {
             switch (mDelayedRequestName) {
                 case COMMAND: {
-                    String input = mTempBundle.getString("input");
-                    int charsPerLine = mTempBundle.getInt("charsPerLine");
+                    final String input = mTempBundle.getString("input");
+                    final int charsPerLine = mTempBundle.getInt("charsPerLine");
                     runCommand(input, charsPerLine);
                     mTempBundle.remove("input");
                     mTempBundle.remove("charsPerLine");
                     break;
                 }
-                case COMMANDS: {
+                case COMMANDS:
                     fetchCommands();
                     break;
-                }
-                case COMPLETE: {
-                    String input = mTempBundle.getString("input");
+                case COMPLETE:
+                    final String input = mTempBundle.getString("input");
                     completeInput(input);
                     mTempBundle.remove("input");
                     break;
-                }
-                case CONNECT: {
+                case CONNECT:
                     connect(mServerUrl);
                     break;
-                }
-                case HISTORY: {
+                case HISTORY:
                     fetchHistory();
                     break;
-                }
                 default:
                     break;
             }
         }
     }
 
-    void attachConsole(ConsoleActivity console) {
+    void attachConsole(@NonNull final ConsoleActivity console) {
         mConsole = console;
     }
 
@@ -567,13 +549,13 @@ public class HermitClient implements Parcelable {
     }
 
     public int getAst() {
-        return (mToken != null) ? mToken.getAst() : NO_TOKEN;
+        return mToken != null ? mToken.getAst() : NO_TOKEN;
     }
 
-    private boolean isNetworkConnected(RequestName name) {
+    private boolean isNetworkConnected(@NonNull final RequestName name) {
         if (Prefs.isBluetoothSource(mConsole)) {
             if (BluetoothUtils.isBluetoothEnabled(mConsole)) {
-                if (BluetoothUtils.getBluetoothDevice(mConsole) != null) {
+                if (BluetoothUtils.getBluetoothDevice(mConsole).isPresent()) {
                     return true;
                 } else {
                     notifyDelay(name);
@@ -598,14 +580,14 @@ public class HermitClient implements Parcelable {
     }
 
     public boolean isRequestDelayed() {
-        return !mDelayedRequestName.equals(RequestName.NULL);
+        return mDelayedRequestName != RequestName.NULL;
     }
 
     public boolean isTokenAcquired() {
         return isTokenAcquired(false);
     }
 
-    private boolean isTokenAcquired(boolean complainIfNot) {
+    private boolean isTokenAcquired(final boolean complainIfNot) {
         if (mToken == null) {
             if (complainIfNot) {
                 mConsole.appendErrorResponse("ERROR: No token (connect to server first).");
@@ -615,7 +597,7 @@ public class HermitClient implements Parcelable {
         return true;
     }
 
-    private void notifyDelay(RequestName name) {
+    private void notifyDelay(@NonNull final RequestName name) {
         mDelayedRequestName = name;
     }
 
@@ -623,14 +605,15 @@ public class HermitClient implements Parcelable {
         mDelayedRequestName = RequestName.NULL;
     }
 
-    private void showProgressDialog(Context context, final AsyncTask<?,?,?> task, String message) {
+    private void showProgressDialog(@NonNull final Context context,
+                                    @NonNull final AsyncTask<?, ?, ?> task,
+                                    @NonNull final String message) {
         mProgress = new ProgressDialog(context);
         mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgress.setMessage(message);
         mProgress.setCancelable(true);
         mProgress.setOnCancelListener(new OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
+            @Override public void onCancel(@NonNull final DialogInterface dialog) {
                 task.cancel(true);
             }
         });
@@ -643,18 +626,16 @@ public class HermitClient implements Parcelable {
 
     public static final Parcelable.Creator<HermitClient> CREATOR
             = new Parcelable.Creator<HermitClient>() {
-        @Override
-        public HermitClient createFromParcel(Parcel in) {
+        @Override public HermitClient createFromParcel(@NonNull final Parcel in) {
             return new HermitClient(in);
         }
 
-        @Override
-        public HermitClient[] newArray(int size) {
+        @Override public HermitClient[] newArray(final int size) {
             return new HermitClient[size];
         }
     };
 
-    private HermitClient(Parcel in) {
+    private HermitClient(@NonNull final Parcel in) {
         mDelayedRequestName = ParcelUtils.readEnum(in);
         mServerUrl = in.readString();
         mTempBundle = in.readBundle();
@@ -662,13 +643,11 @@ public class HermitClient implements Parcelable {
     }
 
 
-    @Override
-    public int describeContents() {
+    @Override public int describeContents() {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    @Override public void writeToParcel(@NonNull final Parcel dest, final int flags) {
         ParcelUtils.writeEnum(dest, mDelayedRequestName);
         dest.writeString(mServerUrl);
         dest.writeBundle(mTempBundle);

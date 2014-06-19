@@ -1,43 +1,48 @@
 package edu.kufpg.armatus.networking;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.google.common.base.Optional;
 import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class HermitBluetoothSendRequest extends AsyncActivityTask<ConsoleActivity, String, String, Boolean> {
-    private BluetoothAdapter mAdapter;
-    private BluetoothDevice mDevice;
-    private BluetoothSocket mSocket;
+public class HermitBluetoothSendRequest
+        extends AsyncActivityTask<ConsoleActivity, String, String, Boolean> {
+    private Optional<BluetoothAdapter> mAdapter;
+    //private Optional<BluetoothDevice> mDevice;
+    private Optional<BluetoothSocket> mSocket;
 
-    public HermitBluetoothSendRequest(ConsoleActivity activity) {
+    public HermitBluetoothSendRequest(@NonNull final ConsoleActivity activity) {
         super(activity);
     }
 
-    @Override
-    protected void onPreExecute() {
+    @Override protected void onPreExecute() {
         super.onPreExecute();
 
         getActivity().setProgressBarVisibility(true);
         getActivity().disableInput(true);
         mAdapter = BluetoothUtils.getBluetoothAdapter(getActivity());
-        mDevice = BluetoothUtils.getBluetoothDevice(getActivity());
+        //mDevice = BluetoothUtils.getBluetoothDevice(getActivity());
         mSocket = BluetoothUtils.getBluetoothSocket(getActivity());
     }
 
+    @NonNull
     @Override
-    protected Boolean doInBackground(String... params) {
-        if (mSocket != null && mDevice != null && mAdapter != null) {
+    protected Boolean doInBackground(@Nullable final String... params) {
+        if (mSocket.isPresent() && mAdapter.isPresent()) {
+            final BluetoothSocket socket = mSocket.get();
+            final BluetoothAdapter adapter = mAdapter.get();
 
-            if (!mSocket.isConnected() || BluetoothUtils.lastConnectionFailed()) {
-                mAdapter.cancelDiscovery();
+            if (!socket.isConnected() || BluetoothUtils.lastConnectionFailed()) {
+                adapter.cancelDiscovery();
                 try {
-                    mSocket.connect();
-                } catch (IOException e) {
+                    socket.connect();
+                } catch (final IOException e) {
                     e.printStackTrace();
                     publishProgress("ERROR: Socket connection failed. Ensure that the server is up and try again.");
                     return false;
@@ -45,18 +50,21 @@ public class HermitBluetoothSendRequest extends AsyncActivityTask<ConsoleActivit
             }
 
             publishProgress("Attempting to send data to server. Creating output stream...");
-            String message = params[0];
-            if (message == null) {
+            final String message;
+            if (params != null && params[0] != null) {
+                message = params[0];
+            } else {
                 message = "No message provided!";
             }
-            byte[] messageBytes = message.getBytes();
+            final byte[] messageBytes = message.getBytes();
             publishProgress("Output stream created! Sending message (" + message + ") to server...");
-            OutputStream outStream;
+            final OutputStream outStream;
+
             try {
-                outStream = mSocket.getOutputStream();
+                outStream = socket.getOutputStream();
                 outStream.write(messageBytes);
                 outStream.flush();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
                 publishProgress("ERROR: Message sending failed. Ensure that the server is up and try again.");
                 return false;
@@ -68,20 +76,13 @@ public class HermitBluetoothSendRequest extends AsyncActivityTask<ConsoleActivit
         return false;
     }
 
-//    @Override
-//    protected void onProgressUpdate(String... progress) {
-//        getActivity().getHermitClient().handleInput(progress[0]);
-//    }
-
-    @Override
-    protected void onCancelled() {
+    @Override protected void onCancelled() {
         end(true);
     }
 
-    @Override
-    protected void onPostExecute(Boolean result) {
+    @Override protected void onPostExecute(@NonNull final Boolean result) {
         super.onPostExecute(result);
-        if (result != null) {
+        if (result) {
             BluetoothUtils.notifyLastConnectionSucceeded();
         } else {
             BluetoothUtils.notifyLastConnectionFailed();
@@ -89,7 +90,7 @@ public class HermitBluetoothSendRequest extends AsyncActivityTask<ConsoleActivit
         end(false);
     }
 
-    private void end(boolean cancelled) {
+    private void end(final boolean cancelled) {
         if (getActivity().getHermitClient().isRequestDelayed()) {
             getActivity().getHermitClient().notifyDelayedRequestFinished();
         }

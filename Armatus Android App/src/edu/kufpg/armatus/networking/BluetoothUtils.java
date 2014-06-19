@@ -12,8 +12,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import edu.kufpg.armatus.DeviceConstants;
 import edu.kufpg.armatus.Prefs;
@@ -32,14 +32,14 @@ public final class BluetoothUtils {
      * it must match the one that the Armatus Bluetooth server is advertising.
      */
     public static final UUID BASE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    public static final UUID UUID1 = UUID.fromString("b7746a40-c758-4868-aa19-7ac6b3475dfc");
+    //public static final UUID UUID1 = UUID.fromString("b7746a40-c758-4868-aa19-7ac6b3475dfc");
     public static final UUID UUID2 = UUID.fromString("2d64189d-5a2c-4511-a074-77f199fd0834");
     public static final UUID UUID3 = UUID.fromString("e442e09a-51f3-4a7b-91cb-f638491d1412");
     public static final UUID UUID4 = UUID.fromString("a81d6504-4536-49ee-a475-7d96d09439e4");
     public static final UUID UUID5 = UUID.fromString("aa91eab1-d8ad-448e-abdb-95ebba4a9b55");
     public static final UUID UUID6 = UUID.fromString("4d34da73-d0a4-4f40-ac38-917e0a9dee97");
     public static final UUID UUID7 = UUID.fromString("5e14d4df-9c8a-4db7-81e4-c937564c86e0");
-    public static final ImmutableList<UUID> UUIDS = ImmutableList.of(UUID1, UUID2, UUID3, UUID4, UUID5, UUID6, UUID7);
+    public static final ImmutableList<UUID> UUIDS = ImmutableList.of(BASE_UUID, UUID2, UUID3, UUID4, UUID5, UUID6, UUID7);
 
     /**
      * Request code for prompting the user to enable Bluetooth.
@@ -60,16 +60,16 @@ public final class BluetoothUtils {
     /**
      * Reference to the device's Bluetooth adapter.
      */
-    @Nullable private static BluetoothAdapter sAdapter;
-    @Nullable private static BluetoothDevice sDevice;
-    @Nullable private static BluetoothSocket sSocket;
+    private static Optional<BluetoothAdapter> sAdapter = Optional.absent();
+    private static Optional<BluetoothDevice> sDevice = Optional.absent();
+    private static Optional<BluetoothSocket> sSocket = Optional.absent();
 
     private static boolean sLastConnectionFailed = false;
 
     private BluetoothUtils() {}
 
     public static void closeBluetooth() {
-        if (sSocket != null) {
+        if (sSocket.isPresent()) {
             try {
 //				if (sSocket.getOutputStream() != null) {
 //					sSocket.getOutputStream().close();
@@ -77,14 +77,14 @@ public final class BluetoothUtils {
 //				if (sSocket.getInputStream() != null) {
 //					sSocket.getInputStream().close();
 //				}
-                sSocket.close();
+                sSocket.get().close();
             } catch (final IOException e) {
                 Log.w(TAG, "Error occurred when closing Bluetooth socket!");
                 e.printStackTrace();
             }
-            sSocket = null;
+            sSocket = Optional.absent();
         }
-        sDevice = null;
+        sDevice = Optional.absent();
     }
 
     /**
@@ -94,7 +94,7 @@ public final class BluetoothUtils {
      *                 requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
      */
     public static void enableBluetooth(@NonNull final Activity activity) {
-        if (getBluetoothAdapter(activity) != null) {
+        if (getBluetoothAdapter(activity).isPresent()) {
             final Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
         } else {
@@ -110,7 +110,7 @@ public final class BluetoothUtils {
      *                 requestCode} {@link #REQUEST_ENABLE_BLUETOOTH}).
      */
     public static void enableBluetooth(@NonNull final Fragment fragment) {
-        if (getBluetoothAdapter(fragment.getActivity()) != null) {
+        if (getBluetoothAdapter(fragment.getActivity()).isPresent()) {
             final Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             fragment.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
         } else {
@@ -126,17 +126,18 @@ public final class BluetoothUtils {
      * @return the default Bluetooth adapter, or {@code null} if the device does not support
      * Bluetooth.
      */
+    @NonNull
     @SuppressLint({"InlinedApi", "NewApi"})
-    @Nullable public static BluetoothAdapter getBluetoothAdapter(@NonNull final Context context) {
-        if (sAdapter == null) {
+    public static Optional<BluetoothAdapter> getBluetoothAdapter(@NonNull final Context context) {
+        if (!sAdapter.isPresent()) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                sAdapter = BluetoothAdapter.getDefaultAdapter();
+                sAdapter = Optional.fromNullable(BluetoothAdapter.getDefaultAdapter());
             } else {
                 final BluetoothManager manager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-                sAdapter = manager.getAdapter();
+                sAdapter = Optional.fromNullable(manager.getAdapter());
             }
         }
-        if (sAdapter == null) {
+        if (!sAdapter.isPresent()) {
             Log.w(TAG, "Bluetooth is not supported on this " + DeviceConstants.DEVICE_NAME + '!');
         }
         return sAdapter;
@@ -150,49 +151,50 @@ public final class BluetoothUtils {
      * returned if no {@code BluetoothDevice} is found in user preferences or if Bluetooth is
      * not supported on the device.
      */
-    @Nullable public static BluetoothDevice getBluetoothDevice(@NonNull final Context context) {
+    @NonNull public static Optional<BluetoothDevice> getBluetoothDevice(@NonNull final Context context) {
         final String address = Prefs.getBluetoothDeviceAddress(context);
         if (address != null) {
-            final BluetoothAdapter adapter = getBluetoothAdapter(context);
-            if (adapter != null) {
+            final Optional<BluetoothAdapter> adapter = getBluetoothAdapter(context);
+            if (adapter.isPresent()) {
                 if (sDevice == null) {
-                    sDevice = adapter.getRemoteDevice(address);
+                    sDevice = Optional.of(adapter.get().getRemoteDevice(address));
                 }
                 return sDevice;
             } else {
                 Log.w(TAG, "Cannot get Bluetooth device (Bluetooth not supported on this "
                         + DeviceConstants.DEVICE_NAME + ").");
-                return null;
+                return Optional.absent();
             }
         } else {
             Log.w(TAG, "Cannot get Bluetooth device (no device address found in preferences).");
-            return null;
+            return Optional.absent();
         }
     }
 
-    @Nullable public static BluetoothSocket getBluetoothSocket(@NonNull final Context context) {
-        final BluetoothAdapter adapter = getBluetoothAdapter(context);
-        if (adapter != null) {
-            final BluetoothDevice device = getBluetoothDevice(context);
-            if (device != null) {
-                if (sSocket == null) {
+    @NonNull public static Optional<BluetoothSocket> getBluetoothSocket(@NonNull final Context context,
+                                                                        @NonNull final UUID uuid) {
+        final Optional<BluetoothAdapter> adapter = getBluetoothAdapter(context);
+        if (adapter.isPresent()) {
+            final Optional<BluetoothDevice> device = getBluetoothDevice(context);
+            if (device.isPresent()) {
+                if (!sSocket.isPresent()) {
                     try {
-                        sSocket = device.createRfcommSocketToServiceRecord(BASE_UUID);
+                        sSocket = Optional.of(device.get().createRfcommSocketToServiceRecord(uuid));
                     } catch (final IOException e) {
                         e.printStackTrace();
                         Log.w(TAG, "Cannot get Bluetooth socket (creation failed).");
-                        return null;
+                        return Optional.absent();
                     }
                 }
                 return sSocket;
             } else {
                 Log.w(TAG, "Cannot get Bluetooth socket (no device address found in preferences).");
-                return null;
+                return Optional.absent();
             }
         } else {
             Log.w(TAG, "Cannot get Bluetooth socket (Bluetooth not supported on this "
                     + DeviceConstants.DEVICE_NAME + ").");
-            return null;
+            return Optional.absent();
         }
     }
 
@@ -204,7 +206,7 @@ public final class BluetoothUtils {
      *                 requestCode} {@link #REQUEST_FIND_BLUETOOTH_DEVICE}).
      */
     public static void findDeviceName(@NonNull final Activity activity) {
-        if (getBluetoothAdapter(activity) != null) {
+        if (getBluetoothAdapter(activity).isPresent()) {
             final Intent findBtDevicesIntent = new Intent(activity, BluetoothDeviceListActivity.class);
             activity.startActivityForResult(findBtDevicesIntent, REQUEST_FIND_BLUETOOTH_DEVICE);
         } else {
@@ -221,7 +223,7 @@ public final class BluetoothUtils {
      *                 requestCode} {@link #REQUEST_FIND_BLUETOOTH_DEVICE}).
      */
     public static void findDeviceName(@NonNull final Fragment fragment) {
-        if (getBluetoothAdapter(fragment.getActivity()) != null) {
+        if (getBluetoothAdapter(fragment.getActivity()).isPresent()) {
             final Intent findBtDevicesIntent = new Intent(fragment.getActivity(), BluetoothDeviceListActivity.class);
             fragment.startActivityForResult(findBtDevicesIntent, REQUEST_FIND_BLUETOOTH_DEVICE);
         } else {
@@ -231,17 +233,23 @@ public final class BluetoothUtils {
     }
 
     public static boolean isBluetoothConnected(@NonNull final Context context) {
-        final BluetoothAdapter adapter = getBluetoothAdapter(context);
-        if (adapter != null) {
-            final BluetoothDevice device = getBluetoothDevice(context);
-            if (device != null) {
-                final BluetoothSocket socket = getBluetoothSocket(context);
-                if (socket != null) {
-                    return socket.isConnected();
-                } else {
-                    Log.w(TAG, "Cannot determine Bluetooth state (socket creation failed).");
-                    return false;
+        final Optional<BluetoothAdapter> adapter = getBluetoothAdapter(context);
+        if (adapter.isPresent()) {
+            final Optional<BluetoothDevice> device = getBluetoothDevice(context);
+            if (device.isPresent()) {
+                for (final UUID uuid : UUIDS) {
+                    final Optional<BluetoothSocket> socket = getBluetoothSocket(context, uuid);
+                    if (socket.isPresent()) {
+                        if (socket.get().isConnected()) {
+                            return true;
+                        }
+                    } else {
+                        Log.w(TAG, "Cannot determine Bluetooth state (socket creation failed).");
+                        return false;
+                    }
                 }
+
+                return false;
             } else {
                 Log.w(TAG, "Cannot determine Bluetooth state (no device found in preferences).");
                 return false;
@@ -261,9 +269,9 @@ public final class BluetoothUtils {
      * supported on the device.
      */
     public static boolean isBluetoothEnabled(@NonNull final Context context) {
-        final BluetoothAdapter adapter = getBluetoothAdapter(context);
-        if (adapter != null) {
-            return adapter.isEnabled();
+        final Optional<BluetoothAdapter> adapter = getBluetoothAdapter(context);
+        if (adapter.isPresent()) {
+            return adapter.get().isEnabled();
         } else {
             Log.w(TAG, "Cannot determine Bluetooth state (Bluetooth not supported on this "
                     + DeviceConstants.DEVICE_NAME + ").");
