@@ -40,6 +40,7 @@ public final class BluetoothUtils {
     public static final UUID UUID6 = UUID.fromString("4d34da73-d0a4-4f40-ac38-917e0a9dee97");
     public static final UUID UUID7 = UUID.fromString("5e14d4df-9c8a-4db7-81e4-c937564c86e0");
     public static final ImmutableList<UUID> UUIDS = ImmutableList.of(BASE_UUID, UUID2, UUID3, UUID4, UUID5, UUID6, UUID7);
+    //public static final ImmutableList<UUID> UUIDS = ImmutableList.of(UUID1, UUID2, UUID3, UUID4, UUID5, UUID6, UUID7);
 
     /**
      * Request code for prompting the user to enable Bluetooth.
@@ -177,16 +178,16 @@ public final class BluetoothUtils {
         if (adapter.isPresent()) {
             final Optional<BluetoothDevice> device = getBluetoothDevice(context);
             if (device.isPresent()) {
-                if (!sSocket.isPresent()) {
-                    try {
-                        sSocket = Optional.of(device.get().createRfcommSocketToServiceRecord(uuid));
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                        Log.w(TAG, "Cannot get Bluetooth socket (creation failed).");
-                        return Optional.absent();
-                    }
+                final Optional<BluetoothSocket> socket;
+                try {
+                    socket = Optional.of(device.get().createRfcommSocketToServiceRecord(uuid));
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    Log.w(TAG, "Cannot get Bluetooth socket (creation failed).");
+                    return Optional.absent();
                 }
-                return sSocket;
+
+                return socket;
             } else {
                 Log.w(TAG, "Cannot get Bluetooth socket (no device address found in preferences).");
                 return Optional.absent();
@@ -289,6 +290,14 @@ public final class BluetoothUtils {
 
     public static void notifyLastConnectionSucceeded() {
         sLastConnectionFailed = false;
+    }
+
+    public static Optional<BluetoothSocket> getConnectedSocket(@NonNull final Context context) {
+        return sSocket;
+    }
+
+    static void setConnectedSocket(@NonNull final Optional<BluetoothSocket> socket) {
+        sSocket = socket;
     }
 
 }

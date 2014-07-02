@@ -30,6 +30,7 @@ import edu.kufpg.armatus.data.History;
 import edu.kufpg.armatus.data.HistoryCommand;
 import edu.kufpg.armatus.data.Token;
 import edu.kufpg.armatus.networking.BluetoothUtils;
+import edu.kufpg.armatus.networking.HermitBluetoothConnectRequest;
 import edu.kufpg.armatus.networking.HermitBluetoothReceiveRequest;
 import edu.kufpg.armatus.networking.HermitBluetoothSendRequest;
 import edu.kufpg.armatus.networking.HermitHttpServerRequest;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
@@ -53,6 +55,11 @@ public class HermitClient implements Parcelable {
     public static int NO_TOKEN = -1;
     private static final String HISTORY_FILENAME = "/history.txt";
     private ConsoleActivity mConsole;
+    private final List<HermitBluetoothConnectRequest> mConnectRequests = new ArrayList<HermitBluetoothConnectRequest>() {{
+        for (int i = 0; i < 7; i++) {
+            add(null);
+        }
+    }};
     private ProgressDialog mProgress;
 
     private RequestName mDelayedRequestName = RequestName.NULL;
@@ -150,7 +157,13 @@ public class HermitClient implements Parcelable {
             //Hardcode Bluetooth testing for now since I'm lazy
             if (Prefs.isBluetoothSource(mConsole)) {
                 if (input.equals("btconnect") && !BluetoothUtils.isBluetoothConnected(mConsole)) {
-                    new HermitBluetoothReceiveRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    for (int i = 0; i < 7; i++) {
+                        final HermitBluetoothConnectRequest req = new HermitBluetoothConnectRequest(mConsole, i);
+                        mConnectRequests.set(i, req);
+                    }
+                    for (int i = 0; i < 7; i++) {
+                        mConnectRequests.get(i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
                 } else if (isNetworkConnected(RequestName.COMMAND) && BluetoothUtils.isBluetoothConnected(mConsole)) {
                     final String cleanInput = StringUtils.noCharWrap(input);
                     new HermitBluetoothSendRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, cleanInput);
@@ -201,7 +214,7 @@ public class HermitClient implements Parcelable {
             @Override protected void onCancelled(@Nullable final List<Completion> error) {
                 final Optional<String> newErrorMessage = getErrorMessage();
                 setErrorMessage(null);
-                if (newErrorMessage.isPresent() && getActivity() != null) {
+                if (newErrorMessage.isPresent()) {
                     getActivity().addErrorResponseEntry(newErrorMessage.get());
                 }
 
@@ -387,7 +400,7 @@ public class HermitClient implements Parcelable {
             @Override protected void onCancelled(final Void error) {
                 final Optional<String> newErrorMessage = getErrorMessage();
                 setErrorMessage(null);
-                if (newErrorMessage.isPresent() && getActivity() != null) {
+                if (newErrorMessage.isPresent()) {
                     getActivity().addErrorResponseEntry(newErrorMessage.get());
                 }
 
@@ -429,7 +442,7 @@ public class HermitClient implements Parcelable {
                 protected void onCancelled(final CommandResponse error) {
                     final Optional<String> newErrorMessage = getErrorMessage();
                     setErrorMessage(null);
-                    if (newErrorMessage.isPresent() && getActivity() != null) {
+                    if (newErrorMessage.isPresent()) {
                         getActivity().addErrorResponseEntry(newErrorMessage.get());
                     }
 
@@ -540,6 +553,20 @@ public class HermitClient implements Parcelable {
 
     void attachConsole(@NonNull final ConsoleActivity console) {
         mConsole = console;
+    }
+
+    public synchronized void attachConnectRequest(final int uuidIndex,
+                                           @NonNull final HermitBluetoothConnectRequest connectRequest) {
+        mConnectRequests.set(uuidIndex, connectRequest);
+    }
+
+    public synchronized void bluetoothReceiveRequest(final int connectedUuidIndex) {
+        for (int i = 0; i < 7; i++) {
+            if (i != connectedUuidIndex) {
+                mConnectRequests.get(i).cancel(true);
+            }
+        }
+        new HermitBluetoothReceiveRequest(mConsole).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void dismissProgressDialog() {

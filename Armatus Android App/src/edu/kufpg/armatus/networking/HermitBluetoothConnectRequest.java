@@ -1,44 +1,73 @@
 package edu.kufpg.armatus.networking;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothSocket;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.common.base.Optional;
 import edu.kufpg.armatus.AsyncActivityTask;
 import edu.kufpg.armatus.console.ConsoleActivity;
 
-public class HermitBluetoothConnectRequest
-        extends AsyncActivityTask<ConsoleActivity, Integer, Void, Void> {
-    private Optional<BluetoothAdapter> mAdapter;
+import java.io.IOException;
+import java.util.UUID;
 
-    public HermitBluetoothConnectRequest(@NonNull final ConsoleActivity activity) {
+public class HermitBluetoothConnectRequest
+        extends AsyncActivityTask<ConsoleActivity, Void, Void, Boolean> {
+    private Optional<BluetoothAdapter> mAdapter;
+    private Optional<BluetoothSocket> mSocket;
+    private final int mUuidIndex;
+
+    public HermitBluetoothConnectRequest(@NonNull final ConsoleActivity activity,
+                                         final int uuidIndex) {
         super(activity);
+        mUuidIndex = uuidIndex;
     }
 
     @Override protected void onPreExecute() {
         super.onPreExecute();
-        if (getActivity() != null) {
-            mAdapter = BluetoothUtils.getBluetoothAdapter(getActivity());
-        }
+
+        getActivity().setProgressBarVisibility(true);
+        getActivity().disableInput(true);
+        mAdapter = BluetoothUtils.getBluetoothAdapter(getActivity());
+        final UUID uuid = BluetoothUtils.UUIDS.get(mUuidIndex);
+        mSocket = BluetoothUtils.getBluetoothSocket(getActivity(), uuid);
     }
 
-    @Override protected Void doInBackground(@Nullable final Integer... params) {
-        if (mAdapter.isPresent()) {
+    @NonNull
+    @Override
+    protected Boolean doInBackground(@Nullable final Void... params) {
+        if (mAdapter.isPresent() && mSocket.isPresent()) {
             final BluetoothAdapter adapter = mAdapter.get();
-            adapter.cancelDiscovery();
+            final BluetoothSocket socket = mSocket.get();
+
+            if (socket.isConnected()) {
+                return true;
+            } else {
+                adapter.cancelDiscovery();
+                try {
+                    socket.connect();
+                    return true;
+                } catch (final IOException ignored) {}
+            }
         }
 
-
-
-
-        return null;
+        return false;
     }
 
-    @Override protected void onCancelled(@Nullable final Void result) {
+    @Override protected void onActivityAttached() {
+        getActivity().getHermitClient().attachConnectRequest(mUuidIndex, this);
+    }
+
+    @Override protected void onCancelled(@NonNull final Boolean result) {
         super.onCancelled(result);
     }
 
-    @Override protected void onPostExecute(@Nullable final Void result) {
+    @Override protected void onPostExecute(@NonNull final Boolean result) {
         super.onPostExecute(result);
+
+        if (result) {
+            BluetoothUtils.setConnectedSocket(mSocket);
+            getActivity().getHermitClient().bluetoothReceiveRequest(mUuidIndex);
+        }
     }
 }
